@@ -3,4 +3,4 @@
 Scripts for initial processing of sequence data.
 
 
-* [Demultiplexing](Demultiplexing)
+* [Demultiplexing](https://github.com/nsc-norway/pipeline/wiki/Demultiplexing)
