@@ -10,4 +10,3 @@ lims = Lims(BASEURI,USERNAME,PASSWORD)
 config = SafeConfigParser()
 
 
-
