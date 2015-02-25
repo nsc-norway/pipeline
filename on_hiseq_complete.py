@@ -12,13 +12,13 @@ import nsc
 
 
 def process_process(lims, process_id):
-  process = Process(lims, id = process_id)
-  # input_output_maps returns a list of tuples with (input,output)
-  analytes = dict((x[0]['limsid'],x[0]['uri']) for x in process.input_output_maps)
-  
-  # add it to the HiSeq data processing protocol step
-  
-  data = ()
+    process = Process(lims, id = process_id)
+    # input_output_maps returns a list of tuples with (input,output)
+    analytes = dict((x[0]['limsid'],x[0]['uri']) for x in process.input_output_maps)
+    
+    # add it to the HiSeq data processing protocol step
+    
+    data = ()
 
 
 # Script startup code
