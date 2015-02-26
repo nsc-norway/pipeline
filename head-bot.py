@@ -1,6 +1,16 @@
-# Script which runs when sequencing is complete.
+#------------------------------#
+# Head Bot
+# NSC data processing manager
+#------------------------------#
 
-# This script moves the sample on to the automatic demux / QC protocol.
+# This script monitors the LIMS via the REST API and schedules processing 
+# steps. Its main purpose is to start other jobs. It only updates a small 
+# number of user defined fields (UDFs) in the API to manage the processing 
+# status. Other information is set directly by the scripts called by the 
+# head bot.
+
+# This system doesn't have any storage system of its own -- all runtime
+# data are kept in the LIMS.
 
 import sys
 import requests
@@ -8,6 +18,16 @@ from genologics.lims import *
 from argparse import ArgumentParser
 #from genologics.epp import EppLogger
 import nsc
+
+
+
+def check_new_processes(): 
+    pass
+
+
+
+def check
+
 
 
 def complete_hiseq(lims, process_id):
@@ -44,4 +64,5 @@ args = parser.parse_args()
 
 nsc.lims.check_version()
 complete_hiseq(nsc.lims, args.pid)
+
 
