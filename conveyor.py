@@ -3,11 +3,10 @@
 # NSC data processing manager
 #------------------------------#
 
-# This script monitors the LIMS via the REST API and schedules processing 
+# This script monitors the LIMS via the REST API and starts processing 
 # steps. Its main purpose is to start other jobs. It only updates a small 
 # number of user defined fields (UDFs) in the API to manage the processing 
-# status. Other information is set directly by the scripts called by the 
-# head bot.
+# status. 
 
 # This system doesn't have any storage system of its own -- all runtime
 # data are kept in the LIMS.
@@ -20,9 +19,21 @@ from argparse import ArgumentParser
 import nsc
 
 
-
-def check_new_processes(): 
+# Tag a flow cell for automatic processing
+def automate(process):
+    if process.udf.get("Sequencing Complete"):
+        # Automated processing now triggered, can remove flag
+        process.udf[nsc.AUTO_FLAG_UDF] = False
     pass
+    #process.udf
+
+
+# Query API for new sequencing steps
+def check_new_processes(lims): 
+    for instr, process in nsc.SEQ_PROCESSES:
+        ps = lims.get_processes(type = process, udf = {nsc.AUTO_FLAG_UDF: "on"})
+        for p in ps:
+            automate(p)
 
 
 
