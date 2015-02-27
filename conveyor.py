@@ -1,5 +1,5 @@
 #------------------------------#
-# Head Bot
+# Conveyor
 # NSC data processing manager
 #------------------------------#
 
@@ -12,28 +12,73 @@
 # data are kept in the LIMS.
 
 import sys
-import requests
-from genologics.lims import *
+import logging
 from argparse import ArgumentParser
+
+# scilife genologics library
+from genologics.lims import *
+
 #from genologics.epp import EppLogger
+
+# Local
 import nsc
+
+logger = logging.getLogger()
+
+
+# Sets a UDF for automatic processing on all pools
+# The UDF Automatic processing group on the pools is set to a 
+# comma separated list of the LIMSIDs of all pools in a single 
+# project
+def mark_project_pools(inputs):
+    project_pools = {}
+    for pool in inputs:
+        project = None
+
+        for sample in pool.samples:
+            if not project:
+                project = sample.project
+            else:
+                if project.id != sample.project.id:
+                    logger.error("Pool has samples from multiple projects. Skipping pool.")
+                    project = None
+                    break
+            
+        if project:
+            project_pools.get(project, default=[]).append(pool)
+
+    for project,pools in project_pools:
+        pool_id_list = ",".join(p.id for p in pools)
+        for pool in pools:
+            pool.udf[nsc.AUTO_POOL_UDF] = pool_id_list
+            pool.put()
 
 
 # Tag a flow cell for automatic processing
-def automate(process):
-    if process.udf.get("Sequencing Complete"):
-        # Automated processing now triggered, can remove flag
+def automate(instrument, process):
+
+    # Is the sequencing finished?
+    if process.udf.get("Finish Date"):
+
+        # Mark the pools for automatic processing (all sequencer types)
+        mark_project_pools(process.all_inputs())
+
+        # Finish the sequencing step
+        finish_process(process)
+
+        # Automated processing now triggered, can remove flag so we don't 
+        # have to process it again.
         process.udf[nsc.AUTO_FLAG_UDF] = False
-    pass
-    #process.udf
+        process.put()
 
 
-# Query API for new sequencing steps
+
+# Query the API for new sequencing processes with automation flag
 def check_new_processes(lims): 
     for instr, process in nsc.SEQ_PROCESSES:
         ps = lims.get_processes(type = process, udf = {nsc.AUTO_FLAG_UDF: "on"})
         for p in ps:
-            automate(p)
+            automate(instr, p)
 
 
 
