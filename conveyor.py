@@ -24,13 +24,14 @@ from genologics.lims import *
 import nsc
 
 logger = logging.getLogger()
+nsc.lims.check_version()
 
 
-# Sets a UDF for automatic processing on all pools
-# The UDF Automatic processing group on the pools is set to a 
-# comma separated list of the LIMSIDs of all pools in a single 
-# project
 def mark_project_pools(inputs):
+    '''Sets a UDF for automatic processing on all pools
+        The "Automatic processing group" UDF on the pools is set to a 
+        comma separated list of the LIMSIDs of all pools in a single 
+        project'''
     project_pools = {}
     for pool in inputs:
         project = None
@@ -54,8 +55,10 @@ def mark_project_pools(inputs):
             pool.put()
 
 
-# Tag a flow cell for automatic processing
+
+
 def automate(instrument, process):
+    '''Tag a flow cell for automatic processing'''
 
     # Is the sequencing finished?
     if process.udf.get("Finish Date"):
@@ -73,16 +76,14 @@ def automate(instrument, process):
 
 
 
-# Query the API for new sequencing processes with automation flag
 def check_new_processes(lims): 
+    '''Query the API for new sequencing processes with automation flag'''
     for instr, process in nsc.SEQ_PROCESSES:
         ps = lims.get_processes(type = process, udf = {nsc.AUTO_FLAG_UDF: "on"})
         for p in ps:
             automate(instr, p)
 
 
-
-def check
 
 
 
@@ -111,14 +112,5 @@ def complete_hiseq(lims, process_id):
     
     data = ()
 
-
-# Script startup code
-parser = ArgumentParser()
-parser.add_argument("--pid", help="Process id")
-
-args = parser.parse_args()
-
-nsc.lims.check_version()
-complete_hiseq(nsc.lims, args.pid)
 
 
