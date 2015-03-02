@@ -3,7 +3,7 @@
 #------------------------------#
 
 # Manages workflow steps in the LIMS. This mainly centers around the 
-# step API resource. Advancing work etc.
+# step API resource. Completing and starting steps.
 
 
 import logging
@@ -18,23 +18,29 @@ def finish_step(lims, process_id):
     step, and steps which are the last step of a protocol.
     All samples are advanced to the next step.'''
 
-    step = Step(id=process_id)
+    step = Step(lims, id=process_id)
 
-    finish_protocol = False
-    next_step = None
+    next_elements = step.configuration.transitions
+    finish_protocol = len(next_elements) == 0
+    if len(next_elements) == 1:
+        next_step = next_elements[0].step
+    else:
+        raise Exception("There are multiple options for next step, don't know what to do.")
 
+    # Set next action for each sample
     for a in step.actions.next_actions:
         if finish_protocol:
-            a.action = "???"
+            a.action = "complete"
         else:
-            a.next_step = next_step
             a.action = "nextstep"
+            a.next_step = next_step
+    step.actions.put()
+
+    while step.current_state in ['Record Details', 'Assign Next Steps']:
+        step.advance()
+
+    if step.current_state != 'Completed':
+        raise Exception("Failed to finish the step. It is in state " + step.current_state)
 
 
-
-
-def start_step_move():
-    '''Starts a step with the specified samples and moves to the 
-    "record details" screen.'''
-    pass
 

@@ -1,7 +1,7 @@
 from genologics.lims import *
 import nsc
-step = Step(nsc.lims, id="122-308")
-step.actions.next_actions[0].next_step=Step(nsc.lims, id="24-301")
-step.actions.next_actions[0].action="nextstep"
-print step.actions.next_actions[0]
+import conveyor
+#q = Queue(nsc.lims, id="40")
+#inputs = q.artifacts[0:1]
 
+#step = nsc.lims.create_step(q.protocol_step_config, dict((i,1) for i in inputs))

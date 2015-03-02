@@ -22,6 +22,7 @@ from genologics.lims import *
 
 # Local
 import nsc
+import workflow
 
 logger = logging.getLogger()
 nsc.lims.check_version()
@@ -67,7 +68,7 @@ def automate(instrument, process):
         mark_project_pools(process.all_inputs())
 
         # Finish the sequencing step
-        finish_process(process)
+        workflow.finish_process(process)
 
         # Automated processing now triggered, can remove flag so we don't 
         # have to process it again.
@@ -83,6 +84,14 @@ def check_new_processes(lims):
         for p in ps:
             automate(instr, p)
 
+
+def start_automated_protocols(lims):
+    '''Checks for samples in the automated protocols and starts steps if 
+    possible.'''
+    
+    for protocol, protocol_steps in nsc.automated_protocol_steps.items():
+        proto = lims.get_protocols(name=protocol)
+        print proto
 
 
 
