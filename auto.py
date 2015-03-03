@@ -87,41 +87,42 @@ def check_new_processes(lims):
             init_automation(instr, p)
 
 
+def get_input_jobs(queue, grouping):
+    
+
+    # Grouped by UDF
+    input_map = {}
+    for ana in queue.artifacts:
+        auto_project_group = ana.udf.get(nsc.AUTO_POOL_UDF)
+        if auto_project_group:
+            input_map.get()
+
+    
+
+
 def start_automated_protocols(lims):
     '''Checks for samples in the automated protocols and starts steps if 
     possible.'''
     
-    for protocol, protocol_steps in nsc.automated_protocol_steps.items():
-        proto = lims.get_protocols(name=protocol)
-        print proto
-
-
-
-
-def complete_hiseq(lims, process_id):
-    process = Process(lims, id = process_id)
-
-    if len(process.input_output_maps) == 0:
-        print "There are no samples to process."
-    else:
-        # Input_output_maps returns a list of tuples with (input,output)
-        # Get the input analytes to the sequencing process, which will also be the input to 
-        # the following processes. There is one sample per lane.
-        analytes = dict((x[0]['limsid'],x[0]['uri']) for x in process.input_output_maps)
-
-        # For any item in the dictionary (pools), get the location, which is a tuple
-        # of container and position, and save the container
-        flowcell = analytes.itervalues().next().location[0]
+    # Loop over protocols in config
+    for protocol, protocol_steps in nsc.automated_protocol_steps:
+        proto = lims.get_protocols(name=protocol)[0]
         
-        # Get the sample sheet. The sample sheet is an artifact of the Cluster 
-        # Generation protocol step, which happened before the Sequencing step.
-        # Get the parent process of any of the input pools
-        fc_prepare_process = analytes.itervalues().next().parent
-        
+        # Check all protocol steps known for this protocol
+        for ps in proto.steps:
 
-    # add it to the HiSeq data processing protocol step
-    
-    data = ()
+            # Check if this protocol step should be processed 
+            found = False
+            for setup in protocol_steps:
+                if setup.name == ps.name:
+                    found = True
+                    break
 
+            if found:
+                q = ps.queue()
+                jobs = get_input_groups(q, step.grouping)
 
+                for job in jobs:
+                    step = lims.create_step(ps, job)
+                    step.execute_script() # todo
 

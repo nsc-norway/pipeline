@@ -27,9 +27,15 @@ config.read(['/etc/nsc.conf'])
 
 #slurm_script = config.get("nsc", "slurm_script")
 
+class StepSetup:
+    def __init__(self, name, grouping):
+        self.name = name
+        self.grouping = grouping
+
 # Todo: move into config file, or just use this as the config.
-automated_protocol_steps = {
-        "Illumina SBS (HiSeq GAIIx) 5.0": ["Bcl Conversion & Demultiplexing (Illumina SBS) 5.0"]
-        }
+automated_protocol_steps = [
+        ("Illumina SBS (HiSeq GAIIx) 5.0",
+            [StepSetup("Bcl Conversion & Demultiplexing (Illumina SBS) 5.0", "project")])
+        ]
 
 
