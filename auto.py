@@ -87,22 +87,74 @@ def check_new_processes(lims):
             init_automation(instr, p)
 
 
-def get_input_jobs(queue, grouping):
-    
+def get_input_groups(queue):
+    '''Get group of inputs for automated jobs.
 
-    # Grouped by UDF
+    Input is a list of artifacts.
+    
+    Analytes have a UDF which contains a comma separated list of 
+    all the sample IDs of an automation group.
+    The groups correspond to a projects. This function returns a 
+    list of *complete* groups of inputs.'''
+
     input_map = {}
-    for ana in queue.artifacts:
+    for ana in queue:
         auto_project_group = ana.udf.get(nsc.AUTO_POOL_UDF)
         if auto_project_group:
-            input_map.get()
+            group_inputs = input_map.get(auto_project_group, default=[])
+            group_inputs.append(ana)
 
+    groups = []
+    for udf, inputs in input_map.items():
+        input_ids = [i.id for i in inputs]
+        if all(limsid in input_ids for limsid in udf.split(",")):
+            groups.append(inputs)
+
+    return inputs
+
+
+def get_input_flowcell(queue):
+    ''' Get a list of inputs from the queue of a step, 
+    corresponding to a full flow cell. If not all inputs are present in
+    the queue, the flow cell is ignored.
     
+    If there are pools on the flow
+    cell which do not have the automation flag set, these inputs are 
+    ignored.
+    '''
+
+    flowcell_inputs = {} # FCID : input list
+
+    for ana in queue:
+        fcid = ana.location[0].id
+        input_list = flowcell_inputs.get(fcid, default=[])
+        input_list.append(ana)
+
+
+    flowcell_groups = []
+    for fcid,inputs in flowcell_inputs.items():
+        fc = inputs.location[0]
+        input_ids = [i.id for i in inputs]
+        valid = True
+        for art in fc.placements.values():
+            if art.udf.get(nsc.AUTO_POOL_UDF):
+                if art_id not in [input_ids]:
+                    valid = False
+
+        if valid:
+            flowcell_groups.append(inputs)
+
+
+    return flowcell_groups
+
+
+        
 
 
 def start_automated_protocols(lims):
     '''Checks for samples in the automated protocols and starts steps if 
-    possible.'''
+    possible, then executes a script on the "record details" screen if 
+    present.'''
     
     # Loop over protocols in config
     for protocol, protocol_steps in nsc.automated_protocol_steps:
@@ -120,7 +172,10 @@ def start_automated_protocols(lims):
 
             if found:
                 q = ps.queue()
-                jobs = get_input_groups(q, step.grouping)
+                if step.grouping == "project":
+                    jobs = get_input_groups(q.artifacts)
+                elif step.grouping == "flowcell":
+                    jobs = get_input_flowcell(q.artifacts)
 
                 for job in jobs:
                     step = lims.create_step(ps, job)
