@@ -57,9 +57,11 @@ def mark_project_pools(inputs):
 
 
 
-
-def automate(instrument, process):
-    '''Tag a flow cell for automatic processing'''
+def init_automation(instrument, process):
+    '''This should be called on sequencing processes which already have
+    the automation flag set. This clears the process-level automation flag 
+    and sets UDFs on the analytes (pools) instead. It will only run if all
+    QC flags are set.'''
 
     # Is the sequencing finished?
     if process.udf.get("Finish Date"):
@@ -82,7 +84,7 @@ def check_new_processes(lims):
     for instr, process in nsc.SEQ_PROCESSES:
         ps = lims.get_processes(type = process, udf = {nsc.AUTO_FLAG_UDF: "on"})
         for p in ps:
-            automate(instr, p)
+            init_automation(instr, p)
 
 
 def start_automated_protocols(lims):
