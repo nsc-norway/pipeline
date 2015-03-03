@@ -14,6 +14,7 @@
 import sys
 import logging
 from argparse import ArgumentParser
+from collections import defaultdict
 
 # scilife genologics library
 from genologics.lims import *
@@ -24,7 +25,6 @@ from genologics.lims import *
 import nsc
 import workflow
 
-logger = logging.getLogger()
 nsc.lims.check_version()
 
 
@@ -33,7 +33,10 @@ def mark_project_pools(inputs):
         The "Automatic processing group" UDF on the pools is set to a 
         comma separated list of the LIMSIDs of all pools in a single 
         project'''
-    project_pools = {}
+
+    logging.debug("Processing %d inputs" % len(inputs))
+
+    project_pools = defaultdict(list)
     for pool in inputs:
         project = None
 
@@ -42,53 +45,72 @@ def mark_project_pools(inputs):
                 project = sample.project
             else:
                 if project.id != sample.project.id:
-                    logger.error("Pool has samples from multiple projects. Skipping pool.")
+                    logging.error("Pool has samples from multiple projects. Skipping pool.")
                     project = None
                     break
             
         if project:
-            project_pools.get(project, default=[]).append(pool)
+            project_pools[project].append(pool)
 
-    for project,pools in project_pools:
+    logging.debug("Marking %d groups of pools as projects." % len(project_pools))
+    for project, pools in project_pools.items():
         pool_id_list = ",".join(p.id for p in pools)
         for pool in pools:
             pool.udf[nsc.AUTO_POOL_UDF] = pool_id_list
             pool.put()
 
 
-def 
+def qc_flags_set(process):
+    return not any(analyte.qc_flag == 'UNKNOWN' for analyte in process.all_inputs(unique=True))
 
 
-
-def init_automation(instrument, process):
+def init_automation(lims, instrument, process):
     '''This should be called on sequencing processes which already have
     the automation flag set. This clears the process-level automation flag 
     and sets UDFs on the analytes (pools) instead. It will only run if all
     QC flags are set.'''
 
     # Is the sequencing finished?
-    if process.udf.get("Finish Date"):
+    finished = False
+    try:
+        finished = process.udf['Dummy date field']
+        #finished = process.udf["Finish Date"] != ""
+    except KeyError:
+        pass
 
+    if finished:
+        logging.debug("Sequencing is finished for process: " + process.id)
         if qc_flags_set(process):
+            logging.debug("All QC flags are set for process: " + process.id)
+            logging.debug("Marking it for automation...")
+
             # Mark the pools for automatic processing (all sequencer types)
             mark_project_pools(process.all_inputs())
 
             # Finish the sequencing step
-            workflow.finish_process(process)
+            workflow.finish_step(lims, process.id)
 
             # Automated processing now triggered, can remove flag so we don't 
             # have to process it again.
             process.udf[nsc.AUTO_FLAG_UDF] = False
             process.put()
+            logging.debug("Finished initiating automation")
+        else:
+            logging.debug("Not all QC flags set for process: " + process.id)
+
+    else:
+        logging.debug("Sequencing is not yet finished for process: " + process.id)
 
 
 
 def check_new_processes(lims): 
     '''Query the API for new sequencing processes with automation flag'''
+    
     for instr, process in nsc.SEQ_PROCESSES:
-        ps = lims.get_processes(type = process, udf = {nsc.AUTO_FLAG_UDF: "on"})
+        ps = lims.get_processes(type = process, udf = {nsc.AUTO_FLAG_UDF: "true"})
+        logging.debug("Found " + str(len(ps)) + " sequencing processes of type " + process)
         for p in ps:
-            init_automation(instr, p)
+            init_automation(lims, instr, p)
 
 
 
@@ -105,7 +127,12 @@ def get_input_groups(queue):
 
     input_map = {}
     for ana in queue:
-        auto_project_group = ana.udf.get(nsc.AUTO_POOL_UDF)
+        auto_project_group = None
+        try:
+            auto_project_group = ana.udf[nsc.AUTO_POOL_UDF]
+        except KeyError:
+            pass
+
         if auto_project_group:
             group_inputs = input_map.get(auto_project_group, default=[])
             group_inputs.append(ana)
@@ -116,7 +143,7 @@ def get_input_groups(queue):
         if all(limsid in input_ids for limsid in udf.split(",")):
             groups.append(inputs)
 
-    return inputs
+    return groups
 
 
 def get_input_flowcell(queue):
@@ -163,7 +190,8 @@ def start_steps(lims, protocol_step, protocol_step_setup):
     protocol_step_setup is a NSC-specific class which holds a few configuration 
     options.'''
 
-    queue = protocol_step.queue
+    queue = protocol_step.queue()
+    logging.debug("Found %d items in the queue" % (len(queue.artifacts)))
     if protocol_step_setup.grouping == "project":
         jobs = get_input_groups(queue.artifacts)
     elif protocol_step_setup.grouping == "flowcell":
@@ -173,6 +201,7 @@ def start_steps(lims, protocol_step, protocol_step_setup):
     
     steps = []
     for job in jobs:
+        logging.debug("Creating step for samples " + ",".join([ana.id for ana in job]))
         steps.append(lims.create_step(protocol_step, job))
 
     return steps
@@ -192,7 +221,7 @@ def start_automated_protocols(lims):
         
         # Check all protocol steps known for this protocol
         for ps in proto.steps:
-
+            
             # Check if this protocol step should be processed 
             found = False
             for setup in protocol_steps:
@@ -201,13 +230,22 @@ def start_automated_protocols(lims):
                     break
 
             if found:
+                logging.debug("Checking the queue of " + setup.name)
                 steps = start_steps(lims, ps, setup)
-                
+                logging.debug("Started %d steps." % len(steps))
+
                 # Run scripts if configured
                 if setup.script:
                     for step in steps:
                         for ap in step.available_programs:
                             if ap.name == setup.script:
                                 ap.trigger()
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+    logging.debug("auto.py Workflow management script")
+    check_new_processes(nsc.lims)
+    start_automated_protocols(nsc.lims)
 
 
