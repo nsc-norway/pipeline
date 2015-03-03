@@ -56,6 +56,9 @@ def mark_project_pools(inputs):
             pool.put()
 
 
+def 
+
+
 
 def init_automation(instrument, process):
     '''This should be called on sequencing processes which already have
@@ -66,16 +69,17 @@ def init_automation(instrument, process):
     # Is the sequencing finished?
     if process.udf.get("Finish Date"):
 
-        # Mark the pools for automatic processing (all sequencer types)
-        mark_project_pools(process.all_inputs())
+        if qc_flags_set(process):
+            # Mark the pools for automatic processing (all sequencer types)
+            mark_project_pools(process.all_inputs())
 
-        # Finish the sequencing step
-        workflow.finish_process(process)
+            # Finish the sequencing step
+            workflow.finish_process(process)
 
-        # Automated processing now triggered, can remove flag so we don't 
-        # have to process it again.
-        process.udf[nsc.AUTO_FLAG_UDF] = False
-        process.put()
+            # Automated processing now triggered, can remove flag so we don't 
+            # have to process it again.
+            process.udf[nsc.AUTO_FLAG_UDF] = False
+            process.put()
 
 
 
@@ -87,6 +91,7 @@ def check_new_processes(lims):
             init_automation(instr, p)
 
 
+
 def get_input_groups(queue):
     '''Get group of inputs for automated jobs.
 
@@ -95,7 +100,8 @@ def get_input_groups(queue):
     Analytes have a UDF which contains a comma separated list of 
     all the sample IDs of an automation group.
     The groups correspond to a projects. This function returns a 
-    list of *complete* groups of inputs.'''
+    list of *complete* groups of inputs -- if not all samples are
+    present, then none are returned.'''
 
     input_map = {}
     for ana in queue:
@@ -115,12 +121,12 @@ def get_input_groups(queue):
 
 def get_input_flowcell(queue):
     ''' Get a list of inputs from the queue of a step, 
-    corresponding to a full flow cell. If not all inputs are present in
-    the queue, the flow cell is ignored.
+    corresponding to all the pools on a  flow cell. If not all inputs are 
+    present in the queue, the flow cell is ignored for now.
     
     If there are pools on the flow
     cell which do not have the automation flag set, these inputs are 
-    ignored.
+    ignored, and the flow cell may still be returned.
     '''
 
     flowcell_inputs = {} # FCID : input list
@@ -147,14 +153,38 @@ def get_input_flowcell(queue):
 
     return flowcell_groups
 
-
         
 
+def start_steps(lims, protocol_step, protocol_step_setup):
+    '''Starts zero or more instances of a specific protocol step.
+    
+    protocol_step is a protocol step configuration entity from the LIMS.
+    
+    protocol_step_setup is a NSC-specific class which holds a few configuration 
+    options.'''
+
+    queue = protocol_step.queue
+    if protocol_step_setup.grouping == "project":
+        jobs = get_input_groups(queue.artifacts)
+    elif protocol_step_setup.grouping == "flowcell":
+        jobs = get_input_flowcell(queue.artifacts)
+    else:
+        raise Exception("Grouping not configured correctly for " + protocol_step_setup.name)
+    
+    steps = []
+    for job in jobs:
+        steps.append(lims.create_step(protocol_step, job))
+
+    return steps
+
+
+
+        
 
 def start_automated_protocols(lims):
     '''Checks for samples in the automated protocols and starts steps if 
     possible, then executes a script on the "record details" screen if 
-    present.'''
+    configured.'''
     
     # Loop over protocols in config
     for protocol, protocol_steps in nsc.automated_protocol_steps:
@@ -171,13 +201,13 @@ def start_automated_protocols(lims):
                     break
 
             if found:
-                q = ps.queue()
-                if step.grouping == "project":
-                    jobs = get_input_groups(q.artifacts)
-                elif step.grouping == "flowcell":
-                    jobs = get_input_flowcell(q.artifacts)
+                steps = start_steps(lims, ps, setup)
+                
+                # Run scripts if configured
+                if setup.script:
+                    for step in steps:
+                        for ap in step.available_programs:
+                            if ap.name == setup.script:
+                                ap.trigger()
 
-                for job in jobs:
-                    step = lims.create_step(ps, job)
-                    step.execute_script() # todo
 

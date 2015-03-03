@@ -28,9 +28,10 @@ config.read(['/etc/nsc.conf'])
 #slurm_script = config.get("nsc", "slurm_script")
 
 class StepSetup:
-    def __init__(self, name, grouping):
+    def __init__(self, name, grouping, script = None):
         self.name = name
         self.grouping = grouping
+        self.script = script
 
 # Todo: move into config file, or just use this as the config.
 automated_protocol_steps = [
