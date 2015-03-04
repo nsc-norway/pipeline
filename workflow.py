@@ -20,27 +20,29 @@ def finish_step(lims, process_id):
 
     step = Step(lims, id=process_id)
 
-    next_elements = step.configuration.transitions
-    finish_protocol = len(next_elements) == 0
-    if len(next_elements) == 1:
-        next_step = next_elements[0].step
-    else:
-        raise Exception("There are multiple options for next step, don't know what to do.")
-
-    # Set next action for each sample
-    for a in step.actions.next_actions:
-        if finish_protocol:
-            a.action = "complete"
-        else:
-            a.action = "nextstep"
-            a.next_step = next_step
-    step.actions.put()
-
-    while step.current_state in ['Record Details', 'Assign Next Steps']:
-        step.advance()
-
     if step.current_state != 'Completed':
-        raise Exception("Failed to finish the step. It is in state " + step.current_state)
+
+        next_elements = step.configuration.transitions
+        finish_protocol = len(next_elements) == 0
+        if len(next_elements) == 1:
+            next_step = next_elements[0].step
+        else:
+            raise Exception("There are multiple options for next step, don't know what to do.")
+    
+        # Set next action for each sample
+        for a in step.actions.next_actions:
+            if finish_protocol:
+                a.action = "complete"
+            else:
+                a.action = "nextstep"
+                a.next_step = next_step
+        step.actions.put()
+    
+        while step.current_state in ['Record Details', 'Assign Next Steps']:
+            step.advance()
+    
+        if step.current_state != 'Completed':
+            raise Exception("Failed to finish the step. It is in state " + step.current_state)
 
 
 

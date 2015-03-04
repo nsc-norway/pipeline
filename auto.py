@@ -34,11 +34,9 @@ def mark_flowcell_projects(fc):
         comma separated list of the LIMSIDs of all pools in a single 
         project'''
 
-    logging.debug("Processing %d inputs" % len(inputs))
+    logging.debug("Processing flowcell " + fc.id)
 
-    fc = inputs[0]
     project_lanes = defaultdict(list)
-
     for lane,pool in fc.placements.items():
         project = None
 
@@ -56,10 +54,10 @@ def mark_flowcell_projects(fc):
         if project:
             project_lanes[project.id].append(lane)
 
-    logging.debug("Marking %d groups of lanes as projects." % len(project_pools))
+    logging.debug("Marking %d groups of lanes as projects." % len(project_lanes))
     group_strings = []
     for project, lanes in project_lanes.items():
-        lane_group = ",".join(lane for lane in lanes)
+        lane_group = ",".join(sorted(lanes))
         group_strings.append(lane_group)
 
     lane_group_list = "|".join(group_strings)
@@ -95,11 +93,13 @@ def init_automation(lims, instrument, process):
             # Mark the flow cell for automatic processing (all sequencer types)
             mark_flowcell_projects(process.all_inputs()[0].location[0])
 
+            logging.debug("Finishing sequencing step...")
             # Finish the sequencing step
             workflow.finish_step(lims, process.id)
 
             # Automated processing now triggered, can remove flag so we don't 
             # have to process it again.
+            logging.debug("Done. Removing automation checkbox.")
             process.udf[nsc.AUTO_FLAG_UDF] = False
             process.put()
             logging.debug("Finished marking for automation")
@@ -123,33 +123,41 @@ def check_new_processes(lims):
 
 
 def get_input_groups(queue):
-    '''Get group of inputs for automated jobs.
+    '''Get groups of inputs for automated jobs.
 
-    Input is a list of artifacts.
-    
-    Analytes have a UDF which contains a comma separated list of 
-    all the sample IDs of an automation group.
-    The groups correspond to a projects. This function returns a 
-    list of *complete* groups of inputs -- if not all samples are
-    present, then none are returned.'''
+    Flow cells which are set up for automation include a UDF with information 
+    about which lanes should be processed together. The basic data items are 
+    the positions of the lanes on the flow cell as given in the LIMS. The positions
+    in a group are separated by commas. The groups are separated by pipe characters.
 
-    input_map = {}
+    Example: 1:1,2:1,3:1|4:1,5:1|6:1,7:1,8:1
+
+    The groups correspond to proects.
+    '''
+
+    # flowcell_info value tuples (flowcell, [analytes])
+    flowcell_info = {}
+
     for ana in queue:
-        auto_project_group = None
-        try:
-            auto_project_group = ana.udf[nsc.AUTO_POOL_UDF]
-        except KeyError:
-            pass
-
-        if auto_project_group:
-            group_inputs = input_map.get(auto_project_group, default=[])
-            group_inputs.append(ana)
+        fc = ana.location[0]
+        if not flowcell_info.has_key(fc.id):
+            flowcell_info[fc.id] = (fc, [], [])
+        flowcell_info[fc.id][1].append(ana)
 
     groups = []
-    for udf, inputs in input_map.items():
-        input_ids = [i.id for i in inputs]
-        if all(limsid in input_ids for limsid in udf.split(",")):
-            groups.append(inputs)
+
+    for fcid,info in flowcell_info.items():
+        fc = info[0]
+        try:
+            lanes_auto = fc.udf[nsc.AUTO_FLOWCELL_UDF]
+        except KeyError:
+            continue
+
+        for group in lanes_auto.split("|"):
+            have_lanes = [a.location[1] for a in info[1]]
+            have_all = all(lane in have_lanes for lane in group.split(","))
+            if have_all:
+                groups.append([a for a in info[1] if a.location[1] in group])
 
     return groups
 
@@ -164,27 +172,31 @@ def get_input_flowcell(queue):
     ignored, and the flow cell may still be returned.
     '''
 
-    flowcell_inputs = {} # FCID : input list
+    flowcell_inputs = defaultdict(list)
 
     for ana in queue:
         fcid = ana.location[0].id
-        input_list = flowcell_inputs.get(fcid, default=[])
+        input_list = flowcell_inputs[fcid]
         input_list.append(ana)
 
+    logging.debug("Found %d flowcells, checking if any are complete" % len(flowcell_inputs))
 
     flowcell_groups = []
     for fcid,inputs in flowcell_inputs.items():
+        logging.debug("Checking flowcell " + fcid)
         fc = inputs.location[0]
-        input_ids = [i.id for i in inputs]
-        valid = True
-        for art in fc.placements.values():
-            if art.udf.get(nsc.AUTO_POOL_UDF):
-                if art_id not in [input_ids]:
-                    valid = False
+
+        auto_udf = fc.udf[nsc.AUTO_FLOWCELL_UDF]
+        lanes = auto_udf.replace("|", ",").split(",")
+        have_input_ids = [i.id for i in inputs]
+        
+        valid = all(fc.placements[i].id in have_input_ids for i in lanes)
 
         if valid:
             flowcell_groups.append(inputs)
-
+            logging.debug("All expected inputs are present, returning this flow cell")
+        else: 
+            logging.debug("Not all inputs found in flow cell, ignoring it")
 
     return flowcell_groups
 
@@ -223,7 +235,7 @@ def start_automated_protocols(lims):
     possible, then executes a script on the "record details" screen if 
     configured.'''
     
-    # Loop over protocols in config
+    # Loop over protocols in NSC configuration file
     for protocol, protocol_steps in nsc.automated_protocol_steps:
         proto = lims.get_protocols(name=protocol)[0]
         
@@ -248,6 +260,7 @@ def start_automated_protocols(lims):
                         for ap in step.available_programs:
                             if ap.name == setup.script:
                                 ap.trigger()
+
 
 
 if __name__ == "__main__":
