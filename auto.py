@@ -23,7 +23,7 @@ from genologics.lims import *
 
 # Local
 import nsc
-import workflow
+import utilities
 
 nsc.lims.check_version()
 
@@ -95,7 +95,7 @@ def init_automation(lims, instrument, process):
 
             logging.debug("Finishing sequencing step...")
             # Finish the sequencing step
-            workflow.finish_step(lims, process.id)
+            utilities.finish_step(lims, process.id)
 
             # Automated processing now triggered, can remove flag so we don't 
             # have to process it again.
@@ -236,7 +236,7 @@ def start_automated_protocols(lims):
     configured.'''
     
     # Loop over protocols in NSC configuration file
-    for protocol, protocol_steps in nsc.automated_protocol_steps:
+    for protocol, protocol_steps in nsc.AUTOMATED_PROTOCOL_STEPS:
         proto = lims.get_protocols(name=protocol)[0]
         
         # Check all protocol steps known for this protocol
