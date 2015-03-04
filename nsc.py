@@ -5,7 +5,7 @@ from genologics.config import *
 from ConfigParser import SafeConfigParser
 
 AUTO_FLAG_UDF = "Automatic processing"
-AUTO_POOL_UDF = "Automatic processing group"
+AUTO_FLOWCELL_UDF = "Automation lane groups"
 
 SEQ_PROCESSES=[
         ('hiseq', 'Illumina Sequencing (Illumina SBS) 5.0')

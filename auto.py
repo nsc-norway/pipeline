@@ -28,18 +28,22 @@ import workflow
 nsc.lims.check_version()
 
 
-def mark_project_pools(inputs):
-    '''Sets a UDF for automatic processing on all pools
-        The "Automatic processing group" UDF on the pools is set to a 
+def mark_flowcell_projects(fc):
+    '''Sets a UDF for automatic processing on the flow cell Container.
+        The "Automation lane groups" UDF on the pools is set to a 
         comma separated list of the LIMSIDs of all pools in a single 
         project'''
 
     logging.debug("Processing %d inputs" % len(inputs))
 
-    project_pools = defaultdict(list)
-    for pool in inputs:
+    fc = inputs[0]
+    project_lanes = defaultdict(list)
+
+    for lane,pool in fc.placements.items():
         project = None
 
+        # Check that all samples in the pool (lane) are from the same
+        # project
         for sample in pool.samples:
             if not project:
                 project = sample.project
@@ -50,14 +54,18 @@ def mark_project_pools(inputs):
                     break
             
         if project:
-            project_pools[project].append(pool)
+            project_lanes[project.id].append(lane)
 
-    logging.debug("Marking %d groups of pools as projects." % len(project_pools))
-    for project, pools in project_pools.items():
-        pool_id_list = ",".join(p.id for p in pools)
-        for pool in pools:
-            pool.udf[nsc.AUTO_POOL_UDF] = pool_id_list
-            pool.put()
+    logging.debug("Marking %d groups of lanes as projects." % len(project_pools))
+    group_strings = []
+    for project, lanes in project_lanes.items():
+        lane_group = ",".join(lane for lane in lanes)
+        group_strings.append(lane_group)
+
+    lane_group_list = "|".join(group_strings)
+    fc.udf[nsc.AUTO_FLOWCELL_UDF] = lane_group_list
+    fc.put()
+    
 
 
 def qc_flags_set(process):
@@ -84,8 +92,8 @@ def init_automation(lims, instrument, process):
             logging.debug("All QC flags are set for process: " + process.id)
             logging.debug("Marking it for automation...")
 
-            # Mark the pools for automatic processing (all sequencer types)
-            mark_project_pools(process.all_inputs())
+            # Mark the flow cell for automatic processing (all sequencer types)
+            mark_flowcell_projects(process.all_inputs()[0].location[0])
 
             # Finish the sequencing step
             workflow.finish_step(lims, process.id)
@@ -94,7 +102,7 @@ def init_automation(lims, instrument, process):
             # have to process it again.
             process.udf[nsc.AUTO_FLAG_UDF] = False
             process.put()
-            logging.debug("Finished initiating automation")
+            logging.debug("Finished marking for automation")
         else:
             logging.debug("Not all QC flags set for process: " + process.id)
 
