@@ -19,5 +19,5 @@
 #SBATCH --hint=multithread
 
 # Execute the requested command
-"$@"
+python move-files.py "${@}"
 

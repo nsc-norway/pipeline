@@ -29,7 +29,10 @@ AUTOMATED_PROTOCOL_STEPS = [
         ]
 
 SBATCH="/usr/bin/sbatch"
+RSYNC="/usr/bin/rsync"
 LOG_DIR="/data/nsc.loki/logs"
+
+SECONDARY_STORAGE="/data/nsc.loki"
 
 lims = Lims(BASEURI,USERNAME,PASSWORD)
 

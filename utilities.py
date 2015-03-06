@@ -9,6 +9,7 @@
 import logging
 import subprocess, sys
 from genologics.lims import *
+import nsc
 
 logger = logging.getLogger()
 
@@ -46,6 +47,10 @@ def finish_step(lims, process_id):
             raise Exception("Failed to finish the step. It is in state " + step.current_state)
 
 
+
+
+# The check_output function is only available in >=2.7, but we also support 2.6,
+# as on RHEL6.
 if sys.version_info >= (2, 7):
     check_output = subprocess.check_output
 else:

@@ -4,55 +4,68 @@ import subprocess
 
 from genologics.lims import *
 import nsc
+import utilities
 
 
-'''
-Cleanup script:
+hiseq_exclude_paths = ["/Thumbnail_Images",
+        "/Data/Intensities/L00*",
+        "/Data/Intensities/BaseCalls/L00*"
+        ]
+
+nextseq_exclude_paths = ["TODO" ]
 
 
-directory=$1
-echo "......"
-read -r -p "Do you want to clean $directory? [Y/n]" response
-response=${response,,}
-if [[ $response =~ ^(no|n) ]]; then
-	echo "You aborted this delete"
-fi
-echo "Cleaning started for $directory ....."
-echo "......"
-cd $directory 
+def rsync(source_path, destination_path, exclude):
+    '''Runs the rsync command. Note that trailing slashes
+    on paths are significant.'''
 
-echo "Delecting Thumbnail images"
-rm -r Thumbnail_Images
-echo "Done"
-echo
-
-echo "Delecting Data/Intensities/L00* (*.clocs)"
-cd Data/Intensities
-ls | grep "L00" |xargs rm -r
-echo "Done"
-echo
-
-echo "Delecting Data/Intensities/BaseCalls/L00* (bcl and stats)"
-cd BaseCalls
-ls | grep "L00" |xargs rm -r
-echo "Done"
-echo
-
-echo "Done cleaning $directory"
-
-'''
+    args = [nsc.RSYNC]
+    args += ["--exclude=" + path for path in exclude]
+    args += [source_path, destination_path]
+    code = subprocess.check_call(args)
+    return code
 
 
+def fix_source(source):
+    return source # todo: check what lims says | remove trailing slash
 
-def main():
-    print 'Here we are, in move-files'
 
-    pass
+def main(id = process, instrument, source_path):
+
+    process = Process(nsc.lims, id = process_id)
+    process.udf['Status'] = 'Running...'
+    process.put()
+
+    if instrument == "hiseq" or instrument == "nextseq":
+        destination = nsc.SECONDARY_STORAGE
+        source = fix_source(source_path)
+        if instrument == "hiseq":
+            exclude = hiseq_exclude_paths
+        elif instrument == "nextseq":
+            exclude = nextseq_exclude_paths
+        command_ok = rsync(source, destination, exclude)
+    elif instrument == "miseq":
+        command_ok = False
+
+    if command_ok:
+        process.udf['Status'] = 'Finished'
+    else:
+        process.udf['Status'] = 'Error'
+    process.put()
+
+
+    
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('nsc')
+    parser.add_argument("--pid", help="Process ID")
+    parser.add_argument('--instrument', help="Instrument type")
+    parser.add_argument('source_path', help="Source path, as given in the LIMS")
+    # Destination is configured by nsc config file (I think this is
+    # more flexible)
 
-    main()
+    args = parser.parse_args()
+
+    main(args.pid, args.source_path)
 
