@@ -32,7 +32,9 @@ SBATCH="/usr/bin/sbatch"
 RSYNC="/usr/bin/rsync"
 LOG_DIR="/data/nsc.loki/logs"
 
+PRIMARY_STORAGE = "/data/runScratch.boston"
 SECONDARY_STORAGE="/data/nsc.loki"
+SET_GROUP='nsc-seq'
 
 lims = Lims(BASEURI,USERNAME,PASSWORD)
 

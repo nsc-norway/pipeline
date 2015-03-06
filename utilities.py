@@ -48,6 +48,23 @@ def finish_step(lims, process_id):
 
 
 
+def get_sequencing_process(process):
+    '''Gets the sequencing process from a process object corresponing to a process
+    which is run after sequencing, such as demultiplexing. This function looks up
+    the sequencing step by examining the sibling processes run on one of the
+    samples in the process's inputs.'''
+
+    # Each entry in input_output_maps is an input/output specification with a single
+    # input and any number of outputs. This gets the first input.
+    first_io = process.input_output_maps[0]
+    first_in_artifact = first_io[0]['uri']
+
+    processes = process.lims.get_processes(inputartifactlimsid=first_in_artifact.id)
+
+    for proc in processes:
+        if proc.type.name in [p[1] for p in nsc.SEQ_PROCESSES]:
+            return proc
+
 
 # The check_output function is only available in >=2.7, but we also support 2.6,
 # as on RHEL6.
