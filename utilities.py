@@ -89,6 +89,12 @@ def get_index_sequence(artifact):
         return None
 
 
+def fail(process, message):
+    '''Report failure from background job'''
+
+    process.udf[nsc.JOB_STATUS_UDF] = 'Failed: ' + message
+    process.put()
+
 
 # The check_output function is only available in >=2.7, but we also support 2.6,
 # as on RHEL6.

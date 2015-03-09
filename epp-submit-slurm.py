@@ -25,8 +25,11 @@ def submit_job(script, script_args):
     return int(output)
 
 
-def post_job_id(process_id, job_id_udf, job_id):
-    print "Would set job id to ", job_id
+def post_job_id(process_id, job_id):
+    process = Process(nsc.lims, id = process_id)
+    process.udf[nsc.JOB_ID_UDF] = job_id
+    process.udf[nsc.JOB_STATUS_UDF] = 'Submitted'
+    process.put()
 
 
 def main(process_id, job_id_udf, script, args):
@@ -39,12 +42,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--pid', help='Process ID')
-    parser.add_argument('--jid-udf', default="Job ID", help='Name of Job ID UDF')
     parser.add_argument('script', help='Script to submit to sbatch')
     parser.add_argument('job_args', nargs=argparse.REMAINDER, help='Arguments to pass to the job script')
 
     args = parser.parse_args()
 
     nsc.lims.check_version()
-    main(args.pid, args.jid_udf, args.script, args.job_args)
+    main(args.pid, args.script, args.job_args)
 

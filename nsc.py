@@ -8,6 +8,15 @@ from ConfigParser import SafeConfigParser
 AUTO_FLAG_UDF = "Automatic processing"
 AUTO_FLOWCELL_UDF = "Automation lane groups"
 
+JOB_ID_UDF = "Job ID"
+JOB_STATUS_UDF = "Job status"
+
+BASES_MASK_UDF = "Bases mask"
+THREADS_UDF = "Threads"
+MISMATCHES_UDF = "Number of mismatches"
+SOURCE_RUN_DIR_UDF = "Source run directory"
+DEST_FASTQ_DIR_UDF = "Fastq output directory"
+
 # Sequencing processes
 SEQ_PROCESSES=[
         ('hiseq', 'Illumina Sequencing (Illumina SBS) 5.0')
@@ -28,12 +37,18 @@ AUTOMATED_PROTOCOL_STEPS = [
             [StepSetup("Bcl Conversion & Demultiplexing (Illumina SBS) 5.0", "project")])
         ]
 
+# System programs
 SBATCH="/usr/bin/sbatch"
 RSYNC="/usr/bin/rsync"
 LOG_DIR="/data/nsc.loki/logs"
 
+# Data processing programs
+CONFIGURE_BCL_TO_FASTQ="/data/common/tools/nscbin/configureBclToFastq.pl"
+
+# Paths
 PRIMARY_STORAGE = "/data/runScratch.boston"
 SECONDARY_STORAGE="/data/nsc.loki"
+
 SET_GROUP='nsc-seq'
 
 lims = Lims(BASEURI,USERNAME,PASSWORD)

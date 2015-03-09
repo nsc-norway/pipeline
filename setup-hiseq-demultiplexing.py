@@ -43,15 +43,29 @@ def extract_sample_sheet(sample_sheet, inputs):
     return "\r\n".join(res)
 
 
+def get_paths(process, seq_process):
+    try:
+        run_id = seq_process.udf['Run ID']
+    except:
+        return None
 
-def compute_bases_mask(process):
+    source_path = os.path.join(nsc.PRIMARY_STORAGE, run_id)
+    project = process.get_inputs()[0].project
+    output_subdir = "Unaligned_" + project.name
+    dest_path = os.path.join(nsc.SECONDARY_STORAGE, run_id, output_subdir)
+
+    return (source_path, dest_path)
+
+
+
+def compute_bases_mask(process, seq_proc):
     '''Compute the --use-bases-mask option for fastq conversion. 
     This option specifies how each imaging cycle is interpreted. It 
     gives the number and order of data reads and index reads.
     
-    The argument is a reference to the current process.'''
+    The first argument is a reference to the current process, the second
+    is a reference to the corresponding sequencing process.'''
 
-    seq_proc = utilities.get_sequencing_process(process)
 
     # These are the properties of the run. The full data sequence is 
     # always returned, but we set the index length and multiplicity.
@@ -113,12 +127,29 @@ def main(process_id, sample_sheet_file):
     # This script can only handle the case when there is a single clustering process
     if len(parent_pids) == 1:
         cluster_proc = parent_processes[0]
+        seq_proc = utilities.get_sequencing_process(process)
+
+        paths = get_paths(process)
+        if paths:
+            process.udf[nsc.SOURCE_RUN_DIR_UDF] = paths[0]
+            process.udf[nsc.DEST_FASTQ_DIR_UDF] = paths[1]
 
         # use-bases-mask
-        base_mask = compute_bases_mask(process)
+        base_mask = compute_bases_mask(process, seq_proc)
         if base_mask:
-            process.udf['Bases mask'] = base_mask
-            process.put()
+            process.udf[nsc.BASES_MASK_UDF] = base_mask
+
+            # Compute number of threads for slurm job
+            reads = 2
+            try:
+                test = seq_proc.udf['Read 2 Cycles']
+            except:
+                reads = 1
+
+            n_threads = len(process.get_inputs(unique = True)) * reads
+            process.udf[nsc.THREADS_UDF] = n_threads
+
+        process.put()
 
         # Sample sheet
         sample_sheet = get_sample_sheet_data(cluster_proc)
