@@ -4,6 +4,10 @@
 # to the secondary storage used for longer term sotrage. The script *excludes*
 # the actual data, as only the fastq files are stored on secondary storage.
 
+# The MiSeq is not handled by this script, because we use the internal MiSeq
+# storage at NSC. MiSeq copying is done by an internal cron job (TBD whether
+# runs should first be copied on primary storage).
+
 import os.path, sys
 import argparse
 import subprocess
@@ -28,17 +32,13 @@ def rsync(source_path, destination_path, exclude):
     on paths are significant.'''
 
     args = [nsc.RSYNC, '-rlt', '--chmod=g+rwX']
+    # TODO check if group is set by set-gid bit
     #args += ['--groupmap=*:' + nsc.SET_GROUP]
     args += ["--exclude=" + path for path in exclude]
     args += [source_path, destination_path]
     code = subprocess.check_call(args)
     return code
 
-def smbclient(source_host, source_path, destination_path, exclude):
-    pass
-
-def miseq_source(process):
-    return None,None
 
 def main(process_id, instrument):
 
@@ -77,8 +77,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--pid", help="Process ID", required=True)
     parser.add_argument('--instrument', help="Instrument type", required=True)
-    # Destination is configured by nsc config file (I think this is
-    # more flexible)
 
     args = parser.parse_args()
 

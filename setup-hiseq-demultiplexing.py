@@ -1,4 +1,4 @@
-# Script to be called directly by EPP when starting the HiSeq demultiplexing.
+# Script to be called directly by EPP when starting the HiSeq demultiplexing step. 
 # Sets steering options for the demultiplexing job in UDFs on the demultiplexing 
 # process. The options are set based on the input samples. Other options which 
 # do not depend on the inputs should be set as defaults in the LIMS or in the 
@@ -8,6 +8,7 @@ import sys
 from argparse import ArgumentParser
 from genologics.lims import *
 import nsc
+import utilities
 
 
 # Key determined parameters:
@@ -42,6 +43,33 @@ def extract_sample_sheet(sample_sheet, inputs):
     return "\r\n".join(res)
 
 
+
+def compute_bases_mask(process):
+    '''Compute the --use-bases-mask option for fastq conversion. 
+    This option specifies how each imaging cycle is interpreted. It 
+    gives the number and order of data reads and index reads.
+    
+    The argument is a reference to the current process.'''
+
+    seq_proc = utilities.get_sequencing_process(process)
+
+    # These are the properties of the run. The full data sequence is 
+    # always returned, but we set the index length and multiplicity.
+    # For this we also need to look up the properties of the input samples.
+    read1_length = seq_proc.udf['Read 1 Cycles']
+    read2_length = seq_proc.udf['Read 2 Cycles']
+    index1_length = seq_proc.udf['Index 1 Read Cycles']
+    index2_length = seq_proc.udf['Index 2 Read Cycles']
+    # TODO: what happens for single read / single index runs?
+    # Check with actual run...
+
+    # Always use the full read length for data reads
+    use_bases_mask =  "y%d" % read1_length
+    use_bases_mask += "I" + str
+
+
+
+
 def main(process_id, sample_sheet_file):
     process = Process(nsc.lims, id=process_id)
     # Get the clustering processes
@@ -63,6 +91,7 @@ def main(process_id, sample_sheet_file):
             print "Failed to find sample sheet"
 
         # use-bases-mask
+        compute_bases_mask(process)
 
         
 
