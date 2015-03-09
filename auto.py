@@ -30,7 +30,7 @@ nsc.lims.check_version()
 
 def mark_flowcell_projects(fc):
     '''Sets a UDF for automatic processing on the flow cell Container.
-        The "Automation lane groups" UDF on the pools is set to a 
+        The "Automation lane groups" UDF on the container is set to a 
         comma separated list of the LIMSIDs of all pools in a single 
         project'''
 
@@ -73,7 +73,7 @@ def qc_flags_set(process):
 def init_automation(lims, instrument, process):
     '''This should be called on sequencing processes which already have
     the automation flag set. This clears the process-level automation flag 
-    and sets UDFs on the analytes (pools) instead. It will only run if all
+    and sets UDFs on the container instead. It will only run if all
     QC flags are set.'''
 
     # Is the sequencing finished?
