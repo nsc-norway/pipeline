@@ -55,19 +55,54 @@ def compute_bases_mask(process):
 
     # These are the properties of the run. The full data sequence is 
     # always returned, but we set the index length and multiplicity.
-    # For this we also need to look up the properties of the input samples.
-    read1_length = seq_proc.udf['Read 1 Cycles']
-    read2_length = seq_proc.udf['Read 2 Cycles']
-    index1_length = seq_proc.udf['Index 1 Read Cycles']
-    index2_length = seq_proc.udf['Index 2 Read Cycles']
-    # TODO: what happens for single read / single index runs?
-    # Check with actual run...
+    # For this we also need to look up the properties of the input samples.  
+    try:
+        read_1_length = seq_proc.udf['Read 1 Cycles']
+    except KeyError:
+        return None
+
+    try:
+        read_2_length = seq_proc.udf['Read 2 Cycles']
+    except KeyError:
+        read_2_length = None
+
+    index_1_length = index_2_length = None
+    try:
+        index_1_length = seq_proc.udf['Index 1 Read Cycles']
+        index_2_length = seq_proc.udf['Index 2 Read Cycles']
+    except KeyError:
+        pass
+
+    # Get an example index sequence from the pool. Note that it takes an input
+    # from the demultiplexing process, not the sequencing, so we are sure to get
+    # the right kind of index.
+    index_sequence = utilities.get_index_sequence(process.get_inputs()[0])
+
+    if index_sequence and index_sequence != 'NoIndex':
+        indices = index_sequence.split('-') 
+        i1length = len(indices[0])
+        if len(indices) == 2:
+            i2length = len(indices[1])
+            pool_index_length = (i1length, i2length)
+        else:
+            pool_index_length = (i1length, 0)
+    else:
+        pool_index_length = (0, 0)
 
     # Always use the full read length for data reads
     use_bases_mask =  "y%d" % read1_length
-    use_bases_mask += "I" + str
+    index_reads = [index_1_length, index_2_length]
+    for read_il, pool_il in zip(index_reads, pool_index_length):
+        if read_il:
+            use_bases_mask += ","
+            if pool_il > 0:
+                use_bases_mask += "I" + str(pool_il)
+            use_bases_mask += "n" * (pool_il - read_il)
 
+    if read_2_length:
+        use_bases_mask += ",y%d" % read_2_length
 
+    return use_bases_mask
 
 
 def main(process_id, sample_sheet_file):
@@ -79,6 +114,12 @@ def main(process_id, sample_sheet_file):
     if len(parent_pids) == 1:
         cluster_proc = parent_processes[0]
 
+        # use-bases-mask
+        base_mask = compute_bases_mask(process)
+        if base_mask:
+            process.udf['Bases mask'] = base_mask
+            process.put()
+
         # Sample sheet
         sample_sheet = get_sample_sheet_data(cluster_proc)
         if sample_sheet:
@@ -89,10 +130,6 @@ def main(process_id, sample_sheet_file):
             of.close()
         else: # not actually a failure if there is no sample sheet
             print "Failed to find sample sheet"
-
-        # use-bases-mask
-        compute_bases_mask(process)
-
         
 
     else: # number of parent processes not one

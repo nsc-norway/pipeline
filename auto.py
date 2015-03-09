@@ -255,8 +255,6 @@ def start_automated_protocols(lims):
                 logging.debug("Started %d steps." % len(steps))
 
                 # Run scripts if configured
-                # TODO: only run scripts if automatically executed scripts
-                # succeed
                 if setup.script:
                     for step in steps:
                         for ap in step.available_programs:

@@ -66,6 +66,30 @@ def get_sequencing_process(process):
             return proc
 
 
+def get_index_sequence(artifact):
+    for label in artifact.reagent_labels:
+        # The structure of the reagent label XML isn't consistent with other lims
+        # objects: there is no parent tag that holds all other data. Let's do an
+        # ad hoc get request for now.
+        lims = artifact.lims
+        list_root = lims.get(lims.get_uri('reagenttypes'), params={'name': label})
+
+        # Gets a list of reagent types with that name
+        for rt in list_root.findall('reagent-type'):
+            # Gets the reagent type by ID
+            rt_root = lims.get(rt.attrib['uri'])
+
+            # Look for the index in the XML hierarchy
+            for special_type in rt_root.findall('special-type'):
+                if special_type.attrib['name'] == "Index":
+                    for attribute_tag in special_type.findall('attribute'):
+                        if attribute_tag.attrib['name'] == "Sequence":
+                            return attribute_tag.attrib['value']
+
+        return None
+
+
+
 # The check_output function is only available in >=2.7, but we also support 2.6,
 # as on RHEL6.
 if sys.version_info >= (2, 7):
