@@ -1,10 +1,14 @@
 # Demultiplexing script for HiSeq
 
-# This scripts locates the sample sheet from the lims and extracts 
-# the lanes in question.
+# This is the primary demultiplexing job. It is contolled by the setup-
+# hiseq-demultiplexing script, through the use of UDFs on the process in the
+# LIMS.
 
+# Its primary data processing functionality is handled by:
+# configureBclToFastq.pl
+# make
 
-# Overview:
+# Functional overview:
 # - Get options for demultiplexing 
 # - Set running / error flag in UDF
 # - Run demultiplexing
