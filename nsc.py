@@ -40,7 +40,7 @@ AUTOMATED_PROTOCOL_STEPS = [
 # System programs
 SBATCH="/usr/bin/sbatch"
 RSYNC="/usr/bin/rsync"
-LOG_DIR="/data/nsc.loki/logs"
+LOG_DIR="/data/nsc.loki/robots/logs"
 
 # Data processing programs
 CONFIGURE_BCL_TO_FASTQ="/data/common/tools/nscbin/configureBclToFastq.pl"
