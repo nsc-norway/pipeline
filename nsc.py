@@ -33,14 +33,23 @@ class StepSetup:
 # The top-level items are tuples of protocol name and lists of StepSetup 
 # objects. The StepSetup objects represent a step in a protocol.
 AUTOMATED_PROTOCOL_STEPS = [
-        ("Illumina SBS (HiSeq GAIIx) 5.0",
-            [StepSetup("Bcl Conversion & Demultiplexing (Illumina SBS) 5.0", "project")])
+        ("Demultiplexing and QC",
+            [
+                StepSetup("Copy run directory (HiSeq)", "project"),
+                StepSetup("Demultiplexing (HiSeq)", "project")
+            ])
         ]
 
 # System programs
-SBATCH="/usr/bin/sbatch"
 RSYNC="/usr/bin/rsync"
-LOG_DIR="/data/nsc.loki/robots/logs"
+LOG_DIR="/data/nsc.loki/automation/logs"
+
+# Command line to run slurm
+# ** OUS net: need to add this to sudoers to allow glsai to run as seq-user **
+#glsai   ALL=(seq-user)  NOPASSWD:/usr/bin/sbatch
+#Defaults:glsai          !requiretty
+INVOKE_SBATCH_ARGLIST=["/bin/sudo", "-u", "seq-user", "/usr/bin/sbatch"]
+
 
 # Data processing programs
 CONFIGURE_BCL_TO_FASTQ="/data/common/tools/nscbin/configureBclToFastq.pl"
