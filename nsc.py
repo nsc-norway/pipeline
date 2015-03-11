@@ -44,6 +44,7 @@ LOG_DIR="/data/nsc.loki/robots/logs"
 
 # Data processing programs
 CONFIGURE_BCL_TO_FASTQ="/data/common/tools/nscbin/configureBclToFastq.pl"
+MAKE="/usr/bin/make"
 
 # Paths
 PRIMARY_STORAGE = "/data/runScratch.boston"

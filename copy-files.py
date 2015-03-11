@@ -49,26 +49,20 @@ def main(process_id, instrument):
     seq_process = utilities.get_sequencing_process(process)
     runid = seq_process.udf['Run ID']
 
-    if instrument == "hiseq" or instrument == "nextseq":
-        destination = nsc.SECONDARY_STORAGE
-        source = os.path.join(nsc.PRIMARY_STORAGE, runid) # No trailing slash
-        if instrument == "hiseq":
-            exclude = hiseq_exclude_paths
-        elif instrument == "nextseq":
-            exclude = nextseq_exclude_paths
-        command_ok = rsync(source, destination, exclude)
+    destination = nsc.SECONDARY_STORAGE
+    source = os.path.join(nsc.PRIMARY_STORAGE, runid) # No trailing slash
+    if instrument == "hiseq":
+        exclude = hiseq_exclude_paths
+    elif instrument == "nextseq":
+        exclude = nextseq_exclude_paths
     elif instrument == "miseq":
-        destination = nsc.SECONDARY_STORAGE
-        host,path = miseq_source(runid)
         print "Miseq not supported yet!"
-        command_ok = False
+    command_ok = rsync(source, destination, exclude)
 
     if command_ok:
-        process.udf['Status'] = 'Finished ', datetime.datetime.now()
-        utilities.finish_step(nsc.lims, process)
+        utilities.success_finish(process)
     else:
-        process.udf['Status'] = 'Error ', datetime.datetime.now()
-    process.put()
+        utilities.fail(process, 'File copy error')
     return command_ok
     
 
@@ -80,5 +74,5 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    sys.exit(main(args.pid, args.instrument))
+    main(args.pid, args.instrument)
 

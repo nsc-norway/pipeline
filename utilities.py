@@ -8,6 +8,7 @@
 
 import logging
 import subprocess, sys
+import datetime
 from genologics.lims import *
 import nsc
 
@@ -89,14 +90,41 @@ def get_index_sequence(artifact):
         return None
 
 
-def fail(process, message):
-    '''Report failure from background job'''
+def upload_file(process, name,  path):
+    pf = ProtoFile(process.lims, process.uri, path)
+    pf = process.lims.glsstorage(pf)    
+    f = pf.post()
+    f.upload(open(path).read())
 
-    process.udf[nsc.JOB_STATUS_UDF] = 'Failed: ' + message
+
+def running(process):
+    process.udf[nsc.JOB_STATUS_UDF] = 'Running'
     process.put()
 
 
-# The check_output function is only available in >=2.7, but we also support 2.6,
+def fail(process, message):
+    '''Report failure from background job'''
+
+    process.udf[nsc.JOB_STATUS_UDF] = 'Failed: ' + datetime.datetime.now() + ": " + message
+    process.put()
+
+def success_finish(process):
+    '''Called by background jobs (slurm) to declare that the task has been 
+    completed successfully.'''
+
+    process.udf[nsc.JOB_STATUS_UDF] = 'Completed successfully', datetime.datetime.now()
+    process.put()
+
+    try:
+        automation = process.get_inputs()[0].udf[nsc.AUTO_FLOWCELL_UDF]
+    except KeyError:
+        automation = False
+
+    if automation:
+        finish_step(process.lims, process.id)
+
+
+# The check_output function is only available in Python >=2.7, but we also support 2.6,
 # as on RHEL6.
 if sys.version_info >= (2, 7):
     check_output = subprocess.check_output

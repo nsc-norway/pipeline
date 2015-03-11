@@ -51,9 +51,10 @@ def download_sample_sheet(process, save_dir):
         return False
 
 
-def run_demultiplexing(process_id, ssheet, bases_mask, n_threads, mismatches, start_dir, dest_run_dir):
+def run_demultiplexing(process, ssheet, bases_mask, n_threads, mismatches, start_dir, dest_run_dir):
     os.chdir(start_dir)
-    log = open("configureBclToFastq-" + process_id + ".log", "w")
+    cfg_log_name = os.path.join(nsc.LOG_DIR, "configureBclToFastq-" + process.id + ".log")
+    log = open(cfg_log_name, "w")
     
     args = ['--mismatches', str(mismatches)]
     args += ['--fastq-cluster-count', 0]
@@ -62,38 +63,48 @@ def run_demultiplexing(process_id, ssheet, bases_mask, n_threads, mismatches, st
     args += ['--output-dir', dest_run_dir]
 
     # configureBclToFastq.pl
-    rcode = subprocess.check_call([nsc.CONFIGURE_BCL_TO_FASTQ] + args, stdout=log, stderr=log)
+    rcode = subprocess.call([nsc.CONFIGURE_BCL_TO_FASTQ] + args, stdout=log, stderr=log)
+
     log.close()
-
-    utilities.upload_file()
-
+    utilities.upload_file(process, cfg_log_name)
 
     if rcode == 0:
         os.chdir(dest_run_dir)
         args = ['-j' + str(n_threads)]
-        log = open("make_" + process_id + ".log", "w")
+        make_log_file = os.path.join(nsc.LOG_DIR, "make_" + process_id + ".log")
+        log = open(make_log_file, "w")
 
+        rcode = subprocess.call([nsc.MAKE] + args)
+        log.close()
 
+        utilities.upload_file(process, make_log_file)
+
+        if rcode == 0:
+            return True
+        else:
+            utilities.fail(process, "Make failure (see log)")
+    else:
+        utilities.fail(process, "configureBclToFastq failure (see log)")
     
-
-    
-
-    return True
+    return False
 
 
 def main(process_id):
     process = Process(nsc.lims, id=process_id)
+
+    utilities.running(process)
+
     cfg = get_config(process)
 
+    success = False
     if cfg:
         start_dir = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
     
         ssheet = download_sample_sheet(process, start_dir)
     
         if ssheet:
-            status = run_demultiplexing(process_id, ssheet, cfg.bases_mask,
+            success = run_demultiplexing(process, ssheet, cfg.bases_mask,
                     cfg.n_threads, cfg.mismatches, start_dir, cfg.dest_dir)
-
             
         else:
             utilities.fail(process, "Can't get the sample sheet")
@@ -101,8 +112,13 @@ def main(process_id):
     else:
         utilities.fail(process, "Missing configuration information, can't demultiplex")
         
-
-
+    
+    if success:
+        utilities.success_finish(process)
+    # If failing, should have already notified of failure, just quit
+    else:
+        if not process.udf[nsc.JOB_STATUS_UDF].startswith('Fail'):
+            utilities.fail(process, "Unknown failure")
 
 
 if __name__ == "__main__":
