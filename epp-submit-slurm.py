@@ -4,6 +4,9 @@
 # This script calls slurm with the correct configuration for the site,
 # then records the job-id in a UDF.
 
+# The script must be installed in the customer extensions directory, 
+# because it needs to be readable by the glsai user.
+
 
 import sys, os.path
 import argparse

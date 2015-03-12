@@ -48,7 +48,8 @@ LOG_DIR="/data/nsc.loki/automation/logs"
 # ** OUS net: need to add this to sudoers to allow glsai to run as seq-user **
 #glsai   ALL=(seq-user)  NOPASSWD:/usr/bin/sbatch
 #Defaults:glsai          !requiretty
-INVOKE_SBATCH_ARGLIST=["/bin/sudo", "-u", "seq-user", "/usr/bin/sbatch"]
+INVOKE_SBATCH_ARGLIST=["/bin/sudo", "-u", "seq-user", "/usr/bin/sbatch",
+        "-D", "/data/nsc.loki/automation/run"]
 
 
 # Data processing programs
