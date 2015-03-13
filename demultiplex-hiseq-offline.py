@@ -1,32 +1,25 @@
-# Demultiplexing script for HiSeq
+#!/bin/env python
 
-# This is the primary demultiplexing job. It is contolled by the setup-
-# hiseq-demultiplexing script, through the use of UDFs on the process in the
-# LIMS.
+# Demultiplexing script for HiSeq -- non-LIMSified version
 
-# Its primary data processing functionality is handled by:
-# configureBclToFastq.pl
-# make
+# This script is designed to be run with sbatch directly. 
+# The following options should be specified for sbatch on 
+# the command line: 
+# --mem
+# --nthreads
+# Demultiplexing options can be given after the script name.
+# These are passed to configureBclToFastq.pl
 
-# Functional overview:
-# - Get options for demultiplexing 
-# - Set running / error flag in UDF
-# - Run demultiplexing
-# - Upload result files and set UDFs on samples
-# - Set job finished status
-# - Finsih demultiplexing step if using automatic processing
+
+
 
 import sys, os
 from genologics.lims import *
 import nsc
 import utilities
-import demultiplex
 
 
 def get_config(process):
-    '''Configuration is stored in UDFs on the demultiplexing process. This
-    function loads them into a generic object.'''
-
     try:
         cfg = object()
         cfg.bases_mask = process.udf[nsc.BASES_MASK_UDF]
@@ -41,9 +34,6 @@ def get_config(process):
 
 
 def download_sample_sheet(process, save_dir):
-    '''Downloads the demultiplexing process's sample sheet, which contains only
-    samples for the requested project (written by setup-demultiplex-hiseq.py).'''
-
     sample_sheet = None
     for o in process.all_outputs(unique=True):
         if o.output_type == "ResultFile" and o.name == "SampleSheet csv":
@@ -59,14 +49,12 @@ def download_sample_sheet(process, save_dir):
 
 
 def run_demultiplexing(process, ssheet, bases_mask, n_threads, mismatches, start_dir, dest_run_dir):
-    '''First calls the configureFastqToBcl.py, then calls make in the fastq file directory.'''
-
     os.chdir(start_dir)
     cfg_log_name = os.path.join(nsc.LOG_DIR, "configureBclToFastq-" + process.id + ".log")
     log = open(cfg_log_name, "w")
     
     args = ['--mismatches', str(mismatches)]
-    args += ['--fastq-cluster-count', "0"]
+    args += ['--fastq-cluster-count', 0]
     args += ['--sample-sheet', ssheet]
     args += ['--use-bases-mask', bases_mask]
     args += ['--output-dir', dest_run_dir]
@@ -102,6 +90,7 @@ def main(process_id):
     process = Process(nsc.lims, id=process_id)
 
     utilities.running(process)
+
     cfg = get_config(process)
 
     success = False
@@ -113,10 +102,6 @@ def main(process_id):
         if ssheet:
             success = run_demultiplexing(process, ssheet, cfg.bases_mask,
                     cfg.n_threads, cfg.mismatches, start_dir, cfg.dest_dir)
-            if success:
-                demultiplex.populate_udfs(process, TODO) or utilities.fail(process, "Failed to set UDFs")
-            else:
-                utilities.fail(process, "Demultiplexing process exited with an error status")
             
         else:
             utilities.fail(process, "Can't get the sample sheet")

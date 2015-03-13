@@ -11,6 +11,7 @@ AUTO_FLOWCELL_UDF = "Automation lane groups"
 JOB_ID_UDF = "Job ID"
 JOB_STATUS_UDF = "Job status"
 
+# UDFs for configuration and job steering
 BASES_MASK_UDF = "Bases mask"
 THREADS_UDF = "Threads"
 MISMATCHES_UDF = "Number of mismatches"
@@ -33,7 +34,7 @@ class StepSetup:
 # The top-level items are tuples of protocol name and lists of StepSetup 
 # objects. The StepSetup objects represent a step in a protocol.
 AUTOMATED_PROTOCOL_STEPS = [
-        ("Demultiplexing and QC",
+        ("Demultiplexing and QC (HiSeq)",
             [
                 StepSetup("Copy run directory (HiSeq)", "project"),
                 StepSetup("Demultiplexing (HiSeq)", "project")
@@ -55,6 +56,7 @@ INVOKE_SBATCH_ARGLIST=["/bin/sudo", "-u", "seq-user", "/usr/bin/sbatch",
 # Data processing programs
 CONFIGURE_BCL_TO_FASTQ="/data/common/tools/nscbin/configureBclToFastq.pl"
 MAKE="/usr/bin/make"
+FASTQC=""
 
 # Paths
 PRIMARY_STORAGE = "/data/runScratch.boston"
@@ -69,8 +71,6 @@ config = SafeConfigParser({
     "slurm_script": "nsc-slurm.sh"
      })
 config.read(['/etc/nsc.conf'])
-
-#slurm_script = config.get("nsc", "slurm_script")
 
 
 # Todo: move into config file, or just use this as the config.
