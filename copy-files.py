@@ -32,22 +32,27 @@ def rsync(source_path, destination_path, exclude):
     on paths are significant.'''
 
     args = [nsc.RSYNC, '-rlt', '--chmod=g+rwX']
-    # TODO check if group is set by set-gid bit
-    #args += ['--groupmap=*:' + nsc.SET_GROUP]
     args += ["--exclude=" + path for path in exclude]
     args += [source_path, destination_path]
-    code = subprocess.check_call(args)
+    # Running rsync client in slurm jobs: It is necessary to remove SELinux protections
+    # on rsync. Use this command: sudo semanage permissive -a rsync_t
+    # This isn't a security hazard because we don't use the rsync daemon.
+    code = subprocess.call(args)
     return code
 
 
 def main(process_id, instrument):
 
     process = Process(nsc.lims, id = process_id)
-    process.udf['Status'] = 'Running...'
+    process.udf[nsc.JOB_STATUS_UDF] = 'Running...'
     process.put()
 
     seq_process = utilities.get_sequencing_process(process)
-    runid = seq_process.udf['Run ID']
+    try:
+        runid = seq_process.udf['Run ID']
+    except (KeyError, AttributeError):
+        utilities.fail(process, 'Run-ID not available')
+        return False
 
     destination = nsc.SECONDARY_STORAGE
     source = os.path.join(nsc.PRIMARY_STORAGE, runid) # No trailing slash
@@ -57,7 +62,7 @@ def main(process_id, instrument):
         exclude = nextseq_exclude_paths
     elif instrument == "miseq":
         print "Miseq not supported yet!"
-    command_ok = rsync(source, destination, exclude)
+    command_ok = rsync(source, destination, ["/" + runid + e for e in exclude])
 
     if command_ok:
         utilities.success_finish(process)

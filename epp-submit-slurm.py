@@ -20,7 +20,8 @@ import utilities
 def submit_job(memory, nthreads, jobname, script, script_args):
     logfile = os.path.join(nsc.LOG_DIR, 'slurm-%j.out')
     args = ['--output=' + logfile, '--error=' + logfile, '--parsable',
-            '--job-name=' + jobname, '--nthreads=' + nthreads, '--mem=' + memory]
+            '--job-name=' + jobname, '--cpus-per-task=' + str(nthreads),
+            '--mem=' + str(memory)]
     args.append(script)
     args += script_args
     output = utilities.check_output(nsc.INVOKE_SBATCH_ARGLIST + args)
@@ -37,23 +38,22 @@ def main(process_id, memory, inputmem, nthreads, inputthreads, jobname, script, 
     process = Process(nsc.lims, id=process_id)
 
     if inputthreads:
-        nthreads += len(process.get_inputs(unique=True))*inputthreads
+        nthreads += len(process.all_inputs(unique=True))*inputthreads
     if inputmem: 
-        memory += len(process.get_inputs(unique=True))*inputmem
+        memory += len(process.all_inputs(unique=True))*inputmem
 
     job_id = submit_job(memory, nthreads, jobname, script, args)
-    if process_id:
-        post_job_id(process_id, job_id)
+    post_job_id(process, job_id)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--pid', help='Process ID')
-    parser.add_argument('--threads', help='Number of threads', default=1)
-    parser.add_argument('--inputthreads', help='Number of (extra) threads to request per process input')
-    parser.add_argument('--mem', help='Memory to request for the process (megabytes)', default=1024)
-    parser.add_argument('--inputmem', help='Memory to request per process input (megabytes)')
+    parser.add_argument('--threads', type=int, help='Number of threads', default=1)
+    parser.add_argument('--inputthreads', type=int, help='Number of (extra) threads to request per process input')
+    parser.add_argument('--mem', type=int, help='Memory to request for the process (megabytes)', default=1024)
+    parser.add_argument('--inputmem', type=int, help='Memory to request per process input (megabytes)')
     parser.add_argument('--jobname', help='Job name')
     parser.add_argument('script', help='Script to submit to sbatch')
     parser.add_argument('job_args', nargs=argparse.REMAINDER, help='Arguments to pass to the job script')
@@ -61,5 +61,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     nsc.lims.check_version()
-    main(args.pid, args.script, args.mem, args.inputmem, args.nthreads, args.inputthreads, args.jobname, args.job_args)
+    main(args.pid, args.mem, args.inputmem, args.threads, args.inputthreads, args.jobname, args.script, args.job_args)
 

@@ -105,18 +105,18 @@ def running(process):
 def fail(process, message):
     '''Report failure from background job'''
 
-    process.udf[nsc.JOB_STATUS_UDF] = 'Failed: ' + datetime.datetime.now() + ": " + message
+    process.udf[nsc.JOB_STATUS_UDF] = 'Failed: ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ": " + message
     process.put()
 
 def success_finish(process):
     '''Called by background jobs (slurm) to declare that the task has been 
     completed successfully.'''
 
-    process.udf[nsc.JOB_STATUS_UDF] = 'Completed successfully', datetime.datetime.now()
+    process.udf[nsc.JOB_STATUS_UDF] = 'Completed successfully at ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     process.put()
 
     try:
-        automation = process.get_inputs()[0].udf[nsc.AUTO_FLOWCELL_UDF]
+        automation = process.all_inputs()[0].udf[nsc.AUTO_FLOWCELL_UDF]
     except KeyError:
         automation = False
 
@@ -130,13 +130,14 @@ if sys.version_info >= (2, 7):
     check_output = subprocess.check_output
 else:
     def check_output(args):
-        proc = subprocess.Popen(args, stdout=subprocess.PIPE)
-        data = proc.communicate()[0]
+        proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        data = proc.communicate()
 
-        if proc.wait() == 0:
-            return data
+        rcode = proc.wait()
+        if rcode == 0:
+            return data[0]
         else:
-            raise subprocess.CalledProcessError("Non-zero exit code from " + args[0])
+            raise OSError(args[0] + ": " +str(rcode) +  data[1])
 
 
 
