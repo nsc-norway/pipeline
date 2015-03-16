@@ -111,17 +111,19 @@ def main(process_id):
         ssheet = download_sample_sheet(process, start_dir)
     
         if ssheet:
-            success = run_demultiplexing(process, ssheet, cfg.bases_mask,
+            process_ok = run_demultiplexing(process, ssheet, cfg.bases_mask,
                     cfg.n_threads, cfg.mismatches, start_dir, cfg.dest_dir)
-            if success:
-                demultiplex.populate_udfs(process, TODO) or utilities.fail(process, "Failed to set UDFs")
-            else:
+            if process_ok:
+                success = demultiplex.populate_results(process, TODO)
+                if not success:
+                    utilities.fail(process, "Failed to set UDFs")
+            else: # Processing (make, etc)
                 utilities.fail(process, "Demultiplexing process exited with an error status")
             
-        else:
+        else: # Sample sheet
             utilities.fail(process, "Can't get the sample sheet")
 
-    else:
+    else: # cfg
         utilities.fail(process, "Missing configuration information, can't demultiplex")
         
     
