@@ -9,6 +9,7 @@ from argparse import ArgumentParser
 from genologics.lims import *
 import nsc
 import utilities
+import logging
 
 
 # Key determined parameters:
@@ -126,17 +127,22 @@ def main(process_id, sample_sheet_file):
     parent_pids = set(p.uri for p in parent_processes)
     # This script can only handle the case when there is a single clustering process
     if len(parent_pids) == 1:
+        logging.debug('Found the right number of parent processes')
         cluster_proc = parent_processes[0]
         seq_proc = utilities.get_sequencing_process(process)
 
-        paths = get_paths(process)
+        paths = get_paths(process, seq_proc)
         if paths:
+            logging.debug('Found source and destination paths')
             process.udf[nsc.SOURCE_RUN_DIR_UDF] = paths[0]
             process.udf[nsc.DEST_FASTQ_DIR_UDF] = paths[1]
+        else:
+            logging.debug('Unable to determine source and destination paths')
 
         # use-bases-mask
         base_mask = compute_bases_mask(process, seq_proc)
         if base_mask:
+            logging.debug('Determined bases mask')
             process.udf[nsc.BASES_MASK_UDF] = base_mask
 
             # Compute number of threads for slurm job
@@ -148,14 +154,19 @@ def main(process_id, sample_sheet_file):
 
             n_threads = len(process.get_inputs(unique = True)) * reads
             process.udf[nsc.THREADS_UDF] = n_threads
+        else:
+            logging.debug('Unable to determine bases mask')
 
         process.put()
+        logging.debug('Saved settings in the process')
 
         # Sample sheet
         sample_sheet = get_sample_sheet_data(cluster_proc)
         if sample_sheet:
+            logging.debug('Found the sample sheet')
             inputs = process.all_inputs(unique=True)
             partial_sample_sheet = extract_sample_sheet(sample_sheet, inputs)
+            logging.debug('Found the sample sheet')
             of = open(sample_sheet_file, 'w')
             of.write(partial_sample_sheet)
             of.close()
@@ -175,5 +186,7 @@ if __name__ == "__main__":
     parser.add_argument('samplesheetfile', help="Sample sheet file to write")
 
     args = parser.parse_args()
+    logging.basicConfig(level=logging.DEBUG)
+    logging.debug('Starting "setup demultiplexing" script')
     sys.exit(main(args.pid,args.samplesheetfile))
 
