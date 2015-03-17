@@ -51,6 +51,8 @@ def download_sample_sheet(process, save_dir):
                 sample_sheet = o.files[0].download()
 
     if sample_sheet:
+        if process.id == "":
+            raise ValueError("Process ID is an empty string")
         name = "SampleSheet-" + process.id + ".csv"
         file(os.path.join(save_dir, name), 'w').write(sample_sheet)
         return name
@@ -111,10 +113,16 @@ def main(process_id):
         ssheet = download_sample_sheet(process, start_dir)
     
         if ssheet:
+            project_name = process.all_inputs()[0].samples[0].project.name
+            fastq_dir = os.path.join(cfg.dest_dir, "Unaligned_" + project_name)
             process_ok = run_demultiplexing(process, ssheet, cfg.bases_mask,
-                    cfg.n_threads, cfg.mismatches, start_dir, cfg.dest_dir)
+                    cfg.n_threads, cfg.mismatches, start_dir, fastq_dir)
             if process_ok:
-                success = demultiplex.populate_results(process, TODO)
+                try:
+                    success = demultiplex.populate_results(process, fastq_dir)
+                except (IOError,KeyError):
+                    success = False
+
                 if not success:
                     utilities.fail(process, "Failed to set UDFs")
             else: # Processing (make, etc)
