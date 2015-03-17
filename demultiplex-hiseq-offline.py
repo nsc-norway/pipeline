@@ -1,5 +1,8 @@
 #!/bin/env python
 
+# NOTE: Non-LIMS script is not implemented yet, and may never be!
+
+
 # Demultiplexing script for HiSeq -- non-LIMSified version
 
 # This script is designed to be run with sbatch directly. 
