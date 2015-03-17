@@ -17,6 +17,9 @@ stats = [
 
 
 def parse_demux_stats(stats_file):
+    for l in stats_file:
+        pass
+
     return None
 
 
