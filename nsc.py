@@ -13,16 +13,10 @@ JOB_STATUS_UDF = "Job status"
 
 # UDFs for configuration and job steering
 BASES_MASK_UDF = "Bases mask"
-THREADS_UDF = "Threads"
+THREADS_UDF = "Number of threads"
 MISMATCHES_UDF = "Number of mismatches"
 SOURCE_RUN_DIR_UDF = "Source run directory"
 DEST_FASTQ_DIR_UDF = "Fastq output directory"
-
-# Output file names (some are hardcoded and not given here, e.g.
-# 'SampleSheet csv', as that is identical to the one used in the official
-# lims processes)
-DEMULTIPLEX_STATS_FILE="Demultiplex stats htm"
-
 
 # Sequencing processes
 SEQ_PROCESSES=[

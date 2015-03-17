@@ -116,7 +116,7 @@ def success_finish(process):
     process.put()
 
     try:
-        automation = process.all_inputs()[0].udf[nsc.AUTO_FLOWCELL_UDF]
+        automation = process.get_inputs()[0].udf[nsc.AUTO_FLOWCELL_UDF]
     except KeyError:
         automation = False
 
