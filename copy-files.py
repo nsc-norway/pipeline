@@ -35,8 +35,12 @@ def rsync(source_path, destination_path, exclude):
     args += ["--exclude=" + path for path in exclude]
     args += [source_path, destination_path]
     # Running rsync client in slurm jobs: It is necessary to remove SELinux protections
-    # on rsync. Use this command: sudo semanage permissive -a rsync_t
-    # This isn't a security hazard because we don't use the rsync daemon.
+    # on rsync. This isn't a security hazard because the restrictions are intended for
+    # the rsync daemon, not the client that we use. The command is:
+    # sudo semanage fcontext -m -t bin_t /usr/bin/rsync
+    # sudo restorecon /usr/bin/rsync
+    # Confirm: ls -lZ /usr/bin/rsync | grep bin_t
+    # Note: first command requires absolute path.
     code = subprocess.call(args)
     return code
 
