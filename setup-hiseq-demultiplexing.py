@@ -4,7 +4,7 @@
 # do not depend on the inputs should be set as defaults in the LIMS or in the 
 # NSC configuration file.
 
-import sys
+import sys, os
 from argparse import ArgumentParser
 from genologics.lims import *
 import nsc
@@ -51,7 +51,7 @@ def get_paths(process, seq_process):
         return None
 
     source_path = os.path.join(nsc.PRIMARY_STORAGE, run_id)
-    project = process.get_inputs()[0].project
+    project = process.all_inputs()[0].samples[0].project
     output_subdir = "Unaligned_" + project.name
     dest_path = os.path.join(nsc.SECONDARY_STORAGE, run_id, output_subdir)
 
@@ -91,7 +91,7 @@ def compute_bases_mask(process, seq_proc):
     # Get an example index sequence from the pool. Note that it takes an input
     # from the demultiplexing process, not the sequencing, so we are sure to get
     # the right kind of index.
-    index_sequence = utilities.get_index_sequence(process.get_inputs()[0])
+    index_sequence = utilities.get_index_sequence(process.all_inputs()[0])
 
     if index_sequence and index_sequence != 'NoIndex':
         indices = index_sequence.split('-') 
@@ -105,14 +105,14 @@ def compute_bases_mask(process, seq_proc):
         pool_index_length = (0, 0)
 
     # Always use the full read length for data reads
-    use_bases_mask =  "y%d" % read1_length
+    use_bases_mask =  "y%d" % read_1_length
     index_reads = [index_1_length, index_2_length]
     for read_il, pool_il in zip(index_reads, pool_index_length):
         if read_il:
             use_bases_mask += ","
             if pool_il > 0:
                 use_bases_mask += "I" + str(pool_il)
-            use_bases_mask += "n" * (pool_il - read_il)
+            use_bases_mask += "n" * (read_il - pool_il)
 
     if read_2_length:
         use_bases_mask += ",y%d" % read_2_length
@@ -152,7 +152,7 @@ def main(process_id, sample_sheet_file):
             except:
                 reads = 1
 
-            n_threads = len(process.get_inputs(unique = True)) * reads
+            n_threads = len(process.all_inputs(unique = True)) * reads
             process.udf[nsc.THREADS_UDF] = n_threads
         else:
             logging.debug('Unable to determine bases mask')

@@ -92,8 +92,9 @@ def get_index_sequence(artifact):
 
 def upload_file(process, name,  path):
     pf = ProtoFile(process.lims, process.uri, path)
-    pf = process.lims.glsstorage(pf)    
+    pf = process.lims.glsstorage(pf)
     f = pf.post()
+    process.get(force=True)
     f.upload(open(path).read())
 
 
