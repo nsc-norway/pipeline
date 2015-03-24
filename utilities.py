@@ -91,6 +91,7 @@ def get_index_sequence(artifact):
 
 
 def upload_file(process, name,  path):
+<<<<<<< HEAD
     attach = None
     for out in process.all_outputs():
         if out.name == name:

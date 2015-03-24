@@ -22,7 +22,6 @@ OTHER_OPTIONS_UDF = "Other options for configureBclToFastq"
 # Output files
 CONFIGURE_LOG = "configureBclToFastq log"
 MAKE_LOG = "make log"
-
 DEMULTIPLEX_STATS_FILE = "Demultiplex_stats htm"
 
 # Sequencing processes
