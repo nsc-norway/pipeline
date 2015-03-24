@@ -42,7 +42,7 @@ def rsync(source_path, destination_path, exclude):
     # Confirm: ls -lZ /usr/bin/rsync | grep bin_t
     # Note: first command requires absolute path.
     code = subprocess.call(args)
-    return code
+    return code == 0
 
 
 def main(process_id, instrument):

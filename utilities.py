@@ -91,9 +91,17 @@ def get_index_sequence(artifact):
 
 
 def upload_file(process, name,  path):
-    pf = ProtoFile(process.lims, process.uri, path)
-    pf = process.lims.glsstorage(pf)    
+    attach = None
+    for out in process.all_outputs():
+        if out.name == name:
+            attach = out
+            break
+    if not attach:
+        raise ValueError(name + " is not a valid result file for " + process.id)
+    pf = ProtoFile(process.lims, attach.uri, path)
+    pf = process.lims.glsstorage(pf)
     f = pf.post()
+    process.get(force=True)
     f.upload(open(path).read())
 
 
@@ -112,11 +120,11 @@ def success_finish(process):
     '''Called by background jobs (slurm) to declare that the task has been 
     completed successfully.'''
 
-    process.udf[nsc.JOB_STATUS_UDF] = 'Completed successfully at ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    process.udf[nsc.JOB_STATUS_UDF] = 'Completed successfully ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     process.put()
 
     try:
-        automation = process.get_inputs()[0].udf[nsc.AUTO_FLOWCELL_UDF]
+        automation = process.all_inputs()[0].udf[nsc.AUTO_FLOWCELL_UDF]
     except KeyError:
         automation = False
 

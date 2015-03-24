@@ -12,11 +12,18 @@ JOB_ID_UDF = "Job ID"
 JOB_STATUS_UDF = "Job status"
 
 # UDFs for configuration and job steering
-BASES_MASK_UDF = "Bases mask"
+BASES_MASK_UDF = "Bases Mask"
 THREADS_UDF = "Number of threads"
 MISMATCHES_UDF = "Number of mismatches"
 SOURCE_RUN_DIR_UDF = "Source run directory"
 DEST_FASTQ_DIR_UDF = "Fastq output directory"
+OTHER_OPTIONS_UDF = "Other options for configureBclToFastq"
+
+# Output files
+CONFIGURE_LOG = "configureBclToFastq log"
+MAKE_LOG = "make log"
+
+DEMULTIPLEX_STATS_FILE = "Demultiplex_stats htm"
 
 # Sequencing processes
 SEQ_PROCESSES=[

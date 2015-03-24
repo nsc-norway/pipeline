@@ -5,7 +5,7 @@
 # Accounting / management
 #SBATCH --account=nsc
 #SBATCH --qos=high
-#SBATCH --partition=nsc
+#SBATCH --partition=main
 
 # Job resources. 
 #SBATCH --nodes=1
