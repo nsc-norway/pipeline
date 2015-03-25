@@ -34,7 +34,6 @@ def get_demux_stats(demux_summary_file_path):
             pass
 
 
-
 def parse_demux_stats(stats_data):
     '''Parse the Demultiplex_stats.htm file and return a list of records,
     one for each row.'''
@@ -49,9 +48,9 @@ def parse_demux_stats(stats_data):
 
     barcode_lane_table = tables[1]
     barcode_lanes = []
-    for row in re.finditer("<tr>(.*?)</tr>", barcode_lane_table):
+    for row in re.finditer("<tr>(.*?)</tr>", barcode_lane_table, re.DOTALL): 
         barcode_lane = {}
-        for i, cell in enumerate(re.finditer("<td>(.*?)</td>", row)):
+        for i, cell in enumerate(re.finditer("<td>(.*?)</td>", row.groups(1))):
             barcode_lane[field_names[i]] = cell
         barcode_lanes.append(barcode_lane)
 
