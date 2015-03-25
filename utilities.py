@@ -90,8 +90,16 @@ def get_index_sequence(artifact):
         return None
 
 
-def upload_file(process, name,  path):
-<<<<<<< HEAD
+def upload_file(process, name, path = None, data = None):
+    '''This function uploads the provided file to a ResultFile output with 
+    on the given process with the specified name.'''
+
+    if not data:
+        if path:
+            data = open(path).read()
+        else:
+            raise ValueError("Must give either path or data")
+
     attach = None
     for out in process.all_outputs():
         if out.name == name:
@@ -103,7 +111,7 @@ def upload_file(process, name,  path):
     pf = process.lims.glsstorage(pf)
     f = pf.post()
     process.get(force=True)
-    f.upload(open(path).read())
+    f.upload(data)
 
 
 def running(process):

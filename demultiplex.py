@@ -3,8 +3,10 @@
 import os
 import re
 import glob
-from genologics.lims import *
 from xml.etree import ElementTree
+from decimal import *
+from genologics.lims import *
+import nsc, utilities
 
 
 # List of tupes:
@@ -15,14 +17,14 @@ from xml.etree import ElementTree
 # * The actual name of the UDF is Yield PF (Gb) R1 etc.
 
 stats = [
-        (('# Reads'), '# Reads', None),
-        (('Yield (Mbases)'), 'Yield PF (Gb)', lambda x: str(int(x) / 1.0)),
-        (('% PF'), '%PF', None), 
-        (('% of raw clusters per lane'), '% of Raw Clusters Per Lane', None),
-        (('% Perfect Index Reads'), '% Perfect Index Read', None),
-        (('% One Mismatch Reads (Index)'), '% One Mismatch Reads (Index)', None),
-        (('% of &gt;= Q30 Bases (PF)'), '% Bases >=Q30', None),
-        (( 'Mean Quality Score (PF)'), 'Ave Q Score', None)
+        (('# Reads',), '# Reads', lambda x: int(x.replace(',',''))),
+        (('Yield (Mbases)',), 'Yield PF (Gb)', lambda x: int(x) / 1.0),
+        (('% PF',), '%PF', float), 
+        (('% of raw clusters per lane',), '% of Raw Clusters Per Lane', float),
+        (('% Perfect Index Reads',), '% Perfect Index Read', float),
+        (('% One Mismatch Reads (Index)',), '% One Mismatch Reads (Index)', float),
+        (('% of &gt;= Q30 Bases (PF)',), '% Bases >=Q30', float),
+        (( 'Mean Quality Score (PF)',), 'Ave Q Score', float)
         ]
 
 
@@ -50,20 +52,26 @@ def parse_demux_stats(stats_data):
     barcode_lanes = []
     for row in re.finditer("<tr>(.*?)</tr>", barcode_lane_table, re.DOTALL): 
         barcode_lane = {}
-        for i, cell in enumerate(re.finditer("<td>(.*?)</td>", row.groups(1))):
-            barcode_lane[field_names[i]] = cell
+        for i, cell in enumerate(re.finditer("<td>(.*?)</td>", row.group(1))):
+            barcode_lane[field_names[i]] = cell.group(1)
         barcode_lanes.append(barcode_lane)
 
     return barcode_lanes
 
 
 
-def lookup_sample(process, sample_name):
-    for i in process.all_inputs(unique=True):
-        if i.name == sample_name:
-            return i
-    return None
+def lookup_outfile(process, analyte_id, lane):
+    '''Look up the output artifact representing a line in the sample sheet'''
 
+    lane_id = lane + ":1"
+    sample = Artifact(nsc.lims, id=analyte_id).samples[0]
+    for input,output in process.input_output_maps:
+        if input['uri'].location[1] == lane_id:
+            if input['uri'].samples[0].id == sample.id:
+                if output['uri'].name == nsc.FASTQ_OUTPUT.format(sample.name):
+                    return output['uri']
+                    
+    return None
 
 
 def populate_results(process, demux_result_dir):
@@ -76,43 +84,28 @@ def populate_results(process, demux_result_dir):
         raise ValueError("Demultiplex_Stats.htm file does not exist")
 
     statfile = open(demultiplex_stats[0])
-    shared_out_files = process.shared_result_files()
     stats_data = statfile.read()
-    for f in shared_out_files:
-        if f.name == nsc.DEMULTIPLEX_STATS_FILE:
-            f.upload(stats_data)
+    utilities.upload_file(process, nsc.DEMULTIPLEX_STATS_FILE, data = stats_data)
 
     ds = parse_demux_stats(stats_data)
 
-    for sample in ds:
-        print "SampleRef: ", sample_lane['SampleRef']
+    for sample_lane in ds:
         if sample_lane['Index'] != "Undetermined":
             # Try to look up the sample by LIMS ID -- if the sample sheet is generated
             # by Clarity, the Description is set to the LIMS ID.
-            limsid = sample_lane['Description']
-            lims_sample = None
-            if limsid:
-                try:
-                    lims_sample = Artifact(process.lims, limsid)
-                except:
-                    pass
-            if not lims_sample:
-                # Look up by name
-                lims_sample = lookup_sample(process, sample_lane['SampleRef'])
+            lims_fastqfile = lookup_outfile(process, sample_lane['Description'], sample_lane['Lane'])
 
-            print "Lims sample looked up: ", lims_sample
-
-            if lims_sample:
+            if lims_fastqfile:
                 for statname, udfname, convert in stats:
                     for st in statname:
                         try:
                             if not convert:
                                 convert = lambda x: x
-                            lims_sample.udf[udfname] = convert(sample_lane[st])
-                            print "Set " , udfname, " to ", sample_lane[st], "on", lims_sample.id
+                            if sample_lane[st]:
+                                lims_fastqfile.udf[udfname] = convert(sample_lane[st])
                         except KeyError:
                             pass
-                lims_sample.put()
+                lims_fastqfile.put()
 
     return True
 

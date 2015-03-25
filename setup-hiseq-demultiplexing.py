@@ -52,7 +52,7 @@ def get_paths(process, seq_process):
 
     source_path = os.path.join(nsc.PRIMARY_STORAGE, run_id)
     project = process.all_inputs()[0].samples[0].project
-    output_subdir = "Unaligned_" + project.name
+    output_subdir = "Unaligned_" + process.id
     dest_path = os.path.join(nsc.SECONDARY_STORAGE, run_id, output_subdir)
 
     return (source_path, dest_path)

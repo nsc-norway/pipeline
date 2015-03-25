@@ -19,10 +19,16 @@ SOURCE_RUN_DIR_UDF = "Source run directory"
 DEST_FASTQ_DIR_UDF = "Fastq output directory"
 OTHER_OPTIONS_UDF = "Other options for configureBclToFastq"
 
+# Other UDFs
+# Tracking the location of fastq files
+FILE_LOCATION = "Data location"
+
+
 # Output files
 CONFIGURE_LOG = "configureBclToFastq log"
 MAKE_LOG = "make log"
-DEMULTIPLEX_STATS_FILE = "Demultiplex_stats htm"
+DEMULTIPLEX_STATS_FILE = "Demultiplex_stats.htm"
+FASTQ_OUTPUT = "{0} fastq"
 
 # Sequencing processes
 SEQ_PROCESSES=[

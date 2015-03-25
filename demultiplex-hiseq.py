@@ -37,9 +37,13 @@ def get_config(process):
         cfg.mismatches = process.udf[nsc.MISMATCHES_UDF]
         cfg.run_dir = process.udf[nsc.SOURCE_RUN_DIR_UDF]
         cfg.dest_dir = process.udf[nsc.DEST_FASTQ_DIR_UDF]
+    except KeyError:
+        return None
+    # Optional
+    try:
         cfg.other_options = process.udf[nsc.OTHER_OPTIONS_UDF]
     except KeyError:
-        cfg = None
+        cfg.other_options = None
 
     return cfg
 
@@ -59,7 +63,7 @@ def download_sample_sheet(process, save_dir):
             raise ValueError("Process ID is an empty string")
         name = "SampleSheet-" + process.id + ".csv"
         file(os.path.join(save_dir, name), 'w').write(sample_sheet)
-        return name
+        return name, sample_sheet
     else:
         return False
 
@@ -108,6 +112,63 @@ def run_demultiplexing(process, ssheet, bases_mask, n_threads, mismatches,
     return False
 
 
+def parse_sample_sheet(sample_sheet):
+    lines = sample_sheet.splitlines()
+    headers = lines[0].split(",")
+    samples = []
+    for l in lines[1:]:
+        sam = {}
+        for h, v in zip(headers, l.split(",")):
+            sam[h] = v
+        samples.append(sam)
+
+    return samples
+
+
+def rename_project_directories(runid, unaligned_dir, sample_sheet):
+    '''Renames project fastq directories: adds the date, machine name and flowcell
+    index (A or B) to the name of the project directories.
+    
+    Returns the mapping of project names (mangled for the sample sheet) to the 
+    renamed directories.'''
+
+    date_machine_flowcell = re.match(r"([\d]+_[^_]+)_[\d]+_([AB])", runid)
+    project_prefix = date_machine_flowcell.group(1) + "." + date_machine_flowcell.group(2) + "."
+
+    projects = set(sam['SampleProject'] for sam in sample_sheet)
+    projdir = {}
+    for pro in projects:
+        original = os.path.join(unaligned_dir, "Project_" + pro)
+        rename_to = os.path.join(unaligned_dir, project_prefix + "Project_" + pro)
+        os.rename(original, rename_to)
+        projdir[pro] = rename_to
+
+    return projdir
+
+
+def check_fastq_and_attach_files(process, sample_sheet, projdirs, reads):
+    '''Attaches ResultFile outputs of the HiSeq demultiplexing process.'''
+
+    for sam in sample_sheet:
+        sample_dir = "Sample_" + sam['SampleID']
+        fastq_names = ["{0}_{1}_L{2}_{3}_001.fastq.gz".format(sam['SampleID'],
+            sam['Index'], sam['Lane'].zfill(3), r) for r in reads]
+        fastq_paths = [os.path.join(projdirs[sam['SampleProject']], 
+            sample_dir, fq) for fq in fastq_names]
+
+        for fp in fastq_paths:
+            # Continues even if file doesn't exist. This will be discovered
+            # in other ways, preferring "robust" operation here.
+            if os.path.exists(fp):
+                print "looking up analyte id ", sam['Description'], "lane", sam['Lane']
+                result_file_artifact = demultiplex.lookup_outfile(process, sam['Description'],
+                        sam['Lane'])
+                pf = ProtoFile(nsc.lims, result_file_artifact.uri, fp)
+                pf = nsc.lims.glsstorage(pf)
+                f = pf.post()
+                f.upload(fp) # content of the file is the path
+    
+
 def main(process_id):
     process = Process(nsc.lims, id=process_id)
 
@@ -118,15 +179,28 @@ def main(process_id):
     if cfg:
         start_dir = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
     
-        ssheet = download_sample_sheet(process, start_dir)
+        ssheet_file,sample_sheet_data = download_sample_sheet(process, start_dir)
+        sample_sheet = parse_sample_sheet(sample_sheet_data)
     
-        if ssheet:
-            process_ok = run_demultiplexing(process, ssheet, cfg.bases_mask,
-                    cfg.n_threads, cfg.mismatches, start_dir, cfg.dest_dir,
-                    cfg.other_options)
+        if ssheet_file:
+            process_ok = True
+            #process_ok = run_demultiplexing(process, ssheet_file, cfg.bases_mask,
+            #        cfg.n_threads, cfg.mismatches, start_dir, cfg.dest_dir,
+            #        cfg.other_options)
             if process_ok:
+                seq_proc = utilities.get_sequencing_process(process)
+                runid = seq_proc.udf['Run ID']
+                projdirs = rename_project_directories(runid, cfg.dest_dir, sample_sheet)
+                reads = ["R1"]
+                try:
+                    if seq_proc.udf['Read 2 Cycles']:
+                        reads.append("R2")
+                except KeyError:
+                    pass
+                check_fastq_and_attach_files(process, sample_sheet, projdirs, reads)
                 try:
                     success = demultiplex.populate_results(process, cfg.dest_dir)
+                    success = success and demultiplex.attach_files(process, cfg.dest_dir)
                 except (IOError,KeyError):
                     success = False
 
@@ -157,7 +231,7 @@ if __name__ == "__main__":
         except:
             process = Process(nsc.lims, id = sys.argv[1])
             utilities.fail(process, "Unexpected: " + str(sys.exc_info()[1]))
-            raise sys.exc_info()[1]
+            raise
     else:
         print "use: demultiplex-hiseq.py <process-id>"
         sys.exit(1)
