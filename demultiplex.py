@@ -28,36 +28,6 @@ stats = [
         ]
 
 
-def get_demux_stats(demux_summary_file_path):
-    tree = ElementTree.parse(demux_summary_file_path)
-    root = tree.getroot()
-    if root.tag == "Summary":
-        for lane in root.findall("Lane"):
-            pass
-
-
-def parse_demux_stats(stats_data):
-    '''Parse the Demultiplex_stats.htm file and return a list of records,
-    one for each row.'''
-
-    # re.DOTALL does a "tall" match, including multiple lines
-    tables = re.findall("<table[ >].*?</table>", stats_data, re.DOTALL)
-
-    header_table = tables[0]
-    field_names = []
-    for match in re.finditer("<th>(.*?)</th>", header_table):
-        field_names.append(match.group(1))
-
-    barcode_lane_table = tables[1]
-    barcode_lanes = []
-    for row in re.finditer("<tr>(.*?)</tr>", barcode_lane_table, re.DOTALL): 
-        barcode_lane = {}
-        for i, cell in enumerate(re.finditer("<td>(.*?)</td>", row.group(1))):
-            barcode_lane[field_names[i]] = cell.group(1)
-        barcode_lanes.append(barcode_lane)
-
-    return barcode_lanes
-
 
 
 def lookup_outfile(process, analyte_id, lane):
@@ -74,22 +44,8 @@ def lookup_outfile(process, analyte_id, lane):
     return None
 
 
-def populate_results(process, demux_result_dir):
-    '''Reads demultiplexing results and adds UDFs to artifacts.
-    
-    The demux_result_dir argument should refer to the "Unaligned" directory.'''
-
-    demultiplex_stats = glob.glob(demux_result_dir + "/Basecall_Stats_*/Demultiplex_Stats.htm")
-    if not demultiplex_stats:
-        raise ValueError("Demultiplex_Stats.htm file does not exist")
-
-    statfile = open(demultiplex_stats[0])
-    stats_data = statfile.read()
-    utilities.upload_file(process, nsc.DEMULTIPLEX_STATS_FILE, data = stats_data)
-
-    ds = parse_demux_stats(stats_data)
-
-    for sample_lane in ds:
+def set_output_file_udfs(process, demultiplex_stats):
+    for sample_lane in demultiplex_stats:
         if sample_lane['Index'] != "Undetermined":
             # Try to look up the sample by LIMS ID -- if the sample sheet is generated
             # by Clarity, the Description is set to the LIMS ID.
@@ -106,6 +62,30 @@ def populate_results(process, demux_result_dir):
                         except KeyError:
                             pass
                 lims_fastqfile.put()
+
+def set_lane_udfs(process, demultiplex_stats):
+    '''Set UDFs on inputs to the demultiplexing proces, based on demultiplexing 
+    statistics.
+    
+    Setting data on inputs seems wrong..'''
+    pass
+
+
+def populate_results(process, demux_result_dir):
+    '''Reads demultiplexing results and adds UDFs to artifacts.
+    
+    The demux_result_dir argument should refer to the "Unaligned" directory.'''
+
+    demultiplex_stats = glob.glob(demux_result_dir + "/Basecall_Stats_*/Demultiplex_Stats.htm")
+    if not demultiplex_stats:
+        raise ValueError("Demultiplex_Stats.htm file does not exist")
+
+    statfile = open(demultiplex_stats[0])
+    stats_data = statfile.read()
+    utilities.upload_file(process, nsc.DEMULTIPLEX_STATS_FILE, data = stats_data)
+
+    ds = parse_demux_stats(stats_data)
+    set_output_file_udfs(process, ds)
 
     return True
 

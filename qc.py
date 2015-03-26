@@ -16,4 +16,3 @@ def run_fastqc(fastq_dir, logfile=subprocess.STDOUT, max_threads=None):
 def generate_report():
     pass
 
-

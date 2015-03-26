@@ -167,7 +167,7 @@ def check_fastq_and_attach_files(process, sample_sheet, projdirs, reads):
                 pf = nsc.lims.glsstorage(pf)
                 f = pf.post()
                 f.upload(fp) # content of the file is the path
-    
+
 
 def main(process_id):
     process = Process(nsc.lims, id=process_id)
@@ -200,7 +200,7 @@ def main(process_id):
                 check_fastq_and_attach_files(process, sample_sheet, projdirs, reads)
                 try:
                     success = demultiplex.populate_results(process, cfg.dest_dir)
-                    success = success and demultiplex.attach_files(process, cfg.dest_dir)
+
                 except (IOError,KeyError):
                     success = False
 
