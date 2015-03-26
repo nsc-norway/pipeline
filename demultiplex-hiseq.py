@@ -174,6 +174,18 @@ def main(process_id):
 
     utilities.running(process)
     cfg = get_config(process)
+    
+    seq_proc = utilities.get_sequencing_process(process)
+    runid = seq_proc.udf['Run ID']
+    destination = os.path.join(nsc.SECONDARY_STORAGE, runid)
+    try:
+        os.mkdir(destination)
+        # If directory didn't exist, we can call the copy files job
+        if not copyfiles.copy_files(process, 'hiseq'):
+            utilities.fail(process, 'Unable to copy files')
+            return
+    except OSError:
+        pass # Already exists (or other errors we'll happily ignore)
 
     success = False
     if cfg:
@@ -188,8 +200,6 @@ def main(process_id):
             #        cfg.n_threads, cfg.mismatches, start_dir, cfg.dest_dir,
             #        cfg.other_options)
             if process_ok:
-                seq_proc = utilities.get_sequencing_process(process)
-                runid = seq_proc.udf['Run ID']
                 projdirs = rename_project_directories(runid, cfg.dest_dir, sample_sheet)
                 reads = ["R1"]
                 try:

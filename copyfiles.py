@@ -45,18 +45,11 @@ def rsync(source_path, destination_path, exclude):
     return code == 0
 
 
-def main(process_id, instrument):
-
-    process = Process(nsc.lims, id = process_id)
-    process.udf[nsc.JOB_STATUS_UDF] = 'Running...'
-    process.put()
-
+def copy_files(process, instrument):
     seq_process = utilities.get_sequencing_process(process)
-    try:
-        runid = seq_process.udf['Run ID']
-    except (KeyError, AttributeError):
-        utilities.fail(process, 'Run-ID not available')
-        return False
+    # if it throws KeyError, AttributeError, etc., tough luck, handle 
+    # upstream
+    runid = seq_process.udf['Run ID']
 
     destination = nsc.SECONDARY_STORAGE
     source = os.path.join(nsc.PRIMARY_STORAGE, runid) # No trailing slash
@@ -66,14 +59,7 @@ def main(process_id, instrument):
         exclude = nextseq_exclude_paths
     elif instrument == "miseq":
         print "Miseq not supported yet!"
-    command_ok = rsync(source, destination, ["/" + runid + e for e in exclude])
-
-    if command_ok:
-        utilities.success_finish(process)
-    else:
-        utilities.fail(process, 'File copy error')
-    return command_ok
-    
+    return rsync(source, destination, ["/" + runid + e for e in exclude])
 
 
 if __name__ == '__main__':
@@ -83,5 +69,5 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args.pid, args.instrument)
+    main(Process(nsc.lims, id=args.pid), args.instrument)
 

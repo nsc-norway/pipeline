@@ -1,7 +1,5 @@
 import re
 
-
-
 def parse_demux_stats(stats_data):
     '''Parse the Demultiplex_stats.htm file and return a list of records,
     one for each row.'''
@@ -23,4 +21,15 @@ def parse_demux_stats(stats_data):
         barcode_lanes.append(barcode_lane)
 
     return barcode_lanes
+
+
+
+def get_demux_stats(demux_summary_file_path):
+    tree = ElementTree.parse(demux_summary_file_path)
+    root = tree.getroot()
+    if root.tag == "Summary":
+        for lane in root.findall("Lane"):
+            pass
+
+
 
