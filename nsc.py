@@ -73,6 +73,7 @@ FASTQC=""
 # Paths
 PRIMARY_STORAGE = "/data/runScratch.boston"
 SECONDARY_STORAGE="/data/nsc.loki"
+DO_COPY_METADATA_FILES=True
 
 SET_GROUP='nsc-seq'
 

@@ -112,17 +112,6 @@ def run_demultiplexing(process, ssheet, bases_mask, n_threads, mismatches,
     return False
 
 
-def parse_sample_sheet(sample_sheet):
-    lines = sample_sheet.splitlines()
-    headers = lines[0].split(",")
-    samples = []
-    for l in lines[1:]:
-        sam = {}
-        for h, v in zip(headers, l.split(",")):
-            sam[h] = v
-        samples.append(sam)
-
-    return samples
 
 
 def rename_project_directories(runid, unaligned_dir, sample_sheet):
@@ -178,21 +167,26 @@ def main(process_id):
     seq_proc = utilities.get_sequencing_process(process)
     runid = seq_proc.udf['Run ID']
     destination = os.path.join(nsc.SECONDARY_STORAGE, runid)
-    try:
-        os.mkdir(destination)
-        # If directory didn't exist, we can call the copy files job
-        if not copyfiles.copy_files(process, 'hiseq'):
-            utilities.fail(process, 'Unable to copy files')
-            return
-    except OSError:
-        pass # Already exists (or other errors we'll happily ignore)
+
+    if nsc.DO_COPY_METADATA_FILES:
+        already_existed = True
+        try:
+            os.mkdir(destination)
+            already_existed = False
+        except OSError:
+            pass
+
+        if not already_existed:
+            if not copyfiles.copy_files(process, 'hiseq'):
+                utilities.fail(process, 'Unable to copy files')
+                return
 
     success = False
     if cfg:
         start_dir = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
     
         ssheet_file,sample_sheet_data = download_sample_sheet(process, start_dir)
-        sample_sheet = parse_sample_sheet(sample_sheet_data)
+        sample_sheet = utilities.parse_hiseq_sample_sheet(sample_sheet_data)
     
         if ssheet_file:
             process_ok = True
