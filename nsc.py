@@ -75,6 +75,8 @@ PRIMARY_STORAGE = "/data/runScratch.boston"
 SECONDARY_STORAGE="/data/nsc.loki"
 DO_COPY_METADATA_FILES=True
 
+
+# Group of files written (TODO: not currently used)
 SET_GROUP='nsc-seq'
 
 lims = Lims(BASEURI,USERNAME,PASSWORD)
