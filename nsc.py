@@ -29,6 +29,7 @@ CONFIGURE_LOG = "configureBclToFastq log"
 MAKE_LOG = "make log"
 DEMULTIPLEX_STATS_FILE = "Demultiplex_stats.htm"
 FASTQ_OUTPUT = "{0} fastq"
+LOG_DIR="/data/nsc.loki/automation/logs"
 
 # Sequencing processes
 SEQ_PROCESSES=[
@@ -55,7 +56,8 @@ AUTOMATED_PROTOCOL_STEPS = [
 
 # System programs
 RSYNC="/usr/bin/rsync"
-LOG_DIR="/data/nsc.loki/automation/logs"
+MD5DEEP="/usr/bin/md5deep"
+PDFLATEX="/usr/bin/pdflatex"
 
 # Command line to run slurm
 # ** OUS net: need to add this to sudoers to allow glsai to run as seq-user **
@@ -74,6 +76,11 @@ FASTQC=""
 PRIMARY_STORAGE = "/data/runScratch.boston"
 SECONDARY_STORAGE="/data/nsc.loki"
 DO_COPY_METADATA_FILES=True
+
+# Template files
+CUSTOMER_REPORT_TEMPLATE = "/data/nsc.loki/scripts/template/reportTemplate_indLane_v4.tex"
+INTERNAL_HTML_TOP = "/data/nsc.loki/scripts/template/QC_NSC_report_template.html"
+LOGO = "/data/nsc.loki/scripts/template/NSC_logo_original_RGB.tif"
 
 
 # Group of files written (TODO: not currently used)

@@ -1,76 +1,295 @@
-# QC functions top level module file
+# QC functions library module file
 
 # This module provides QC-related functions for all Illumina sequencer types.
 
 import subprocess
+import re, os
+import shutil
+from multiprocessing import Pool
+import nsc, utilities
 
 
 def run_fastqc(files, logfile=subprocess.STDOUT, output_dir=None, max_threads=None):
     '''Run fastqc on a set of fastq files'''
     args = []
     if max_threads:
-        args += ['--threads=' + max_threads]
+        args += ['--threads=' + str(max_threads)]
     if output_dir:
         args += ["--outdir=" + output_dir]
     args += files
     rc = subprocess.call([nsc.FASTQC] + args, stderr=logfile, stdout=logfile)
     
 
-def move_fastqc_results(fastqc_dir, samples):
-    for s in samples:
-        sample_dir = os.path.join(fastqc_dir, "Sample_" + s.name)
-        try:
-            os.mkdir(sample_dir)
-        except OSError:
-            print "Warning: Writing into existing sample directory Sample_" + s.name
 
-        
+def fastqc_dir(fastqfile):
+    '''Get base name of fastqc directory given the name of the fastq file'''
+    if not fp.path.endswith("fastq.gz"):
+        raise ValueError("Can only process fastq.gz files!")
+    return re.sub("fastq.gz$", "_fastqc", os.path.basename(fp))
 
+
+
+def move_fastqc_results(quality_control_dir, sample):
+    '''Move fastqc reports into correct subdirectories. Initially, 
+    they will be created directly in the quality_control_dir.
+    (The reason is that we want to run a single fastqc command, to 
+    use multi-threading, so we can't give different output dirs)'''
+
+    sample_dir = os.path.join(quality_control_dir, "Sample_" + sample.name)
+    os.mkdir(sample_dir) # may raise OSError if exists
+    
+    for f in sample.files:
+        fp  = f.path
+        fastqc_result_dir_name = fastqc_dir(fp)
+
+        # Don't need the zip, as we have the uncompressed version.
+        os.remove(quality_control_dir + ".zip")
+
+        # Move from root fastqc to sample directory
+        src_file = os.path.join(quality_control_dir, fastqc_result_dir_name)
+        dst_file = os.path.join(sample_dir, fastqc_result_dir_name)
+        os.rename(src_file, dst_file)
+
+
+def replace_multiple(replacedict, string):
+    '''Replace each key in replacedict found in string with the
+    value in replacedict. Note: special regex characters are not
+    escaped, as we don't need that.'''
+    # thanks, stackoverflow 6116978 (also considered Python's Template, 
+    # but the use of dollar signs in template placeholders interferes 
+    # with latex syntax, though only when editing the template itself)
+
+    pattern = re.compile('|'.join(replacedict.keys()))
+    return pattern.sub(lambda m: rep[m.group(0)], text)
+
+
+def tex_escape(s):
+    return re.sub("(!?\d|\w|\(|\)|\+|\-|\.", lambda x: "\\" + x.group(0), s)
+
+
+def generate_report_for_customer(quality_control_dir, run_id,
+        software_versions, template, sample_fastq):
+    '''Generate PDF report for a fastq file.
+
+    The last argument, sample_fastq, is a tuple containing a 
+    Sample object and a FastqFile object'''
+
+    sample, fastq = sample_fastq
+    sample_dir = os.path.join(quality_control_dir, "Sample_" + sample.name)
+    pdf_dir = os.path.join(sample_dir, "pdf")
+    os.mkdir(pdf_dir)
+    os.chdir(pdf_dir) # fine to do cd in parallel since we're using multiprocessing
+
+    raw_replacements = {
+        '__RunName__': run_id,
+        '__VersionString__': " & ".join([software_versions['RTA'], software_versions['bcl2fastq']]),
+        '__SampleName__': sample.name,
+        '__ReadNum__': fastq.read_num,
+        '__TotalN__': sample.num_reads,
+        '__Folder__': '../' + fastqc_dir(fastq.path)
+            }
+
+    replacements = dict((k, tex_escape(v)) for k,v in raw_replacements.items())
+    report_root_name = ".".join(run_id, str(sample.lane), "Sample_" + sample.name,
+            "Read" + str(fastq.read_num), "qc")
+    fname = report_root_name + ".tex"
+    of = open(fname, "w")
+    of.write(replace_multiple(replacements, template))
+    of.close()
+    DEVNULL = open(os.devnull, 'wb') # discard output
+    subprocess.check_call([nsc.PDFLATEX, '-shell-escape', fname],
+            stdout=DEVNULL, stdin=DEVNULL)
+
+    pdfname = report_root_name + ".pdf"
+    fastq_sample_dir = os.path.dirname(fastq.path)
+    os.copy(pdfname, fastq_sample_dir + "/" + pdfname)
+    os.rename(pdfname, quality_control_dir + pdfname)
+
+
+def compute_md5(project_path, threads):
+    md5data = utilities.check_output([nsc.MD5DEEP, "-rl", "-j" + str(threads), "."],
+            cwd=project_path)
+    open(os.path.join(project_path, "md5sum.txt"), "w")).write(md5data)
+
+
+def extract_format_overrepresented(fqc_report, fastqfile, index):
+    '''Processes the fastqc_report.html file for a single fastq file and extracts the
+    overrepresented sequences.'''
+
+    with open(fqc_report) as reportfile: # we'll be good about closing these, since there may be many
+        found_over = False
+        buf = ""
+
+        for l in reportfile:
+            if found_over:
+                if "<table>" in l:
+                    buf += '<table border="1">\n'
+                elif "</table>" in l:
+                    buf += l
+                    break
+                else:
+                    buf += l
+
+            elif "No overrepresented sequences" in l:
+                return '''\
+<h2 id="{id}">{laneName}</h2>
+<div style="font:10pt courier">
+<p>No overrepresented sequences</p>
+<p></p>
+</div>
+'''.format(id=index, laneName=fastqfile)
+            elif "Overrepresented sequences</h2>" in l:
+                found_over = True
+                buf += '<h2 id="{id}">{laneName}</h2>\n'.format(id=index, laneName=fastqfile)
+                buf += '<p></p>\n'
+                buf += '<div style="font: 10pt courier;">\n'
+
+        buf += "</div>\n"
+        return buf
+
+
+
+
+
+
+def generate_internal_html_report(quality_control_dir, samples):
+    # Generate the NSC QC report HTML file
+    top_file = open(nsc.INTERNAL_HTML_TOP)
+    overrepresented_seq_buffer = ""
+    shutil.copy(nsc.LOGO, quality_control_dir)
+    with open(os.path.join(quality_control_dir, "NSC.QC.report.htm"), 'w') as out_file:
+        out_file.write(top_file.read())
+    
+        images = ["per_base_quality.png", "per_base_sequence_content.png", "per_sequence_quality.png", "per_base_n_content.png", "duplication_levels.png")
+    
+        i = 0
+        for s in samples:
+            subdir = "Sample_" + s.name
+            for fq in s.files:
+                fq_name = os.path.basename(fq.path)
+                fqc_dir = fastqc_dir(fq.path)
+
+                cell1 = "<tr><td align=\"left\"><b>{fileName}<br><br>SampleName: {sampleName}<br>Read Num: {nReads}</b></td>\n"
+                out_file.write(cell1.format(fileName=fq_name, sampleName=s.name, nReads=fq.num_reads))
+    
+                for img in images:
+                    cell = "<td><img src=\"{subDir}/{fastqcDir}/Images/{image}\" class=\"graph\" align=\"center\"></td>\n"
+                    out_file.write(cell.format(subDir=subdir, fastqcDir=fqc_dir, image=img))
+    
+                celln = "<td align=\"center\"><b><a name=\"{subDir}/{fileName}\"><a href=\"{index}\">Overrepresented sequences</a></b></td>\n</tr>\n";
+                out_file.write(celln.format(subDir=subdir, fileName=fq_name, index=i))
+                
+                report_path = os.path.join(quality_control_dir, subdir, fqc_dir, "fastqc_report.html")
+                overrepresented_seq_buffer += extract_format_overrepresented(report_path, fq_name, index)
+
+                i += 1
+        out_file.write("</table>\n")
+        out_file.write(overrepresented_seq_buffer)
+        out_file.write("</body>\n</html>\n")
+
+            
+
+
+# Model: Objects containing projects, samples and files.
+# Represents a unified interface to the QC functionality, similar to the
+# SampleInformation.txt BarcodeLaneStatistics.txt from the previous perl scripts.
 
 class Project(object):
-    def __init__(self, project_name, samples=[]):
-        self.project_name = project_name
+    def __init__(self, name, path, samples=[]):
+        self.name = name
+        self.path = path
         self.samples = samples
 
 
 class Sample(object):
-    def __init__(self, name, paths):
+    '''Contains information about a sample (one instance of this class
+    for each lane on which the sample is run). Contains a list of FastqFile
+    objects representing the reads.'''
+
+    def __init__(self, lane, name, files):
+        self.lane = lane
         self.name = name
-        self.paths = paths
+        self.files = files
+
+class FastqFile(object):
+    '''Represents a single output file for a specific sample, lane and
+    read. Currently assumed to be no more than one FastqFile per read.
+    
+    read_num is the read index, 1 or 2 (second read is only available for paired
+    end). Index reads are not considered.
+
+    Path is the path to the fastq file relative to the "Unaligned"
+    (bcl2fastq output) directory.
+    
+    num_reads is the number of full sequences that were read (number of clusters).'''
+
+    def __init__(self, read_num, path, num_reads):
+        self.read_num = read_num
+        self.path = path
+        self.num_reads = num_reads
 
 
-def qc_main(demultiplex_dir, projects_samples, data_reads, index_reads,
+
+
+def qc_main(demultiplex_dir, projects, data_reads, index_reads,
         run_id, software_versions, threads = 1):
-    '''demultiplex_dir is the location of the demultiplexed reads.
+    '''demultiplex_dir is the location of the demultiplexed reads,
+    i.e., Unaligned.
 
-    projects_samples is a list of Project objects containing references
+    projects is a list of Project objects containing references
     to samples and files. This is a generalised specification of 
     the information in the sample sheet, valid for all Illumina
-    instrument types.
+    instrument types. It also contains some data for the results, 
+    not just experiment setup.
 
     data_reads and index_reads are lists of integers representing
     the number of cycles in each read.
+
+    software_versions is a dict with (software name: version)
+    software name: RTA, bcl2fastq
     '''
     output_dir = os.path.join(demultiplex_dir, "inHouseDataProcessing")
-    fastqc_dir = os.path.join(output_dir, "QualityControl")
+    quality_control_dir = os.path.join(output_dir, "QualityControl")
     try:
         os.mkdir(output_dir) # Unaligned/inHouseDataProcessing/
     except OSError:
         pass
     try:
-        os.mkdir(fastqc_dir) # Unaligned/inHouseDataProcessing/QualityControl
+        os.mkdir(quality_control_dir) # Unaligned/inHouseDataProcessing/QualityControl
     except OSError:
         pass
     
 
-    # First dump all fastqc output into QualityControl, them move thme 
+    all_fastq = [f.path for f in s.files for s in pro.samples for pro in projects]
+
+    if len(set(os.path.basename(p) for p in all_fastq)) < len(all_fastq):
+        raise RuntimeError("Not all fastq file names are unique! Can't deal with this, consider splitting into smaller jobs.")
+
+    # Run FastQC
+    # First output all fastqc results into QualityControl, them move them
     # in place later
-    all_fastq = [p for p in s.paths for s in pro.samples for pro in projects_samples]
+    run_fastqc(all_fastq, output_dir=quality_control_dir, max_threads=threads) 
+    samples = [sam for sam in pro.samples for pro in projects]
+    for s in samples:
+       move_fastqc_results(quality_control_dir, s)
 
-    if len(set(os.path.split(p)[1] for p in all_fastq)) < len(all_fastq):
-        raise Exception("Not all fastq file names are unique! Can't deal with this, consider splitting into smaller jobs.")
+    # Generate PDF reports in parallel
+    template = open(nsc.CUSTOMER_REPORT_TEMPLATE).read()
+    proc_closure = lambda x: generate_report_for_customer(quality_control_dir, run_id,
+            software_versions, template, x)
+    pool = Pool(int(threads))
+    # Run one task for each fastq file, giving a sample reference and FastqFile as argument
+    # along with the arguments specified in the lambda above
+    pool.map(proc_closure, [s,f for f in s.files for s in samples])
+    
+    # Generate md5sums for projects
+    for p in projects:
+        compute_md5(p.path, threads)
 
-    run_fastqc(all_fastq, output_dir=fastqc_dir, max_threads=threads) 
-    move_fastqc_results(s for s in pro.samples for pro in projects_samples)
+    # Generate internal reports
+    generate_internal_html_report(quality_control_dir, samples)
+    
+    # Prepare information for emails, etc
+    
 
 
