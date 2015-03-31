@@ -189,26 +189,36 @@ def get_hiseq_qc_data(run_id, n_reads, demultiplexing_units):
 
         for proj, entries in project_entries.items():
             project_dir = get_hiseq_project_dir(run_id, proj)
+
+            samples = []
+
             for e in entries:
                 sample_dir = project_dir + "/Sample_" + e['SampleID']
                 for stats in demux_stats:
                     if stats['Lane'] == e['Lane'] and stats['Sample ID'] == e['SampleID']:
                         stats_entry = stats
 
+                files = []
                 for ri in xrange(1, n_reads):
-                    path = sample_dir + "/{sampleId}_{index}_L{lane}_R{readIndex}_001.fastq.gz"
-                    path = path.format(e['SampleID'], e['Index'], e['Lane'].zfill(3), ri) 
-                    if not os.path.exists(os.path.join(u.fastq_root, path)):
-                        raise RuntimeError("Missing fastq file " + path + "!")
+
+                    # FastqFile
+                    path_t = sample_dir + "/{sampleId}_{index}_L{lane}_R{readIndex}_001.fastq.gz"
+                    path = path_t.format(e['SampleID'], e['Index'], e['Lane'].zfill(3), ri) 
+
                     f = FastqFile(int(e['Lane']), ri, path, num(stats_entry['# Reads']),
                             num(stats_entry['% of raw clusters per lane']))
                     # PF clusters = raw clusters because bcl2fastq doesn't save non-PF clusters
                     if stats_entry['% PF'] != "100.00" and stats_entry['Yield (Mbases)'] != "0":
                         raise RuntimeError("Expected 100 % PF clusters, can't get the stats")
 
+                    files.append(f)
 
+                s = Sample(e['SampleID'], files)
+
+            # Project 
             path = os.path.join(u.fastq_root, "Proj_" + projname)
             p = Project(proj, project_dir, samples)
+            projects.append(p)
 
     return projects
 
