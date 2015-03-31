@@ -19,6 +19,7 @@
 import sys, os, re
 import subprocess
 from genologics.lims import *
+import shutil
 import nsc
 import utilities
 import demultiplex
@@ -91,6 +92,7 @@ def run_demultiplexing(process, ssheet, bases_mask, n_threads, mismatches,
 
     log.close()
     utilities.upload_file(process, nsc.CONFIGURE_LOG, cfg_log_name)
+    shutil.copy(ssheet, dest_run_dir + "/SampleSheet-" + process.id + ".csv")
 
     if rcode == 0:
         os.chdir(dest_run_dir)
@@ -122,14 +124,12 @@ def rename_project_directories(runid, unaligned_dir, sample_sheet):
     Returns the mapping of project names (mangled for the sample sheet) to the 
     renamed directories.'''
 
-    date_machine_flowcell = re.match(r"([\d]+_[^_]+)_[\d]+_([AB])", runid)
-    project_prefix = date_machine_flowcell.group(1) + "." + date_machine_flowcell.group(2) + "."
 
     projects = set(sam['SampleProject'] for sam in sample_sheet)
     projdir = {}
     for pro in projects:
         original = os.path.join(unaligned_dir, "Project_" + pro)
-        rename_to = os.path.join(unaligned_dir, project_prefix + "Project_" + pro)
+        rename_to = os.path.join(unaligned_dir, parse.get_hiseq_project_dir(runid, pro))
         os.rename(original, rename_to)
         projdir[pro] = rename_to
 

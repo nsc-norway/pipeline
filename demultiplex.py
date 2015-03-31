@@ -45,7 +45,15 @@ def lookup_outfile(process, analyte_id, lane):
     return None
 
 
-def set_output_file_udfs(process, demultiplex_stats):
+def set_udfs(process, demultiplex_stats):
+    '''Set UDFs on inputs (analytes representing the lanes) and output
+    files (each fastq file).
+    '''
+    inputs = dict((i.location[0], i) for i in process.all_inputs(unique=True))
+    if len(set(i.location[1] for i in inputs)) != 1:
+        print "error: Wrong number of flowcells detected"
+        return
+
     for sample_lane in demultiplex_stats:
         if sample_lane['Index'] != "Undetermined":
             # Try to look up the sample by LIMS ID -- if the sample sheet is generated
@@ -64,27 +72,26 @@ def set_output_file_udfs(process, demultiplex_stats):
                             pass
                 lims_fastqfile.put()
 
+            else: # Undetermined!
+                analyte = inputs["{0}:1".format(sample_lane['Lane'])]
+                analyte.udf[nsc.LANE_UNDETERMINED_UDF] = sample_lane['% of raw clusters per lane']
+                analyte.put()
+
+
+
+
 
 def set_lane_udfs(process, demultiplexing_dir):
-    '''Set UDFs on inputs to the demultiplexing proces, based on demultiplexing 
-    statistics. Setting data on inputs is a bit strange, but common for QC 
-    processes.
+    ''' -- NOT USED -- 
     
-    TODO: Determine which stats are filled by the sequencing process; add information
-    on undetermined indexes.'''
+    Set UDFs on inputs to the demultiplexing proces, based on demultiplexing 
+    statistics. '''
     
-    demultiplex_summary = glob.glob(demux_result_dir + "/Basecall_Stats_*/Flowcell_demux_summary.xtm")
-    ds = parse.parse_demux_summary(demultiplex_summary)
-    inputs = dict((i.location[0], i) for i in process.all_inputs(unique=True))
-    if len(set(i.location[1] for i in inputs)) != 1:
-        print "error: Wrong number of flowcells detected"
-        return
 
     for lane, data in ds.items():
         analyte = inputs["{0}:1".format(lane)]
         for read, d in data.items():
             yield_pf = sum(s['Yield'] for s in d['Pf'])
-
 
 
 
@@ -103,8 +110,7 @@ def populate_results(process, demux_result_dir):
     utilities.upload_file(process, "Demultiplex_stats.htm", data = stats_data)
 
     ds = parse.parse_demux_stats(stats_data)
-    set_output_file_udfs(process, ds)
-    set_lane_udfs(process, demux_result_dir)
+    set_udfs(process, ds)
 
     return True
 

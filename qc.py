@@ -85,12 +85,12 @@ def generate_report_for_customer(quality_control_dir, run_id,
         '__VersionString__': " & ".join([software_versions['RTA'], software_versions['bcl2fastq']]),
         '__SampleName__': sample.name,
         '__ReadNum__': fastq.read_num,
-        '__TotalN__': sample.num_reads,
+        '__TotalN__': sample.num_pf_reads,
         '__Folder__': '../' + fastqc_dir(fastq.path)
             }
 
     replacements = dict((k, tex_escape(v)) for k,v in raw_replacements.items())
-    report_root_name = ".".join(run_id, str(fastq.lane), "Sample_" + sample.name,
+    report_root_name = ".".join(run_id, str(fastq.lane.id), "Sample_" + sample.name,
             "Read" + str(fastq.read_num), "qc")
     fname = report_root_name + ".tex"
     of = open(fname, "w")
@@ -109,7 +109,7 @@ def generate_report_for_customer(quality_control_dir, run_id,
 def compute_md5(project_path, threads):
     md5data = utilities.check_output([nsc.MD5DEEP, "-rl", "-j" + str(threads), "."],
             cwd=project_path)
-    open(os.path.join(project_path, "md5sum.txt"), "w")).write(md5data)
+    open(os.path.join(project_path, "md5sum.txt"), "w").write(md5data)
 
 
 def extract_format_overrepresented(fqc_report, fastqfile, index):
@@ -151,13 +151,14 @@ def extract_format_overrepresented(fqc_report, fastqfile, index):
 
 def generate_internal_html_report(quality_control_dir, samples):
     # Generate the NSC QC report HTML file
-    top_file = open(nsc.INTERNAL_HTML_TOP)
+    top_file = open(os.path.dirname(__file__) + "/template/QC_NSC_report_template.html")
     overrepresented_seq_buffer = ""
-    shutil.copy(nsc.LOGO, quality_control_dir)
+    shutil.copy(os.path.dirname(__file__) + "/template/NSC_logo_original_RGB.tif",
+                            quality_control_dir)
     with open(os.path.join(quality_control_dir, "NSC.QC.report.htm"), 'w') as out_file:
         out_file.write(top_file.read())
     
-        images = ["per_base_quality.png", "per_base_sequence_content.png", "per_sequence_quality.png", "per_base_n_content.png", "duplication_levels.png")
+        images = ["per_base_quality.png", "per_base_sequence_content.png", "per_sequence_quality.png", "per_base_n_content.png", "duplication_levels.png"]
     
         i = 0
         for s in samples:
@@ -167,7 +168,7 @@ def generate_internal_html_report(quality_control_dir, samples):
                 fqc_dir = fastqc_dir(fq.path)
 
                 cell1 = "<tr><td align=\"left\"><b>{fileName}<br><br>SampleName: {sampleName}<br>Read Num: {nReads}</b></td>\n"
-                out_file.write(cell1.format(fileName=fq_name, sampleName=s.name, nReads=fq.num_reads))
+                out_file.write(cell1.format(fileName=fq_name, sampleName=s.name, nReads=fq.num_pf_reads))
     
                 for img in images:
                     cell = "<td><img src=\"{subDir}/{fastqcDir}/Images/{image}\" class=\"graph\" align=\"center\"></td>\n"
@@ -186,7 +187,7 @@ def generate_internal_html_report(quality_control_dir, samples):
 
             
 
-def writeSampleInfoTable(output_path, runid, project):
+def write_sample_info_table(output_path, runid, project):
     with open(output_path, 'w') as out:
         out.write('--------------------------------		\n')
         out.write('Email for ' + project.name)
@@ -194,61 +195,80 @@ def writeSampleInfoTable(output_path, runid, project):
         nsamples = len(project.samples)
         out.write('Sequence ready for download - sequencing run ' + runid + ' - ' + project.name + ' (' + nsamples + ' samples)\n\n')
 
-        fastqfiles = []
+        for f in (fi for fi in s.files for s in project.samples):
+            out.write(os.path.basename(fi.path) + "\t")
+            out.write(str(f.num_pf_reads) + "\t")
+            out.write("fragments\n")
 
 
 
+def write_internal_sample_table(output_path, runid, samples):
+    with open(output_path, 'w') as out:
+        out.write("--------------------------------\n")
+        out.write("Table for GA_runs.xlsx\n")
+        out.write("--------------------------------\n\n")
+        out.write("Summary for run " + runid + "\n\n")
+        out.write("Need not copy column A\n\n")
+
+        for s in samples:
+            for f in s.files:
+                if f.read_num == 1:
+                    out.write(s.name + "\t")
+                    out.write(f.lane.raw_cluster_density + "\t")
+                    out.write(f.lane.pf_cluster_density + "\t")
+                    out.write(f.percent_of_pf_clusters + "%\t")
+                    out.write(f.num_pf_reads + "\t")
+                    out.write("\n")
 
 
 
+def write_summary_email(output_path, runid, projects):
+    with open(output_path, 'w') as out:
+        summary_email_head = '''\
+--------------------------------							
+Summary email to NSC members							
+--------------------------------							
+							
+Summary for run {runId}							
+							
+PF = pass illumina filter							
+PF cluster no = number of PF cluster in the lane							
+Undetermined ratio = how much proportion of fragments can not be assigned to a sample in the indexed lane							
+Quality = summary of the overall quality							
 
-# Model: Objects containing projects, samples and files.
-# Represents a unified interface to the QC functionality, similar to the
-# SampleInformation.txt BarcodeLaneStatistics.txt from the previous perl scripts.
+Lane	Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2)	Undetermined ratio	Quality
+'''.format(runid = runid)
+        out.write(summary_email_head)
+        # assumes 1 project per lane, and undetermined
+        lane_proj = dict((proj.samples[0].files[0].lane.id, proj) for proj in projects if not re.match("lane\d", proj.name))
+        lane_undetermined = dict((proj.samples[0].files[0].lane.id, proj) for proj in projects if re.match("lane\d", proj.name))
 
-class Project(object):
-    def __init__(self, name, path, samples=[]):
-        self.name = name
-        self.path = path
-        self.samples = samples
+        for l in sorted(lane_proj.keys):
+            proj = lane_proj[l]
+            undetermined = lane_undetermined[l]
+            lane = proj.samples[0].files[0].lane
+            out.write(str(l) + "\t")
+            cluster_no = sum(f.num_pf_reads for f in s.files for s in proj.samples + undetermined.samples)
+            out.write(str(cluster_no) + "\t")
+            out.write(lane.pf_ratio + "\t")
+            out.write(lane.raw_cluster_density + "\t")
+            out.write(lane.pf_cluster_density + "\t")
+            undetermined_ratio = undetermined.samples[-1].files[-1].percent_of_pf_clusters
+            out.write(str(undetermined_ratio) + "%\t")
+            out.write("ok\n")
 
 
-class Sample(object):
-    '''Contains information about a sample. Contains a list of FastqFile
-    objects representing the reads. One instance for each sample on a 
-    flowcell, even if that sample is run on multiple lanes.'''
-
-    def __init__(self, lane, name, files):
-        self.name = name
-        self.files = files
-
-class FastqFile(object):
-    '''Represents a single output file for a specific sample, lane and
-    read. Currently assumed to be no more than one FastqFile per read.
-    
-    lane is the lane number (1-based)
-
-    read_num is the read index, 1 or 2 (second read is only available for paired
-    end). Index reads are not considered.
-
-    Path is the path to the fastq file relative to the "Unaligned"
-    (bcl2fastq output) directory.
-    
-    num_reads is the number of full sequences that were read (number of clusters, 
-    note the alternative meaning of "read").'''
-
-    def __init__(self, lane, read_num, path, num_reads):
-        self.lane = lane
-        self.read_num = read_num
-        self.path = path
-        self.num_reads = num_reads
 
 
 
 
 def qc_main(demultiplex_dir, projects, data_reads, index_reads,
         run_id, software_versions, threads = 1):
-    '''demultiplex_dir is the location of the demultiplexed reads,
+    '''QC on demultiplexed data. Can be run per project, don't need
+    access to all demultiplexed runs.
+    
+
+    demultiplex_dir is the location of the demultiplexed reads,
     i.e., Unaligned.
 
     projects is a list of Project objects containing references
@@ -289,13 +309,14 @@ def qc_main(demultiplex_dir, projects, data_reads, index_reads,
        move_fastqc_results(quality_control_dir, s)
 
     # Generate PDF reports in parallel
-    template = open(nsc.CUSTOMER_REPORT_TEMPLATE).read()
-    proc_closure = lambda x: generate_report_for_customer(quality_control_dir, run_id,
+    template = open(os.path.dirname(__file__) + "/template/QC_NSC_report_template.html").read()
+    proc_closure = lambda x: generate_report_for_customer(
+            quality_control_dir, run_id,
             software_versions, template, x)
     pool = Pool(int(threads))
     # Run one task for each fastq file, giving a sample reference and FastqFile as argument
     # along with the arguments specified in the lambda above
-    pool.map(proc_closure, [s,f for f in s.files for s in samples])
+    pool.map(proc_closure, [(s,f) for f in s.files for s in samples])
     
     # Generate md5sums for projects
     for p in projects:
@@ -305,6 +326,18 @@ def qc_main(demultiplex_dir, projects, data_reads, index_reads,
     generate_internal_html_report(quality_control_dir, samples)
     
     # Prepare information for emails, etc
-    
+    delivery_dir = quality_control_dir + "/Delivery"
+    # For email to customers
+    for project in projects:
+        fname = delivery_dir + "/Email_for_" + project.name + ".xls"
+        write_sample_info_table(fname, run_id, project)
+
+    # Internal bookkeeping
+    fname = delivery_dir + "/Table_for_GA_runs_" + run_id + ".xls"
+    write_internal_sample_table(fname, run_id, samples)
+
+    # Summary email for NSC staff
+    fname = delivery_dir + "/Summary_email_for_NSC_" + run_id + ".xls"
+    write_summary_email(fname, run_id, projects)
 
 

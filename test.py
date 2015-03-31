@@ -6,5 +6,6 @@
 
 import nsc
 from genologics.lims import *
+import qc
 
 

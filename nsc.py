@@ -20,8 +20,7 @@ DEST_FASTQ_DIR_UDF = "Fastq output directory"
 OTHER_OPTIONS_UDF = "Other options for configureBclToFastq"
 
 # Other UDFs
-# Tracking the location of fastq files
-FILE_LOCATION = "Data location"
+LANE_UNDETERMINED_UDF = "% Undetermined indices"
 
 
 # Output files
@@ -69,17 +68,12 @@ INVOKE_SBATCH_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/sbatch",
 # Data processing programs
 CONFIGURE_BCL_TO_FASTQ="/data/common/tools/nscbin/configureBclToFastq.pl"
 MAKE="/usr/bin/make"
-FASTQC=""
+FASTQC="/data/common/tools/nscbin/fastqc"
 
 # Paths
 PRIMARY_STORAGE = "/data/runScratch.boston"
 SECONDARY_STORAGE="/data/nsc.loki"
 DO_COPY_METADATA_FILES=True
-
-# Template files
-CUSTOMER_REPORT_TEMPLATE = "/data/nsc.loki/scripts/template/reportTemplate_indLane_v4.tex"
-INTERNAL_HTML_TOP = "/data/nsc.loki/scripts/template/QC_NSC_report_template.html"
-LOGO = "/data/nsc.loki/scripts/template/NSC_logo_original_RGB.tif"
 
 
 # Group of files written (TODO: not currently used)
