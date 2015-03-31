@@ -22,6 +22,7 @@ from genologics.lims import *
 import nsc
 import utilities
 import demultiplex
+import parse
 
 class Config:
     pass
@@ -186,7 +187,7 @@ def main(process_id):
         start_dir = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
     
         ssheet_file,sample_sheet_data = download_sample_sheet(process, start_dir)
-        sample_sheet = utilities.parse_hiseq_sample_sheet(sample_sheet_data)
+        sample_sheet = parse.parse_hiseq_sample_sheet(sample_sheet_data)
     
         if ssheet_file:
             process_ok = True

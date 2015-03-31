@@ -27,7 +27,6 @@ FILE_LOCATION = "Data location"
 # Output files
 CONFIGURE_LOG = "configureBclToFastq log"
 MAKE_LOG = "make log"
-DEMULTIPLEX_STATS_FILE = "Demultiplex_stats.htm"
 FASTQ_OUTPUT = "{0} fastq"
 LOG_DIR="/data/nsc.loki/automation/logs"
 

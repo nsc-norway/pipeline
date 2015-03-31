@@ -11,9 +11,10 @@ from collections import defaultdict
 from genologics import *
 import nsc, utilities
 import qc
+import parse
 
 
-def get_hiseq_projects(sample_sheet, reads=[]):
+def get_hiseq_projects(sample_sheet, demultiplex_stats, reads=[]):
     proj_samples = defaultdict(list)
     # sort samples into projects
     for sr in sample_sheet:
@@ -25,16 +26,20 @@ def get_hiseq_projects(sample_sheet, reads=[]):
         projdir = "Project_" + projname
         samples = []
         for sam in rows:
+            sample_name = sam['SampleID']
+            lane = int(sam['Lane'])
+            files = []
             files = [projdir + "/Sample_{1}/TODO"]
             s = Sample(files)
             samples.append(s)
 
-        projects.append(Project(projdir, samples))
+        projects.append(Project(projname, projdir, samples))
 
     
 
 def qc_hiseq():
-    ss = utilities.parse_hiseq_sample_sheet()
+    ss = parse.parse_hiseq_sample_sheet()
+    ds = parse.parse_demux_stats.....
     projects = get_hiseq_projects(demulitplex_dir, ss, ["1","2"])
 
 def main(process_id):

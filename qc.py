@@ -90,7 +90,7 @@ def generate_report_for_customer(quality_control_dir, run_id,
             }
 
     replacements = dict((k, tex_escape(v)) for k,v in raw_replacements.items())
-    report_root_name = ".".join(run_id, str(sample.lane), "Sample_" + sample.name,
+    report_root_name = ".".join(run_id, str(fastq.lane), "Sample_" + sample.name,
             "Read" + str(fastq.read_num), "qc")
     fname = report_root_name + ".tex"
     of = open(fname, "w")
@@ -149,9 +149,6 @@ def extract_format_overrepresented(fqc_report, fastqfile, index):
 
 
 
-
-
-
 def generate_internal_html_report(quality_control_dir, samples):
     # Generate the NSC QC report HTML file
     top_file = open(nsc.INTERNAL_HTML_TOP)
@@ -189,6 +186,21 @@ def generate_internal_html_report(quality_control_dir, samples):
 
             
 
+def writeSampleInfoTable(output_path, runid, project):
+    with open(output_path, 'w') as out:
+        out.write('--------------------------------		\n')
+        out.write('Email for ' + project.name)
+        out.write('--------------------------------		\n\n')
+        nsamples = len(project.samples)
+        out.write('Sequence ready for download - sequencing run ' + runid + ' - ' + project.name + ' (' + nsamples + ' samples)\n\n')
+
+        fastqfiles = []
+
+
+
+
+
+
 
 # Model: Objects containing projects, samples and files.
 # Represents a unified interface to the QC functionality, similar to the
@@ -202,12 +214,11 @@ class Project(object):
 
 
 class Sample(object):
-    '''Contains information about a sample (one instance of this class
-    for each lane on which the sample is run). Contains a list of FastqFile
-    objects representing the reads.'''
+    '''Contains information about a sample. Contains a list of FastqFile
+    objects representing the reads. One instance for each sample on a 
+    flowcell, even if that sample is run on multiple lanes.'''
 
     def __init__(self, lane, name, files):
-        self.lane = lane
         self.name = name
         self.files = files
 
@@ -215,15 +226,19 @@ class FastqFile(object):
     '''Represents a single output file for a specific sample, lane and
     read. Currently assumed to be no more than one FastqFile per read.
     
+    lane is the lane number (1-based)
+
     read_num is the read index, 1 or 2 (second read is only available for paired
     end). Index reads are not considered.
 
     Path is the path to the fastq file relative to the "Unaligned"
     (bcl2fastq output) directory.
     
-    num_reads is the number of full sequences that were read (number of clusters).'''
+    num_reads is the number of full sequences that were read (number of clusters, 
+    note the alternative meaning of "read").'''
 
-    def __init__(self, read_num, path, num_reads):
+    def __init__(self, lane, read_num, path, num_reads):
+        self.lane = lane
         self.read_num = read_num
         self.path = path
         self.num_reads = num_reads

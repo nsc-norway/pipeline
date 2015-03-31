@@ -67,5 +67,20 @@ def parse_demux_summary(demux_summary_file_path):
 
 
 
+def parse_hiseq_sample_sheet(sample_sheet):
+    lines = sample_sheet.splitlines()
+    headers = lines[0].split(",")
+    samples = []
+    for l in lines[1:]:
+        sam = {}
+        for h, v in zip(headers, l.split(",")):
+            sam[h] = v
+        samples.append(sam)
+
+    return samples
+
+
+
+
 #stats = parse_demux_stats("/home/fa2k/tmp/demo/demux-results/Basecall_Stats_C6A17ANXX/Flowcell_demux_summary.xml")
 

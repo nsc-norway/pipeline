@@ -7,7 +7,7 @@ from xml.etree import ElementTree
 from decimal import *
 from genologics.lims import *
 import nsc, utilities
-import results
+import parse
 
 
 # Stats on FASTQ files. List of tupes:
@@ -74,7 +74,7 @@ def set_lane_udfs(process, demultiplexing_dir):
     on undetermined indexes.'''
     
     demultiplex_summary = glob.glob(demux_result_dir + "/Basecall_Stats_*/Flowcell_demux_summary.xtm")
-    ds = results.parse_demux_summary(demultiplex_summary)
+    ds = parse.parse_demux_summary(demultiplex_summary)
     inputs = dict((i.location[0], i) for i in process.all_inputs(unique=True))
     if len(set(i.location[1] for i in inputs)) != 1:
         print "error: Wrong number of flowcells detected"
@@ -100,9 +100,9 @@ def populate_results(process, demux_result_dir):
 
     statfile = open(demultiplex_stats[0])
     stats_data = statfile.read()
-    utilities.upload_file(process, nsc.DEMULTIPLEX_STATS_FILE, data = stats_data)
+    utilities.upload_file(process, "Demultiplex_stats.htm", data = stats_data)
 
-    ds = results.parse_demux_stats(stats_data)
+    ds = parse.parse_demux_stats(stats_data)
     set_output_file_udfs(process, ds)
     set_lane_udfs(process, demux_result_dir)
 
