@@ -9,7 +9,7 @@ from multiprocessing import Pool
 import nsc, utilities
 
 
-def run_fastqc(files, logfile=subprocess.STDOUT, output_dir=None, max_threads=None):
+def run_fastqc(files, output_dir=None, max_threads=None):
     '''Run fastqc on a set of fastq files'''
     args = []
     if max_threads:
@@ -17,15 +17,16 @@ def run_fastqc(files, logfile=subprocess.STDOUT, output_dir=None, max_threads=No
     if output_dir:
         args += ["--outdir=" + output_dir]
     args += files
-    rc = subprocess.call([nsc.FASTQC] + args, stderr=logfile, stdout=logfile)
+    print "Running fastqc on", len(files), "files"
+    rc = subprocess.call([nsc.FASTQC] + args)
     
 
 
-def fastqc_dir(fastqfile):
+def fastqc_dir(fp):
     '''Get base name of fastqc directory given the name of the fastq file'''
-    if not fp.path.endswith("fastq.gz"):
+    if not fp.endswith(".fastq.gz"):
         raise ValueError("Can only process fastq.gz files!")
-    return re.sub("fastq.gz$", "_fastqc", os.path.basename(fp))
+    return re.sub(".fastq.gz$", "_fastqc", os.path.basename(fp))
 
 
 
@@ -36,14 +37,17 @@ def move_fastqc_results(quality_control_dir, sample):
     use multi-threading, so we can't give different output dirs)'''
 
     sample_dir = os.path.join(quality_control_dir, "Sample_" + sample.name)
-    os.mkdir(sample_dir) # may raise OSError if exists
+    try:
+        os.mkdir(sample_dir)
+    except OSError:
+        pass
     
     for f in sample.files:
-        fp  = f.path
+        fp = f.path
         fastqc_result_dir_name = fastqc_dir(fp)
 
         # Don't need the zip, as we have the uncompressed version.
-        os.remove(quality_control_dir + ".zip")
+        os.remove(os.path.join(quality_control_dir, fastqc_result_dir_name + ".zip"))
 
         # Move from root fastqc to sample directory
         src_file = os.path.join(quality_control_dir, fastqc_result_dir_name)
@@ -183,7 +187,7 @@ def generate_internal_html_report(quality_control_dir, samples):
                 i += 1
         out_file.write("</table>\n")
         out_file.write(overrepresented_seq_buffer)
-        out_file.write("</body>\n</html>\n")
+        out_file.write("</div>\n</body>\n</html>\n")
 
             
 
@@ -237,13 +241,13 @@ Undetermined ratio = how much proportion of fragments can not be assigned to a s
 Quality = summary of the overall quality							
 
 Lane	Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2)	Undetermined ratio	Quality
-'''.format(runid = runid)
+'''.format(runId = runid)
         out.write(summary_email_head)
         # assumes 1 project per lane, and undetermined
         lane_proj = dict((proj.samples[0].files[0].lane.id, proj) for proj in projects if not re.match("lane\d", proj.name))
         lane_undetermined = dict((proj.samples[0].files[0].lane.id, proj) for proj in projects if re.match("lane\d", proj.name))
 
-        for l in sorted(lane_proj.keys):
+        for l in sorted(lane_proj.keys()):
             proj = lane_proj[l]
             undetermined = lane_undetermined[l]
             lane = proj.samples[0].files[0].lane
@@ -262,8 +266,7 @@ Lane	Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density
 
 
 
-def qc_main(demultiplex_dir, projects, data_reads, index_reads,
-        run_id, software_versions, threads = 1):
+def qc_main(demultiplex_dir, projects, run_id, software_versions, threads = 1):
     '''QC on demultiplexed data. Can be run per project, don't need
     access to all demultiplexed lanes.
     
@@ -278,25 +281,22 @@ def qc_main(demultiplex_dir, projects, data_reads, index_reads,
     instrument types. It also contains some data for the results, 
     not just experiment setup.
 
-    data_reads and index_reads are lists of integers representing
-    the number of cycles in each read.
-
     software_versions is a dict with (software name: version)
     software name: RTA, bcl2fastq
     '''
+    # Unaligned/inHouseDataProcessing/
     output_dir = os.path.join(demultiplex_dir, "inHouseDataProcessing")
+    # Unaligned/inHouseDataProcessing/QualityControl
     quality_control_dir = os.path.join(output_dir, "QualityControl")
-    try:
-        os.mkdir(output_dir) # Unaligned/inHouseDataProcessing/
-    except OSError:
-        pass
-    try:
-        os.mkdir(quality_control_dir) # Unaligned/inHouseDataProcessing/QualityControl
-    except OSError:
-        pass
-    
+    delivery_dir = quality_control_dir + "/Delivery"
+    for d in [output_dir, quality_control_dir, delivery_dir]:
+        try:
+            os.mkdir(d) 
+        except OSError:
+            pass
 
-    all_fastq = [f.path for f in s.files for s in pro.samples for pro in projects]
+    print "Number of projects: ", len(projects)
+    all_fastq = [f.path for pro in projects for s in pro.samples for f in s.files]
 
     if len(set(os.path.basename(f) for f in all_fastq)) < len(all_fastq):
         raise RuntimeError("Not all fastq file names are unique! Can't deal with this, consider splitting into smaller jobs.")
@@ -305,7 +305,7 @@ def qc_main(demultiplex_dir, projects, data_reads, index_reads,
     # First output all fastqc results into QualityControl, them move them
     # in place later
     run_fastqc(all_fastq, output_dir=quality_control_dir, max_threads=threads) 
-    samples = [sam for sam in pro.samples for pro in projects]
+    samples = [sam for pro in projects for sam in pro.samples]
     for s in samples:
        move_fastqc_results(quality_control_dir, s)
 
@@ -317,7 +317,7 @@ def qc_main(demultiplex_dir, projects, data_reads, index_reads,
     pool = Pool(int(threads))
     # Run one task for each fastq file, giving a sample reference and FastqFile as argument
     # along with the arguments specified in the lambda above
-    pool.map(proc_closure, [(s,f) for f in s.files for s in samples])
+    pool.map(proc_closure, [(s,f) for s in samples for f in s.files])
     
     # Generate md5sums for projects
     for p in projects:
@@ -326,7 +326,6 @@ def qc_main(demultiplex_dir, projects, data_reads, index_reads,
     # Generate internal reports
     generate_internal_html_report(quality_control_dir, samples)
     
-    delivery_dir = quality_control_dir + "/Delivery"
     # For email to customers
     for project in projects:
         fname = delivery_dir + "/Email_for_" + project.name + ".xls"
