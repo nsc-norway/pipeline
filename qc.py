@@ -265,14 +265,15 @@ Lane	Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density
 def qc_main(demultiplex_dir, projects, data_reads, index_reads,
         run_id, software_versions, threads = 1):
     '''QC on demultiplexed data. Can be run per project, don't need
-    access to all demultiplexed runs.
+    access to all demultiplexed lanes.
     
 
     demultiplex_dir is the location of the demultiplexed reads,
     i.e., Unaligned.
 
     projects is a list of Project objects containing references
-    to samples and files. This is a generalised specification of 
+    to samples and files. See parse.py for Project, Sample and 
+    FastqFile classes. This is a generalised specification of 
     the information in the sample sheet, valid for all Illumina
     instrument types. It also contains some data for the results, 
     not just experiment setup.
@@ -297,7 +298,7 @@ def qc_main(demultiplex_dir, projects, data_reads, index_reads,
 
     all_fastq = [f.path for f in s.files for s in pro.samples for pro in projects]
 
-    if len(set(os.path.basename(p) for p in all_fastq)) < len(all_fastq):
+    if len(set(os.path.basename(f) for f in all_fastq)) < len(all_fastq):
         raise RuntimeError("Not all fastq file names are unique! Can't deal with this, consider splitting into smaller jobs.")
 
     # Run FastQC
@@ -325,12 +326,15 @@ def qc_main(demultiplex_dir, projects, data_reads, index_reads,
     # Generate internal reports
     generate_internal_html_report(quality_control_dir, samples)
     
-    # Prepare information for emails, etc
     delivery_dir = quality_control_dir + "/Delivery"
     # For email to customers
     for project in projects:
         fname = delivery_dir + "/Email_for_" + project.name + ".xls"
         write_sample_info_table(fname, run_id, project)
+
+    # The following reports don't need to be used (i.e. read, copied) for  
+    # LIMS-based runs, as a dedicated job will generate these for the full
+    # run after all demultiplexing has completed.
 
     # Internal bookkeeping
     fname = delivery_dir + "/Table_for_GA_runs_" + run_id + ".xls"
