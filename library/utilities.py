@@ -9,6 +9,7 @@
 import logging
 import subprocess, sys
 import datetime
+import locale # Not needed in 2.7
 from genologics.lims import *
 import nsc
 
@@ -141,13 +142,21 @@ def success_finish(process):
         finish_step(process.lims, process.id)
 
 
+locale.setlocale(locale.LC_ALL, 'en_US')
+def display_int(val):
+    '''Adds thousands separators. To be replaced with "{:,}".format(val) when 
+    upgrading to Python 2.7'''
+    return locale.format("%d", round(val), grouping=True)
+
+
+
 # The check_output function is only available in Python >=2.7, but we also support 2.6,
 # as on RHEL6.
 if sys.version_info >= (2, 7):
     check_output = subprocess.check_output
 else:
-    def check_output(args):
-        proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    def check_output(args, **kwargs):
+        proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
         data = proc.communicate()
 
         rcode = proc.wait()

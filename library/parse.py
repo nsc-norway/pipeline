@@ -4,6 +4,68 @@ from collections import defaultdict
 
 
 
+# Model: Objects containing projects, samples and files.
+# Represents a unified interface to the QC functionality, similar to the
+# SampleInformation.txt BarcodeLaneStatistics.txt from the perl scripts.
+
+class Project(object):
+    '''Project object.
+    name: name with special characters replaced
+    path: base name of project directory (not full path)
+    samples: list of samples
+    '''
+    def __init__(self, name, proj_dir, samples=[]):
+        self.name = name
+        self.proj_dir = proj_dir
+        self.samples = samples
+
+
+class Sample(object):
+    '''Contains information about a sample. Contains a list of FastqFile
+    objects representing the reads. One instance for each sample on a 
+    flowcell, even if that sample is run on multiple lanes.'''
+
+    def __init__(self, name, files):
+        self.name = name
+        self.files = files
+
+
+class Lane(object):
+    '''Represents a lane (physically separate sub-units of flowcells).
+    
+    For MiSeq and NextSeq there is only one lane (NextSeq's lanes aren't
+    independent)..'''
+
+    def __init__(self, id, raw_cluster_density, pf_cluster_density, pf_ratio):
+        self.id = id
+        self.raw_cluster_density = raw_cluster_density
+        self.pf_cluster_density = pf_cluster_density
+        self.pf_ratio = pf_ratio
+
+
+class FastqFile(object):
+    '''Represents a single output file for a specific sample, lane and
+    read. Currently assumed to be no more than one FastqFile per read.
+    
+    lane is a Lane object containing lane-specific stats.
+
+    read_num is the read index, 1 or 2 (second read is only available for paired
+    end). Index reads are not considered.
+
+    Path is the path to the fastq file relative to the "Unaligned"
+    (bcl2fastq output) directory.
+    
+    num_pf_reads is the number of full sequences that were read (number of clusters, 
+    note the alternative meaning of "read").'''
+
+    def __init__(self, lane, read_num, path, num_pf_reads, percent_of_pf_clusters):
+        self.lane = lane
+        self.read_num = read_num
+        self.path = path
+        self.num_pf_reads = num_pf_reads # Num_of_PF_Reads
+        self.percent_of_pf_clusters = percent_of_pf_clusters
+
+
 
 
 def parse_demux_stats(stats_data):
@@ -97,67 +159,6 @@ def get_hiseq_project_dir(run_id, project_name):
     
 
 
-
-# Model: Objects containing projects, samples and files.
-# Represents a unified interface to the QC functionality, similar to the
-# SampleInformation.txt BarcodeLaneStatistics.txt from the perl scripts.
-
-class Project(object):
-    '''Project object.
-    name: name with special characters replaced
-    path: base name of project directory (not full path)
-    samples: list of samples
-    '''
-    def __init__(self, name, proj_dir, samples=[]):
-        self.name = name
-        self.proj_dir = proj_dir
-        self.samples = samples
-
-
-class Sample(object):
-    '''Contains information about a sample. Contains a list of FastqFile
-    objects representing the reads. One instance for each sample on a 
-    flowcell, even if that sample is run on multiple lanes.'''
-
-    def __init__(self, name, files):
-        self.name = name
-        self.files = files
-
-
-class Lane(object):
-    '''Represents a lane (physically separate sub-units of flowcells).
-    
-    For MiSeq and NextSeq there is only one lane (NextSeq's lanes aren't
-    independent)..'''
-
-    def __init__(self, id, raw_cluster_density, pf_cluster_density, pf_ratio):
-        self.id = id
-        self.raw_cluster_density = raw_cluster_density
-        self.pf_cluster_density = pf_cluster_density
-        self.pf_ratio = pf_ratio
-
-
-class FastqFile(object):
-    '''Represents a single output file for a specific sample, lane and
-    read. Currently assumed to be no more than one FastqFile per read.
-    
-    lane is a Lane object containing lane-specific stats.
-
-    read_num is the read index, 1 or 2 (second read is only available for paired
-    end). Index reads are not considered.
-
-    Path is the path to the fastq file relative to the "Unaligned"
-    (bcl2fastq output) directory.
-    
-    num_pf_reads is the number of full sequences that were read (number of clusters, 
-    note the alternative meaning of "read").'''
-
-    def __init__(self, lane, read_num, path, num_pf_reads, percent_of_pf_clusters):
-        self.lane = lane
-        self.read_num = read_num
-        self.path = path
-        self.num_pf_reads = num_pf_reads # Num_of_PF_Reads
-        self.percent_of_pf_clusters = percent_of_pf_clusters
 
 
 

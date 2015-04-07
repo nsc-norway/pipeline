@@ -8,6 +8,7 @@ import shutil
 from multiprocessing import Pool
 import nsc, utilities
 
+template_dir = os.path.dirname(os.path.dirname(__file__)) + "/template"
 
 def run_fastqc(files, output_dir=None, max_threads=None):
     '''Run fastqc on a set of fastq files'''
@@ -18,7 +19,8 @@ def run_fastqc(files, output_dir=None, max_threads=None):
         args += ["--outdir=" + output_dir]
     args += files
     print "Running fastqc on", len(files), "files"
-    rc = subprocess.call([nsc.FASTQC] + args)
+    DEVNULL = open(os.devnull, 'wb') # discard output
+    rc = subprocess.call([nsc.FASTQC] + args, stdout=DEVNULL)
     
 
 
@@ -52,10 +54,14 @@ def move_fastqc_results(quality_control_dir, sample):
         # Move from root fastqc to sample directory
         src_file = os.path.join(quality_control_dir, fastqc_result_dir_name)
         dst_file = os.path.join(sample_dir, fastqc_result_dir_name)
+        if os.path.exists(dst_file):
+            shutil.rmtree(dst_file)
         os.rename(src_file, dst_file)
 
 
-def replace_multiple(replacedict, string):
+
+
+def replace_multiple(replacedict, text):
     '''Replace each key in replacedict found in string with the
     value in replacedict. Note: special regex characters are not
     escaped, as we don't need that.'''
@@ -64,61 +70,66 @@ def replace_multiple(replacedict, string):
     # with latex syntax, though only when editing the template itself)
 
     pattern = re.compile('|'.join(replacedict.keys()))
-    return pattern.sub(lambda m: rep[m.group(0)], text)
+    return pattern.sub(lambda m: replacedict[m.group(0)], text)
 
 
 def tex_escape(s):
-    return re.sub("(!?\d|\w|\(|\)|\+|\-|\.", lambda x: "\\" + x.group(0), s)
+    return re.sub(r"[^\da-zA-Z()+-. ]", lambda x: '\\' + x.group(0), s)
 
 
-def generate_report_for_customer(quality_control_dir, run_id,
-        software_versions, template, sample_fastq):
+def generate_report_for_customer(args):
     '''Generate PDF report for a fastq file.
 
     The last argument, sample_fastq, is a tuple containing a 
     Sample object and a FastqFile object'''
-
-    sample, fastq = sample_fastq
+    fastq_dir, quality_control_dir, run_id, software_versions, template,\
+            sample, fastq = args
     sample_dir = os.path.join(quality_control_dir, "Sample_" + sample.name)
     pdf_dir = os.path.join(sample_dir, "pdf")
-    os.mkdir(pdf_dir)
+    try:
+        os.mkdir(pdf_dir)
+    except OSError:
+        shutil.rmtree(pdf_dir)
+        os.mkdir(pdf_dir)
+
     os.chdir(pdf_dir) # fine to do cd in parallel since we're using multiprocessing
 
     raw_replacements = {
-        '__RunName__': run_id,
-        '__VersionString__': " & ".join([software_versions['RTA'], software_versions['bcl2fastq']]),
-        '__SampleName__': sample.name,
-        '__ReadNum__': fastq.read_num,
-        '__TotalN__': sample.num_pf_reads,
-        '__Folder__': '../' + fastqc_dir(fastq.path)
+        '__RunName__': tex_escape(run_id),
+        '__VersionString__': tex_escape(" & ".join([software_versions['RTA'], software_versions['bcl2fastq']])),
+        '__SampleName__': tex_escape(sample.name),
+        '__ReadNum__': tex_escape(str(fastq.read_num)),
+        '__TotalN__': tex_escape(str(fastq.num_pf_reads)),
+        '__Folder__': '../' + fastqc_dir(fastq.path),
+        '__TemplateDir__': template_dir
             }
 
-    replacements = dict((k, tex_escape(v)) for k,v in raw_replacements.items())
-    report_root_name = ".".join(run_id, str(fastq.lane.id), "Sample_" + sample.name,
-            "Read" + str(fastq.read_num), "qc")
+    replacements = dict((k, v) for k,v in raw_replacements.items())
+    report_root_name = ".".join((run_id, str(fastq.lane.id), "Sample_" + sample.name,
+            "Read" + str(fastq.read_num), "qc"))
     fname = report_root_name + ".tex"
     of = open(fname, "w")
     of.write(replace_multiple(replacements, template))
     of.close()
     DEVNULL = open(os.devnull, 'wb') # discard output
-    subprocess.check_call([nsc.PDFLATEX, '-shell-escape', fname],
-            stdout=DEVNULL, stdin=DEVNULL)
+    subprocess.check_call([nsc.PDFLATEX, '-shell-escape', fname], stdout=DEVNULL)
 
     pdfname = report_root_name + ".pdf"
-    fastq_sample_dir = os.path.dirname(fastq.path)
-    os.copy(pdfname, fastq_sample_dir + "/" + pdfname)
-    os.rename(pdfname, quality_control_dir + pdfname)
+    shutil.copyfile(pdfname, os.path.join(fastq_dir, os.path.dirname(fastq.path), pdfname))
+    os.rename(pdfname, quality_control_dir + "/" + pdfname)
 
 
-def compute_md5(project_path, threads):
+def compute_md5(proj_dir, threads):
     md5data = utilities.check_output([nsc.MD5DEEP, "-rl", "-j" + str(threads), "."],
-            cwd=project_path)
-    open(os.path.join(project_path, "md5sum.txt"), "w").write(md5data)
+            cwd=proj_dir)
+    open(os.path.join(proj_dir, "md5sum.txt"), "w").write(md5data)
 
 
 def extract_format_overrepresented(fqc_report, fastqfile, index):
     '''Processes the fastqc_report.html file for a single fastq file and extracts the
-    overrepresented sequences.'''
+    overrepresented sequences.
+    
+    Index is an arbitrary identifier used as an anchor (<a>) in the HTML.'''
 
     with open(fqc_report) as reportfile: # we'll be good about closing these, since there may be many
         found_over = False
@@ -155,10 +166,9 @@ def extract_format_overrepresented(fqc_report, fastqfile, index):
 
 def generate_internal_html_report(quality_control_dir, samples):
     # Generate the NSC QC report HTML file
-    top_file = open(os.path.dirname(__file__) + "/template/QC_NSC_report_template.html")
+    top_file = open(template_dir + "/QC_NSC_report_template.html")
     overrepresented_seq_buffer = ""
-    shutil.copy(os.path.dirname(__file__) + "/template/NSC_logo_original_RGB.tif",
-                            quality_control_dir)
+    shutil.copy(template_dir + "/NSC_logo_original_RGB.tif", quality_control_dir)
     with open(os.path.join(quality_control_dir, "NSC.QC.report.htm"), 'w') as out_file:
         out_file.write(top_file.read())
     
@@ -171,18 +181,18 @@ def generate_internal_html_report(quality_control_dir, samples):
                 fq_name = os.path.basename(fq.path)
                 fqc_dir = fastqc_dir(fq.path)
 
-                cell1 = "<tr><td align=\"left\"><b>{fileName}<br><br>SampleName: {sampleName}<br>Read Num: {nReads}</b></td>\n"
+                cell1 = "<tr><td align=\"left\"><b>{fileName}<br/><br/>SampleName: {sampleName}<br/>Read Num: {nReads}</b></td>\n"
                 out_file.write(cell1.format(fileName=fq_name, sampleName=s.name, nReads=fq.num_pf_reads))
     
                 for img in images:
-                    cell = "<td><img src=\"{subDir}/{fastqcDir}/Images/{image}\" class=\"graph\" align=\"center\"></td>\n"
+                    cell = "<td><a href=\"{subDir}/{fastqcDir}/Images/{image}\"><img src=\"{subDir}/{fastqcDir}/Images/{image}\" class=\"graph\" align=\"center\"/></a></td>\n"
                     out_file.write(cell.format(subDir=subdir, fastqcDir=fqc_dir, image=img))
     
-                celln = "<td align=\"center\"><b><a name=\"{subDir}/{fileName}\"><a href=\"{index}\">Overrepresented sequences</a></b></td>\n</tr>\n";
+                celln = "<td align=\"center\"><b><a href=\"#M{index}\">Overrepresented sequences</a></b></td>\n</tr>\n";
                 out_file.write(celln.format(subDir=subdir, fileName=fq_name, index=i))
                 
                 report_path = os.path.join(quality_control_dir, subdir, fqc_dir, "fastqc_report.html")
-                overrepresented_seq_buffer += extract_format_overrepresented(report_path, fq_name, index)
+                overrepresented_seq_buffer += extract_format_overrepresented(report_path, fq_name, "M" + str(i))
 
                 i += 1
         out_file.write("</table>\n")
@@ -197,16 +207,16 @@ def write_sample_info_table(output_path, runid, project):
         out.write('Email for ' + project.name)
         out.write('--------------------------------		\n\n')
         nsamples = len(project.samples)
-        out.write('Sequence ready for download - sequencing run ' + runid + ' - ' + project.name + ' (' + nsamples + ' samples)\n\n')
+        out.write('Sequence ready for download - sequencing run ' + runid + ' - ' + project.name + ' (' + str(nsamples) + ' samples)\n\n')
 
-        for f in (fi for fi in s.files for s in project.samples):
-            out.write(os.path.basename(fi.path) + "\t")
+        for f in (fi for s in project.samples for fi in s.files):
+            out.write(os.path.basename(f.path) + "\t")
             out.write(str(f.num_pf_reads) + "\t")
             out.write("fragments\n")
 
 
 
-def write_internal_sample_table(output_path, runid, samples):
+def write_internal_sample_table(output_path, runid, projects):
     with open(output_path, 'w') as out:
         out.write("--------------------------------\n")
         out.write("Table for GA_runs.xlsx\n")
@@ -214,15 +224,15 @@ def write_internal_sample_table(output_path, runid, samples):
         out.write("Summary for run " + runid + "\n\n")
         out.write("Need not copy column A\n\n")
 
-        for s in samples:
+        for s in (s for proj in projects for s in proj.samples if proj.name != "Undetermined_indices"):
             for f in s.files:
                 if f.read_num == 1:
                     out.write(s.name + "\t")
-                    out.write(f.lane.raw_cluster_density + "\t")
-                    out.write(f.lane.pf_cluster_density + "\t")
-                    out.write(f.percent_of_pf_clusters + "%\t")
-                    out.write(f.num_pf_reads + "\t")
-                    out.write("\n")
+                    out.write(str(int(round(f.lane.raw_cluster_density))) + "\t")
+                    out.write(str(int(round(f.lane.pf_cluster_density))) + "\t")
+                    out.write(str(f.percent_of_pf_clusters) + "%\t")
+                    out.write(str(int(round(f.num_pf_reads))) + "\t")
+                    out.write("ok\t\tok\n")
 
 
 
@@ -244,19 +254,20 @@ Lane	Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density
 '''.format(runId = runid)
         out.write(summary_email_head)
         # assumes 1 project per lane, and undetermined
-        lane_proj = dict((proj.samples[0].files[0].lane.id, proj) for proj in projects if not re.match("lane\d", proj.name))
-        lane_undetermined = dict((proj.samples[0].files[0].lane.id, proj) for proj in projects if re.match("lane\d", proj.name))
+        lane_proj = dict((proj.samples[0].files[0].lane.id, proj) for proj in projects if proj.name != "Undetermined_indices")
+        lane_undetermined = dict((proj.samples[0].files[0].lane.id, proj) for proj in projects if proj.name == "Undetermined_indices")
 
         for l in sorted(lane_proj.keys()):
             proj = lane_proj[l]
             undetermined = lane_undetermined[l]
             lane = proj.samples[0].files[0].lane
             out.write(str(l) + "\t")
-            cluster_no = sum(f.num_pf_reads for f in s.files for s in proj.samples + undetermined.samples)
-            out.write(str(cluster_no) + "\t")
-            out.write(lane.pf_ratio + "\t")
-            out.write(lane.raw_cluster_density + "\t")
-            out.write(lane.pf_cluster_density + "\t")
+            out.write(proj.name + "\t")
+            cluster_no = sum(f.num_pf_reads for s in proj.samples + undetermined.samples for f in s.files)
+            out.write('"' + utilities.display_int(cluster_no) + '"\t')
+            out.write(str(lane.pf_ratio) + "\t")
+            out.write('"' + utilities.display_int(lane.raw_cluster_density) + '"\t')
+            out.write('"' + utilities.display_int(lane.pf_cluster_density) + '"\t')
             undetermined_ratio = undetermined.samples[-1].files[-1].percent_of_pf_clusters
             out.write(str(undetermined_ratio) + "%\t")
             out.write("ok\n")
@@ -266,12 +277,11 @@ Lane	Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density
 
 
 
-def qc_main(demultiplex_dir, projects, run_id, software_versions, threads = 1):
+def qc_main(input_demultiplex_dir, projects, run_id, software_versions, threads = 1):
     '''QC on demultiplexed data. Can be run per project, don't need
     access to all demultiplexed lanes.
-    
 
-    demultiplex_dir is the location of the demultiplexed reads,
+    input_demultiplex_dir is the location of the demultiplexed reads,
     i.e., Unaligned.
 
     projects is a list of Project objects containing references
@@ -284,6 +294,8 @@ def qc_main(demultiplex_dir, projects, run_id, software_versions, threads = 1):
     software_versions is a dict with (software name: version)
     software name: RTA, bcl2fastq
     '''
+
+    demultiplex_dir = os.path.abspath(input_demultiplex_dir)
     # Unaligned/inHouseDataProcessing/
     output_dir = os.path.join(demultiplex_dir, "inHouseDataProcessing")
     # Unaligned/inHouseDataProcessing/QualityControl
@@ -304,32 +316,33 @@ def qc_main(demultiplex_dir, projects, run_id, software_versions, threads = 1):
     # Run FastQC
     # First output all fastqc results into QualityControl, them move them
     # in place later
+    os.chdir(demultiplex_dir)
     run_fastqc(all_fastq, output_dir=quality_control_dir, max_threads=threads) 
     samples = [sam for pro in projects for sam in pro.samples]
     for s in samples:
        move_fastqc_results(quality_control_dir, s)
 
     # Generate PDF reports in parallel
-    template = open(os.path.dirname(__file__) + "/template/QC_NSC_report_template.html").read()
-    proc_closure = lambda x: generate_report_for_customer(
-            quality_control_dir, run_id,
-            software_versions, template, x)
+    # Templates at: ../template/
+    template = open(template_dir + "/reportTemplate_indLane_v4.tex").read()
+    arg_pack = [demultiplex_dir, quality_control_dir, run_id, software_versions, template]
     pool = Pool(int(threads))
-    # Run one task for each fastq file, giving a sample reference and FastqFile as argument
-    # along with the arguments specified in the lambda above
-    pool.map(proc_closure, [(s,f) for s in samples for f in s.files])
+    # Run one task for each fastq file, giving a sample reference and FastqFile as argument 
+    # as well as the ones given above. Debug note: change pool.map to map for better errors.
+    pool.map(generate_report_for_customer, [tuple(arg_pack + [s,f]) for s in samples for f in s.files]) 
     
     # Generate md5sums for projects
     for p in projects:
-        compute_md5(p.path, threads)
+        compute_md5(os.path.join(demultiplex_dir, p.proj_dir), threads)
 
     # Generate internal reports
     generate_internal_html_report(quality_control_dir, samples)
     
     # For email to customers
     for project in projects:
-        fname = delivery_dir + "/Email_for_" + project.name + ".xls"
-        write_sample_info_table(fname, run_id, project)
+        if project.name != "Undetermined_indices":
+            fname = delivery_dir + "/Email_for_" + project.name + ".xls"
+            write_sample_info_table(fname, run_id, project)
 
     # The following reports don't need to be used (i.e. read, copied) for  
     # LIMS-based runs, as a dedicated job will generate these for the full
@@ -337,7 +350,7 @@ def qc_main(demultiplex_dir, projects, run_id, software_versions, threads = 1):
 
     # Internal bookkeeping
     fname = delivery_dir + "/Table_for_GA_runs_" + run_id + ".xls"
-    write_internal_sample_table(fname, run_id, samples)
+    write_internal_sample_table(fname, run_id, projects)
 
     # Summary email for NSC staff
     fname = delivery_dir + "/Summary_email_for_NSC_" + run_id + ".xls"

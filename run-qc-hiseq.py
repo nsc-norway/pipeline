@@ -78,7 +78,7 @@ def main_lims():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--threads', type=int, default=2, help='Number of threads (cores)')
+    parser.add_argument('--threads', type=int, default=1, help='Number of threads (cores)')
     parser.add_argument('--pid', default=None, help="Process-ID if running within LIMS")
     parser.add_argument('DIR', default=None, help="Demultiplexed data directory (Unaligned for HiSeq, BaseCalls for Mi/NextSeq)")
     args = parser.parse_args()

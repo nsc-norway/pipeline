@@ -1,5 +1,8 @@
 # Copy global run stats/metadata files from primary to secondary storage
 
+# Can be used as a module, or called directly from the command line. The latter
+# is not used at the moment, and may not work properly.
+
 # This script copies data from the storage are written to by the sequencers,
 # to the secondary storage used for longer term sotrage. The script *excludes*
 # the actual data, as only the fastq files are stored on secondary storage.
