@@ -9,7 +9,8 @@
 import logging
 import subprocess, sys
 import datetime
-import locale # Not needed in 2.7
+import locale # Not needed in 2.7, see display_int
+from operator import attrgetter
 from genologics.lims import *
 import nsc
 
@@ -66,6 +67,26 @@ def get_sequencing_process(process):
     for proc in processes:
         if proc.type.name in [p[1] for p in nsc.SEQ_PROCESSES]:
             return proc
+
+
+def get_demux_process(process):
+    '''Gets the demultiplexing process corresponding to a given analyte (lane
+    on a flow cell). Analogous to the above method.'''
+
+    # Find the demultiplexing process: First process which has output file
+    # per reagent label
+    input = process.all_inputs()[0]
+    sib_procs = nsc.lims.get_processes(inputartifactlimsid=input.id)
+    sib_procs.sort(key=attrgetter('id'))
+    for s in sib_procs:
+        io = s.input_output_maps
+        for x in io:
+            output = io[1]
+            if output['output-type'] == "ResultFile" and\
+                    output['output-generation-type'] == "PerReagentLabel":
+                return s
+    
+
 
 
 def get_index_sequence(artifact):

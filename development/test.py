@@ -1,3 +1,5 @@
+import sys, os.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 #q = Queue(nsc.lims, id="40")
 #inputs = q.artifacts[0:1]
 

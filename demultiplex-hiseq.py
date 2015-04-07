@@ -20,8 +20,7 @@ import sys, os, re
 import subprocess
 from genologics.lims import *
 import shutil
-import parse
-from library import nsc, utilities, demultiplex
+from library import nsc, utilities, demultiplex, parse
 
 class Config:
     pass
@@ -148,9 +147,10 @@ def check_fastq_and_attach_files(process, sample_sheet, projdirs, reads):
             # Continues even if file doesn't exist. This will be discovered
             # in other ways, preferring "robust" operation here.
             if os.path.exists(fp):
-                print "looking up analyte id ", sam['Description'], "lane", sam['Lane']
-                result_file_artifact = demultiplex.lookup_outfile(process, sam['Description'],
-                        sam['Lane'])
+                # The convention is to have the LIMS ID in the description field. If this fails, 
+                # there's not a lot more we can do, so the following line just crashes with an 
+                # exception (HTTP 404).
+                result_file_artifact = demultiplex.lookup_outfile(process, sam['Description'], sam['Lane'])
                 pf = ProtoFile(nsc.lims, result_file_artifact.uri, fp)
                 pf = nsc.lims.glsstorage(pf)
                 f = pf.post()
@@ -158,6 +158,7 @@ def check_fastq_and_attach_files(process, sample_sheet, projdirs, reads):
 
 
 def main(process_id):
+    os.umask(770)
     process = Process(nsc.lims, id=process_id)
 
     utilities.running(process)
@@ -188,10 +189,9 @@ def main(process_id):
         sample_sheet = parse.parse_hiseq_sample_sheet(sample_sheet_data)
     
         if ssheet_file:
-            process_ok = True
-            #process_ok = run_demultiplexing(process, ssheet_file, cfg.bases_mask,
-            #        cfg.n_threads, cfg.mismatches, start_dir, cfg.dest_dir,
-            #        cfg.other_options)
+            process_ok = run_demultiplexing(process, ssheet_file, cfg.bases_mask,
+                    cfg.n_threads, cfg.mismatches, start_dir, cfg.dest_dir,
+                    cfg.other_options)
             if process_ok:
                 projdirs = rename_project_directories(runid, cfg.dest_dir, sample_sheet)
                 reads = ["R1"]
@@ -221,16 +221,19 @@ def main(process_id):
     
     if success:
         utilities.success_finish(process)
+        return True
     # If failing, should have already notified of failure, just quit
     else:
         if not process.udf[nsc.JOB_STATUS_UDF].startswith('Fail'):
             utilities.fail(process, "Unknown failure")
+        return False
 
 
 if __name__ == "__main__":
     if len(sys.argv) >= 2:
         try:
-            main(sys.argv[1])
+            if not main(sys.argv[1]):
+                sys.exit(1)
         except:
             process = Process(nsc.lims, id = sys.argv[1])
             utilities.fail(process, "Unexpected: " + str(sys.exc_info()[1]))

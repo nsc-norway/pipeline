@@ -11,12 +11,6 @@ from collections import defaultdict
 from genologics import *
 from library import nsc, utilities, qc, parse
 
-def get_project_sample():
-    pass
-
-def qc_hiseq():
-    pass
-
 
 def get_lane_cluster_density(path):
     '''Get cluster density for lanes from report files.
@@ -69,25 +63,46 @@ def main(threads, demultiplex_dir):
     qc.qc_main(demultiplex_dir, projects, run_id, info['sw_versions'], threads)
 
 
-def main_lims():
-    try:
-        pass
-    except:
-        pass
+def main_lims(threads, process_id):
+    '''LIMS-based QC wrapper. 
+    
+    To be run in slurm job, called via epp-submit-slurm.py.'''
+
+    process = Process(nsc.lims, id=process_id)
+    seq_process = utilities.get_sequencing_process(process)
+    demux_process = utilities.get_demux_process(process)
+
+    run_id = seq_process.udf['Run ID']
+    demultiplex_dir = demux_process.udf[nsc.DEST_FASTQ_DIR_UDF]
+    
+    lanes = {}
+    for lane in process.all_inputs():
+        TODO()
+
+
+
+
+
+    qc.qc_main(demultiplex_dir, projects, run_id, info['sw_versions'], threads)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--threads', type=int, default=1, help='Number of threads (cores)')
     parser.add_argument('--pid', default=None, help="Process-ID if running within LIMS")
-    parser.add_argument('DIR', default=None, help="Demultiplexed data directory (Unaligned for HiSeq, BaseCalls for Mi/NextSeq)")
+    parser.add_argument('DIR', default=None, help="Demultiplexed data directory (Unaligned)")
     args = parser.parse_args()
     if args.pid and not args.DIR:
-        main_lims(args.threads, args.pid)
+        try:
+            main_lims(args.threads, args.pid)
+        except:
+            process = Process(nsc.lims, id=args.pid)
+            utilities.fail(process, "Unexpected: " + str(sys.exc_info()[1]))
+            raise
     elif args.DIR and not args.pid:
         main(args.threads, args.DIR)
     else:
-        print "Must specify either LIMS-ID of project or Unaligned (bcl2fastq output) directory"
+        print "Must specify either LIMS-ID of QC process or Unaligned (bcl2fastq output) directory"
         sys.exit(1)
 
 

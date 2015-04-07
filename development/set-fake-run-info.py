@@ -1,4 +1,6 @@
-import sys, time
+import sys, os.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+import time
 from genologics.lims import *
 import nsc
 

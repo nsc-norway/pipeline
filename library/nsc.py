@@ -47,7 +47,6 @@ class StepSetup:
 AUTOMATED_PROTOCOL_STEPS = [
         ("Demultiplexing and QC (HiSeq)",
             [
-                StepSetup("Copy run directory (HiSeq)", "project"),
                 StepSetup("Demultiplexing (HiSeq)", "project")
             ])
         ]
