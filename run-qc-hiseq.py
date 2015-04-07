@@ -9,9 +9,7 @@ import sys, os
 import argparse, glob
 from collections import defaultdict
 from genologics import *
-import nsc, utilities
-import qc
-import parse
+from library import nsc, utilities, qc, parse
 
 def get_project_sample():
     pass

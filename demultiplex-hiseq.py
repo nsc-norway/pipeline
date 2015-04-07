@@ -20,10 +20,8 @@ import sys, os, re
 import subprocess
 from genologics.lims import *
 import shutil
-import nsc
-import utilities
-import demultiplex
 import parse
+from library import nsc, utilities, demultiplex
 
 class Config:
     pass
