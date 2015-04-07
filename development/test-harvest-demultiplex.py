@@ -1,4 +1,4 @@
-import demultiplex
+import ..demultiplex
 from genologics.lims import *
 import nsc
 import sys
