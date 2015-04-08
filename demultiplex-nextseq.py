@@ -1,20 +1,12 @@
-# Demultiplexing script for HiSeq
+# Demultiplexing script for NextSeq
 
 # This is the primary demultiplexing job. It is contolled by the setup-
-# hiseq-demultiplexing script, through the use of UDFs on the process in the
+# nextseq-demultiplexing script, through the use of UDFs on the process in the
 # LIMS.
 
-# Its primary data processing functionality is handled by:
-# configureBclToFastq.pl
-# make
+# Its primary data processing functionality is handled by the program:
+# bcl2fastq
 
-# Functional overview:
-# - Get options for demultiplexing 
-# - Set running / error flag in UDF
-# - Run demultiplexing
-# - Upload result files and set UDFs on samples
-# - Set job finished status
-# - Finsih demultiplexing step if using automatic processing
 
 import sys, os, re
 import subprocess
@@ -31,9 +23,7 @@ def get_config(process):
 
     try:
         cfg = Config()
-        cfg.bases_mask = process.udf[nsc.BASES_MASK_UDF]
         cfg.n_threads = process.udf[nsc.THREADS_UDF]
-        cfg.mismatches = process.udf[nsc.MISMATCHES_UDF]
         cfg.run_dir = process.udf[nsc.SOURCE_RUN_DIR_UDF]
         cfg.dest_dir = process.udf[nsc.DEST_FASTQ_DIR_UDF]
     except KeyError:
@@ -47,9 +37,9 @@ def get_config(process):
     return cfg
 
 
-def download_sample_sheet(process, save_dir):
-    '''Downloads the demultiplexing process's sample sheet, which contains only
-    samples for the requested project (written by setup-demultiplex-hiseq.py).'''
+def locate_save_sample_sheet(process, run_dir):
+    '''Locates the sample sheet. Either uses a sample sheet specified in the LIMS 
+    process, or takes it from the run directory.'''
 
     sample_sheet = None
     for o in process.all_outputs(unique=True):
@@ -61,31 +51,26 @@ def download_sample_sheet(process, save_dir):
         if process.id == "":
             raise ValueError("Process ID is an empty string")
         name = "SampleSheet-" + process.id + ".csv"
-        file(os.path.join(save_dir, name), 'w').write(sample_sheet)
-        return name, sample_sheet
+        file(os.path.join(run_dir, name), 'w').write(sample_sheet)
+        return name
     else:
-        return False
+        return "SampleSheet.csv"
 
 
-def run_demultiplexing(process, ssheet, bases_mask, n_threads, mismatches,
-        start_dir, dest_run_dir, other_options):
-    '''First calls the configureFastqToBcl.py, then calls make in the fastq file directory.'''
+def run_demultiplexing(process, sample_sheet_path, n_threads, start_dir,
+        dest_run_dir, other_options):
 
-    os.chdir(start_dir)
-    cfg_log_name = os.path.join(nsc.LOG_DIR, "configureBclToFastq-" + process.id + ".log")
-    log = open(cfg_log_name, "w")
+    '''Run bcl2fastq.'''
+
+    bcl2fastq_log_path = os.path.join(nsc.LOG_DIR, "bcl2fastq-" + process.id + ".log")
+    log = open(bcl2fastq_log_path, "w")
     
-    args = ['--mismatches', str(mismatches)]
-    args += ['--fastq-cluster-count', "0"]
-    args += ['--sample-sheet', ssheet]
-    args += ['--use-bases-mask', bases_mask]
     args += ['--output-dir', dest_run_dir]
     args += ['--input-dir', start_dir]
     if other_options:
-        args += re.split(" *", other_options)
+        args += re.split(" +", other_options)
 
-    # configureBclToFastq.pl
-    rcode = subprocess.call([nsc.CONFIGURE_BCL_TO_FASTQ] + args, stdout=log, stderr=log)
+    rcode = subprocess.call([nsc.CONFIGURE_BCL_TO_FASTQ] + args, cwd=start_dir, stdout=log, stderr=log)
 
     log.close()
     utilities.upload_file(process, nsc.CONFIGURE_LOG, cfg_log_name)
@@ -156,18 +141,10 @@ def check_fastq_and_attach_files(process, sample_sheet, projdirs, reads):
                 f.upload(fp) # content of the file is the path
 
 
-def main(process_id):
-    os.umask(770)
-    process = Process(nsc.lims, id=process_id)
+def copy_to_secondary():
+    '''Copy to secondary storage if required.'''
 
-    utilities.running(process)
-    cfg = get_config(process)
-    
-    seq_proc = utilities.get_sequencing_process(process)
-    runid = seq_proc.udf['Run ID']
-    print "Demultiplexing job for LIMS process", process_id, ", run", runid
     destination = os.path.join(nsc.SECONDARY_STORAGE, runid)
-
     if nsc.DO_COPY_METADATA_FILES:
         already_existed = True
         try:
@@ -177,16 +154,31 @@ def main(process_id):
             pass
 
         if not already_existed:
-            if not copyfiles.copy_files(process, 'hiseq'):
+            if not copyfiles.copy_files(process, 'nextseq'):
                 utilities.fail(process, 'Unable to copy files')
-                return
+                return False
+
+
+def main(process_id):
+    os.umask(770)
+    process = Process(nsc.lims, id=process_id)
+
+    utilities.running(process)
+    cfg = get_config(process)
+    
+    seq_proc = utilities.get_sequencing_process(process)
+    runid = seq_proc.udf['Run ID']
+
+    print "Demultiplexing process for LIMS process", process_id, ", NextSeq run", runid
+    copy_to_secondary()
 
     success = False
     if cfg:
         start_dir = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
     
-        ssheet_file,sample_sheet_data = download_sample_sheet(process, start_dir)
-        sample_sheet = parse.parse_hiseq_sample_sheet(sample_sheet_data)
+        ssheet_file,sample_sheet_data = locate_save_sample_sheet(process, cfg.run_dir, start_dir)
+
+        ##sample_sheet = parse.parse_hiseq_sample_sheet(sample_sheet_data)
     
         if ssheet_file:
             process_ok = run_demultiplexing(process, ssheet_file, cfg.bases_mask,
@@ -209,6 +201,8 @@ def main(process_id):
 
                 if not success:
                     utilities.fail(process, "Failed to set UDFs")
+            else: # Processing (make, etc)
+                utilities.fail(process, "Demultiplexing process exited with an error status")
             
         else: # Sample sheet
             utilities.fail(process, "Can't get the sample sheet")
@@ -237,7 +231,7 @@ if __name__ == "__main__":
             raise
         sys.exit(ok)
     else:
-        print "use: demultiplex-hiseq.py <process-id>"
+        print "use: demultiplex-nextseq.py <process-id>"
         sys.exit(1)
 
 

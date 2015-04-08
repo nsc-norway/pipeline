@@ -73,16 +73,26 @@ def main_lims(threads, process_id):
     demux_process = utilities.get_demux_process(process)
 
     run_id = seq_process.udf['Run ID']
+    for n_reads in xrange(10):
+        try:
+            rc = seq_process.udf["Read {0} Cycles".format(r)]
+        except KeyError:
+            break
+
     demultiplex_dir = demux_process.udf[nsc.DEST_FASTQ_DIR_UDF]
     
     lanes = {}
     for lane in process.all_inputs():
-        TODO()
+        lane_id = int(re.match("(\d+):1", lane.location[1]).group(1))
+        # UDFs are set by Illumina Sequencing process
+        density_raw = lane.udf['Cluster Density (K/mm^2) R1']
+        n_raw = lane.udf['Clusters Raw R1']
+        n_pf = lane.udf['Clusters PF R1']
+        density_pf = density_raw * n_pf / n_raw
+        pf_ratio = lane.udf['%PF R1'] / 100.0
+        lanes[l] = parse.Lane(lane_id, density_raw, density_pf, pf_ratio)
 
-
-
-
-
+    info, projects = parse.get_hiseq_qc_data(run_id, n_reads, lanes, demultiplex_dir)
     qc.qc_main(demultiplex_dir, projects, run_id, info['sw_versions'], threads)
 
 

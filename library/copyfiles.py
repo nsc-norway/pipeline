@@ -26,7 +26,8 @@ hiseq_exclude_paths = ["/Thumbnail_Images",
         "/Data/Intensities/BaseCalls/L00*"
         ]
 
-nextseq_exclude_paths = ["TODO" ]
+nextseq_exclude_paths = ["/Data/Intensities/L00*",
+        "/Data/Intensities/BaseCalls/L00*"]
 
 
 def rsync(source_path, destination_path, exclude):

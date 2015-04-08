@@ -33,13 +33,13 @@ def post_job_id(process, job_id):
     process.put()
 
 
-def main(process_id, memory, inputmem, nthreads, inputthreads, jobname, script, args):
+def main(process_id, memory, threadmem, nthreads, inputthreads, jobname, script, args):
     process = Process(nsc.lims, id=process_id)
 
     if inputthreads:
         nthreads += len(process.all_inputs(unique=True))*inputthreads
-    if inputmem: 
-        memory += len(process.all_inputs(unique=True))*inputmem
+    if threadmem: 
+        memory += nthreads*threadmem
 
     job_id = submit_job(memory, nthreads, jobname, script, args)
     post_job_id(process, job_id)
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     parser.add_argument('--threads', type=int, help='Number of threads', default=1)
     parser.add_argument('--inputthreads', type=int, help='Number of (extra) threads to request per process input')
     parser.add_argument('--mem', type=int, help='Memory to request for the process (megabytes)', default=1024)
-    parser.add_argument('--inputmem', type=int, help='Memory to request per process input (megabytes)')
+    parser.add_argument('--thread-mem', type=int, help='Additional memory to request per thread')
     parser.add_argument('--jobname', help='Job name')
     parser.add_argument('script', help='Script to submit to sbatch')
     parser.add_argument('job_args', nargs=argparse.REMAINDER, help='Arguments to pass to the job script')
@@ -60,5 +60,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     nsc.lims.check_version()
-    main(args.pid, args.mem, args.inputmem, args.threads, args.inputthreads, args.jobname, args.script, args.job_args)
+    main(args.pid, args.mem, args.thread_mem, args.threads, args.inputthreads, args.jobname, args.script, args.job_args)
 

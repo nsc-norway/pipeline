@@ -56,7 +56,9 @@ class FastqFile(object):
     (bcl2fastq output) directory.
     
     num_pf_reads is the number of full sequences that were read (number of clusters, 
-    note the alternative meaning of "read").'''
+    note the alternative meaning of "read").
+    
+    empty is set by the QC function. You may set it, but it will be overwritten.'''
 
     def __init__(self, lane, read_num, path, num_pf_reads, percent_of_pf_clusters):
         self.lane = lane
@@ -64,6 +66,7 @@ class FastqFile(object):
         self.path = path
         self.num_pf_reads = num_pf_reads # Num_of_PF_Reads
         self.percent_of_pf_clusters = percent_of_pf_clusters
+        self.empty = False
 
 
 
@@ -251,8 +254,8 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
                 path_t = sample_dir + "/{0}_{1}_L{2}_R{3}_001.fastq.gz"
                 path = path_t.format(e['SampleId'], e['Index'], e['Lane'].zfill(3), ri) 
                 lane = lanes[int(e['Lane'])]
-                f = FastqFile(lane, ri, path, num(stats_entry['# Reads']),
-                        num(stats_entry['% of raw clusters per lane'], float))
+                seq_reads = num(stats_entry['# Reads']) / n_reads
+                f = FastqFile(lane, ri, path, seq_reads, num(stats_entry['% of raw clusters per lane'], float))
                 # PF clusters = raw clusters because bcl2fastq doesn't save non-PF clusters
                 if stats_entry['% PF'] != "100.00" and stats_entry['Yield (Mbases)'] != "0":
                     raise RuntimeError("Expected 100 % PF clusters, can't get the stats")
