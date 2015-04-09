@@ -70,16 +70,17 @@ def update_stats_fastqc(quality_control_dir, sample):
 
     sample_dir = os.path.join(quality_control_dir, "Sample_" + sample.name)
     for f in sample.files:
-        fastqc_result_dir = os.path.join(sample_dir, fastqc_dir(f.path))
-        with open(fastqc_result_dir + "/fastqc_data.txt") as fqc_data:
-            for l in fqc_data:
-                total = re.match("Total Sequences (\d+)$", l)
-                if total:
-                    if f.num_pf_reads:
-                        assert f.num_pf_reads == int(total.group(1))
-                    else:
-                        f.num_pf_reads = int(total.group(1))
-                    break
+        if not f.empty:
+            fastqc_result_dir = os.path.join(sample_dir, fastqc_dir(f.path))
+            with open(fastqc_result_dir + "/fastqc_data.txt") as fqc_data:
+                for l in fqc_data:
+                    total = re.match("Total Sequences (\d+)$", l)
+                    if total:
+                        if f.num_pf_reads:
+                            assert f.num_pf_reads == int(total.group(1))
+                        else:
+                            f.num_pf_reads = int(total.group(1))
+                        break
 
 
 
@@ -312,7 +313,8 @@ Lane	Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density
 
 
 
-def qc_main(input_demultiplex_dir, projects, run_id, software_versions, threads = 1):
+def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
+        software_versions, threads = 1):
     '''QC on demultiplexed data. Can be run per project, don't need
     access to all demultiplexed lanes.
 
@@ -331,12 +333,11 @@ def qc_main(input_demultiplex_dir, projects, run_id, software_versions, threads 
     '''
 
     demultiplex_dir = os.path.abspath(input_demultiplex_dir)
-    # Unaligned/inHouseDataProcessing/
-    output_dir = os.path.join(demultiplex_dir, "inHouseDataProcessing")
+    # Unaligned/QualityControl/
+    quality_control_dir = os.path.join(demultiplex_dir, "QualityControl")
     # Unaligned/inHouseDataProcessing/QualityControl
-    quality_control_dir = os.path.join(output_dir, "QualityControl")
-    delivery_dir = output_dir + "/Delivery"
-    for d in [output_dir, quality_control_dir, delivery_dir]:
+    delivery_dir = quality_control_dir + "/Delivery"
+    for d in [quality_control_dir, delivery_dir]:
         try:
             os.mkdir(d) 
         except OSError:

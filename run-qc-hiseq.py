@@ -61,7 +61,7 @@ def main(threads, demultiplex_dir):
     print "Number of lanes to process:", len(lanes)
 
     info, projects = parse.get_hiseq_qc_data(run_id, n_reads, lanes, demultiplex_dir)
-    qc.qc_main(demultiplex_dir, projects, run_id, info['sw_versions'], threads)
+    qc.qc_main(demultiplex_dir, projects, 'hiseq', run_id, info['sw_versions'], threads)
 
 
 def main_lims(threads, process_id):
@@ -94,7 +94,7 @@ def main_lims(threads, process_id):
         lanes[l] = parse.Lane(lane_id, density_raw, density_pf, pf_ratio)
 
     info, projects = parse.get_hiseq_qc_data(run_id, n_reads, lanes, demultiplex_dir)
-    qc.qc_main(demultiplex_dir, projects, run_id, info['sw_versions'], threads)
+    qc.qc_main(demultiplex_dir, projects, 'hiseq', run_id, info['sw_versions'], threads)
 
 
 if __name__ == '__main__':

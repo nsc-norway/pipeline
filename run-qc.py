@@ -13,15 +13,27 @@ from genologics import *
 from common import nsc, utilities, qc, parse
 
 
-def main(threads, run_dir):
+def main(threads, run_dir, no_sample_sheet):
     run_id = os.path.basename(os.path.realpath(run_dir))
-    if not re.match("^\d{6}_NS[A-Z0-9]+_\d{4}_[A-Z0-9]+$", run_id):
-        print "Error: Specified directory doesn't look like a NextSeq run directory"
+    match = re.match("^\d{6}_(NS|M)[A-Z0-9]+_\d{4}_[A-Z0-9\-]+$", run_id)
+    if not match:
+        print "Error: Specified directory doesn't look like a MiSeq or NextSeq run directory"
         sys.exit(1)
 
+    if match.group(1) == "M":
+        instrument = "miseq"
+    elif match.group(1) == "NS":
+        instrument = "nextseq"
+    else:
+        raise ValueError("The given directory is not a MiSeq or NextSeq run.")
+
     demultiplex_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
-    info, projects = parse.get_nextseq_qc_data(run_id, run_dir)
-    qc.qc_main(demultiplex_dir, projects, run_id, info['sw_versions'], threads)
+    if no_sample_sheet:
+        info, projects = parse.get_ne_mi_seq_from_files(run_dir)
+    else:
+        info, projects = parse.get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument)
+
+    qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
 
 
 def main_lims(threads, process_id):
@@ -55,13 +67,14 @@ def main_lims(threads, process_id):
         lanes[l] = parse.Lane(lane_id, density_raw, density_pf, pf_ratio)
 
     info, projects = parse.get_hiseq_qc_data(run_id, n_reads, lanes, demultiplex_dir)
-    qc.qc_main(demultiplex_dir, projects, run_id, info['sw_versions'], threads)
+    qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--threads', type=int, default=None, help='Number of threads (cores)')
     parser.add_argument('--pid', default=None, help="Process-ID if running within LIMS")
+    parser.add_argument('--no-sample-sheet', action='store_true', help="Run without sample sheet, look for files")
     parser.add_argument('DIR', default=None, help="Run directory")
     args = parser.parse_args()
     threads = args.threads
@@ -80,7 +93,7 @@ if __name__ == '__main__':
             utilities.fail(process, "Unexpected: " + str(sys.exc_info()[1]))
             raise
     elif args.DIR and not args.pid:
-        main(threads, args.DIR)
+        main(threads, args.DIR, args.no_sample_sheet)
     else:
         print "Must specify either LIMS-ID of QC process or Unaligned (bcl2fastq output) directory"
         sys.exit(1)

@@ -180,6 +180,8 @@ def parse_ne_mi_seq_sample_sheet(sample_sheet):
         elif header == "[Data]":
             result['data'] = parse_csv_sample_sheet(data)
 
+    return result
+
 
 def get_hiseq_project_dir(run_id, project_name):
     '''Gets project directory name, prefixed by date and flowcell index'''
@@ -202,12 +204,12 @@ def num(string, ntype=int):
         return ntype(0)
 
 
-def get_sw_versions(demultiplex_config):
+def get_hiseq_sw_versions(demultiplex_config):
     '''Get a dict with software names->versions.
     
     demultiplex_config is an Element object (from ElementTree)'''
 
-    sw_versions = {}
+    sw_versions = []
     # Software tags are nested (best way to see is to just look at the xml)
     sw_tags = [demultiplex_config.find('Software')]
     while sw_tags:
@@ -216,7 +218,7 @@ def get_sw_versions(demultiplex_config):
         if tag.attrib['Name'] == "configureBclToFastq.pl": #special case
             name, ver = tag.attrib['Version'].split('-')
             sw_versions.append((name, ver))
-        else if "RTA" in tag.attrib['Name']:
+        elif "RTA" in tag.attrib['Name']:
             sw_versions.append((tag.attrib['Name'], tag.attrib['Version']))
 
     return sw_versions
@@ -238,7 +240,7 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
     xmltree = ElementTree.parse(os.path.join(root_dir, "DemultiplexConfig.xml"))
     demultiplex_config = xmltree.getroot()
 
-    sw_versions = get_sw_versions(demultiplex_config)
+    sw_versions = get_hiseq_sw_versions(demultiplex_config)
 
     flowcell_info = demultiplex_config.find("FlowcellInfo")
     fcid = flowcell_info.attrib['ID']
@@ -306,14 +308,18 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
 def get_sw_versions(run_dir):
     '''Mainly for Mi/NextSeq'''
 
-    xmltree = ElementTree.parse(os.path.join(run_dir, 'RunParameters.xml'))
+    try:
+        xmltree = ElementTree.parse(os.path.join(run_dir, 'RunParameters.xml'))
+    except IOError:
+        xmltree = ElementTree.parse(os.path.join(run_dir, 'runParameters.xml'))
+
     run_parameters = xmltree.getroot()
     rta_ver = run_parameters.find("RTAVersion").text
     return {"RTA": rta_ver}
 
 
 
-def get_ne_mi_seq_from_ssheet(run_id, run_dir, sample_sheet_path=None):
+def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, sample_sheet_path=None):
     '''Get NextSeq or MiSeq QC model objects.
 
     Gets the info from the sample sheet. Works for indexed projects and for 
@@ -331,14 +337,20 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, sample_sheet_path=None):
     project_dir = get_project_dir(run_id, project_name)
 
     lane = Lane(1, None, None, None)
+    if instrument == "miseq":
+        file_lane_id = "1"
+    elif instrument == "nextseq":
+        file_lane_id = "X"
+
 
     samples = []
-    for sam_index, sam in zip(xrange(1), sample_sheet['data']):
+    for sam_index, sam in enumerate(sample_sheet['data']):
         files = []
         sample_name = sam['Sample_ID']
         for ir in xrange(1, n_reads+1):
-            path = project_dir + "/" + sample_name + "_S" + str(sam_index)\
-                    + "_L00X_R" + str(ir) + "_.fastq.gz"
+            path = "{0}/{1}_S{2}_L00{3}_R{4}_001.fastq.gz".format(
+                    project_dir, sample_name, str(sam_index + 1),
+                    file_lane_id, str(ir))
             files.append(FastqFile(lane, ir, path, None, None))
 
         sample = Sample(sample_name, files)
@@ -347,7 +359,7 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, sample_sheet_path=None):
     project = Project(project_name, project_dir, samples)
 
     unfiles = [
-            FastqFile(lane, ir, "Undetermined_S0_L00X_R%d_001.fastq.gz" % ir, None, None)
+            FastqFile(lane, ir, "Undetermined_S0_L00%s_R%d_001.fastq.gz" % (file_lane_id, ir), None, None)
             for ir in xrange(1, n_reads + 1)
             ]
     unsample = Sample("Undetermined", unfiles)
