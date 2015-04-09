@@ -22,7 +22,7 @@ from genologics.lims import *
 #from genologics.epp import EppLogger
 
 # Local
-from library import nsc, utilities
+from common import nsc, utilities
 
 nsc.lims.check_version()
 

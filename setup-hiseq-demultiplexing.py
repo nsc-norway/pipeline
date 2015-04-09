@@ -8,7 +8,7 @@ import sys, os
 from argparse import ArgumentParser
 from genologics.lims import *
 import logging
-from library import nsc, utilities
+from common import nsc, utilities
 
 
 # Key determined parameters:

@@ -3,7 +3,6 @@ from xml.etree import ElementTree
 from collections import defaultdict
 
 
-
 # Model: Objects containing projects, samples and files.
 # Represents a unified interface to the QC functionality, similar to the
 # SampleInformation.txt BarcodeLaneStatistics.txt from the perl scripts.
@@ -11,7 +10,9 @@ from collections import defaultdict
 class Project(object):
     '''Project object.
     name: name with special characters replaced
-    path: base name of project directory (not full path)
+    path: base name of project directory 
+      path is relative to Unaligned for HiSeq, and relative to Data/Intensities/BaseCalls
+      for MiSeq and NextSeq
     samples: list of samples
     '''
     def __init__(self, name, proj_dir, samples=[]):
@@ -53,10 +54,12 @@ class FastqFile(object):
     end). Index reads are not considered.
 
     Path is the path to the fastq file relative to the "Unaligned"
-    (bcl2fastq output) directory.
+    (bcl2fastq output) directory or Data/Intensities/BaseCalls.
     
     num_pf_reads is the number of full sequences that were read (number of clusters, 
-    note the alternative meaning of "read").'''
+    note the alternative meaning of "read").
+    
+    empty is set by the QC function. You may set it, but it will be overwritten.'''
 
     def __init__(self, lane, read_num, path, num_pf_reads, percent_of_pf_clusters):
         self.lane = lane
@@ -64,6 +67,7 @@ class FastqFile(object):
         self.path = path
         self.num_pf_reads = num_pf_reads # Num_of_PF_Reads
         self.percent_of_pf_clusters = percent_of_pf_clusters
+        self.empty = False
 
 
 
@@ -136,8 +140,7 @@ def parse_demux_summary(demux_summary_file_path):
     return total, undetermined
 
 
-
-def parse_hiseq_sample_sheet(sample_sheet):
+def parse_csv_sample_sheet(sample_sheet):
     lines = sample_sheet.splitlines()
     headers = lines[0].split(",")
     samples = []
@@ -149,6 +152,33 @@ def parse_hiseq_sample_sheet(sample_sheet):
     return samples
 
 
+def parse_hiseq_sample_sheet(sample_sheet):
+    return parse_csv_sample_sheet(sample_sheet)
+
+
+def parse_ne_mi_seq_sample_sheet(sample_sheet):
+    '''Returns a dict with keys header, reads, data. 
+
+    header: dict of key-value pairs
+    reads: list of number of cycles in each read
+    data: list of samples
+    '''
+
+    # Will contain ['', Header 1, Data 1, Header 2, Data 2] where "header" are the 
+    # things in []s
+    sections = re.split(r"(\[\w+\])[\r\n]+", sample_sheet)
+    result = {}
+    for header, data in zip(sections[1::2], sections[2::2]):
+        if header == "[Header]":
+            result['header'] = {}
+            for l in data.splitlines():
+                parts = l.split(",")
+                if len(parts) == 2:
+                    result['header'][parts[0]] = parts[1]
+        elif header == "[Reads]":
+            result['reads'] = [int(c) for c in data.splitlines() if c.isdigit()]
+        elif header == "[Data]":
+            result['data'] = parse_csv_sample_sheet(data)
 
 
 def get_hiseq_project_dir(run_id, project_name):
@@ -156,10 +186,12 @@ def get_hiseq_project_dir(run_id, project_name):
     date_machine_flowcell = re.match(r"([\d]+_[^_]+)_[\d]+_([AB])", run_id)
     project_prefix = date_machine_flowcell.group(1) + "." + date_machine_flowcell.group(2) + "."
     return project_prefix + "Project_" + project_name
-    
 
-
-
+def get_project_dir(run_id, project_name):
+    '''Gets project directory name for mi and nextseq.'''
+    date_machine = re.match(r"([\d]+_[^_]+)_", run_id)
+    project_dir = date_machine.group(1) + ".Project_" + project_name
+    return project_dir
 
 
 # Support functions for get_hiseq_qc_data
@@ -183,9 +215,9 @@ def get_sw_versions(demultiplex_config):
         sw_tags += tag.findall("Software")
         if tag.attrib['Name'] == "configureBclToFastq.pl": #special case
             name, ver = tag.attrib['Version'].split('-')
-            sw_versions[name] = ver
-        else:
-            sw_versions[tag.attrib['Name']] = tag.attrib['Version']
+            sw_versions.append((name, ver))
+        else if "RTA" in tag.attrib['Name']:
+            sw_versions.append((tag.attrib['Name'], tag.attrib['Version']))
 
     return sw_versions
 
@@ -251,8 +283,8 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
                 path_t = sample_dir + "/{0}_{1}_L{2}_R{3}_001.fastq.gz"
                 path = path_t.format(e['SampleId'], e['Index'], e['Lane'].zfill(3), ri) 
                 lane = lanes[int(e['Lane'])]
-                f = FastqFile(lane, ri, path, num(stats_entry['# Reads']),
-                        num(stats_entry['% of raw clusters per lane'], float))
+                seq_reads = num(stats_entry['# Reads']) / n_reads
+                f = FastqFile(lane, ri, path, seq_reads, num(stats_entry['% of raw clusters per lane'], float))
                 # PF clusters = raw clusters because bcl2fastq doesn't save non-PF clusters
                 if stats_entry['% PF'] != "100.00" and stats_entry['Yield (Mbases)'] != "0":
                     raise RuntimeError("Expected 100 % PF clusters, can't get the stats")
@@ -269,4 +301,103 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
     info = {"sw_versions": sw_versions}
 
     return info, projects
+
+
+def get_sw_versions(run_dir):
+    '''Mainly for Mi/NextSeq'''
+
+    xmltree = ElementTree.parse(os.path.join(run_dir, 'RunParameters.xml'))
+    run_parameters = xmltree.getroot()
+    rta_ver = run_parameters.find("RTAVersion").text
+    return {"RTA": rta_ver}
+
+
+
+def get_ne_mi_seq_from_ssheet(run_id, run_dir, sample_sheet_path=None):
+    '''Get NextSeq or MiSeq QC model objects.
+
+    Gets the info from the sample sheet. Works for indexed projects and for 
+    projects with no index, but with an entry in the sample sheet.
+    
+    This is limited compared to the HiSeq version -- many fields are filled
+    with None because they are not available / we don't use them.'''
+
+    if not sample_sheet_path:
+        sample_sheet_path = os.path.join(run_dir, 'SampleSheet.csv')
+
+    sample_sheet = parse_ne_mi_seq_sample_sheet(open(sample_sheet_path).read())
+    n_reads = len(sample_sheet['reads'])
+    project_name = sample_sheet['header']['Experiment Name']
+    project_dir = get_project_dir(run_id, project_name)
+
+    lane = Lane(1, None, None, None)
+
+    samples = []
+    for sam_index, sam in zip(xrange(1), sample_sheet['data']):
+        files = []
+        sample_name = sam['Sample_ID']
+        for ir in xrange(1, n_reads+1):
+            path = project_dir + "/" + sample_name + "_S" + str(sam_index)\
+                    + "_L00X_R" + str(ir) + "_.fastq.gz"
+            files.append(FastqFile(lane, ir, path, None, None))
+
+        sample = Sample(sample_name, files)
+        samples.append(sample)
+
+    project = Project(project_name, project_dir, samples)
+
+    unfiles = [
+            FastqFile(lane, ir, "Undetermined_S0_L00X_R%d_001.fastq.gz" % ir, None, None)
+            for ir in xrange(1, n_reads + 1)
+            ]
+    unsample = Sample("Undetermined", unfiles)
+    unproject = Project("Undetermined", None, [unsample]) 
+
+    info = {'sw_versions': get_sw_versions(run_dir)}
+    return info, [project, unproject]
+    
+
+
+def get_ne_mi_seq_from_files(run_dir):
+    '''Get NextSeq or MiSeq QC "model" objects for run, without using sample
+    sheet information.
+
+    This function looks for project directories and extracts infromation from 
+    the directory structure / file names. It is less likely to crash than the above 
+    function, but also more likely to do something wrong.'''
+
+    lane = Lane(1, None, None, None)
+
+    projects = []
+    basecalls_dir = os.path.join(run_dir, "Data", "intensities", "BaseCalls")
+    projects_paths = glob.glob(os.path.join(basecalls_dir, "*_*.Project_*"))
+    for pp in project_paths:
+        p_dir = os.path.basename(pp)
+        project_name = re.match("[\d]+_[A-Z0-9]+\.Project_(.*)", p_dir).group(1)
+
+        sample_files = defaultdict(list)
+
+        for filename in os.listdir(pp):
+            parts = re.match("(.*?)_S\d+_L00X_R(\d+)_001.fastq.gz$", filename)
+            if parts:
+                sample_name = parts.group(1)
+                read_n = int(parts.group(2))
+                sample_files[sample_name].append((read_n, filename))
+
+        samples = []
+        for sample_name, files in sample_files.items():
+            files = []
+            for read_n, fname in files:
+                f = FastqFile(lane, read_n, p_dir + "/" + fname)
+                files.append(f)
+
+            samples.append(Sample(sample_name, files))
+
+        projects.append(Project(project_name, p_dir, samples))
+
+    info = {'sw_versions': get_sw_versions(run_dir)}
+    return info, projects
+
+
+
 
