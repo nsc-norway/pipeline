@@ -22,16 +22,25 @@ def main(threads, run_dir, no_sample_sheet):
 
     if match.group(1) == "M":
         instrument = "miseq"
+        # MiSeq has the Data/reports info, like HiSeq, getting clu. density from files
+        pf_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane PF.txt")
+        lane_pf = get_lane_cluster_density(pf_path)
+        raw_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane.txt")
+        lane_raw = get_lane_cluster_density(raw_path)
+        lane = Lane(1, lane_raw[1], lane_pf[1], lane_pf[1] / lane_raw[1])
+
     elif match.group(1) == "NS":
+        run_completion = ElementTree.parse(os.path.join(run_dir, "RunCompletionStatus.xml")).getroot()
+        clus_den = float(run_completion.find("ClusterDensity").text)
+        pf_ratio = float(run_completion.find("ClustersPassingFilter").text) / 100.0
         instrument = "nextseq"
-    else:
-        raise ValueError("The given directory is not a MiSeq or NextSeq run.")
+        lane = Lane(1, clus_den, clus_den * pf_ratio, pf_ratio)
 
     demultiplex_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
     if no_sample_sheet:
-        info, projects = parse.get_ne_mi_seq_from_files(run_dir)
+        info, projects = parse.get_ne_mi_seq_from_files(run_dir, lane)
     else:
-        info, projects = parse.get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument)
+        info, projects = parse.get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane)
 
     qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
 
@@ -41,33 +50,45 @@ def main_lims(threads, process_id):
     
     To be run in slurm job, called via epp-submit-slurm.py.'''
 
-    # TODO!! this is the HiSeq version....
     process = Process(nsc.lims, id=process_id)
+    utilities.running(process)
     seq_process = utilities.get_sequencing_process(process)
-    demux_process = utilities.get_demux_process(process)
 
     run_id = seq_process.udf['Run ID']
-    for n_reads in xrange(10):
-        try:
-            rc = seq_process.udf["Read {0} Cycles".format(r)]
-        except KeyError:
-            break
 
-    demultiplex_dir = demux_process.udf[nsc.DEST_FASTQ_DIR_UDF]
-    
-    lanes = {}
-    for lane in process.all_inputs():
-        lane_id = int(re.match("(\d+):1", lane.location[1]).group(1))
-        # UDFs are set by Illumina Sequencing process
-        density_raw = lane.udf['Cluster Density (K/mm^2) R1']
-        n_raw = lane.udf['Clusters Raw R1']
-        n_pf = lane.udf['Clusters PF R1']
-        density_pf = density_raw * n_pf / n_raw
-        pf_ratio = lane.udf['%PF R1'] / 100.0
-        lanes[l] = parse.Lane(lane_id, density_raw, density_pf, pf_ratio)
+    instrument = utilities.get_instrument(seq_process)
+    if instrument == "miseq":
+        demultiplex_dir = "Don't know yet..." 
+    elif instrument == "nextseq":
+        demux_process = utilities.get_demux_process(process)
+        demultiplex_dir = demux_process.udf[nsc.DEST_FASTQ_DIR_UDF]
+    else:
+        raise ValueError("This script can only handle MiSeq and NextSeq")
 
-    info, projects = parse.get_hiseq_qc_data(run_id, n_reads, lanes, demultiplex_dir)
+    # Run directory on secondary storage
+    dd = os.path.realpath(demultiplex_dir)
+    m = re.match("(.*)/Data/Intensities/BaseCalls$", dd)
+    if m:
+        run_dir = m.group(1)
+    else:
+        raise RuntimeError("Directory structure doesn't match expectations")
+
+
+    # Lane cluster density -- UDFs are set by Illumina Sequencing process for 
+    # Mi and NextSeq ( to check this )
+    lane = next(process.all_inputs())
+    density_raw = lane.udf['Cluster Density (K/mm^2) R1']
+    n_raw = lane.udf['Clusters Raw R1']
+    n_pf = lane.udf['Clusters PF R1']
+    density_pf = density_raw * n_pf / n_raw
+    pf_ratio = lane.udf['%PF R1'] / 100.0
+    # Using 1 logical lane even for NS until we can extract data from each lane
+    # independently
+    lane = parse.Lane(1, density_raw, density_pf, pf_ratio)
+
+    info, projects = parse.get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane)
     qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
+    utilities.success_finish(process)
 
 
 if __name__ == '__main__':

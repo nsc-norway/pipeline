@@ -8,13 +8,13 @@ from collections import defaultdict
 # SampleInformation.txt BarcodeLaneStatistics.txt from the perl scripts.
 
 class Project(object):
-    '''Project object.
+    """Project object.
     name: name with special characters replaced
     path: base name of project directory 
       path is relative to Unaligned for HiSeq, and relative to Data/Intensities/BaseCalls
       for MiSeq and NextSeq
     samples: list of samples
-    '''
+    """
     def __init__(self, name, proj_dir, samples=[]):
         self.name = name
         self.proj_dir = proj_dir
@@ -22,9 +22,9 @@ class Project(object):
 
 
 class Sample(object):
-    '''Contains information about a sample. Contains a list of FastqFile
+    """Contains information about a sample. Contains a list of FastqFile
     objects representing the reads. One instance for each sample on a 
-    flowcell, even if that sample is run on multiple lanes.'''
+    flowcell, even if that sample is run on multiple lanes."""
 
     def __init__(self, name, files):
         self.name = name
@@ -32,10 +32,10 @@ class Sample(object):
 
 
 class Lane(object):
-    '''Represents a lane (physically separate sub-units of flowcells).
+    """Represents a lane (physically separate sub-units of flowcells).
     
     For MiSeq and NextSeq there is only one lane (NextSeq's lanes aren't
-    independent)..'''
+    independent).."""
 
     def __init__(self, id, raw_cluster_density, pf_cluster_density, pf_ratio):
         self.id = id
@@ -45,7 +45,7 @@ class Lane(object):
 
 
 class FastqFile(object):
-    '''Represents a single output file for a specific sample, lane and
+    """Represents a single output file for a specific sample, lane and
     read. Currently assumed to be no more than one FastqFile per read.
     
     lane is a Lane object containing lane-specific stats.
@@ -59,7 +59,7 @@ class FastqFile(object):
     num_pf_reads is the number of full sequences that were read (number of clusters, 
     note the alternative meaning of "read").
     
-    empty is set by the QC function. You may set it, but it will be overwritten.'''
+    empty is set by the QC function. You may set it, but it will be overwritten."""
 
     def __init__(self, lane, read_num, path, num_pf_reads, percent_of_pf_clusters):
         self.lane = lane
@@ -73,8 +73,8 @@ class FastqFile(object):
 
 
 def parse_demux_stats(stats_data):
-    '''Parse the Demultiplex_stats.htm file and return a list of records,
-    one for each row.'''
+    """Parse the Demultiplex_stats.htm file and return a list of records,
+    one for each row."""
 
     # re.DOTALL does a "tall" match, including multiple lines
     tables = re.findall("<table[ >].*?</table>", stats_data, re.DOTALL)
@@ -97,17 +97,18 @@ def parse_demux_stats(stats_data):
 
 
 def parse_demux_summary(demux_summary_file_path):
-    '''Get lane-read-level demultiplexing statistics from
+    """Get lane-read-level demultiplexing statistics from
     Flowcell_demux_summary.xml.
     
     Statistics gathered:
+        - per sample
         - per lane
         - per read (1/2)
         - pass filter / raw
     
     The lane_stats dict is quad-nested; by lane ID, read index (1/2),
     Pf / Raw and finally stat name.
-    '''
+    """
 
     xmltree = ElementTree.parse(demux_summary_file_path)
     root = xmltree.getroot()
@@ -121,6 +122,7 @@ def parse_demux_summary(demux_summary_file_path):
         lane_id = lane.attrib['index']
 
         for sample in lane.findall("Sample"):
+            sample_name = sample.attrib['index']
             for barcode in sample.findall("Barcode"):
                 barcode_index = barcode.attrib['index']
                 for tile in barcode.findall("Tile"):
@@ -129,15 +131,120 @@ def parse_demux_summary(demux_summary_file_path):
                         for filtertype in read:
                             ft = filtertype.tag
                             for stat in filtertype:
-                                stat_val = total[lane_id][read_id][ft].get(stat.tag, 0)
+                                stat_val = total[sample_name][lane_id][read_id][ft].get(stat.tag, 0)
                                 add = int(stat.text)
-                                total[lane_id][read_id][ft][stat.tag] = stat_val + add
+                                total[sample_name][lane_id][read_id][ft][stat.tag] = stat_val + add
                                 if barcode_index == "Undetermined":
-                                    un_val = undetermined[lane_id][read_id][ft].get(stat.tag, 0)
-                                    undetermined[lane_id][read_id][ft][stat.tag] = un_val + add
+                                    un_val = undetermined[sample_name][lane_id][read_id][ft].get(stat.tag, 0)
+                                    undetermined[sample_name][lane_id][read_id][ft][stat.tag] = un_val + add
 
 
     return total, undetermined
+
+
+def parse_ns_conversion_stats(conversion_stats_path):
+    """Get "conversion stats" from the NextSeq stats.
+
+
+    Loops over the comprehensive tree structure of the XML file and generates the
+    grand totals. 
+
+    [
+        (Lane, Sample name, {sample stats}, {sample stats PF})
+    ]
+    For the nextseq, the lane is always 1 and we integrate over the NS lanes, as
+    they are not independent anyway.
+    """
+    xmltree = ElementTree.parse(conversion_stats_path)
+    root = xmltree.getroot()
+    tree = lambda: defaultdict(tree)
+    total = tree()
+    undetermined = tree()
+    if root.tag != "Stats":
+        raise RuntimeError("Expected XML element Stats, found " + root.tag)
+    fc = root.find("Flowcell")
+    project = next(pro for pro in fc.findall("Project") if pro.attrib['name'] != "default")
+    for sample in lane.findall("Sample"):
+        sample_id = sample.attrib['name']
+        stats_pf = defaultdict(int)
+        stats_raw = defaultdict(int)
+        for barcode in sample.findall("Barcode"):
+            for lane in barcode.findall("Lane"):
+                for tile in lane.findall("Tile"):
+                    for filtertype in lane:
+                        ft = filtertype.tag
+                        if ft == "Raw":
+                            st = stats_raw
+                        elif ft == "Pf":
+                            st = stats_pf
+                        for read_or_cc in filtertype:
+                            if read_or_cc.tag == "ClusterCount":
+                                st["ClusterCount"] += int(read_or_cc.text)
+                            elif read_or_cc.tag == "Read":
+                                for stat in read_or_cc:
+                                    st[stat.tag] += int(stat.text)
+
+        samples.append((1, sample_id, stats_raw, stats_pf))
+
+    return samples
+
+def parse_ns_conversion_stats(conversion_stats_path):
+    """Get "conversion stats" from the NextSeq stats.
+
+
+    Loops over the comprehensive tree structure of the XML file and generates the
+    grand totals. 
+
+    [
+        (Lane, Sample name, {sample stats}, {sample stats PF})
+    ]
+    For the nextseq, the lane is always 1 and we integrate over the NS lanes, as
+    they are not independent anyway.
+    """
+    xmltree = ElementTree.parse(conversion_stats_path)
+    root = xmltree.getroot()
+    tree = lambda: defaultdict(tree)
+    total = tree()
+    undetermined = tree()
+    if root.tag != "Stats":
+        raise RuntimeError("Expected XML element Stats, found " + root.tag)
+    fc = root.find("Flowcell")
+    project = next(pro for pro in fc.findall("Project") if pro.attrib['name'] != "default")
+    for sample in lane.findall("Sample"):
+        sample_id = sample.attrib['name']
+        stats_pf = defaultdict(int)
+        stats_raw = defaultdict(int)
+        for barcode in sample.findall("Barcode"):
+            for lane in barcode.findall("Lane"):
+                for tile in lane.findall("Tile"):
+                    for filtertype in lane:
+                        ft = filtertype.tag
+                        if ft == "Raw":
+                            st = stats_raw
+                        elif ft == "Pf":
+                            st = stats_pf
+                        for read_or_cc in filtertype:
+                            if read_or_cc.tag == "ClusterCount":
+                                st["ClusterCount"] += int(read_or_cc.text)
+                            elif read_or_cc.tag == "Read":
+                                for stat in read_or_cc:
+                                    st[stat.tag] += int(stat.text)
+
+        samples.append((1, sample_id, stats_raw, stats_pf))
+
+    return samples
+
+
+def get_nextseq_stats(stats_xml_file_path):
+    """
+    fooo
+    """
+
+    
+
+
+    return total, undetermined
+
 
 
 def parse_csv_sample_sheet(sample_sheet):
@@ -157,12 +264,12 @@ def parse_hiseq_sample_sheet(sample_sheet):
 
 
 def parse_ne_mi_seq_sample_sheet(sample_sheet):
-    '''Returns a dict with keys header, reads, data. 
+    """Returns a dict with keys header, reads, data. 
 
     header: dict of key-value pairs
     reads: list of number of cycles in each read
     data: list of samples
-    '''
+    """
 
     # Will contain ['', Header 1, Data 1, Header 2, Data 2] where "header" are the 
     # things in []s
@@ -184,13 +291,13 @@ def parse_ne_mi_seq_sample_sheet(sample_sheet):
 
 
 def get_hiseq_project_dir(run_id, project_name):
-    '''Gets project directory name, prefixed by date and flowcell index'''
+    """Gets project directory name, prefixed by date and flowcell index"""
     date_machine_flowcell = re.match(r"([\d]+_[^_]+)_[\d]+_([AB])", run_id)
     project_prefix = date_machine_flowcell.group(1) + "." + date_machine_flowcell.group(2) + "."
     return project_prefix + "Project_" + project_name
 
 def get_project_dir(run_id, project_name):
-    '''Gets project directory name for mi and nextseq.'''
+    """Gets project directory name for mi and nextseq."""
     date_machine = re.match(r"([\d]+_[^_]+)_", run_id)
     project_dir = date_machine.group(1) + ".Project_" + project_name
     return project_dir
@@ -205,9 +312,9 @@ def num(string, ntype=int):
 
 
 def get_hiseq_sw_versions(demultiplex_config):
-    '''Get a dict with software names->versions.
+    """Get a dict with software names->versions.
     
-    demultiplex_config is an Element object (from ElementTree)'''
+    demultiplex_config is an Element object (from ElementTree)"""
 
     sw_versions = []
     # Software tags are nested (best way to see is to just look at the xml)
@@ -225,13 +332,13 @@ def get_hiseq_sw_versions(demultiplex_config):
 
 
 def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
-    '''Get HiSeq metadata about project, sample and files, including QC data. 
+    """Get HiSeq metadata about project, sample and files, including QC data. 
     Converted to the internal representation (model) classes defined above.
 
     n_reads is the number of sequence read passes, 1 or 2 (paired end)
 
     lanes is a dict with key: numeric lane number, value: lane object
-    '''
+    """
     
     # Getting flowcell, software and sample information from DemultiplexConfig.xml
     # It has almost exactly the same data as the sample sheet, but it has the
@@ -260,8 +367,8 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
 
 
     # Demultiplex_stats.htm contains most of the required information
-    ds_path = os.path.join(root_dir, "Basecall_Stats_" + fcid, "Demultiplex_Stats.htm")
-    demux_stats = parse_demux_stats(open(ds_path).read())
+    ds_path = os.path.join(root_dir, "Basecall_Stats_" + fcid, "Flowcell_demux_summary.xml")
+    demux_sum = parse_demux_summary(open(ds_path).read())
 
     projects = []
     for proj, entries in project_entries.items():
@@ -306,7 +413,7 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
 
 
 def get_sw_versions(run_dir):
-    '''Mainly for Mi/NextSeq'''
+    """Mainly for Mi/NextSeq"""
 
     try:
         xmltree = ElementTree.parse(os.path.join(run_dir, 'RunParameters.xml'))
@@ -319,14 +426,14 @@ def get_sw_versions(run_dir):
 
 
 
-def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, sample_sheet_path=None):
-    '''Get NextSeq or MiSeq QC model objects.
+def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane, sample_sheet_path=None):
+    """Get NextSeq or MiSeq QC model objects.
 
     Gets the info from the sample sheet. Works for indexed projects and for 
     projects with no index, but with an entry in the sample sheet.
     
     This is limited compared to the HiSeq version -- many fields are filled
-    with None because they are not available / we don't use them.'''
+    with None because they are not available / we don't use them."""
 
     if not sample_sheet_path:
         sample_sheet_path = os.path.join(run_dir, 'SampleSheet.csv')
@@ -336,7 +443,6 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, sample_sheet_path=Non
     project_name = sample_sheet['header']['Experiment Name']
     project_dir = get_project_dir(run_id, project_name)
 
-    lane = Lane(1, None, None, None)
     if instrument == "miseq":
         file_lane_id = "1"
     elif instrument == "nextseq":
@@ -363,22 +469,20 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, sample_sheet_path=Non
             for ir in xrange(1, n_reads + 1)
             ]
     unsample = Sample("Undetermined", unfiles)
-    unproject = Project("Undetermined", None, [unsample]) 
+    unproject = Project("Undetermined_indices", None, [unsample]) 
 
     info = {'sw_versions': get_sw_versions(run_dir)}
     return info, [project, unproject]
     
 
 
-def get_ne_mi_seq_from_files(run_dir):
-    '''Get NextSeq or MiSeq QC "model" objects for run, without using sample
+def get_ne_mi_seq_from_files(run_dir, lane):
+    """Get NextSeq or MiSeq QC "model" objects for run, without using sample
     sheet information.
 
     This function looks for project directories and extracts infromation from 
     the directory structure / file names. It is less likely to crash than the above 
-    function, but also more likely to do something wrong.'''
-
-    lane = Lane(1, None, None, None)
+    function, but also more likely to do something wrong."""
 
     projects = []
     basecalls_dir = os.path.join(run_dir, "Data", "intensities", "BaseCalls")

@@ -51,7 +51,8 @@ def main(threads, demultiplex_dir):
 
     dm_path = glob.glob(os.path.join(demultiplex_dir, "Basecall_Stats_*", "Flowcell_demux_summary.xml"))[0]
     demux_summary = parse.parse_demux_summary(dm_path)
-    n_reads = len(demux_summary[0].values()[0])
+    # Number of reads: take the first sample and lane, count the reads
+    n_reads = len(demux_summary[0].values()[0].values()[0])
     print "Number of non-index reads:", n_reads
     
     lanes = {}
@@ -70,6 +71,9 @@ def main_lims(threads, process_id):
     To be run in slurm job, called via epp-submit-slurm.py.'''
 
     process = Process(nsc.lims, id=process_id)
+
+    utilities.running(process)
+
     seq_process = utilities.get_sequencing_process(process)
     demux_process = utilities.get_demux_process(process)
 
@@ -95,6 +99,8 @@ def main_lims(threads, process_id):
 
     info, projects = parse.get_hiseq_qc_data(run_id, n_reads, lanes, demultiplex_dir)
     qc.qc_main(demultiplex_dir, projects, 'hiseq', run_id, info['sw_versions'], threads)
+
+    utilities.success_finish(process)
 
 
 if __name__ == '__main__':

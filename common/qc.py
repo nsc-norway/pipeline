@@ -74,7 +74,7 @@ def update_stats_fastqc(quality_control_dir, sample):
             fastqc_result_dir = os.path.join(sample_dir, fastqc_dir(f.path))
             with open(fastqc_result_dir + "/fastqc_data.txt") as fqc_data:
                 for l in fqc_data:
-                    total = re.match("Total Sequences (\d+)$", l)
+                    total = re.match("Total Sequences\t(\d+)", l)
                     if total:
                         if f.num_pf_reads:
                             assert f.num_pf_reads == int(total.group(1))
@@ -203,18 +203,31 @@ def generate_internal_html_report(quality_control_dir, samples):
                 fqc_dir = fastqc_dir(fq.path)
 
                 cell1 = "<tr><td align=\"left\"><b>{fileName}<br/><br/>SampleName: {sampleName}<br/>Read Num: {nReads}</b></td>\n"
-                out_file.write(cell1.format(fileName=fq_name, sampleName=s.name, nReads=fq.num_pf_reads))
+                if fq.empty:
+                    n_reads = 0
+                else:
+                    n_reads = fq.num_pf_reads
+                out_file.write(cell1.format(
+                    fileName=fq_name,
+                    sampleName=s.name,
+                    nReads=utilities.display_int(n_reads)
+                    ))
     
                 for img in images:
-                    cell = "<td><a href=\"{subDir}/{fastqcDir}/Images/{image}\"><img src=\"{subDir}/{fastqcDir}/Images/{image}\" class=\"graph\" align=\"center\"/></a></td>\n"
-                    out_file.write(cell.format(subDir=subdir, fastqcDir=fqc_dir, image=img))
+                    if fq.empty:
+                        out_file.write("<td></td>\n")
+                    else:
+                        cell = "<td><a href=\"{subDir}/{fastqcDir}/Images/{image}\"><img src=\"{subDir}/{fastqcDir}/Images/{image}\" class=\"graph\" align=\"center\"/></a></td>\n"
+                        out_file.write(cell.format(subDir=subdir, fastqcDir=fqc_dir, image=img))
     
-                celln = "<td align=\"center\"><b><a href=\"#M{index}\">Overrepresented sequences</a></b></td>\n</tr>\n";
-                out_file.write(celln.format(subDir=subdir, fileName=fq_name, index=i))
                 
                 report_path = os.path.join(quality_control_dir, subdir, fqc_dir, "fastqc_report.html")
                 if not fq.empty:
+                    celln = "<td align=\"center\"><b><a href=\"#M{index}\">Overrepresented sequences</a></b></td>\n</tr>\n";
+                    out_file.write(celln.format(subDir=subdir, fileName=fq_name, index=i))
                     overrepresented_seq_buffer += extract_format_overrepresented(report_path, fq_name, "M" + str(i))
+                else:
+                    out_file.write("<td></td>\n</tr>\n")
 
                 i += 1
 
@@ -293,7 +306,11 @@ Lane	Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density
 
         for l in sorted(lane_proj.keys()):
             lane, proj = lane_proj[l]
-            undetermined_file = lane_undetermined[l]
+            try:
+                undetermined_file = lane_undetermined[l]
+            except KeyError:
+                undetermined_file = None
+
             out.write(str(l) + "\t")
             out.write(proj.name + "\t")
             cluster_no = sum(f.num_pf_reads
@@ -305,7 +322,10 @@ Lane	Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density
             out.write("%4.2f" % (lane.pf_ratio) + "\t")
             out.write(utilities.display_int(lane.raw_cluster_density) + '\t')
             out.write(utilities.display_int(lane.pf_cluster_density) + '\t')
-            out.write(str(undetermined_file.percent_of_pf_clusters) + "%\t")
+            if undetermined_file:
+                out.write(str(undetermined_file.percent_of_pf_clusters) + "%\t")
+            else:
+                out.write("0%\t")
             out.write("ok\n")
 
 
@@ -393,11 +413,10 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
             fname = delivery_dir + "/Email_for_" + project.name + ".xls"
             write_sample_info_table(fname, run_id, project)
 
-    # The following reports don't need to be used (i.e. read, copied) for  
-    # LIMS-based runs, as a dedicated job will generate these for the full
-    # run after all demultiplexing has completed (TODO).
 
-    # Internal bookkeeping
+    # For internal bookkeeping -- This will not be needed when we move to Clarity LIMS
+    # exclusively, but we need to figure out how to get all the stats into LIMS for all 
+    # sequencer types.
     fname = delivery_dir + "/Table_for_GA_runs_" + run_id + ".xls"
     write_internal_sample_table(fname, run_id, projects)
 
