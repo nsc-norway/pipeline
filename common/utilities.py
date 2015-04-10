@@ -68,6 +68,8 @@ def get_sequencing_process(process):
         if proc.type.name in [p[1] for p in nsc.SEQ_PROCESSES]:
             return proc
 
+def get_instrument(seq_process):
+    return next(p[0] for p in nsc.SEQ_PROCESS if seq_process.type.name == p[1])
 
 def get_demux_process(process):
     '''Gets the demultiplexing process corresponding to a given analyte (lane

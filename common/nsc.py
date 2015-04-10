@@ -31,7 +31,9 @@ LOG_DIR="/data/nsc.loki/automation/logs"
 
 # Sequencing processes
 SEQ_PROCESSES=[
-        ('hiseq', 'Illumina Sequencing (Illumina SBS) 5.0')
+        ('hiseq', 'Illumina Sequencing (Illumina SBS) 5.0'),
+        ('nextseq', 'Something'),
+        ('miseq', 'MiSeq Run (MiSeq) 5.0')
         ]
 
 # Auxiliary class to represent configuration

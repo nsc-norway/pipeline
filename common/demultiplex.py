@@ -32,7 +32,7 @@ stats = [
 
 
 def lookup_outfile(process, analyte_id, lane):
-    '''Look up the output artifact representing a line in the sample sheet'''
+    """Look up the output artifact representing a line in the sample sheet"""
 
     lane_id = lane + ":1"
     sample = Artifact(nsc.lims, id=analyte_id).samples[0]
@@ -46,9 +46,9 @@ def lookup_outfile(process, analyte_id, lane):
 
 
 def set_udfs(process, demultiplex_stats):
-    '''Set UDFs on inputs (analytes representing the lanes) and output
+    """Set UDFs on inputs (analytes representing the lanes) and output
     files (each fastq file).
-    '''
+    """
     inputs = dict((i.location[0], i) for i in process.all_inputs(unique=True))
     if len(set(i.location[1] for i in inputs)) != 1:
         print "error: Wrong number of flowcells detected"
@@ -82,10 +82,10 @@ def set_udfs(process, demultiplex_stats):
 
 
 def set_lane_udfs(process, demultiplexing_dir):
-    ''' -- NOT USED -- 
+    """ -- NOT USED -- 
     
     Set UDFs on inputs to the demultiplexing proces, based on demultiplexing 
-    statistics. '''
+    statistics. """
     
 
     for lane, data in ds.items():
@@ -97,9 +97,9 @@ def set_lane_udfs(process, demultiplexing_dir):
 
 
 def populate_results(process, demux_result_dir):
-    '''Reads demultiplexing results and adds UDFs to artifacts.
+    """Reads demultiplexing results and adds UDFs to artifacts.
     
-    The demux_result_dir argument should refer to the "Unaligned" directory.'''
+    The demux_result_dir argument should refer to the "Unaligned" directory."""
 
     demultiplex_stats = glob.glob(demux_result_dir + "/Basecall_Stats_*/Demultiplex_Stats.htm")
     if not demultiplex_stats:

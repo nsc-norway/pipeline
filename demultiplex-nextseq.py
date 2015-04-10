@@ -59,8 +59,7 @@ def locate_save_sample_sheet(process, run_dir):
 
 def run_demultiplexing(process, sample_sheet_path, n_threads, start_dir,
         dest_run_dir, other_options):
-
-    '''Run bcl2fastq.'''
+    '''Run bcl2fastq2.'''
 
     bcl2fastq_log_path = os.path.join(nsc.LOG_DIR, "bcl2fastq-" + process.id + ".log")
     log = open(bcl2fastq_log_path, "w")
