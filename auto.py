@@ -28,10 +28,10 @@ nsc.lims.check_version()
 
 
 def mark_flowcell_projects(fc):
-    '''Sets a UDF for automatic processing on the flow cell Container.
+    """Sets a UDF for automatic processing on the flow cell Container.
         The "Automation lane groups" UDF on the container is set to a 
         comma separated list of the LIMSIDs of all pools in a single 
-        project'''
+        project"""
 
     logging.debug("Processing flowcell " + fc.id)
 
@@ -70,10 +70,10 @@ def qc_flags_set(process):
 
 
 def init_automation(lims, instrument, process):
-    '''This should be called on sequencing processes which already have
+    """This should be called on sequencing processes which already have
     the automation flag set. This clears the process-level automation flag 
     and sets UDFs on the container instead. It will only run if all
-    QC flags are set.'''
+    QC flags are set."""
 
     # Is the sequencing finished?
     finished = False
@@ -111,7 +111,7 @@ def init_automation(lims, instrument, process):
 
 
 def check_new_processes(lims): 
-    '''Query the API for new sequencing processes with automation flag'''
+    """Query the API for new sequencing processes with automation flag"""
     
     for instr, process in nsc.SEQ_PROCESSES:
         ps = lims.get_processes(type = process, udf = {nsc.AUTO_FLAG_UDF: "true"})
@@ -122,7 +122,7 @@ def check_new_processes(lims):
 
 
 def get_input_groups(queue):
-    '''Get groups of inputs for automated jobs.
+    """Get groups of inputs for automated jobs.
 
     Flow cells which are set up for automation include a UDF with information 
     about which lanes should be processed together. The basic data items are 
@@ -132,7 +132,7 @@ def get_input_groups(queue):
     Example: 1:1,2:1,3:1|4:1,5:1|6:1,7:1,8:1
 
     The groups correspond to proects.
-    '''
+    """
 
     # flowcell_info value tuples (flowcell, [analytes])
     flowcell_info = {}
@@ -162,14 +162,14 @@ def get_input_groups(queue):
 
 
 def get_input_flowcell(queue):
-    ''' Get a list of inputs from the queue of a step, 
+    """ Get a list of inputs from the queue of a step, 
     corresponding to all the pools on a  flow cell. If not all inputs are 
     present in the queue, the flow cell is ignored for now.
     
     If there are pools on the flow
     cell which do not have the automation flag set, these inputs are 
     ignored, and the flow cell may still be returned.
-    '''
+    """
 
     flowcell_inputs = defaultdict(list)
 
@@ -202,12 +202,12 @@ def get_input_flowcell(queue):
         
 
 def start_steps(lims, protocol_step, protocol_step_setup):
-    '''Starts zero or more instances of a specific protocol step.
+    """Starts zero or more instances of a specific protocol step.
     
     protocol_step is a protocol step configuration entity from the LIMS.
     
     protocol_step_setup is a NSC-specific class which holds a few configuration 
-    options.'''
+    options."""
 
     queue = protocol_step.queue()
     logging.debug("Found %d items in the queue" % (len(queue.artifacts)))
@@ -230,9 +230,9 @@ def start_steps(lims, protocol_step, protocol_step_setup):
         
 
 def start_automated_protocols(lims):
-    '''Checks for samples in the automated protocols and starts steps if 
+    """Checks for samples in the automated protocols and starts steps if 
     possible, then executes a script on the "record details" screen if 
-    configured.'''
+    configured."""
     
     # Loop over protocols in NSC configuration file
     for protocol, protocol_steps in nsc.AUTOMATED_PROTOCOL_STEPS:

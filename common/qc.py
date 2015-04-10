@@ -14,7 +14,7 @@ import nsc, utilities
 template_dir = os.path.dirname(os.path.dirname(__file__)) + "/template"
 
 def run_fastqc(files, demultiplex_dir, output_dir=None, max_threads=None):
-    '''Run fastqc on a set of fastq files'''
+    """Run fastqc on a set of fastq files"""
     args = []
     if max_threads:
         args += ['--threads=' + str(max_threads), '--quiet']
@@ -28,7 +28,7 @@ def run_fastqc(files, demultiplex_dir, output_dir=None, max_threads=None):
 
 
 def fastqc_dir(fp):
-    '''Get base name of fastqc directory given the name of the fastq file'''
+    """Get base name of fastqc directory given the name of the fastq file"""
     if not fp.endswith(".fastq.gz"):
         raise ValueError("Can only process fastq.gz files!")
     return re.sub(".fastq.gz$", "_fastqc", os.path.basename(fp))
@@ -36,10 +36,10 @@ def fastqc_dir(fp):
 
 
 def move_fastqc_results(quality_control_dir, sample):
-    '''Move fastqc reports into correct subdirectories. Initially, 
+    """Move fastqc reports into correct subdirectories. Initially, 
     they will be created directly in the quality_control_dir.
     (The reason is that we want to run a single fastqc command, to 
-    use multi-threading, so we can't give different output dirs)'''
+    use multi-threading, so we can't give different output dirs)"""
 
     sample_dir = os.path.join(quality_control_dir, "Sample_" + sample.name)
     try:
@@ -65,8 +65,8 @@ def move_fastqc_results(quality_control_dir, sample):
             
 
 def update_stats_fastqc(quality_control_dir, sample):
-    '''Gets total number of sequences from fastqc output, or confirms existing
-    number if already set'''
+    """Gets total number of sequences from fastqc output, or confirms existing
+    number if already set"""
 
     sample_dir = os.path.join(quality_control_dir, "Sample_" + sample.name)
     for f in sample.files:
@@ -85,9 +85,9 @@ def update_stats_fastqc(quality_control_dir, sample):
 
 
 def replace_multiple(replacedict, text):
-    '''Replace each key in replacedict found in string with the
+    """Replace each key in replacedict found in string with the
     value in replacedict. Note: special regex characters are not
-    escaped, as we don't need that.'''
+    escaped, as we don't need that."""
     # thanks, stackoverflow 6116978 (also considered Python's Template, 
     # but the use of dollar signs in template placeholders interferes 
     # with latex syntax, though only when editing the template itself)
@@ -101,10 +101,10 @@ def tex_escape(s):
 
 
 def generate_report_for_customer(args):
-    '''Generate PDF report for a fastq file.
+    """Generate PDF report for a fastq file.
 
     The last argument, sample_fastq, is a tuple containing a 
-    Sample object and a FastqFile object'''
+    Sample object and a FastqFile object"""
     fastq_dir, quality_control_dir, run_id, software_versions, template,\
             sample, fastq = args
     sample_dir = os.path.join(quality_control_dir, "Sample_" + sample.name)
@@ -147,10 +147,10 @@ def compute_md5(proj_dir, threads, files):
 
 
 def extract_format_overrepresented(fqc_report, fastqfile, index):
-    '''Processes the fastqc_report.html file for a single fastq file and extracts the
+    """Processes the fastqc_report.html file for a single fastq file and extracts the
     overrepresented sequences.
     
-    Index is an arbitrary identifier used as an anchor (<a>) in the HTML.'''
+    Index is an arbitrary identifier used as an anchor (<a>) in the HTML."""
 
     with open(fqc_report) as reportfile: # we'll be good about closing these, since there may be many
         found_over = False
@@ -167,13 +167,13 @@ def extract_format_overrepresented(fqc_report, fastqfile, index):
                     buf += l
 
             elif "No overrepresented sequences" in l:
-                return '''\
+                return """\
 <h2 id="{id}">{laneName}</h2>
 <div style="font:10pt courier">
 <p>No overrepresented sequences</p>
 <p></p>
 </div>
-'''.format(id=index, laneName=fastqfile)
+""".format(id=index, laneName=fastqfile)
             elif "Overrepresented sequences</h2>" in l:
                 found_over = True
                 buf += '<h2 id="{id}">{laneName}</h2>\n'.format(id=index, laneName=fastqfile)
@@ -281,7 +281,7 @@ def write_internal_sample_table(output_path, runid, projects):
 
 def write_summary_email(output_path, runid, projects):
     with open(output_path, 'w') as out:
-        summary_email_head = '''\
+        summary_email_head = """\
 --------------------------------							
 Summary email to NSC members							
 --------------------------------							
@@ -294,7 +294,7 @@ Undetermined ratio = how much proportion of fragments can not be assigned to a s
 Quality = summary of the overall quality							
 
 Lane	Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2)	Undetermined ratio	Quality
-'''.format(runId = runid)
+""".format(runId = runid)
         out.write(summary_email_head)
         # assumes 1 project per lane, and undetermined
         # Dict: lane ID => (lane object, project object)
@@ -335,7 +335,7 @@ Lane	Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density
 
 def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
         software_versions, threads = 1):
-    '''QC on demultiplexed data. Can be run per project, don't need
+    """QC on demultiplexed data. Can be run per project, don't need
     access to all demultiplexed lanes.
 
     input_demultiplex_dir is the location of the demultiplexed reads,
@@ -350,7 +350,7 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
 
     software_versions is a dict with (software name: version)
     software name: RTA, bcl2fastq
-    '''
+    """
 
     demultiplex_dir = os.path.abspath(input_demultiplex_dir)
     # Unaligned/QualityControl/

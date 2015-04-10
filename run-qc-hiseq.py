@@ -14,9 +14,9 @@ from common import nsc, utilities, qc, parse
 
 
 def get_lane_cluster_density(path):
-    '''Get cluster density for lanes from report files.
+    """Get cluster density for lanes from report files.
     
-    Returns a dict indexed by the 1-based lane number.'''
+    Returns a dict indexed by the 1-based lane number."""
 
     with open(path) as f:
         # Discard up to and including Lane
@@ -66,9 +66,9 @@ def main(threads, demultiplex_dir):
 
 
 def main_lims(threads, process_id):
-    '''LIMS-based QC wrapper. 
+    """LIMS-based QC wrapper. 
     
-    To be run in slurm job, called via epp-submit-slurm.py.'''
+    To be run in slurm job, called via epp-submit-slurm.py."""
 
     process = Process(nsc.lims, id=process_id)
 

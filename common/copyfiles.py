@@ -31,8 +31,8 @@ nextseq_exclude_paths = ["/Data/Intensities/L00*",
 
 
 def rsync(source_path, destination_path, exclude):
-    '''Runs the rsync command. Note that trailing slashes
-    on paths are significant.'''
+    """Runs the rsync command. Note that trailing slashes
+    on paths are significant."""
 
     args = [nsc.RSYNC, '-rlt', '--chmod=g+rwX']
     args += ["--exclude=" + path for path in exclude]

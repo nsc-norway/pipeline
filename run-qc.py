@@ -46,9 +46,9 @@ def main(threads, run_dir, no_sample_sheet):
 
 
 def main_lims(threads, process_id):
-    '''LIMS-based QC wrapper. 
+    """LIMS-based QC wrapper. 
     
-    To be run in slurm job, called via epp-submit-slurm.py.'''
+    To be run in slurm job, called via epp-submit-slurm.py."""
 
     process = Process(nsc.lims, id=process_id)
     utilities.running(process)

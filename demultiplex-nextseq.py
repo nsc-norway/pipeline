@@ -18,8 +18,8 @@ class Config:
     pass
 
 def get_config(process):
-    '''Configuration is stored in UDFs on the demultiplexing process. This
-    function loads them into a generic object.'''
+    """Configuration is stored in UDFs on the demultiplexing process. This
+    function loads them into a generic object."""
 
     try:
         cfg = Config()
@@ -38,8 +38,8 @@ def get_config(process):
 
 
 def locate_save_sample_sheet(process, run_dir):
-    '''Locates the sample sheet. Either uses a sample sheet specified in the LIMS 
-    process, or takes it from the run directory.'''
+    """Locates the sample sheet. Either uses a sample sheet specified in the LIMS 
+    process, or takes it from the run directory."""
 
     sample_sheet = None
     for o in process.all_outputs(unique=True):
@@ -59,7 +59,7 @@ def locate_save_sample_sheet(process, run_dir):
 
 def run_demultiplexing(process, sample_sheet_path, n_threads, start_dir,
         dest_run_dir, other_options):
-    '''Run bcl2fastq2.'''
+    """Run bcl2fastq2."""
 
     bcl2fastq_log_path = os.path.join(nsc.LOG_DIR, "bcl2fastq-" + process.id + ".log")
     log = open(bcl2fastq_log_path, "w")
@@ -98,11 +98,11 @@ def run_demultiplexing(process, sample_sheet_path, n_threads, start_dir,
 
 
 def rename_project_directories(runid, unaligned_dir, sample_sheet):
-    '''Renames project fastq directories: adds the date, machine name and flowcell
+    """Renames project fastq directories: adds the date, machine name and flowcell
     index (A or B) to the name of the project directories.
     
     Returns the mapping of project names (mangled for the sample sheet) to the 
-    renamed directories.'''
+    renamed directories."""
 
 
     projects = set(sam['SampleProject'] for sam in sample_sheet)
@@ -117,7 +117,7 @@ def rename_project_directories(runid, unaligned_dir, sample_sheet):
 
 
 def check_fastq_and_attach_files(process, sample_sheet, projdirs, reads):
-    '''Attaches ResultFile outputs of the HiSeq demultiplexing process.'''
+    """Attaches ResultFile outputs of the HiSeq demultiplexing process."""
 
     for sam in sample_sheet:
         sample_dir = "Sample_" + sam['SampleID']
@@ -141,7 +141,7 @@ def check_fastq_and_attach_files(process, sample_sheet, projdirs, reads):
 
 
 def copy_to_secondary():
-    '''Copy to secondary storage if required.'''
+    """Copy to secondary storage if required."""
 
     destination = os.path.join(nsc.SECONDARY_STORAGE, runid)
     if nsc.DO_COPY_METADATA_FILES:

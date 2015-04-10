@@ -16,7 +16,7 @@ from common import nsc, utilities
 # - Use-bases-mask parameter
 
 def get_sample_sheet_data(cluster_proc):
-    '''Gets the sample sheet from the clustering process'''
+    """Gets the sample sheet from the clustering process"""
 
     outputs = cluster_proc.all_outputs(unique=True)
     for o in outputs:
@@ -27,7 +27,7 @@ def get_sample_sheet_data(cluster_proc):
 
 
 def extract_sample_sheet(sample_sheet, inputs):
-    '''Extracts the lanes in the inputs from the sample sheet'''
+    """Extracts the lanes in the inputs from the sample sheet"""
     
     lanes = []
     for i in inputs:
@@ -64,12 +64,12 @@ def get_paths(process, seq_process):
 
 
 def compute_bases_mask(process, seq_proc):
-    '''Compute the --use-bases-mask option for fastq conversion. 
+    """Compute the --use-bases-mask option for fastq conversion. 
     This option specifies how each imaging cycle is interpreted. It 
     gives the number and order of data reads and index reads.
     
     The first argument is a reference to the current process, the second
-    is a reference to the corresponding sequencing process.'''
+    is a reference to the corresponding sequencing process."""
 
 
     # These are the properties of the run. The full data sequence is 

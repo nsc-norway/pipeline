@@ -18,10 +18,10 @@ logger = logging.getLogger()
 
 
 def finish_step(lims, process_id):
-    '''Sets next step for all analytes and finishes the specified step.
+    """Sets next step for all analytes and finishes the specified step.
     This function can handle steps which have a single configured next
     step, and steps which are the last step of a protocol.
-    All samples are advanced to the next step.'''
+    All samples are advanced to the next step."""
 
     step = Step(lims, id=process_id)
 
@@ -52,10 +52,10 @@ def finish_step(lims, process_id):
 
 
 def get_sequencing_process(process):
-    '''Gets the sequencing process from a process object corresponing to a process
+    """Gets the sequencing process from a process object corresponing to a process
     which is run after sequencing, such as demultiplexing. This function looks up
     the sequencing step by examining the sibling processes run on one of the
-    samples in the process's inputs.'''
+    samples in the process's inputs."""
 
     # Each entry in input_output_maps is an input/output specification with a single
     # input and any number of outputs. This gets the first input.
@@ -72,8 +72,8 @@ def get_instrument(seq_process):
     return next(p[0] for p in nsc.SEQ_PROCESS if seq_process.type.name == p[1])
 
 def get_demux_process(process):
-    '''Gets the demultiplexing process corresponding to a given analyte (lane
-    on a flow cell). Analogous to the above method.'''
+    """Gets the demultiplexing process corresponding to a given analyte (lane
+    on a flow cell). Analogous to the above method."""
 
     # Find the demultiplexing process: First process which has output file
     # per reagent label
@@ -115,8 +115,8 @@ def get_index_sequence(artifact):
 
 
 def upload_file(process, name, path = None, data = None):
-    '''This function uploads the provided file to a ResultFile output with 
-    on the given process with the specified name.'''
+    """This function uploads the provided file to a ResultFile output with 
+    on the given process with the specified name."""
 
     if not data:
         if path:
@@ -144,14 +144,14 @@ def running(process):
 
 
 def fail(process, message):
-    '''Report failure from background job'''
+    """Report failure from background job"""
 
     process.udf[nsc.JOB_STATUS_UDF] = 'Failed: ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ": " + message
     process.put()
 
 def success_finish(process):
-    '''Called by background jobs (slurm) to declare that the task has been 
-    completed successfully.'''
+    """Called by background jobs (slurm) to declare that the task has been 
+    completed successfully."""
 
     process.udf[nsc.JOB_STATUS_UDF] = 'Completed successfully ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     process.put()
@@ -167,8 +167,8 @@ def success_finish(process):
 
 locale.setlocale(locale.LC_ALL, 'en_US')
 def display_int(val):
-    '''Adds thousands separators. To be replaced with "{:,}".format(val) when 
-    upgrading to Python 2.7'''
+    """Adds thousands separators. To be replaced with "{:,}".format(val) when 
+    upgrading to Python 2.7"""
     return locale.format("%d", round(val), grouping=True)
 
 

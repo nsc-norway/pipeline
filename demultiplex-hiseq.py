@@ -26,8 +26,8 @@ class Config:
     pass
 
 def get_config(process):
-    '''Configuration is stored in UDFs on the demultiplexing process. This
-    function loads them into a generic object.'''
+    """Configuration is stored in UDFs on the demultiplexing process. This
+    function loads them into a generic object."""
 
     try:
         cfg = Config()
@@ -48,8 +48,8 @@ def get_config(process):
 
 
 def download_sample_sheet(process, save_dir):
-    '''Downloads the demultiplexing process's sample sheet, which contains only
-    samples for the requested project (written by setup-demultiplex-hiseq.py).'''
+    """Downloads the demultiplexing process's sample sheet, which contains only
+    samples for the requested project (written by setup-demultiplex-hiseq.py)."""
 
     sample_sheet = None
     for o in process.all_outputs(unique=True):
@@ -69,7 +69,7 @@ def download_sample_sheet(process, save_dir):
 
 def run_demultiplexing(process, ssheet, bases_mask, n_threads, mismatches,
         start_dir, dest_run_dir, other_options):
-    '''First calls the configureFastqToBcl.py, then calls make in the fastq file directory.'''
+    """First calls the configureFastqToBcl.py, then calls make in the fastq file directory."""
 
     os.chdir(start_dir)
     cfg_log_name = os.path.join(nsc.LOG_DIR, "configureBclToFastq-" + process.id + ".log")
@@ -114,11 +114,11 @@ def run_demultiplexing(process, ssheet, bases_mask, n_threads, mismatches,
 
 
 def rename_project_directories(runid, unaligned_dir, sample_sheet):
-    '''Renames project fastq directories: adds the date, machine name and flowcell
+    """Renames project fastq directories: adds the date, machine name and flowcell
     index (A or B) to the name of the project directories.
     
     Returns the mapping of project names (mangled for the sample sheet) to the 
-    renamed directories.'''
+    renamed directories."""
 
 
     projects = set(sam['SampleProject'] for sam in sample_sheet)
@@ -133,7 +133,7 @@ def rename_project_directories(runid, unaligned_dir, sample_sheet):
 
 
 def check_fastq_and_attach_files(process, sample_sheet, projdirs, reads):
-    '''Attaches ResultFile outputs of the HiSeq demultiplexing process.'''
+    """Attaches ResultFile outputs of the HiSeq demultiplexing process."""
 
     for sam in sample_sheet:
         sample_dir = "Sample_" + sam['SampleID']
