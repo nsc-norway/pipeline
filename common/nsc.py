@@ -20,13 +20,13 @@ DEST_FASTQ_DIR_UDF = "Fastq output directory"
 OTHER_OPTIONS_UDF = "Other options for configureBclToFastq"
 
 # Other UDFs
-LANE_UNDETERMINED_UDF = "% Undetermined indices"
+LANE_UNDETERMINED_UDF = "% Undetermined Indices (PF)"
 
 
 # Output files
 CONFIGURE_LOG = "configureBclToFastq log"
 MAKE_LOG = "make log"
-FASTQ_OUTPUT = "{0} fastq"
+FASTQ_OUTPUT = "{0} R{1} fastq"
 LOG_DIR="/data/nsc.loki/automation/logs"
 
 # Sequencing processes

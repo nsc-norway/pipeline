@@ -132,28 +132,28 @@ def rename_project_directories(runid, unaligned_dir, sample_sheet):
     return projdir
 
 
-def check_fastq_and_attach_files(process, sample_sheet, projdirs, reads):
+def check_fastq_and_attach_files(id_resultfile_map, sample_sheet, projdirs, reads):
     """Attaches ResultFile outputs of the HiSeq demultiplexing process."""
 
     for sam in sample_sheet:
         sample_dir = "Sample_" + sam['SampleID']
-        fastq_names = ["{0}_{1}_L{2}_{3}_001.fastq.gz".format(sam['SampleID'],
-            sam['Index'], sam['Lane'].zfill(3), r) for r in reads]
-        fastq_paths = [os.path.join(projdirs[sam['SampleProject']], 
-            sample_dir, fq) for fq in fastq_names]
 
-        for fp in fastq_paths:
+        for r in reads:
+            fastq_name = ["{0}_{1}_L{2}_R{3}_001.fastq.gz".format(sam['SampleID'],
+                sam['Index'], sam['Lane'].zfill(3), r)
+            fastq_path = os.path.join(projdirs[sam['SampleProject']], sample_dir, fq)
+
             # Continues even if file doesn't exist. This will be discovered
             # in other ways, preferring "robust" operation here.
-            if os.path.exists(fp):
+            if os.path.exists(fastq_path):
                 # The convention is to have the LIMS ID in the description field. If this fails, 
                 # there's not a lot more we can do, so the following line just crashes with an 
-                # exception (HTTP 404).
-                result_file_artifact = demultiplex.lookup_outfile(process, sam['Description'], sam['Lane'])
-                pf = ProtoFile(nsc.lims, result_file_artifact.uri, fp)
+                # exception (due to HTTP 404).
+                result_file_artifact = id_resultfile_map[(int(sam['Lane']), sam['Description'], r)]
+                pf = ProtoFile(nsc.lims, result_file_artifact.uri, fastq_path)
                 pf = nsc.lims.glsstorage(pf)
                 f = pf.post()
-                f.upload(fp) # content of the file is the path
+                f.upload(fastq_path) # content of the file is the path
 
 
 def main(process_id):
@@ -194,21 +194,30 @@ def main(process_id):
                     cfg.other_options)
             if process_ok:
                 projdirs = rename_project_directories(runid, cfg.dest_dir, sample_sheet)
-                reads = ["R1"]
+                reads = [1]
                 try:
                     if seq_proc.udf['Read 2 Cycles']:
-                        reads.append("R2")
+                        reads.append(2)
                 except KeyError:
                     pass
-                check_fastq_and_attach_files(process, sample_sheet, projdirs, reads)
-                try:
-                    success = demultiplex.populate_results(process, cfg.dest_dir)
+                id_resultfile_map = demultiplex.make_id_resultfile_map(process, sample_sheet_data, reads)
+                check_fastq_and_attach_files(id_resultfile_map, sample_sheet, projdirs, reads)
 
-                except (IOError,KeyError):
-                    success = False
+                # Demultiplexing stats
+                demux_stats_path = parse.get_hiseq_stats(os.path.join(
+                    cfg.dest_dir, "Basecall_Stats_" + sample_sheet_data[0]['FCID'], 
+                    "Demultiplex_Stats.htm"
+                    ))
+                utilities.upload_file(process, "Demultiplex_stats.htm", path = demux_stats_path)
+                fc_demux_summary_path = parse.get_hiseq_stats(os.path.join(
+                    cfg.dest_dir, "Basecall_Stats_" + sample_sheet_data[0]['FCID'], 
+                    "Flowcell_demux_summary.xml"
+                    ))
+                demultiplex_stats = parse.get_hiseq_stats(fc_demux_summary_path) 
+                demultiplex.populate_results(process, cfg.dest_dir)
 
-                if not success:
-                    utilities.fail(process, "Failed to set UDFs")
+                success = True
+
             
         else: # Sample sheet
             utilities.fail(process, "Can't get the sample sheet")

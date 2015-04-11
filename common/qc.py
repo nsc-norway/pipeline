@@ -76,10 +76,10 @@ def update_stats_fastqc(quality_control_dir, sample):
                 for l in fqc_data:
                     total = re.match("Total Sequences\t(\d+)", l)
                     if total:
-                        if f.num_pf_reads:
-                            assert f.num_pf_reads == int(total.group(1))
+                        if f.stats['# PF Reads']:
+                            assert f.stats['# PF Reads'] == int(total.group(1))
                         else:
-                            f.num_pf_reads = int(total.group(1))
+                            f.stats['# PF Reads'] = int(total.group(1))
                         break
 
 
@@ -120,7 +120,7 @@ def generate_report_for_customer(args):
         '__VersionString__': tex_escape(" & ".join(v[1] for v in software_versions)),
         '__SampleName__': tex_escape(sample.name),
         '__ReadNum__': str(fastq.read_num),
-        '__TotalN__': utilities.display_int(fastq.num_pf_reads),
+        '__TotalN__': utilities.display_int(fastq.stats['# PF Reads']),
         '__Folder__': '../' + fastqc_dir(fastq.path),
         '__TemplateDir__': template_dir
             }
@@ -206,7 +206,7 @@ def generate_internal_html_report(quality_control_dir, samples):
                 if fq.empty:
                     n_reads = 0
                 else:
-                    n_reads = fq.num_pf_reads
+                    n_reads = fq.stats['# PF Reads']
                 out_file.write(cell1.format(
                     fileName=fq_name,
                     sampleName=s.name,
@@ -248,7 +248,7 @@ def write_sample_info_table(output_path, runid, project):
         files = sorted((fi for s in project.samples for fi in s.files), key=lambda x: os.path.basename(x.path))
         for f in files:
             out.write(os.path.basename(f.path) + "\t")
-            out.write(utilities.display_int(f.num_pf_reads) + "\t")
+            out.write(utilities.display_int(f.stats['# PF Reads'] + "\t")
             out.write("fragments\n")
 
 
@@ -273,8 +273,8 @@ def write_internal_sample_table(output_path, runid, projects):
                     out.write(s.name + "\t")
                     out.write(utilities.display_int(f.lane.raw_cluster_density) + "\t")
                     out.write(utilities.display_int(f.lane.pf_cluster_density) + "\t")
-                    out.write("%4.2f" % (f.percent_of_pf_clusters) + "%\t")
-                    out.write(utilities.display_int(f.num_pf_reads) + "\t")
+                    out.write("%4.2f" % (f.stats['% of PF Clusters Per Lane']) + "%\t")
+                    out.write(utilities.display_int(f.stats['# PF Reads'] + "\t")
                     out.write("ok\t\tok\n")
 
 
@@ -313,7 +313,7 @@ Lane	Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density
 
             out.write(str(l) + "\t")
             out.write(proj.name + "\t")
-            cluster_no = sum(f.num_pf_reads
+            cluster_no = sum(f.stats['# PF Reads']
                     for proj in projects
                     for s in proj.samples
                     for f in s.files
@@ -327,10 +327,6 @@ Lane	Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density
             else:
                 out.write("0%\t")
             out.write("ok\n")
-
-
-
-
 
 
 def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
