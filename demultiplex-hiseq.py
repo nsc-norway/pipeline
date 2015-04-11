@@ -218,7 +218,6 @@ def main(process_id):
 
                 success = True
 
-            
         else: # Sample sheet
             utilities.fail(process, "Can't get the sample sheet")
 
