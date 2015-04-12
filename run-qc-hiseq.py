@@ -33,7 +33,6 @@ def get_lane_cluster_density(path):
         return dict((i+1, lane_sum[i] / lane_ntile[i]) for i in lane_sum.keys())
 
 
-
 def main(threads, demultiplex_dir):
     run_dir = os.path.join(demultiplex_dir, "..")
     run_id = os.path.basename(os.path.realpath(run_dir))
@@ -48,16 +47,18 @@ def main(threads, demultiplex_dir):
     lane_pf = get_lane_cluster_density(pf_path)
     raw_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane.txt")
     lane_raw = get_lane_cluster_density(raw_path)
+    lanes = {}
+    for l in lane_raw.keys():
+        lanes[l] = parse.Lane(l, lane_raw[l], lane_pf[l], lane_pf[l] / lane_raw[l])
 
-    dm_path = glob.glob(os.path.join(demultiplex_dir, "Basecall_Stats_*", "Flowcell_demux_summary.xml"))[0]
+    # Parse demux summary just to get the number of reads
+    dm_path = glob.glob(os.path.join(
+        demultiplex_dir, "Basecall_Stats_*", "Flowcell_demux_summary.xml"
+        ))[0]
     demux_summary = parse.parse_demux_summary(dm_path)
     # Number of reads: take the first sample and lane, count the reads
     n_reads = len(demux_summary[0].values()[0].values()[0])
     print "Number of non-index reads:", n_reads
-    
-    lanes = {}
-    for l in lane_raw.keys():
-        lanes[l] = parse.Lane(l, lane_raw[l], lane_pf[l], lane_pf[l] / lane_raw[l])
 
     print "Number of lanes to process:", len(lanes)
 

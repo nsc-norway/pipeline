@@ -15,7 +15,7 @@ from common import nsc, utilities, qc, parse
 
 def main(threads, run_dir, no_sample_sheet):
     run_id = os.path.basename(os.path.realpath(run_dir))
-    match = re.match("^\d{6}_(NS|M)[A-Z0-9]+_\d{4}_[A-Z0-9\-]+$", run_id)
+    match = re.match(r"^\d{6}_(NS|M)[A-Z0-9]+_\d{4}_[A-Z0-9\-]+$", run_id)
     if not match:
         print "Error: Specified directory doesn't look like a MiSeq or NextSeq run directory"
         sys.exit(1)

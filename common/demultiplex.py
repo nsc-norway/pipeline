@@ -18,7 +18,7 @@ udf_list = [
         ]
 
 
-def make_id_resultfile_map(process, sample_sheet_data, reads):
+def make_id_resultfile_map(process, sample_sheet, reads):
     themap = {}
     lanes = set(int(entry['Lane']) for entry in sample_sheet_data)
     ext_sample_sheet = dict(sample_sheet_data)
@@ -71,6 +71,27 @@ def populate_results(process, ids_analyte_map, demultiplex_stats):
             analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
             analyte.put()
 
+
+
+def download_sample_sheet(process, save_dir):
+    """Downloads the demultiplexing process's sample sheet, which contains only
+    samples for the requested project (added to the LIMS by setup-*-demultiplexing.py)."""
+
+    sample_sheet = None
+    for o in process.all_outputs(unique=True):
+        if o.output_type == "ResultFile" and o.name == "SampleSheet csv":
+            if len(o.files) == 1:
+                sample_sheet = o.files[0].download()
+
+    if sample_sheet:
+        if process.id == "":
+            raise ValueError("Process ID is an empty string")
+        name = "SampleSheet-" + process.id + ".csv"
+        path = os.path.join(save_dir, name)
+        file(path, 'w').write(sample_sheet)
+        return name, sample_sheet
+    else:
+        return None, None
 
 
 

@@ -47,25 +47,6 @@ def get_config(process):
     return cfg
 
 
-def download_sample_sheet(process, save_dir):
-    """Downloads the demultiplexing process's sample sheet, which contains only
-    samples for the requested project (written by setup-demultiplex-hiseq.py)."""
-
-    sample_sheet = None
-    for o in process.all_outputs(unique=True):
-        if o.output_type == "ResultFile" and o.name == "SampleSheet csv":
-            if len(o.files) == 1:
-                sample_sheet = o.files[0].download()
-
-    if sample_sheet:
-        if process.id == "":
-            raise ValueError("Process ID is an empty string")
-        name = "SampleSheet-" + process.id + ".csv"
-        file(os.path.join(save_dir, name), 'w').write(sample_sheet)
-        return name, sample_sheet
-    else:
-        return False
-
 
 def run_demultiplexing(process, ssheet, bases_mask, n_threads, mismatches,
         start_dir, dest_run_dir, other_options):
@@ -185,7 +166,7 @@ def main(process_id):
     if cfg:
         start_dir = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
     
-        ssheet_file,sample_sheet_data = download_sample_sheet(process, start_dir)
+        ssheet_file,sample_sheet_data = demultiplex.download_sample_sheet(process, start_dir)
         sample_sheet = parse.parse_hiseq_sample_sheet(sample_sheet_data)
     
         if ssheet_file:
@@ -200,17 +181,21 @@ def main(process_id):
                         reads.append(2)
                 except KeyError:
                     pass
-                id_resultfile_map = demultiplex.make_id_resultfile_map(process, sample_sheet_data, reads)
-                check_fastq_and_attach_files(id_resultfile_map, sample_sheet, projdirs, reads)
+                id_resultfile_map = demultiplex.make_id_resultfile_map(
+                        process, sample_sheet, reads
+                        )
+                check_fastq_and_attach_files(
+                        id_resultfile_map, sample_sheet, projdirs, reads
+                        )
 
                 # Demultiplexing stats
                 demux_stats_path = parse.get_hiseq_stats(os.path.join(
-                    cfg.dest_dir, "Basecall_Stats_" + sample_sheet_data[0]['FCID'], 
+                    cfg.dest_dir, "Basecall_Stats_" + sample_sheet[0]['FCID'], 
                     "Demultiplex_Stats.htm"
                     ))
                 utilities.upload_file(process, "Demultiplex_stats.htm", path = demux_stats_path)
                 fc_demux_summary_path = parse.get_hiseq_stats(os.path.join(
-                    cfg.dest_dir, "Basecall_Stats_" + sample_sheet_data[0]['FCID'], 
+                    cfg.dest_dir, "Basecall_Stats_" + sample_sheet[0]['FCID'], 
                     "Flowcell_demux_summary.xml"
                     ))
                 demultiplex_stats = parse.get_hiseq_stats(fc_demux_summary_path) 

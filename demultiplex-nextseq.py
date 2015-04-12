@@ -37,25 +37,6 @@ def get_config(process):
     return cfg
 
 
-def locate_save_sample_sheet(process, run_dir):
-    """Locates the sample sheet. Either uses a sample sheet specified in the LIMS 
-    process, or takes it from the run directory."""
-
-    sample_sheet = None
-    for o in process.all_outputs(unique=True):
-        if o.output_type == "ResultFile" and o.name == "SampleSheet csv":
-            if len(o.files) == 1:
-                sample_sheet = o.files[0].download()
-
-    if sample_sheet:
-        if process.id == "":
-            raise ValueError("Process ID is an empty string")
-        name = "SampleSheet-" + process.id + ".csv"
-        file(os.path.join(run_dir, name), 'w').write(sample_sheet)
-        return name
-    else:
-        return "SampleSheet.csv"
-
 
 def run_demultiplexing(process, sample_sheet_path, n_threads, start_dir,
         dest_run_dir, other_options):
@@ -158,6 +139,20 @@ def copy_to_secondary():
                 return False
 
 
+def get_sample_sheet(process, run_dir):
+    """Get sample sheet from LIMS, fall back to SampleSheet.csv in run
+    directory"""
+
+    ssheet_file, sample_sheet = download_sample_sheet(process, run_dir)
+    if ssheet_file:
+        return ssheet_file, sample_sheet
+    else:
+        path = os.path.join(run_dir, "SampleSheet.csv")
+        data = open(path).read()
+        return path, data 
+
+
+
 def main(process_id):
     os.umask(770)
     process = Process(nsc.lims, id=process_id)
@@ -175,9 +170,11 @@ def main(process_id):
     if cfg:
         start_dir = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
     
-        ssheet_file,sample_sheet_data = locate_save_sample_sheet(process, cfg.run_dir, start_dir)
+        ssheet_file, sample_sheet_data = get_sample_sheet.download_sample_sheet(
+                process, cfg.run_dir
+                )
 
-        ##sample_sheet = parse.parse_hiseq_sample_sheet(sample_sheet_data)
+        sample_sheet = parse.parse_hiseq_sample_sheet(sample_sheet_data)
     
         if ssheet_file:
             process_ok = run_demultiplexing(process, ssheet_file, cfg.bases_mask,
