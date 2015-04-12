@@ -25,7 +25,7 @@ def get_config(process):
         cfg = Config()
         cfg.n_threads = process.udf[nsc.THREADS_UDF]
         cfg.run_dir = process.udf[nsc.SOURCE_RUN_DIR_UDF]
-        cfg.dest_dir = process.udf[nsc.DEST_FASTQ_DIR_UDF]
+        cfg.output_dir = process.udf[nsc.NS_OUTPUT_RUN_DIR_UDF]
     except KeyError:
         return None
     # Optional
@@ -78,23 +78,10 @@ def run_demultiplexing(process, sample_sheet_path, n_threads, start_dir,
 
 
 
-def rename_project_directories(runid, unaligned_dir, sample_sheet):
-    """Renames project fastq directories: adds the date, machine name and flowcell
-    index (A or B) to the name of the project directories.
-    
-    Returns the mapping of project names (mangled for the sample sheet) to the 
-    renamed directories."""
+def rename_project_directory(runid, basecalls_dir, project_name):
+    """Renames project directory if it exists."""
 
-
-    projects = set(sam['SampleProject'] for sam in sample_sheet)
-    projdir = {}
-    for pro in projects:
-        original = os.path.join(unaligned_dir, "Project_" + pro)
-        rename_to = os.path.join(unaligned_dir, parse.get_hiseq_project_dir(runid, pro))
-        os.rename(original, rename_to)
-        projdir[pro] = rename_to
-
-    return projdir
+# TODO
 
 
 def check_fastq_and_attach_files(process, sample_sheet, projdirs, reads):
@@ -146,10 +133,12 @@ def get_sample_sheet(process, run_dir):
     ssheet_file, sample_sheet = download_sample_sheet(process, run_dir)
     if ssheet_file:
         return ssheet_file, sample_sheet
-    else:
+    elif os.path.exists(os.path.join(run_dir, "SampleSheet.csv")):
         path = os.path.join(run_dir, "SampleSheet.csv")
         data = open(path).read()
         return path, data 
+    else:
+        return None, None
 
 
 
@@ -170,7 +159,7 @@ def main(process_id):
     if cfg:
         start_dir = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
     
-        ssheet_file, sample_sheet_data = get_sample_sheet.download_sample_sheet(
+        ssheet_file, sample_sheet_data = get_sample_sheet(
                 process, cfg.run_dir
                 )
 
@@ -178,9 +167,10 @@ def main(process_id):
     
         if ssheet_file:
             process_ok = run_demultiplexing(process, ssheet_file, cfg.bases_mask,
-                    cfg.n_threads, cfg.mismatches, start_dir, cfg.dest_dir,
+                    cfg.n_threads, cfg.mismatches, start_dir, cfg.output_dir,
                     cfg.other_options)
             if process_ok:
+# TODO dest_dir
                 projdirs = rename_project_directories(runid, cfg.dest_dir, sample_sheet)
                 reads = ["R1"]
                 try:
@@ -190,6 +180,7 @@ def main(process_id):
                     pass
                 check_fastq_and_attach_files(process, sample_sheet, projdirs, reads)
                 try:
+#TODO dest_dir / output_dir
                     success = demultiplex.populate_results(process, cfg.dest_dir)
 
                 except (IOError,KeyError):

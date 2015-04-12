@@ -4,6 +4,6 @@ from genologics.lims import *
 from common import nsc, parse
 
 stats = parse.get_nextseq_stats("../../ns")
-print stats[("unknown", 1)]
+print stats[(1, "unknown", 1)]
 
 

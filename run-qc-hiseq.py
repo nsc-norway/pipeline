@@ -49,7 +49,8 @@ def main(threads, demultiplex_dir):
     lane_raw = get_lane_cluster_density(raw_path)
     lanes = {}
     for l in lane_raw.keys():
-        lanes[l] = parse.Lane(l, lane_raw[l], lane_pf[l], lane_pf[l] / lane_raw[l])
+        lanes[l] = qc.Lane(l, lane_raw[l], lane_pf[l], lane_pf[l] / lane_raw[l])
+    print "Number of lanes to process:", len(lanes)
 
     # Parse demux summary just to get the number of reads
     dm_path = glob.glob(os.path.join(
@@ -60,9 +61,7 @@ def main(threads, demultiplex_dir):
     n_reads = len(demux_summary[0].values()[0].values()[0])
     print "Number of non-index reads:", n_reads
 
-    print "Number of lanes to process:", len(lanes)
-
-    info, projects = parse.get_hiseq_qc_data(run_id, n_reads, lanes, demultiplex_dir)
+    info, projects = get_hiseq_qc_data(run_id, n_reads, lanes, demultiplex_dir)
     qc.qc_main(demultiplex_dir, projects, 'hiseq', run_id, info['sw_versions'], threads)
 
 
@@ -96,12 +95,106 @@ def main_lims(threads, process_id):
         n_pf = lane.udf['Clusters PF R1']
         density_pf = density_raw * n_pf / n_raw
         pf_ratio = lane.udf['%PF R1'] / 100.0
-        lanes[l] = parse.Lane(lane_id, density_raw, density_pf, pf_ratio)
+        lanes[l] = qc.Lane(lane_id, density_raw, density_pf, pf_ratio)
 
-    info, projects = parse.get_hiseq_qc_data(run_id, n_reads, lanes, demultiplex_dir)
+    info, projects = get_hiseq_qc_data(run_id, n_reads, lanes, demultiplex_dir)
     qc.qc_main(demultiplex_dir, projects, 'hiseq', run_id, info['sw_versions'], threads)
 
     utilities.success_finish(process)
+
+
+def get_hiseq_sw_versions(demultiplex_config):
+    """Get a dict with software names->versions.
+    
+    demultiplex_config is an Element object (from ElementTree)"""
+
+    sw_versions = []
+    # Software tags are nested (best way to see is to just look at the xml)
+    sw_tags = [demultiplex_config.find('Software')]
+    while sw_tags:
+        tag = sw_tags.pop()
+        sw_tags += tag.findall("Software")
+        if tag.attrib['Name'] == "configureBclToFastq.pl": #special case
+            name, ver = tag.attrib['Version'].split('-')
+            sw_versions.append((name, ver))
+        elif "RTA" in tag.attrib['Name']:
+            sw_versions.append((tag.attrib['Name'], tag.attrib['Version']))
+
+    return sw_versions
+
+
+def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
+    """Get HiSeq metadata about project, sample and files, including QC data. 
+    Converted to the internal representation (model) classes defined above.
+
+    n_reads is the number of sequence read passes, 1 or 2 (paired end)
+
+    lanes is a dict with key: numeric lane number, value: lane object
+    """
+    
+    # Getting software and sample information from DemultiplexConfig.xml
+    # It has almost exactly the same data as the sample sheet, but it has the
+    # advantage that it's always written by bcl2fastq, so we know that we're getting
+    # the one that was used for demultiplexing.
+    xmltree = ElementTree.parse(os.path.join(root_dir, "DemultiplexConfig.xml"))
+    demultiplex_config = xmltree.getroot()
+
+    sw_versions = get_hiseq_sw_versions(demultiplex_config)
+
+    flowcell_info = demultiplex_config.find("FlowcellInfo")
+    fcid = flowcell_info.attrib['ID']
+
+    # List of samples
+    samples = []
+    for lane in flowcell_info.findall("Lane"):
+        for sample in lane.findall("Sample"):
+            sd = dict(sample.attrib)
+            sd['Lane'] = lane.attrib['Number']
+            samples.append(sd)
+
+    # Project -> [Samples]
+    project_entries = defaultdict(list)
+    for sample_entry in samples:
+        project_entries[sample_entry['ProjectId']].append(sample_entry)
+
+    # Getting stats from Flowcell_demux_summary.xml (no longer using Demultiplex_stats.htm).
+    ds_path = os.path.join(root_dir, "Basecall_Stats_" + fcid, "Flowcell_demux_summary.xml")
+    demux_sum = parse_demux_summary(open(ds_path).read())
+
+    projects = []
+    for proj, entries in project_entries.items():
+        if re.match("Undetermined_indices$", proj):
+            project_dir = "Undetermined_indices"
+        else:
+            project_dir = parse.get_hiseq_project_dir(run_id, proj)
+
+        samples = []
+        for e in entries:
+            sample_dir = project_dir + "/Sample_" + e['SampleId']
+            files = []
+            for ri in xrange(1, n_reads + 1):
+                stats = demux_sum[(int(e['Lane']), e['SampleId'], ri)]
+
+                # FastqFile
+                path_t = sample_dir + "/{0}_{1}_L{2}_R{3}_001.fastq.gz"
+                path = path_t.format(e['SampleId'], e['Index'], e['Lane'].zfill(3), ri) 
+                lane = lanes[int(e['Lane'])]
+                f = qc.FastqFile(lane, ri, path, stats)
+                files.append(f)
+
+            s = qc.Sample(e['SampleId'], files)
+            samples.append(s)
+
+        # Project 
+        p = qc.Project(proj, project_dir, samples)
+        projects.append(p)
+
+    info = {"sw_versions": sw_versions}
+
+    return info, projects
+
+
+
 
 
 if __name__ == '__main__':

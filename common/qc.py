@@ -13,6 +13,74 @@ import nsc, utilities
 
 template_dir = os.path.dirname(os.path.dirname(__file__)) + "/template"
 
+# Model: Objects containing projects, samples and files.
+# Represents a unified interface to the QC functionality, similar to the
+# SampleInformation.txt BarcodeLaneStatistics.txt from the perl scripts.
+
+class Project(object):
+    """Project object.
+    name: name with special characters replaced
+    path: base name of project directory 
+      path is relative to Unaligned for HiSeq, and relative to Data/Intensities/BaseCalls
+      for MiSeq and NextSeq
+    samples: list of samples
+    """
+    def __init__(self, name, proj_dir, samples=[]):
+        self.name = name
+        self.proj_dir = proj_dir
+        self.samples = samples
+
+
+class Sample(object):
+    """Contains information about a sample. Contains a list of FastqFile
+    objects representing the reads. One instance for each sample on a 
+    flowcell, even if that sample is run on multiple lanes."""
+
+    def __init__(self, name, files):
+        self.name = name
+        self.files = files
+
+
+class Lane(object):
+    """Represents a lane (physically separate sub-units of flowcells).
+    
+    For MiSeq and NextSeq there is only one lane (NextSeq's lanes aren't
+    independent).."""
+
+    def __init__(self, id, raw_cluster_density, pf_cluster_density, pf_ratio):
+        self.id = id
+        self.raw_cluster_density = raw_cluster_density
+        self.pf_cluster_density = pf_cluster_density
+        self.pf_ratio = pf_ratio
+
+
+class FastqFile(object):
+    """Represents a single output file for a specific sample, lane and
+    read. Currently assumed to be no more than one FastqFile per read.
+    
+    lane is a Lane object containing lane-specific stats.
+
+    read_num is the read index, 1 or 2 (second read is only available for paired
+    end). Index reads are not considered.
+
+    Path is the path to the fastq file relative to the "Unaligned"
+    (bcl2fastq output) directory or Data/Intensities/BaseCalls.
+    
+    stats is a dict of stat name => value. See the functions which generate these
+    stats below.
+    
+    empty is set by the QC function. You may set it, but it will be overwritten."""
+
+    def __init__(self, lane, read_num, path, stats):
+        self.lane = lane
+        self.read_num = read_num
+        self.path = path
+        self.stats = stats
+        self.empty = False
+
+
+
+############### FASTQC ################
 def run_fastqc(files, demultiplex_dir, output_dir=None, max_threads=None):
     """Run fastqc on a set of fastq files"""
     args = []
@@ -51,7 +119,6 @@ def move_fastqc_results(quality_control_dir, sample):
         if not f.empty:
             fp = f.path
             fastqc_result_dir_name = fastqc_dir(fp)
-    
             
             fastqc_output = os.path.join(quality_control_dir, fastqc_result_dir_name)
             # Don't need the zip, as we have the uncompressed version.
@@ -114,24 +181,23 @@ def generate_report_for_customer(args):
     except OSError:
         pass
 
-    raw_replacements = {
+    replacements = {
         '__RunName__': tex_escape(run_id),
         '__Programs__': tex_escape(" & ".join(v[0] for v in software_versions)),
         '__VersionString__': tex_escape(" & ".join(v[1] for v in software_versions)),
         '__SampleName__': tex_escape(sample.name),
         '__ReadNum__': str(fastq.read_num),
-        '__TotalN__': utilities.display_int(fastq.stats['# PF Reads']),
+        '__TotalN__': utilities.display_int(fastq.stats['# Reads PF']),
         '__Folder__': '../' + fastqc_dir(fastq.path),
         '__TemplateDir__': template_dir
             }
 
-    replacements = dict((k, v) for k,v in raw_replacements.items())
     report_root_name = ".".join((run_id, str(fastq.lane.id), "Sample_" + sample.name,
             "Read" + str(fastq.read_num), "qc"))
     fname = report_root_name + ".tex"
-    of = open(pdf_dir + "/" + fname, "w")
-    of.write(replace_multiple(replacements, template))
-    of.close()
+    with open(pdf_dir + "/" + fname, "w") as of:
+        of.write(replace_multiple(replacements, template))
+
     DEVNULL = open(os.devnull, 'wb') # discard output
     subprocess.check_call([nsc.PDFLATEX, '-shell-escape', fname], stdout=DEVNULL, stdin=DEVNULL, cwd=pdf_dir)
 
@@ -323,7 +389,7 @@ Lane	Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density
             out.write(utilities.display_int(lane.raw_cluster_density) + '\t')
             out.write(utilities.display_int(lane.pf_cluster_density) + '\t')
             if undetermined_file:
-                out.write(str(undetermined_file.percent_of_pf_clusters) + "%\t")
+                out.write(str(undetermined_file.stats['% of PF Clusters Per Lane']) + "%\t")
             else:
                 out.write("0%\t")
             out.write("ok\n")

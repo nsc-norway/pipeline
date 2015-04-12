@@ -13,6 +13,7 @@ from genologics import *
 from common import nsc, utilities, qc, parse
 
 
+
 def main(threads, run_dir, no_sample_sheet):
     run_id = os.path.basename(os.path.realpath(run_dir))
     match = re.match(r"^\d{6}_(NS|M)[A-Z0-9]+_\d{4}_[A-Z0-9\-]+$", run_id)
@@ -30,15 +31,16 @@ def main(threads, run_dir, no_sample_sheet):
         lane = Lane(1, lane_raw[1], lane_pf[1], lane_pf[1] / lane_raw[1])
 
     elif match.group(1) == "NS":
-        run_completion = ElementTree.parse(os.path.join(run_dir, "RunCompletionStatus.xml")).getroot()
+        instrument = "nextseq"
+        run_completion = ElementTree.parse(
+                os.path.join(run_dir, "RunCompletionStatus.xml")).getroot()
         clus_den = float(run_completion.find("ClusterDensity").text)
         pf_ratio = float(run_completion.find("ClustersPassingFilter").text) / 100.0
-        instrument = "nextseq"
         lane = Lane(1, clus_den, clus_den * pf_ratio, pf_ratio)
 
     demultiplex_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
     if no_sample_sheet:
-        info, projects = parse.get_ne_mi_seq_from_files(run_dir, lane)
+        info, projects = parse.get_ne_mi_seq_from_files(run_dir, instrument, lane)
     else:
         info, projects = parse.get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane)
 
@@ -58,12 +60,12 @@ def main_lims(threads, process_id):
 
     instrument = utilities.get_instrument(seq_process)
     if instrument == "miseq":
-        demultiplex_dir = "Don't know yet..." 
+        demultiplex_dir = "Don't know yet..."
     elif instrument == "nextseq":
         demux_process = utilities.get_demux_process(process)
         demultiplex_dir = demux_process.udf[nsc.DEST_FASTQ_DIR_UDF]
     else:
-        raise ValueError("This script can only handle MiSeq and NextSeq")
+        raise ValueError("This script can only handle MiSeq and NextSeq runs")
 
     # Run directory on secondary storage
     dd = os.path.realpath(demultiplex_dir)
@@ -89,6 +91,126 @@ def main_lims(threads, process_id):
     info, projects = parse.get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane)
     qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
     utilities.success_finish(process)
+
+
+def get_sw_versions(run_dir):
+    """Mainly for Mi/NextSeq"""
+
+    try:
+        xmltree = ElementTree.parse(os.path.join(run_dir, 'RunParameters.xml'))
+    except IOError:
+        xmltree = ElementTree.parse(os.path.join(run_dir, 'runParameters.xml'))
+
+    run_parameters = xmltree.getroot()
+    rta_ver = run_parameters.find("RTAVersion").text
+    return {"RTA": rta_ver}
+
+
+def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane,
+        sample_sheet_path=None):
+    """Get NextSeq or MiSeq QC model objects.
+
+    Gets the info from the sample sheet. Works for indexed projects and for 
+    projects with no index, but with an entry in the sample sheet.
+    
+    This is limited compared to the HiSeq version -- many fields are filled
+    with None because they are not available / we don't use them."""
+
+    if not sample_sheet_path:
+        sample_sheet_path = os.path.join(run_dir, 'SampleSheet.csv')
+
+    sample_sheet = parse_ne_mi_seq_sample_sheet(open(sample_sheet_path).read())
+    n_reads = len(sample_sheet['reads'])
+    project_name = sample_sheet['header']['Experiment Name']
+    project_dir = parse.get_project_dir(run_id, project_name)
+
+    if instrument == "miseq":
+        file_lane_id = "1"
+        stats = {}
+    elif instrument == "nextseq":
+        file_lane_id = "X"
+        stats = parse.get_nextseq_stats(
+                os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats")
+                )
+
+    samples = []
+    for sam_index, sam in enumerate(sample_sheet['data']):
+        files = []
+        sample_name = sam['Sample_ID']
+        for ir in xrange(1, n_reads+1):
+            path = "{0}/{1}_S{2}_L00{3}_R{4}_001.fastq.gz".format(
+                    project_dir, sample_name, str(sam_index + 1),
+                    file_lane_id, str(ir))
+            sample_stats = stats[(1, sample_name, ir)]
+            files.append(FastqFile(lane, ir, path, sample_stats))
+
+        sample = Sample(sample_name, files)
+        samples.append(sample)
+
+    project = Project(project_name, project_dir, samples)
+
+    unfiles = [
+            FastqFile(
+                lane, ir, "Undetermined_S0_L00%s_R%d_001.fastq.gz" % (file_lane_id, ir),
+                stats[(1, "unknown", ir)]
+                )
+            for ir in xrange(1, n_reads + 1)
+            ]
+    unsample = Sample("Undetermined", unfiles)
+    unproject = Project("Undetermined_indices", None, [unsample]) 
+
+    info = {'sw_versions': get_sw_versions(run_dir)}
+    return info, [project, unproject]
+    
+
+
+def get_ne_mi_seq_from_files(run_dir, instrument, lane):
+    """Get NextSeq or MiSeq QC "model" objects for run, without using sample
+    sheet information.
+
+    This function looks for project directories and extracts infromation from 
+    the directory structure / file names. It is less likely to crash than the above 
+    function, but also more likely to do something wrong."""
+
+    if instrument == "miseq":
+        stats = None
+    elif instrument == "nextseq":
+        stats = parse.get_nextseq_stats(
+                os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats")
+                )
+
+    projects = []
+    basecalls_dir = os.path.join(run_dir, "Data", "intensities", "BaseCalls")
+    projects_paths = glob.glob(os.path.join(basecalls_dir, "*_*.Project_*"))
+    for pp in project_paths:
+        p_dir = os.path.basename(pp)
+        project_name = re.match("[\d]+_[A-Z0-9]+\.Project_(.*)", p_dir).group(1)
+
+        sample_files = defaultdict(list)
+
+        for filename in os.listdir(pp):
+            parts = re.match("(.*?)_S\d+_L00X_R(\d+)_001.fastq.gz$", filename)
+            if parts:
+                sample_name = parts.group(1)
+                read_n = int(parts.group(2))
+                sample_files[sample_name].append((read_n, filename))
+
+        samples = []
+        for sample_name, files in sample_files.items():
+            file_objects = []
+            for read_n, fname in files:
+                file_stats = stats[(1, sample_name, read_n)]
+                f = FastqFile(lane, read_n, p_dir + "/" + fname, file_stats)
+                file_objects.append(f)
+
+            samples.append(Sample(sample_name, file_objects))
+
+        projects.append(Project(project_name, p_dir, samples))
+
+    info = {'sw_versions': get_sw_versions(run_dir)}
+    return info, projects
+
+
 
 
 if __name__ == '__main__':

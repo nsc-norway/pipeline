@@ -17,7 +17,9 @@ THREADS_UDF = "Number of threads"
 MISMATCHES_UDF = "Number of mismatches"
 SOURCE_RUN_DIR_UDF = "Source run directory"
 DEST_FASTQ_DIR_UDF = "Fastq output directory"
+NS_OUTPUT_RUN_DIR_UDF = "Output run directory" #NextSeq
 OTHER_OPTIONS_UDF = "Other options for configureBclToFastq"
+NS_OTHER_OPTIONS_UDF = "Other options for bcl2fastq"
 
 # Other UDFs
 LANE_UNDETERMINED_UDF = "% Undetermined Indices (PF)"
