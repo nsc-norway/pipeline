@@ -122,13 +122,16 @@ def move_fastqc_results(quality_control_dir, sample):
             
             fastqc_output = os.path.join(quality_control_dir, fastqc_result_dir_name)
             # Don't need the zip, as we have the uncompressed version.
-            os.remove(os.path.join(quality_control_dir, fastqc_result_dir_name + ".zip"))
-    
-            # Move from root fastqc to sample directory
-            dst_file = os.path.join(sample_dir, fastqc_result_dir_name)
-            if os.path.exists(dst_file):
-                shutil.rmtree(dst_file)
-            os.rename(fastqc_output, dst_file)
+            if os.path.exists(fastqc_output):
+                os.remove(os.path.join(quality_control_dir, fastqc_result_dir_name + ".zip"))
+        
+                # Move from root fastqc to sample directory
+                dst_file = os.path.join(sample_dir, fastqc_result_dir_name)
+                if os.path.exists(dst_file):
+                    shutil.rmtree(dst_file)
+                os.rename(fastqc_output, dst_file)
+            else:
+                print "WARNING: No fastqc output found for", f.path
             
 
 def update_stats_fastqc(quality_control_dir, sample):
@@ -143,10 +146,12 @@ def update_stats_fastqc(quality_control_dir, sample):
                 for l in fqc_data:
                     total = re.match("Total Sequences\t(\d+)", l)
                     if total:
-                        if f.stats['# PF Reads']:
-                            assert f.stats['# PF Reads'] == int(total.group(1))
+                        if f.stats and f.stats.get('# Reads PF'):
+                            assert f.stats['# Reads PF'] == int(total.group(1))
                         else:
-                            f.stats['# PF Reads'] = int(total.group(1))
+                            if not f.stats:
+                                f.stats = {}
+                            f.stats['# Reads PF'] = int(total.group(1))
                         break
 
 
@@ -192,8 +197,9 @@ def generate_report_for_customer(args):
         '__TemplateDir__': template_dir
             }
 
-    report_root_name = ".".join((run_id, str(fastq.lane.id), "Sample_" + sample.name,
-            "Read" + str(fastq.read_num), "qc"))
+    #report_root_name = ".".join((run_id, str(fastq.lane.id), "Sample_" + sample.name,
+    #        "Read" + str(fastq.read_num), "qc"))
+    report_root_name = re.sub(".fastq.gz$", ".qc.pdf", os.path.basename(fastq.path))
     fname = report_root_name + ".tex"
     with open(pdf_dir + "/" + fname, "w") as of:
         of.write(replace_multiple(replacements, template))
@@ -223,16 +229,7 @@ def extract_format_overrepresented(fqc_report, fastqfile, index):
         buf = ""
 
         for l in reportfile:
-            if found_over:
-                if "<table>" in l:
-                    buf += '<table border="1">\n'
-                elif "</table>" in l:
-                    buf += l
-                    break
-                else:
-                    buf += l
-
-            elif "No overrepresented sequences" in l:
+            if "No overrepresented sequences" in l:
                 return """\
 <h2 id="{id}">{laneName}</h2>
 <div style="font:10pt courier">
@@ -240,6 +237,14 @@ def extract_format_overrepresented(fqc_report, fastqfile, index):
 <p></p>
 </div>
 """.format(id=index, laneName=fastqfile)
+            elif found_over:
+                if "<table>" in l:
+                    buf += '<table border="1">\n'
+                elif "</table>" in l:
+                    buf += l
+                    break
+                else:
+                    buf += l
             elif "Overrepresented sequences</h2>" in l:
                 found_over = True
                 buf += '<h2 id="{id}">{laneName}</h2>\n'.format(id=index, laneName=fastqfile)
@@ -272,7 +277,7 @@ def generate_internal_html_report(quality_control_dir, samples):
                 if fq.empty:
                     n_reads = 0
                 else:
-                    n_reads = fq.stats['# PF Reads']
+                    n_reads = fq.stats['# Reads PF']
                 out_file.write(cell1.format(
                     fileName=fq_name,
                     sampleName=s.name,
@@ -311,10 +316,16 @@ def write_sample_info_table(output_path, runid, project):
         nsamples = len(project.samples)
         out.write('Sequence ready for download - sequencing run ' + runid + ' - ' + project.name + ' (' + str(nsamples) + ' samples)\n\n')
 
-        files = sorted((fi for s in project.samples for fi in s.files), key=lambda x: os.path.basename(x.path))
-        for f in files:
+        files = sorted(
+                ((s,fi) for s in project.samples for fi in s.files),
+                key=lambda (s,f): (f.lane.id, s.name, f.read_num)
+                )
+        for s,f in files:
             out.write(os.path.basename(f.path) + "\t")
-            out.write(utilities.display_int(f.stats['# PF Reads'] + "\t")
+            if f.empty:
+                out.write("0\t")
+            else:
+                out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
             out.write("fragments\n")
 
 
@@ -339,13 +350,17 @@ def write_internal_sample_table(output_path, runid, projects):
                     out.write(s.name + "\t")
                     out.write(utilities.display_int(f.lane.raw_cluster_density) + "\t")
                     out.write(utilities.display_int(f.lane.pf_cluster_density) + "\t")
-                    out.write("%4.2f" % (f.stats['% of PF Clusters Per Lane']) + "%\t")
-                    out.write(utilities.display_int(f.stats['# PF Reads'] + "\t")
+                    if f.empty:
+                        out.write("%4.2f" % (0,) + "%\t")
+                        out.write("0\t")
+                    else:
+                        out.write("%4.2f" % (f.stats.get('% of PF Clusters Per Lane', 0)) + "%\t")
+                        out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
                     out.write("ok\t\tok\n")
 
 
 
-def write_summary_email(output_path, runid, projects):
+def write_summary_email(output_path, runid, projects, print_lane_number):
     with open(output_path, 'w') as out:
         summary_email_head = """\
 --------------------------------							
@@ -358,9 +373,16 @@ PF = pass illumina filter
 PF cluster no = number of PF cluster in the lane							
 Undetermined ratio = how much proportion of fragments can not be assigned to a sample in the indexed lane							
 Quality = summary of the overall quality							
-
-Lane	Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2)	Undetermined ratio	Quality
 """.format(runId = runid)
+        if print_lane_number:
+            summary_email_head += """
+Lane	Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2)	Undetermined ratio	Quality
+"""
+        else:
+            summary_email_head += """
+Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2)	Undetermined ratio	Quality
+"""
+
         out.write(summary_email_head)
         # assumes 1 project per lane, and undetermined
         # Dict: lane ID => (lane object, project object)
@@ -377,21 +399,22 @@ Lane	Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density
             except KeyError:
                 undetermined_file = None
 
-            out.write(str(l) + "\t")
+            if print_lane_number:
+                out.write(str(l) + "\t")
             out.write(proj.name + "\t")
-            cluster_no = sum(f.stats['# PF Reads']
+            cluster_no = sum(f.stats['# Reads PF']
                     for proj in projects
                     for s in proj.samples
                     for f in s.files
-                    if f.lane.id == l and f.read_num == 1)
+                    if f.lane.id == l and f.read_num == 1 and not f.empty)
             out.write(utilities.display_int(cluster_no) + '\t')
             out.write("%4.2f" % (lane.pf_ratio) + "\t")
             out.write(utilities.display_int(lane.raw_cluster_density) + '\t')
             out.write(utilities.display_int(lane.pf_cluster_density) + '\t')
-            if undetermined_file:
-                out.write(str(undetermined_file.stats['% of PF Clusters Per Lane']) + "%\t")
+            if undetermined_file and not undetermined_file.empty:
+                out.write("%4.2f" % (undetermined_file.stats['% of PF Clusters Per Lane'],) + "%\t")
             else:
-                out.write("0%\t")
+                out.write("-\t")
             out.write("ok\n")
 
 
@@ -484,6 +507,6 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
 
     # Summary email for NSC staff
     fname = delivery_dir + "/Summary_email_for_NSC_" + run_id + ".xls"
-    write_summary_email(fname, run_id, projects)
+    write_summary_email(fname, run_id, projects, instrument_type=='hiseq')
 
 

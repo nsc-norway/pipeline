@@ -103,6 +103,11 @@ def rename_projdir_ne_mi(runid, output_dir, sample_sheet):
     original_path = basecalls_dir + "/Project_" + project_name
     dir_name = parse.get_project_dir(runid, project_name)
     new_path = basecalls_dir + "/" + dir_name
+    try:
+        os.path.rename(original_path, new_path)
+    except OSError:
+        print "WARNING: Failed to rename output dir"
+
     return new_path
 
 

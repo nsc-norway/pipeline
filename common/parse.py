@@ -1,8 +1,28 @@
-import re, os
+import re
+import os
 from xml.etree import ElementTree
 from collections import defaultdict
 
 
+###################### HI/MISEQ METRICS #######################
+def get_lane_cluster_density(path):
+    """Get cluster density for lanes from report files in Data/reports.
+    
+    Returns a dict indexed by the 1-based lane number."""
+
+    with open(path) as f:
+        # Discard up to and including Lane
+        while not next(f).startswith("Lane\t"):
+            pass
+
+        lane_sum = defaultdict(int)
+        lane_ntile = defaultdict(int)
+        for l in f:
+            cell = l.split("\t")
+            lane_sum[int(cell[0])] += float(cell[2])
+            lane_ntile[int(cell[0])] += 1
+
+        return dict((i+1, lane_sum[i] / lane_ntile[i]) for i in lane_sum.keys())
 
 
 
@@ -31,6 +51,13 @@ def parse_demux_stats(stats_data):
     return barcode_lanes
 
 
+def to_normal_dict(dd):
+    '''Recursive function to convert a tree of defaultdict to a normal dict'''
+    if isinstance(dd, defaultdict):
+        return dict((k, to_normal_dict(v)) for k, v in dd.items())
+    else:
+        return dd
+
 
 def parse_demux_summary(demux_summary_file_path):
     """Get lane-read-level demultiplexing statistics from
@@ -50,6 +77,7 @@ def parse_demux_summary(demux_summary_file_path):
     root = xmltree.getroot()
     tree = lambda: defaultdict(tree)
     total = tree()
+    total = {}
     if root.tag != "Summary":
         raise RuntimeError("Expected XML element Summary, found " + root.tag)
     for lane in root.findall("Lane"):
@@ -63,13 +91,17 @@ def parse_demux_summary(demux_summary_file_path):
                 for tile in barcode.findall("Tile"):
                     for read in tile.findall("Read"):
                         read_id = int(read.attrib['index'])
+                        key = (lane_id, sample_name, read_id)
+                        if not total.has_key(key):
+                            total[key] = defaultdict(dict)
                         for filtertype in read:
                             ft = filtertype.tag
                             for stat in filtertype:
-                                stat_val = total[sample_name][lane_id][read_id][ft].get(stat.tag, 0)
-                                total[sample_name][lane_id][read_id][ft][stat.tag] = stat_val + int(stat.text)
+                                stat_val = total[key][ft].get(stat.tag, 0)
+                                total[key][ft][stat.tag] = stat_val + int(stat.text)
+    
 
-    return total
+    return to_normal_dict(total)
 
 
 def get_hiseq_stats(demux_summary_file_path):
@@ -86,41 +118,36 @@ def get_hiseq_stats(demux_summary_file_path):
     result = {}
     # lane_sum_clusters: { lane_id => number of clusters in lane } (for percentage per file)
     # Uses a single read, as # clusters is the same for all reads
-    lane_sum_pf_clusters = dict(
-            (lane_id, sum(next(rs.values())['Pf']['ClusterCount'] for ss in lanestats for rs in ss))
-            for lane_id, lanestats in demux_summary.items()
-            )
-    lane_sum_raw_clusters = dict(
-            (lane_id, sum(next(rs.values())['Raw']['ClusterCount'] for ss in lanestats for rs in ss))
-            for lane_id, lanestats in demux_summary.items()
-            )
+    lane_sum_pf_clusters = defaultdict(int)
+    lane_sum_raw_clusters = defaultdict(int)
+    for (lane, sample_id, iread), stats in demux_summary.items():
+        lane_sum_pf_clusters[lane] += stats['Pf']['ClusterCount']
+        lane_sum_raw_clusters[lane] += stats['Raw']['ClusterCount']
 
     result = {}
-    for lane_id, lanestats in demux_summary.items():
-        for sample_id, samplestats in lanestats:
-            for iread, readstats in samplestats:
-                pf = readstats['Pf']
-                raw = readstats['Raw']
-                stats = {}
-                stats['# Reads'] = raw['ClusterCount']
-                stats['# Reads PF'] = pf['ClusterCount']
-                stats['Yield PF (Gb)'] = raw['Yield'] / 1e9
-                if raw['ClusterCount'] > 0:
-                    stats['%PF'] = pf['ClusterCount'] * 100.0 / raw['ClusterCount']
-                else:
-                    stats['%PF'] = "100.0"
-                stats['% of Raw Clusters Per Lane'] =\
-                        raw['ClusterCount'] * 100.0 / lane_sum_raw_clusters[lane_id]
-                stats['% of PF Clusters Per Lane'] =\
-                        pf['ClusterCount'] * 100.0 / lane_sum_pf_clusters[lane_id]
-                stats['% Perfect Index Read'] =\
-                        pf['ClusterCount0MismatchBarcode'] * 100.0 / pf['ClusterCount']
-                stats['% One Mismatch Reads (Index)'] =\
-                        pf['ClusterCount1MismatchBarcode'] * 100.0 / pf['ClusterCount']
-                stats['% Bases >=Q30'] = pf['YieldQ30'] * 100.0 / pf['Yield']
-                stats['Ave Q Score'] = pf['QualityScoreSum'] / pf['Yield']
-                
-                result[(lane_id, sample_id, iread)] = stats
+    for (lane_id, sample_id, iread), readstats in demux_summary.items():
+        pf = readstats['Pf']
+        raw = readstats['Raw']
+        stats = {}
+        stats['# Reads'] = raw['ClusterCount']
+        stats['# Reads PF'] = pf['ClusterCount']
+        stats['Yield PF (Gb)'] = raw['Yield'] / 1e9
+        if raw['ClusterCount'] > 0:
+            stats['%PF'] = pf['ClusterCount'] * 100.0 / raw['ClusterCount']
+        else:
+            stats['%PF'] = "100.0"
+        stats['% of Raw Clusters Per Lane'] =\
+                raw['ClusterCount'] * 100.0 / lane_sum_raw_clusters[lane_id]
+        stats['% of PF Clusters Per Lane'] =\
+                pf['ClusterCount'] * 100.0 / lane_sum_pf_clusters[lane_id]
+        stats['% Perfect Index Read'] =\
+                pf['ClusterCount0MismatchBarcode'] * 100.0 / pf['ClusterCount']
+        stats['% One Mismatch Reads (Index)'] =\
+                pf['ClusterCount1MismatchBarcode'] * 100.0 / pf['ClusterCount']
+        stats['% Bases >=Q30'] = pf['YieldQ30'] * 100.0 / pf['Yield']
+        stats['Ave Q Score'] = pf['QualityScoreSum'] / pf['Yield']
+        
+        result[(lane_id, sample_id, iread)] = stats
 
     return result
 

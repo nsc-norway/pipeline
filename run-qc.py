@@ -9,6 +9,7 @@ import re
 import sys, os
 import argparse, glob
 from collections import defaultdict
+from xml.etree import ElementTree
 from genologics import *
 from common import nsc, utilities, qc, parse
 
@@ -25,10 +26,10 @@ def main(threads, run_dir, no_sample_sheet):
         instrument = "miseq"
         # MiSeq has the Data/reports info, like HiSeq, getting clu. density from files
         pf_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane PF.txt")
-        lane_pf = get_lane_cluster_density(pf_path)
+        lane_pf = parse.get_lane_cluster_density(pf_path)
         raw_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane.txt")
-        lane_raw = get_lane_cluster_density(raw_path)
-        lane = Lane(1, lane_raw[1], lane_pf[1], lane_pf[1] / lane_raw[1])
+        lane_raw = parse.get_lane_cluster_density(raw_path)
+        lane = qc.Lane(1, lane_raw[1], lane_pf[1], lane_pf[1] / lane_raw[1])
 
     elif match.group(1) == "NS":
         instrument = "nextseq"
@@ -36,13 +37,13 @@ def main(threads, run_dir, no_sample_sheet):
                 os.path.join(run_dir, "RunCompletionStatus.xml")).getroot()
         clus_den = float(run_completion.find("ClusterDensity").text)
         pf_ratio = float(run_completion.find("ClustersPassingFilter").text) / 100.0
-        lane = Lane(1, clus_den, clus_den * pf_ratio, pf_ratio)
+        lane = qc.Lane(1, clus_den, clus_den * pf_ratio, pf_ratio)
 
     demultiplex_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
     if no_sample_sheet:
-        info, projects = parse.get_ne_mi_seq_from_files(run_dir, instrument, lane)
+        info, projects = get_ne_mi_seq_from_files(run_dir, instrument, lane)
     else:
-        info, projects = parse.get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane)
+        info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane)
 
     qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
 
@@ -88,7 +89,7 @@ def main_lims(threads, process_id):
     # independently
     lane = parse.Lane(1, density_raw, density_pf, pf_ratio)
 
-    info, projects = parse.get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane)
+    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane)
     qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
     utilities.success_finish(process)
 
@@ -103,7 +104,7 @@ def get_sw_versions(run_dir):
 
     run_parameters = xmltree.getroot()
     rta_ver = run_parameters.find("RTAVersion").text
-    return {"RTA": rta_ver}
+    return [("RTA", rta_ver)]
 
 
 def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane,
@@ -119,7 +120,7 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane,
     if not sample_sheet_path:
         sample_sheet_path = os.path.join(run_dir, 'SampleSheet.csv')
 
-    sample_sheet = parse_ne_mi_seq_sample_sheet(open(sample_sheet_path).read())
+    sample_sheet = parse.parse_ne_mi_seq_sample_sheet(open(sample_sheet_path).read())
     n_reads = len(sample_sheet['reads'])
     project_name = sample_sheet['header']['Experiment Name']
     project_dir = parse.get_project_dir(run_id, project_name)
@@ -141,23 +142,23 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane,
             path = "{0}/{1}_S{2}_L00{3}_R{4}_001.fastq.gz".format(
                     project_dir, sample_name, str(sam_index + 1),
                     file_lane_id, str(ir))
-            sample_stats = stats[(1, sample_name, ir)]
-            files.append(FastqFile(lane, ir, path, sample_stats))
+            sample_stats = stats.get((1, sample_name, ir))
+            files.append(qc.FastqFile(lane, ir, path, sample_stats))
 
-        sample = Sample(sample_name, files)
+        sample = qc.Sample(sample_name, files)
         samples.append(sample)
 
-    project = Project(project_name, project_dir, samples)
+    project = qc.Project(project_name, project_dir, samples)
 
     unfiles = [
-            FastqFile(
+            qc.FastqFile(
                 lane, ir, "Undetermined_S0_L00%s_R%d_001.fastq.gz" % (file_lane_id, ir),
-                stats[(1, "unknown", ir)]
+                stats.get((1, "unknown", ir))
                 )
             for ir in xrange(1, n_reads + 1)
             ]
-    unsample = Sample("Undetermined", unfiles)
-    unproject = Project("Undetermined_indices", None, [unsample]) 
+    unsample = qc.Sample("Undetermined", unfiles)
+    unproject = qc.Project("Undetermined_indices", None, [unsample])
 
     info = {'sw_versions': get_sw_versions(run_dir)}
     return info, [project, unproject]
@@ -173,15 +174,15 @@ def get_ne_mi_seq_from_files(run_dir, instrument, lane):
     function, but also more likely to do something wrong."""
 
     if instrument == "miseq":
-        stats = None
+        stats = {}
     elif instrument == "nextseq":
         stats = parse.get_nextseq_stats(
                 os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats")
                 )
 
     projects = []
-    basecalls_dir = os.path.join(run_dir, "Data", "intensities", "BaseCalls")
-    projects_paths = glob.glob(os.path.join(basecalls_dir, "*_*.Project_*"))
+    basecalls_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "*_*.Project_*")
+    project_paths = glob.glob(basecalls_dir)
     for pp in project_paths:
         p_dir = os.path.basename(pp)
         project_name = re.match("[\d]+_[A-Z0-9]+\.Project_(.*)", p_dir).group(1)
@@ -200,12 +201,12 @@ def get_ne_mi_seq_from_files(run_dir, instrument, lane):
             file_objects = []
             for read_n, fname in files:
                 file_stats = stats[(1, sample_name, read_n)]
-                f = FastqFile(lane, read_n, p_dir + "/" + fname, file_stats)
+                f = qc.FastqFile(lane, read_n, p_dir + "/" + fname, file_stats)
                 file_objects.append(f)
 
-            samples.append(Sample(sample_name, file_objects))
+            samples.append(qc.Sample(sample_name, file_objects))
 
-        projects.append(Project(project_name, p_dir, samples))
+        projects.append(qc.Project(project_name, p_dir, samples))
 
     info = {'sw_versions': get_sw_versions(run_dir)}
     return info, projects

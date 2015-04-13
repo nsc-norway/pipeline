@@ -9,28 +9,10 @@ import re
 import sys, os
 import argparse, glob
 from collections import defaultdict
+from xml.etree import ElementTree
 from genologics import *
 from common import nsc, utilities, qc, parse
 
-
-def get_lane_cluster_density(path):
-    """Get cluster density for lanes from report files.
-    
-    Returns a dict indexed by the 1-based lane number."""
-
-    with open(path) as f:
-        # Discard up to and including Lane
-        while not next(f).startswith("Lane\t"):
-            pass
-
-        lane_sum = defaultdict(int)
-        lane_ntile = defaultdict(int)
-        for l in f:
-            cell = l.split("\t")
-            lane_sum[int(cell[0])] += float(cell[2])
-            lane_ntile[int(cell[0])] += 1
-
-        return dict((i+1, lane_sum[i] / lane_ntile[i]) for i in lane_sum.keys())
 
 
 def main(threads, demultiplex_dir):
@@ -44,9 +26,9 @@ def main(threads, demultiplex_dir):
     # can only be had from the global run data dir in a form that's not too
     # error-prone.
     pf_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane PF.txt")
-    lane_pf = get_lane_cluster_density(pf_path)
+    lane_pf = parse.get_lane_cluster_density(pf_path)
     raw_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane.txt")
-    lane_raw = get_lane_cluster_density(raw_path)
+    lane_raw = parse.get_lane_cluster_density(raw_path)
     lanes = {}
     for l in lane_raw.keys():
         lanes[l] = qc.Lane(l, lane_raw[l], lane_pf[l], lane_pf[l] / lane_raw[l])
@@ -57,8 +39,9 @@ def main(threads, demultiplex_dir):
         demultiplex_dir, "Basecall_Stats_*", "Flowcell_demux_summary.xml"
         ))[0]
     demux_summary = parse.parse_demux_summary(dm_path)
-    # Number of reads: take the first sample and lane, count the reads
-    n_reads = len(demux_summary[0].values()[0].values()[0])
+    # Number of reads: take the first sample and lane, count the reads (kind of a
+    # lame way to do it, but it avoids the need for another file parser)
+    n_reads = max(k[2] for k in demux_summary.keys())
     print "Number of non-index reads:", n_reads
 
     info, projects = get_hiseq_qc_data(run_id, n_reads, lanes, demultiplex_dir)
@@ -117,7 +100,8 @@ def get_hiseq_sw_versions(demultiplex_config):
         if tag.attrib['Name'] == "configureBclToFastq.pl": #special case
             name, ver = tag.attrib['Version'].split('-')
             sw_versions.append((name, ver))
-        elif "RTA" in tag.attrib['Name']:
+        # Add RTA just once
+        elif "RTA" in tag.attrib['Name'] and "RTA" not in [sv[0] for sv in sw_versions]:
             sw_versions.append((tag.attrib['Name'], tag.attrib['Version']))
 
     return sw_versions
@@ -138,7 +122,6 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
     # the one that was used for demultiplexing.
     xmltree = ElementTree.parse(os.path.join(root_dir, "DemultiplexConfig.xml"))
     demultiplex_config = xmltree.getroot()
-
     sw_versions = get_hiseq_sw_versions(demultiplex_config)
 
     flowcell_info = demultiplex_config.find("FlowcellInfo")
@@ -159,7 +142,7 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
 
     # Getting stats from Flowcell_demux_summary.xml (no longer using Demultiplex_stats.htm).
     ds_path = os.path.join(root_dir, "Basecall_Stats_" + fcid, "Flowcell_demux_summary.xml")
-    demux_sum = parse_demux_summary(open(ds_path).read())
+    demux_sum = parse.get_hiseq_stats(ds_path)
 
     projects = []
     for proj, entries in project_entries.items():
@@ -173,11 +156,12 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
             sample_dir = project_dir + "/Sample_" + e['SampleId']
             files = []
             for ri in xrange(1, n_reads + 1):
-                stats = demux_sum[(int(e['Lane']), e['SampleId'], ri)]
+                # Empty files will not have any stats, that's why we use get(), not []
+                stats = demux_sum.get((int(e['Lane']), e['SampleId'], ri))
 
                 # FastqFile
                 path_t = sample_dir + "/{0}_{1}_L{2}_R{3}_001.fastq.gz"
-                path = path_t.format(e['SampleId'], e['Index'], e['Lane'].zfill(3), ri) 
+                path = path_t.format(e['SampleId'], e['Index'], e['Lane'].zfill(3), ri)
                 lane = lanes[int(e['Lane'])]
                 f = qc.FastqFile(lane, ri, path, stats)
                 files.append(f)

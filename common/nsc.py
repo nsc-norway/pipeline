@@ -11,7 +11,7 @@ AUTO_FLOWCELL_UDF = "Automation lane groups"
 JOB_ID_UDF = "Job ID"
 JOB_STATUS_UDF = "Job status"
 
-# UDFs for configuration and job steering
+# UDFs for configuration and job steering (On process types)
 BASES_MASK_UDF = "Bases Mask"
 THREADS_UDF = "Number of threads"
 MISMATCHES_UDF = "Number of mismatches"
@@ -21,13 +21,15 @@ NS_OUTPUT_RUN_DIR_UDF = "Output run directory" #NextSeq
 OTHER_OPTIONS_UDF = "Other options for configureBclToFastq"
 NS_OTHER_OPTIONS_UDF = "Other options for bcl2fastq"
 
-# Other UDFs
+# Other UDFs 
+# On Analyte
 LANE_UNDETERMINED_UDF = "% Undetermined Indices (PF)"
 
 
 # Output files
 CONFIGURE_LOG = "configureBclToFastq log"
 MAKE_LOG = "make log"
+BCL2FASTQ_LOG = "bcl2fastq log"
 FASTQ_OUTPUT = "{0} R{1} fastq"
 LOG_DIR="/data/nsc.loki/automation/logs"
 
@@ -71,6 +73,7 @@ INVOKE_SBATCH_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/sbatch",
 # Data processing programs
 CONFIGURE_BCL_TO_FASTQ="/data/common/tools/nscbin/configureBclToFastq.pl"
 MAKE="/usr/bin/make"
+BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
 FASTQC="/data/common/tools/nscbin/fastqc"
 
 # Paths
