@@ -78,12 +78,6 @@ def run_demultiplexing(process, sample_sheet_path, n_threads, start_dir,
 
 
 
-def rename_project_directory(runid, basecalls_dir, project_name):
-    """Renames project directory if it exists."""
-
-# TODO
-
-
 def check_fastq_and_attach_files(process, sample_sheet, projdirs, reads):
     """Attaches ResultFile outputs of the HiSeq demultiplexing process."""
 
@@ -171,7 +165,7 @@ def main(process_id):
                     cfg.other_options)
             if process_ok:
 # TODO dest_dir
-                projdirs = rename_project_directories(runid, cfg.dest_dir, sample_sheet)
+                projdirs = demultiplex.rename_projdir_ne_mi(runid, cfg.output_dir, sample_sheet)
                 reads = ["R1"]
                 try:
                     if seq_proc.udf['Read 2 Cycles']:

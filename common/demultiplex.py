@@ -94,6 +94,13 @@ def download_sample_sheet(process, save_dir):
         return None, None
 
 
+def rename_projdir_ne_mi(runid, output_dir, project_name):
+    """Renames project directory if it exists."""
+
+    project_name = ""
+    
+    basecalls_dir = os.path.join(output_dir, "Data", "Intensities", "BaseCalls") 
+    original = os.path.join(s + "/Project_" + project_name
 
 
 
