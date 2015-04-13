@@ -106,5 +106,3 @@ def rename_projdir_ne_mi(runid, output_dir, sample_sheet):
     return new_path
 
 
-
-
