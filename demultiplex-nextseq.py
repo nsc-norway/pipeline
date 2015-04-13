@@ -79,17 +79,34 @@ def run_demultiplexing(process, sample_sheet_path, num_samples, bases_mask, n_th
         return False
 
 
+def combine_fastq(sample_names, reads, project_path):
+    """Merge fastq files for all lanes. Delete originals."""
+
+    for sam_index, sample_name in enumerate(sample_names):
+        for ir in reads:
+            out_path = "{0}/{1}_S{2}_L00{3}_R{4}_001.fastq.gz".format(
+                                project_path, sample_name, str(sam_index + 1),
+                                "X", str(ir))
+            with open(out_path, 'wb') as out:
+                for lane in xrange(1,5):
+                    in_path = "{0}/{1}_S{2}_L00{3}_R{4}_001.fastq.gz".format(
+                                    project_path, sample_name, str(sam_index + 1),
+                                    lane, str(ir))
+                    shutil.copyfileobj(open(in_path, 'rb'), out)
+                    os.remove(in_path)
 
 
-def combine_fastq_and_attach_files(process, sample_sheet, project_path, reads):
-    """Attaches ResultFile outputs of the HiSeq demultiplexing process."""
+def attach_files(process, sample_sheet, project_path, reads):
+    """Attaches ResultFile outputs of the NextSeq demultiplexing process."""
 
-    for sam in sample_sheet:
+    for sam_index, sam in enumerate(sample_sheet):
         sample_dir = "Sample_" + sam['SampleID']
-        fastq_names = ["{0}_{1}_L{2}_{3}_001.fastq.gz".format(sam['SampleID'],
+        out_path = "{0}/{1}_S{2}_L00{3}_R{4}_001.fastq.gz".format(
+                            project_path, sample_name, str(sam_index + 1),
+                            "X", str(ir))
+        fastq_names = ["{0}_{1}_S_L{2}_{3}_001.fastq.gz".format(sam['SampleID'],
             sam['Index'], sam['Lane'].zfill(3), r) for r in reads]
-        fastq_paths = [os.path.join(projdirs[sam['SampleProject']], 
-            sample_dir, fq) for fq in fastq_names]
+
 
         for fp in fastq_paths:
             # Continues even if file doesn't exist. This will be discovered
@@ -154,7 +171,6 @@ def main(process_id):
 
     cfg = get_config(process)
     if cfg:
-        start_dir = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
         ssheet_file, sample_sheet_content = get_sample_sheet(process, cfg.output_dir)
 
         if sample_sheet_data:
@@ -166,19 +182,25 @@ def main(process_id):
 
     
         process_ok = run_demultiplexing(process, ssheet_file, num_samples,
-                cfg.bases_mask, cfg.n_threads, cfg.mismatches, start_dir, cfg.output_dir,
+                cfg.bases_mask, cfg.n_threads, cfg.mismatches, cfg.run_dir, cfg.output_dir,
                 cfg.other_options)
         
         if process_ok:
-            project_path = demultiplex.rename_projdir_ne_mi(runid, cfg.output_dir, sample_sheet)
             reads = ["R1"]
             try:
                 if seq_proc.udf['Read 2 Cycles']:
                     reads.append("R2")
             except KeyError:
                 pass
-#Undetermined_S0_L00X_R1_001.fastq.gz
-            combine_fastq_and_attach_files(process, sample_sheet, project_path, reads)
+            if ssheet_file:
+                project_path = demultiplex.rename_projdir_ne_mi(runid, cfg.output_dir, sample_sheet)
+                sample_names = [sam['Sample_ID'] for sam in sample_sheet]
+                combine_fastq(sample_names, reads, project_path)
+            undetermined_names = ["Undetermined"]
+            undetermined_path = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
+            combine_fastq(undetermined_names, reads, undetermined_path)
+            attach_files(
+
             try:
 #TODO dest_dir / output_dir
                 success = demultiplex.populate_results(process, cfg.dest_dir)
