@@ -25,6 +25,7 @@ def get_config(process):
         cfg = Config()
         cfg.n_threads = process.udf[nsc.THREADS_UDF]
         cfg.run_dir = process.udf[nsc.SOURCE_RUN_DIR_UDF]
+        cfg.bases_mask = process.udf[nsc.BASES_MASK_UDF]
         cfg.output_dir = process.udf[nsc.NS_OUTPUT_RUN_DIR_UDF]
     except KeyError:
         return None
@@ -38,7 +39,7 @@ def get_config(process):
 
 
 
-def run_demultiplexing(process, sample_sheet_path, n_threads, start_dir,
+def run_demultiplexing(process, sample_sheet_path, bases_mask, n_threads, start_dir,
         dest_run_dir, other_options):
     """Run bcl2fastq2."""
 
@@ -47,6 +48,10 @@ def run_demultiplexing(process, sample_sheet_path, n_threads, start_dir,
     
     args += ['--output-dir', dest_run_dir]
     args += ['--input-dir', start_dir]
+    if sample_sheet_path:
+        args += ['--sample-sheet', sample_sheet_path]
+    if bases_mask:
+        args += ['--use-bases-mask', bases_mask]
     if other_options:
         args += re.split(" +", other_options)
 
@@ -78,7 +83,7 @@ def run_demultiplexing(process, sample_sheet_path, n_threads, start_dir,
 
 
 
-def check_fastq_and_attach_files(process, sample_sheet, projdirs, reads):
+def check_fastq_and_attach_files(process, sample_sheet, project_path, reads):
     """Attaches ResultFile outputs of the HiSeq demultiplexing process."""
 
     for sam in sample_sheet:
@@ -121,16 +126,15 @@ def copy_to_secondary():
 
 
 def get_sample_sheet(process, run_dir):
-    """Get sample sheet from LIMS, fall back to SampleSheet.csv in run
-    directory"""
+    """Get sample sheet from LIMS"""
 
     ssheet_file, sample_sheet = download_sample_sheet(process, run_dir)
     if ssheet_file:
         return ssheet_file, sample_sheet
-    elif os.path.exists(os.path.join(run_dir, "SampleSheet.csv")):
-        path = os.path.join(run_dir, "SampleSheet.csv")
-        data = open(path).read()
-        return path, data 
+    #elif os.path.exists(os.path.join(run_dir, "SampleSheet.csv")):
+    #    path = os.path.join(run_dir, "SampleSheet.csv")
+    #    data = open(path).read()
+    #    return path, data 
     else:
         return None, None
 
@@ -141,7 +145,6 @@ def main(process_id):
     process = Process(nsc.lims, id=process_id)
 
     utilities.running(process)
-    cfg = get_config(process)
     
     seq_proc = utilities.get_sequencing_process(process)
     runid = seq_proc.udf['Run ID']
@@ -150,29 +153,33 @@ def main(process_id):
     copy_to_secondary()
 
     success = False
+
+    cfg = get_config(process)
     if cfg:
         start_dir = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
     
-        ssheet_file, sample_sheet_data = get_sample_sheet(
-                process, cfg.run_dir
-                )
+        ssheet_file, sample_sheet_content = get_sample_sheet(process, cfg.run_dir)
 
-        sample_sheet = parse.parse_hiseq_sample_sheet(sample_sheet_data)
+        if sample_sheet_data:
+            sample_sheet = parse.parse_ne_mi_seq_sample_sheet(sample_sheet_content)
+        else:
+            sample_sheet = None
     
-        if ssheet_file:
-            process_ok = run_demultiplexing(process, ssheet_file, cfg.bases_mask,
-                    cfg.n_threads, cfg.mismatches, start_dir, cfg.output_dir,
-                    cfg.other_options)
+        process_ok = run_demultiplexing(process, ssheet_file, cfg.bases_mask,
+                cfg.n_threads, cfg.mismatches, start_dir, cfg.output_dir,
+                cfg.other_options)
+        
+        if ....:
+
             if process_ok:
-# TODO dest_dir
-                projdirs = demultiplex.rename_projdir_ne_mi(runid, cfg.output_dir, sample_sheet)
+                project_path = demultiplex.rename_projdir_ne_mi(runid, cfg.output_dir, sample_sheet)
                 reads = ["R1"]
                 try:
                     if seq_proc.udf['Read 2 Cycles']:
                         reads.append("R2")
                 except KeyError:
                     pass
-                check_fastq_and_attach_files(process, sample_sheet, projdirs, reads)
+                check_fastq_and_attach_files(process, sample_sheet, project_path, reads)
                 try:
 #TODO dest_dir / output_dir
                     success = demultiplex.populate_results(process, cfg.dest_dir)

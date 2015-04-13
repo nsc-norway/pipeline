@@ -94,13 +94,17 @@ def download_sample_sheet(process, save_dir):
         return None, None
 
 
-def rename_projdir_ne_mi(runid, output_dir, project_name):
+def rename_projdir_ne_mi(runid, output_dir, sample_sheet):
     """Renames project directory if it exists."""
 
-    project_name = ""
+    project_name = sample_sheet['header']['Experiment Name']
     
     basecalls_dir = os.path.join(output_dir, "Data", "Intensities", "BaseCalls") 
-    original = os.path.join(s + "/Project_" + project_name
+    original_path = basecalls_dir + "/Project_" + project_name
+    dir_name = parse.get_project_dir(runid, project_name)
+    new_path = basecalls_dir + "/" + dir_name
+    return new_path
+
 
 
 
