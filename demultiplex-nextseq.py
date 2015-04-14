@@ -100,22 +100,24 @@ def attach_files(process, sample_sheet, project_path, reads):
     """Attaches ResultFile outputs of the NextSeq demultiplexing process."""
 
     for sam_index, sam in enumerate(sample_sheet):
-        sample_dir = "Sample_" + sam['SampleID']
-        out_path = "{0}/{1}_S{2}_L00{3}_R{4}_001.fastq.gz".format(
-                            project_path, sample_name, str(sam_index + 1),
-                            "X", str(ir))
-        fastq_names = ["{0}_{1}_S_L{2}_{3}_001.fastq.gz".format(sam['SampleID'],
-            sam['Index'], sam['Lane'].zfill(3), r) for r in reads]
-
-
-        for fp in fastq_paths:
-            # Continues even if file doesn't exist. This will be discovered
+        sample_name = sam['Sample_ID']
+        for ir in reads:
+            out_path = "{0}/{1}_S{2}_L00X_R{3}_001.fastq.gz".format(
+                                project_path, sample_name, str(sam_index + 1),
+                                str(ir))
+            # Doesn't crash if file doesn't exist. This will be discovered
             # in other ways, preferring "robust" operation here.
             if os.path.exists(fp):
+
                 # The convention is to have the LIMS ID in the description field. If this fails, 
                 # there's not a lot more we can do, so the following line just crashes with an 
                 # exception (HTTP 404).
-                result_file_artifact = demultiplex.lookup_outfile(process, sam['Description'], sam['Lane'])
+                
+                for input, output in process.input_output_maps:
+                    
+                result_file_artifact = demultiplex.lookup_outfile(
+                        process, sam['Description'], sam['Lane']
+                        )
                 pf = ProtoFile(nsc.lims, result_file_artifact.uri, fp)
                 pf = nsc.lims.glsstorage(pf)
                 f = pf.post()
@@ -199,7 +201,8 @@ def main(process_id):
             undetermined_names = ["Undetermined"]
             undetermined_path = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
             combine_fastq(undetermined_names, reads, undetermined_path)
-            attach_files(
+
+            attach_files(process, )
 
             try:
 #TODO dest_dir / output_dir

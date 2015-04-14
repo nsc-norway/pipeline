@@ -30,7 +30,8 @@ LANE_UNDETERMINED_UDF = "% Undetermined Indices (PF)"
 CONFIGURE_LOG = "configureBclToFastq log"
 MAKE_LOG = "make log"
 BCL2FASTQ_LOG = "bcl2fastq log"
-FASTQ_OUTPUT = "{0} R{1} fastq"
+HISEQ_FASTQ_OUTPUT = "{0} L{1} R{2} fastq"
+NEXTSEQ_FASTQ_OUTPUT = "{0} L{1} R{2} fastq"
 LOG_DIR="/data/nsc.loki/automation/logs"
 
 # Sequencing processes

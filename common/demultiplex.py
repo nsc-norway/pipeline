@@ -18,29 +18,6 @@ udf_list = [
         ]
 
 
-def make_id_resultfile_map(process, sample_sheet, reads):
-    themap = {}
-    lanes = set(int(entry['Lane']) for entry in sample_sheet_data)
-    ext_sample_sheet = dict(sample_sheet_data)
-
-    for entry in sample_sheet_data:
-        lane = entry['Lane']
-        lane_location = lane + ":1"
-        id = entry['SampleID']
-        input_limsid = entry['Description']
-        sample = Artifact(nsc.lims, id=input_limsid).samples[0]
-        
-        for input,output in process.input_output_maps:
-            # note: "uri" indexes refer to the entities themselves
-            if input['uri'].location[1] == lane_id:
-                if input['uri'].samples[0].id == sample.id:
-                    for read in reads:
-                        if output['uri'].name == nsc.FASTQ_OUTPUT.format(sample.name, read):
-                            themap[(int(lane), id, read)] = output['uri']
-
-    return themap
-
-
 def populate_results(process, ids_analyte_map, demultiplex_stats):
     """Set UDFs on inputs (analytes representing the lanes) and output
     files (each fastq file).

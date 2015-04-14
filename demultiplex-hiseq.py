@@ -47,7 +47,6 @@ def get_config(process):
     return cfg
 
 
-
 def run_demultiplexing(process, ssheet, bases_mask, n_threads, mismatches,
         start_dir, dest_run_dir, other_options):
     """First calls the configureFastqToBcl.py, then calls make in the fastq file directory."""
@@ -111,6 +110,32 @@ def rename_project_directories(runid, unaligned_dir, sample_sheet):
         projdir[pro] = rename_to
 
     return projdir
+
+
+
+def make_id_resultfile_map(process, sample_sheet, reads):
+    themap = {}
+    lanes = set(int(entry['Lane']) for entry in sample_sheet_data)
+
+    for entry in sample_sheet_data:
+        lane = entry['Lane']
+        lane_location = lane + ":1"
+        id = entry['SampleID']
+        input_limsid = entry['Description']
+        sample = Artifact(nsc.lims, id=input_limsid).samples[0]
+        
+        for input,output in process.input_output_maps:
+            # note: "uri" indexes refer to the entities themselves
+            if input['uri'].location[1] == lane_id:
+                if input['uri'].samples[0].id == sample.id:
+                    for read in reads:
+                        if output['uri'].name == nsc.HISEQ_FASTQ_OUTPUT.format(
+                                sample.name, lane, read
+                                ):
+                            themap[(int(lane), id, read)] = output['uri']
+
+    return themap
+
 
 
 def check_fastq_and_attach_files(id_resultfile_map, sample_sheet, projdirs, reads):
@@ -181,7 +206,7 @@ def main(process_id):
                         reads.append(2)
                 except KeyError:
                     pass
-                id_resultfile_map = demultiplex.make_id_resultfile_map(
+                id_resultfile_map = make_id_resultfile_map(
                         process, sample_sheet, reads
                         )
                 check_fastq_and_attach_files(
