@@ -96,10 +96,10 @@ def combine_fastq(sample_names, reads, project_path):
                     os.remove(in_path)
 
 
-def attach_files(process, sample_sheet, project_path, reads):
+def attach_files(process, sample_sheet_data, project_path, reads):
     """Attaches ResultFile outputs of the NextSeq demultiplexing process."""
 
-    for sam_index, sam in enumerate(sample_sheet):
+    for sam_index, sam in enumerate(sample_sheet_data):
         sample_name = sam['Sample_ID']
         for ir in reads:
             out_path = "{0}/{1}_S{2}_L00X_R{3}_001.fastq.gz".format(
@@ -114,14 +114,14 @@ def attach_files(process, sample_sheet, project_path, reads):
                 # exception (HTTP 404).
                 
                 for input, output in process.input_output_maps:
-                    
-                result_file_artifact = demultiplex.lookup_outfile(
-                        process, sam['Description'], sam['Lane']
-                        )
-                pf = ProtoFile(nsc.lims, result_file_artifact.uri, fp)
-                pf = nsc.lims.glsstorage(pf)
-                f = pf.post()
-                f.upload(fp) # content of the file is the path
+                    # see also: make_id_resultfile_map in HiSeq demultiplexing script
+                    if input['uri'].samples[0].id == sample.id:
+                        if output['uri'].name == nsc.NEXTSEQ_FASTQ_OUTPUT.format(sample.name, ir):
+                            #themap[(int(lane), id, read)] = output['uri']
+                            pf = ProtoFile(nsc.lims, output['uri'], out_path)
+                            pf = nsc.lims.glsstorage(pf)
+                            f = pf.post()
+                            f.upload(fp) # content of the file is the path
 
 
 def copy_to_secondary():
@@ -158,7 +158,7 @@ def get_sample_sheet(process, output_run_dir):
 
 
 def main(process_id):
-    os.umask(770)
+    os.umask(007)
     process = Process(nsc.lims, id=process_id)
 
     utilities.running(process)
@@ -194,26 +194,23 @@ def main(process_id):
                     reads.append("R2")
             except KeyError:
                 pass
-            if ssheet_file:
+            if sample_sheet:
                 project_path = demultiplex.rename_projdir_ne_mi(runid, cfg.output_dir, sample_sheet)
-                sample_names = [sam['Sample_ID'] for sam in sample_sheet]
+                sample_names = [sam['Sample_ID'] for sam in sample_sheet['data']]
                 combine_fastq(sample_names, reads, project_path)
             undetermined_names = ["Undetermined"]
             undetermined_path = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
             combine_fastq(undetermined_names, reads, undetermined_path)
 
-            attach_files(process, )
-
-            try:
-#TODO dest_dir / output_dir
-                success = demultiplex.populate_results(process, cfg.dest_dir)
-
-            except (IOError,KeyError):
-                success = False
+            if sample_sheet:
+                attach_files(process, sample_sheet['data'], project_path, reads)
+                try:
+                    success = populate_results(process, cfg.dest_dir)
+                except (IOError,KeyError):
+                    success = False
 
             if not success:
                 utilities.fail(process, "Failed to set UDFs")
-            else: # Processing (make, etc)
             
         else:
             utilities.fail(process, "Demultiplexing process exited with an error status")

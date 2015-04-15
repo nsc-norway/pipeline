@@ -18,7 +18,7 @@ import datetime
 
 
 from genologics.lims import *
-from library import nsc, utilities
+from common import nsc, utilities
 
 
 hiseq_exclude_paths = ["/Thumbnail_Images",

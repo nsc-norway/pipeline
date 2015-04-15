@@ -113,7 +113,7 @@ def rename_project_directories(runid, unaligned_dir, sample_sheet):
 
 
 
-def make_id_resultfile_map(process, sample_sheet, reads):
+def make_id_resultfile_map(process, sample_sheet_data, reads):
     themap = {}
     lanes = set(int(entry['Lane']) for entry in sample_sheet_data)
 
@@ -146,7 +146,7 @@ def check_fastq_and_attach_files(id_resultfile_map, sample_sheet, projdirs, read
 
         for r in reads:
             fastq_name = ["{0}_{1}_L{2}_R{3}_001.fastq.gz".format(sam['SampleID'],
-                sam['Index'], sam['Lane'].zfill(3), r)
+                sam['Index'], sam['Lane'].zfill(3), r)]
             fastq_path = os.path.join(projdirs[sam['SampleProject']], sample_dir, fq)
 
             # Continues even if file doesn't exist. This will be discovered
@@ -156,10 +156,43 @@ def check_fastq_and_attach_files(id_resultfile_map, sample_sheet, projdirs, read
                 # there's not a lot more we can do, so the following line just crashes with an 
                 # exception (due to HTTP 404).
                 result_file_artifact = id_resultfile_map[(int(sam['Lane']), sam['Description'], r)]
-                pf = ProtoFile(nsc.lims, result_file_artifact.uri, fastq_path)
+                pf = ProtoFile(nsc.lims, result_file_artifact, fastq_path)
                 pf = nsc.lims.glsstorage(pf)
                 f = pf.post()
                 f.upload(fastq_path) # content of the file is the path
+
+
+def populate_results(process, ids_analyte_map, demultiplex_stats):
+    """Set UDFs on inputs (analytes representing the lanes) and output
+    files (each fastq file).
+    """
+    inputs = dict((i.location[0], i) for i in process.all_inputs(unique=True))
+    if len(set(i.location[1] for i in inputs)) != 1:
+        print "error: Wrong number of flowcells detected"
+        return
+
+    for coordinates, stats in demultiplex_stats.items():
+        lane, sample_name, read = coordinates
+        lims_fastqfile = None
+        try:
+            lims_fastqfile = ids_analyte_map[(lane, sample_name, read)]
+        except KeyError:
+            undetermined = not not re.match(r"lane\d$", sample_name)
+
+        if lims_fastqfile:
+            lims_fastqfile.get()
+            for statname in demultiplex.udf_list:
+                try:
+                    lims_fastqfile.udf[statname] = stats[statname]
+                except KeyError:
+                    pass
+            lims_fastqfile.put()
+    
+        elif undetermined:
+            analyte = inputs["{0}:1".format(sample_lane['Lane'])]
+            analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
+            analyte.put()
+
 
 
 def main(process_id):
@@ -224,7 +257,7 @@ def main(process_id):
                     "Flowcell_demux_summary.xml"
                     ))
                 demultiplex_stats = parse.get_hiseq_stats(fc_demux_summary_path) 
-                demultiplex.populate_results(process, cfg.dest_dir)
+                populate_results(process, cfg.dest_dir)
 
                 success = True
 

@@ -18,37 +18,6 @@ udf_list = [
         ]
 
 
-def populate_results(process, ids_analyte_map, demultiplex_stats):
-    """Set UDFs on inputs (analytes representing the lanes) and output
-    files (each fastq file).
-    """
-    inputs = dict((i.location[0], i) for i in process.all_inputs(unique=True))
-    if len(set(i.location[1] for i in inputs)) != 1:
-        print "error: Wrong number of flowcells detected"
-        return
-
-    for coordinates, stats in demultiplex_stats.items():
-        lane, sample_name, read = coordinates
-        lims_fastqfile = None
-        try:
-            lims_fastqfile = ids_analyte_map[(lane, sample_name, read)]
-        except KeyError:
-            undetermined = not not re.match(r"lane\d$", sample_name)
-
-        if lims_fastqfile:
-            for statname in udf_list:
-                try:
-                    lims_fastqfile.udf[statname] = stats[statname]
-                except KeyError:
-                    pass
-            lims_fastqfile.put()
-    
-        elif undetermined:
-            analyte = inputs["{0}:1".format(sample_lane['Lane'])]
-            analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
-            analyte.put()
-
-
 
 def download_sample_sheet(process, save_dir):
     """Downloads the demultiplexing process's sample sheet, which contains only

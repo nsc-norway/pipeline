@@ -56,7 +56,10 @@ def get_paths(process, seq_process):
     for i in process.all_inputs(unique=True):
         lanes.append(i.location[1].split(':')[0])
     
-    output_subdir = "Unaligned_lane" + "".join(sorted(lanes))
+    if len(lanes) == 8:
+        output_subdir = "Unaligned"
+    else:
+        output_subdir = "Unaligned_lane" + "".join(sorted(lanes))
     dest_path = os.path.join(nsc.SECONDARY_STORAGE, run_id, output_subdir)
 
     return (source_path, dest_path)
