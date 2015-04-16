@@ -67,7 +67,7 @@ def download_sample_sheet(process, save_dir):
         name = "SampleSheet-" + process.id + ".csv"
         path = os.path.join(save_dir, name)
         file(path, 'w').write(sample_sheet)
-        return name, sample_sheet
+        return path, sample_sheet
     else:
         return None, None
 

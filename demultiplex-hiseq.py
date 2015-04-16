@@ -162,37 +162,6 @@ def check_fastq_and_attach_files(id_resultfile_map, sample_sheet, projdirs, read
                 f.upload(fastq_path) # content of the file is the path
 
 
-def populate_results(process, ids_analyte_map, demultiplex_stats):
-    """Set UDFs on inputs (analytes representing the lanes) and output
-    files (each fastq file).
-    """
-    inputs = dict((i.location[0], i) for i in process.all_inputs(unique=True))
-    if len(set(i.location[1] for i in inputs)) != 1:
-        print "error: Wrong number of flowcells detected"
-        return
-
-    for coordinates, stats in demultiplex_stats.items():
-        lane, sample_name, read = coordinates
-        lims_fastqfile = None
-        try:
-            lims_fastqfile = ids_analyte_map[(lane, sample_name, read)]
-        except KeyError:
-            undetermined = not not re.match(r"lane\d$", sample_name)
-
-        if lims_fastqfile:
-            lims_fastqfile.get()
-            for statname in demultiplex.udf_list:
-                try:
-                    lims_fastqfile.udf[statname] = stats[statname]
-                except KeyError:
-                    pass
-            lims_fastqfile.put()
-    
-        elif undetermined:
-            analyte = inputs["{0}:1".format(sample_lane['Lane'])]
-            analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
-            analyte.put()
-
 
 
 def main(process_id):
@@ -216,6 +185,7 @@ def main(process_id):
             pass
 
         if not already_existed:
+            utilities.running(process, "Copying run directory")
             if not copyfiles.copy_files(process, 'hiseq'):
                 utilities.fail(process, 'Unable to copy files')
                 return
@@ -224,10 +194,13 @@ def main(process_id):
     if cfg:
         start_dir = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
     
-        ssheet_file,sample_sheet_data = demultiplex.download_sample_sheet(process, start_dir)
+        ssheet_file,sample_sheet_data = demultiplex.download_sample_sheet(
+                process, nsc.SCRATCH_DIR
+                )
         sample_sheet = parse.parse_hiseq_sample_sheet(sample_sheet_data)
     
         if ssheet_file:
+            utilities.running(process, "Demultiplexing")
             process_ok = run_demultiplexing(process, ssheet_file, cfg.bases_mask,
                     cfg.n_threads, cfg.mismatches, start_dir, cfg.dest_dir,
                     cfg.other_options)
@@ -257,7 +230,7 @@ def main(process_id):
                     "Flowcell_demux_summary.xml"
                     ))
                 demultiplex_stats = parse.get_hiseq_stats(fc_demux_summary_path) 
-                populate_results(process, cfg.dest_dir)
+                demultiplex.populate_results(process, cfg.dest_dir)
 
                 success = True
 

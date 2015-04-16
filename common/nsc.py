@@ -32,7 +32,6 @@ MAKE_LOG = "make log"
 BCL2FASTQ_LOG = "bcl2fastq log"
 HISEQ_FASTQ_OUTPUT = "{0} R{1} fastq"
 NEXTSEQ_FASTQ_OUTPUT = "{0} R{1} fastq"
-LOG_DIR="/data/nsc.loki/automation/logs"
 
 # Sequencing processes
 SEQ_PROCESSES=[
@@ -88,6 +87,8 @@ FASTQC="/data/common/tools/nscbin/fastqc"
 # Paths
 PRIMARY_STORAGE = "/data/runScratch.boston"
 SECONDARY_STORAGE="/data/nsc.loki"
+LOG_DIR="/data/nsc.loki/automation/logs"
+SCRATCH_DIR="/data/nsc.loki/automation/run"
 DO_COPY_METADATA_FILES=True
 
 

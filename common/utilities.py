@@ -68,8 +68,10 @@ def get_sequencing_process(process):
         if proc.type.name in [p[1] for p in nsc.SEQ_PROCESSES]:
             return proc
 
+
 def get_instrument(seq_process):
     return next(p[0] for p in nsc.SEQ_PROCESS if seq_process.type.name == p[1])
+
 
 def get_demux_process(process):
     """Gets the demultiplexing process corresponding to a given analyte (lane
@@ -88,8 +90,6 @@ def get_demux_process(process):
                     output['output-generation-type'] == "PerReagentLabel":
                 return s
     
-
-
 
 def get_index_sequence(artifact):
     for label in artifact.reagent_labels:
@@ -138,8 +138,11 @@ def upload_file(process, name, path = None, data = None):
     f.upload(data)
 
 
-def running(process):
-    process.udf[nsc.JOB_STATUS_UDF] = 'Running'
+def running(process, status = None):
+    if status:
+        process.udf[nsc.JOB_STATUS_UDF] = 'Running ({0})'.format(status)
+    else:
+        process.udf[nsc.JOB_STATUS_UDF] = 'Running'
     process.put()
 
 
