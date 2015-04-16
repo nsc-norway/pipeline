@@ -122,15 +122,15 @@ def make_id_resultfile_map(process, sample_sheet, reads):
         lane_location = lane + ":1"
         id = entry['SampleID']
         input_limsid = entry['Description']
-        sample = Artifact(nsc.lims, id=input_limsid).samples[0]
+        analyte = Artifact(nsc.lims, id=input_limsid)
         
         for input,output in process.input_output_maps:
             # note: "uri" indexes refer to the entities themselves
             if input['uri'].location[1] == lane_id:
-                if input['uri'].samples[0].id == sample.id:
+                if input['uri'] == analyte:
                     for read in reads:
                         if output['uri'].name == nsc.HISEQ_FASTQ_OUTPUT.format(
-                                sample.name, lane, read
+                                analyte.samples[0].name, lane, read
                                 ):
                             themap[(int(lane), id, read)] = output['uri']
 
@@ -155,8 +155,8 @@ def check_fastq_and_attach_files(id_resultfile_map, sample_sheet, projdirs, read
                 # The convention is to have the LIMS ID in the description field. If this fails, 
                 # there's not a lot more we can do, so the following line just crashes with an 
                 # exception (due to HTTP 404).
-                result_file_artifact = id_resultfile_map[(int(sam['Lane']), sam['Description'], r)]
-                pf = ProtoFile(nsc.lims, result_file_artifact.uri, fastq_path)
+                result_file_artifact = id_resultfile_map[(int(sam['Lane']), sam['SampleID'], r)]
+                pf = ProtoFile(nsc.lims, result_file_artifact, fastq_path)
                 pf = nsc.lims.glsstorage(pf)
                 f = pf.post()
                 f.upload(fastq_path) # content of the file is the path

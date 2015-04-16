@@ -79,6 +79,25 @@ def run_demultiplexing(process, sample_sheet_path, num_samples, bases_mask, n_th
         return False
 
 
+def make_id_resultfile_map(process, sample_sheet_data, reads):
+    """Produces map from lane, sample-ID and read to output 
+    analyte. Lane is always 1 for NS, but keeping it in for consistency."""
+    themap = {}
+    for entry in sample_sheet_data:
+        id = entry['Sample_ID']
+        input_limsid = entry['Description']
+        input_analyte = Artifact(nsc.lims, id=input_limsid).samples[0]
+        for input, output in process.input_output_maps:
+            if input['uri'] == input_analyte:
+                for read in reads:
+                    if output['uri'].name == nsc.NEXTSEQ_FASTQ_OUTPUT(
+                            input_analyte.samples[0].name, read
+                            ):
+                        themap[(1, id, read)] = output['uri']
+    return themap
+                
+                
+
 def combine_fastq(sample_names, reads, project_path):
     """Merge fastq files for all lanes. Delete originals."""
 
@@ -96,10 +115,10 @@ def combine_fastq(sample_names, reads, project_path):
                     os.remove(in_path)
 
 
-def attach_files(process, sample_sheet, project_path, reads):
+def attach_files(id_resultfile_map, sample_sheet_data, project_path, reads):
     """Attaches ResultFile outputs of the NextSeq demultiplexing process."""
 
-    for sam_index, sam in enumerate(sample_sheet):
+    for sam_index, sam in enumerate(sample_sheet_data):
         sample_name = sam['Sample_ID']
         for ir in reads:
             out_path = "{0}/{1}_S{2}_L00X_R{3}_001.fastq.gz".format(
@@ -107,21 +126,16 @@ def attach_files(process, sample_sheet, project_path, reads):
                                 str(ir))
             # Doesn't crash if file doesn't exist. This will be discovered
             # in other ways, preferring "robust" operation here.
-            if os.path.exists(fp):
+            if os.path.exists(out_path):
 
                 # The convention is to have the LIMS ID in the description field. If this fails, 
                 # there's not a lot more we can do, so the following line just crashes with an 
                 # exception (HTTP 404).
-                
-                for input, output in process.input_output_maps:
-                    
-                result_file_artifact = demultiplex.lookup_outfile(
-                        process, sam['Description'], sam['Lane']
-                        )
-                pf = ProtoFile(nsc.lims, result_file_artifact.uri, fp)
+                result_file_artifact = id_resultfile_map[(1, sample_name, ir)]
+                pf = ProtoFile(nsc.lims, result_file_artifact, out_path)
                 pf = nsc.lims.glsstorage(pf)
                 f = pf.post()
-                f.upload(fp) # content of the file is the path
+                f.upload(out_path) # content of the file is the path
 
 
 def copy_to_secondary():
@@ -188,12 +202,13 @@ def main(process_id):
                 cfg.other_options)
         
         if process_ok:
-            reads = ["R1"]
+            reads = [1]
             try:
                 if seq_proc.udf['Read 2 Cycles']:
-                    reads.append("R2")
+                    reads.append(2)
             except KeyError:
                 pass
+
             if ssheet_file:
                 project_path = demultiplex.rename_projdir_ne_mi(runid, cfg.output_dir, sample_sheet)
                 sample_names = [sam['Sample_ID'] for sam in sample_sheet]
@@ -202,7 +217,9 @@ def main(process_id):
             undetermined_path = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
             combine_fastq(undetermined_names, reads, undetermined_path)
 
-            attach_files(process, )
+            if ssheet_file:
+                id_res_map = make_id_resultfile_map(proces, sample_sheet['data'], reads)
+                attach_files(id_res_map, sample_sheet)
 
             try:
 #TODO dest_dir / output_dir

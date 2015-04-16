@@ -32,6 +32,7 @@ def populate_results(process, ids_analyte_map, demultiplex_stats):
         lims_fastqfile = None
         try:
             lims_fastqfile = ids_analyte_map[(lane, sample_name, read)]
+            undetermined = False
         except KeyError:
             undetermined = not not re.match(r"lane\d$", sample_name)
 
