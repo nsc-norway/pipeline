@@ -10,7 +10,7 @@ import sys, os
 import argparse, glob
 from collections import defaultdict
 from xml.etree import ElementTree
-from genologics import *
+from genologics.lims import *
 from common import nsc, utilities, qc, parse
 
 
@@ -61,7 +61,7 @@ def main_lims(threads, process_id):
 
     instrument = utilities.get_instrument(seq_process)
     if instrument == "miseq":
-        demultiplex_dir = "Don't know yet..."
+        demultiplex_dir = os.path.join(nsc.SECONDARY_STORAGE, run_id, "Data", "Intensities", "BaseCalls")
     elif instrument == "nextseq":
         demux_process = utilities.get_demux_process(process)
         demultiplex_dir = demux_process.udf[nsc.DEST_FASTQ_DIR_UDF]
@@ -79,7 +79,7 @@ def main_lims(threads, process_id):
 
     # Lane cluster density -- UDFs are set by Illumina Sequencing process for 
     # Mi and NextSeq ( to check this )
-    lane = next(process.all_inputs())
+    lane = process.all_inputs()[0]
     density_raw = lane.udf['Cluster Density (K/mm^2) R1']
     n_raw = lane.udf['Clusters Raw R1']
     n_pf = lane.udf['Clusters PF R1']
@@ -87,7 +87,7 @@ def main_lims(threads, process_id):
     pf_ratio = lane.udf['%PF R1'] / 100.0
     # Using 1 logical lane even for NS until we can extract data from each lane
     # independently
-    lane = parse.Lane(1, density_raw, density_pf, pf_ratio)
+    lane = qc.Lane(1, density_raw, density_pf, pf_ratio)
 
     info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane)
     qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
@@ -219,7 +219,7 @@ if __name__ == '__main__':
     parser.add_argument('--threads', type=int, default=None, help='Number of threads (cores)')
     parser.add_argument('--pid', default=None, help="Process-ID if running within LIMS")
     parser.add_argument('--no-sample-sheet', action='store_true', help="Run without sample sheet, look for files")
-    parser.add_argument('DIR', default=None, help="Run directory")
+    parser.add_argument('DIR', default=None, nargs='?', help="Run directory")
     args = parser.parse_args()
     threads = args.threads
     if not threads:

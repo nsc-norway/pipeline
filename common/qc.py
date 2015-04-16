@@ -199,7 +199,7 @@ def generate_report_for_customer(args):
 
     #report_root_name = ".".join((run_id, str(fastq.lane.id), "Sample_" + sample.name,
     #        "Read" + str(fastq.read_num), "qc"))
-    report_root_name = re.sub(".fastq.gz$", ".qc.pdf", os.path.basename(fastq.path))
+    report_root_name = re.sub(".fastq.gz$", ".qc", os.path.basename(fastq.path))
     fname = report_root_name + ".tex"
     with open(pdf_dir + "/" + fname, "w") as of:
         of.write(replace_multiple(replacements, template))
@@ -480,7 +480,7 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
     pool = Pool(int(threads))
     # Run one task for each fastq file, giving a sample reference and FastqFile as argument 
     # as well as the ones given above. Debug note: change pool.map to map for better errors.
-    pool.map(generate_report_for_customer, [tuple(arg_pack + [s,f]) for s in samples for f in s.files if not f.empty]) 
+    map(generate_report_for_customer, [tuple(arg_pack + [s,f]) for s in samples for f in s.files if not f.empty]) 
     
     # Generate md5sums for projects
     for p in projects:

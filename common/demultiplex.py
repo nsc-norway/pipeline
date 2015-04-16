@@ -18,12 +18,12 @@ udf_list = [
         ]
 
 
-def populate_results(process, ids_analyte_map, demultiplex_stats):
+def populate_results(process, ids_resultfile_map, demultiplex_stats):
     """Set UDFs on inputs (analytes representing the lanes) and output
     files (each fastq file).
     """
-    inputs = dict((i.location[0], i) for i in process.all_inputs(unique=True))
-    if len(set(i.location[1] for i in inputs)) != 1:
+    inputs = dict((i.location[1], i) for i in process.all_inputs(unique=True))
+    if len(set(i.location[0] for i in inputs.values())) != 1:
         print "error: Wrong number of flowcells detected"
         return
 
@@ -31,7 +31,7 @@ def populate_results(process, ids_analyte_map, demultiplex_stats):
         lane, sample_name, read = coordinates
         lims_fastqfile = None
         try:
-            lims_fastqfile = ids_analyte_map[(lane, sample_name, read)]
+            lims_fastqfile = ids_resultfile_map[(lane, sample_name, read)]
             undetermined = False
         except KeyError:
             undetermined = not not re.match(r"lane\d$", sample_name)
@@ -45,9 +45,9 @@ def populate_results(process, ids_analyte_map, demultiplex_stats):
             lims_fastqfile.put()
     
         elif undetermined:
-            analyte = inputs["{0}:1".format(sample_lane['Lane'])]
+            analyte = inputs["{0}:1".format(lane)]
             analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
-            analyte.put()
+            #analyte.put() TODO enable -- maybe on next run?
 
 
 

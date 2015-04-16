@@ -23,7 +23,7 @@ NS_OTHER_OPTIONS_UDF = "Other options for bcl2fastq"
 
 # Other UDFs 
 # On Analyte
-LANE_UNDETERMINED_UDF = "% Undetermined Indices (PF)"
+LANE_UNDETERMINED_UDF = "NSC % Undetermined Indices (PF)"
 
 
 # Output files

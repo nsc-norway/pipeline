@@ -115,23 +115,19 @@ def rename_project_directories(runid, unaligned_dir, sample_sheet):
 
 def make_id_resultfile_map(process, sample_sheet_data, reads):
     themap = {}
-    lanes = set(int(entry['Lane']) for entry in sample_sheet_data)
-
     for entry in sample_sheet_data:
         lane = entry['Lane']
         lane_location = lane + ":1"
         id = entry['SampleID']
         input_limsid = entry['Description']
         analyte = Artifact(nsc.lims, id=input_limsid)
-        
-        for input,output in process.input_output_maps:
+        sample = analyte.samples[0]
+        for input, output in process.input_output_maps:
             # note: "uri" indexes refer to the entities themselves
-            if input['uri'].location[1] == lane_id:
-                if input['uri'] == analyte:
-                    for read in reads:
-                        if output['uri'].name == nsc.HISEQ_FASTQ_OUTPUT.format(
-                                analyte.samples[0].name, lane, read
-                                ):
+            if input['uri'].location[1] == lane_location:
+                for read in reads:
+                    if output['uri'].samples == [sample]:
+                        if output['uri'].name == nsc.HISEQ_FASTQ_OUTPUT.format(sample.name, read):
                             themap[(int(lane), id, read)] = output['uri']
 
     return themap
@@ -145,9 +141,10 @@ def check_fastq_and_attach_files(id_resultfile_map, sample_sheet, projdirs, read
         sample_dir = "Sample_" + sam['SampleID']
 
         for r in reads:
-            fastq_name = ["{0}_{1}_L{2}_R{3}_001.fastq.gz".format(sam['SampleID'],
-                sam['Index'], sam['Lane'].zfill(3), r)]
-            fastq_path = os.path.join(projdirs[sam['SampleProject']], sample_dir, fq)
+            fastq_name = "{0}_{1}_L{2}_R{3}_001.fastq.gz".format(
+                    sam['SampleID'], sam['Index'], sam['Lane'].zfill(3), r
+                    )
+            fastq_path = os.path.join(projdirs[sam['SampleProject']], sample_dir, fastq_name)
 
             # Continues even if file doesn't exist. This will be discovered
             # in other ways, preferring "robust" operation here.
@@ -156,7 +153,7 @@ def check_fastq_and_attach_files(id_resultfile_map, sample_sheet, projdirs, read
                 # there's not a lot more we can do, so the following line just crashes with an 
                 # exception (due to HTTP 404).
                 result_file_artifact = id_resultfile_map[(int(sam['Lane']), sam['SampleID'], r)]
-                pf = ProtoFile(nsc.lims, result_file_artifact, fastq_path)
+                pf = ProtoFile(nsc.lims, result_file_artifact, fastq_path + ".txt")
                 pf = nsc.lims.glsstorage(pf)
                 f = pf.post()
                 f.upload(fastq_path) # content of the file is the path
@@ -220,17 +217,17 @@ def main(process_id):
                         )
 
                 # Demultiplexing stats
-                demux_stats_path = parse.get_hiseq_stats(os.path.join(
+                demux_stats_path = os.path.join(
                     cfg.dest_dir, "Basecall_Stats_" + sample_sheet[0]['FCID'], 
                     "Demultiplex_Stats.htm"
-                    ))
+                    )
                 utilities.upload_file(process, "Demultiplex_stats.htm", path = demux_stats_path)
-                fc_demux_summary_path = parse.get_hiseq_stats(os.path.join(
+                fc_demux_summary_path = os.path.join(
                     cfg.dest_dir, "Basecall_Stats_" + sample_sheet[0]['FCID'], 
                     "Flowcell_demux_summary.xml"
-                    ))
+                    )
                 demultiplex_stats = parse.get_hiseq_stats(fc_demux_summary_path) 
-                demultiplex.populate_results(process, cfg.dest_dir)
+                demultiplex.populate_results(process, id_resultfile_map, demultiplex_stats)
 
                 success = True
 

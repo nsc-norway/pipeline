@@ -1,12 +1,9 @@
 # Copy global run stats/metadata files from primary to secondary storage
 
-# Can be used as a module, or called directly from the command line. 
-
 # This script copies data from the storage are written to by the sequencers,
 # to the secondary storage used for longer term sotrage. The script *excludes*
 # the actual data in BCL files, as only the fastq files are stored on secondary 
 # storage. For HiSeq, we also attempt to exclude pre-existing fastq files.
-
 
 # The MiSeq is not handled by this script, because we use the internal MiSeq
 # storage at NSC. MiSeq copying is done by an internal cron job (TBD whether
@@ -49,7 +46,7 @@ def rsync(source_path, destination_path, exclude):
     # symlink source run, and it will still make a real copy.
     # We don't expect any symlinks in the run directories, as it's written
     # by a Windows machine.
-    args = [nsc.RSYNC, '-rLt', '--chmod=g+rwX']
+    args = [nsc.RSYNC, '-rLt', '--chmod=ug+rwX,o-rwx'] # or chmod 660
     args += ["--exclude=" + path for path in exclude]
     args += [source_path, destination_path]
     # Running rsync client in slurm jobs: It is necessary to remove SELinux protections
@@ -79,13 +76,4 @@ def copy_files(process, instrument):
         exclude = miseq_exclude_paths
     return rsync(source, destination, ["/" + runid + e for e in exclude])
 
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--pid", help="Process ID", required=True)
-    parser.add_argument('--instrument', help="Instrument type", required=True)
-
-    args = parser.parse_args()
-
-    main(Process(nsc.lims, id=args.pid), args.instrument)
 

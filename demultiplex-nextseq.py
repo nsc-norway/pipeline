@@ -14,6 +14,8 @@ from genologics.lims import *
 import shutil
 from common import nsc, utilities, demultiplex, parse, copyfiles
 
+# TODO: Sample_ID is the LIMS ID, Sample_Name is the name
+
 class Config:
     pass
 
@@ -141,6 +143,7 @@ def attach_files(id_resultfile_map, sample_sheet_data, project_path, reads):
 def copy_to_secondary():
     """Copy to secondary storage if required."""
 
+    # TODO !!! parameters? make one for hi/nextseq?
     destination = os.path.join(nsc.SECONDARY_STORAGE, runid)
     if nsc.DO_COPY_METADATA_FILES:
         already_existed = True

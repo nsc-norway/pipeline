@@ -70,7 +70,7 @@ def get_sequencing_process(process):
 
 
 def get_instrument(seq_process):
-    return next(p[0] for p in nsc.SEQ_PROCESS if seq_process.type.name == p[1])
+    return next(p[0] for p in nsc.SEQ_PROCESSES if seq_process.type.name == p[1])
 
 
 def get_demux_process(process):
