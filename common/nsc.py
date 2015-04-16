@@ -30,8 +30,8 @@ LANE_UNDETERMINED_UDF = "% Undetermined Indices (PF)"
 CONFIGURE_LOG = "configureBclToFastq log"
 MAKE_LOG = "make log"
 BCL2FASTQ_LOG = "bcl2fastq log"
-HISEQ_FASTQ_OUTPUT = "{0} L{1} R{2} fastq"
-NEXTSEQ_FASTQ_OUTPUT = "{0} L{1} R{2} fastq"
+HISEQ_FASTQ_OUTPUT = "{0} R{1} fastq"
+NEXTSEQ_FASTQ_OUTPUT = "{0} R{1} fastq"
 LOG_DIR="/data/nsc.loki/automation/logs"
 
 # Sequencing processes
@@ -44,17 +44,25 @@ SEQ_PROCESSES=[
 # Auxiliary class to represent configuration
 class StepSetup:
     def __init__(self, name, grouping, script = None):
+        """name is the name of the process type
+
+        grouping can be: project, flowcell. Determines which
+        lanes can be processed together. flowcell requires all
+        lanes together, project only includes lanes from the same
+        project in any given job. TODO: do we need "lane", maybe
+        for CEES/Abel?
+        """
         self.name = name
         self.grouping = grouping
         self.script = script
 
 # Analysis after sequencing. List of protocols and per-protocol info.
 # The top-level items are tuples of protocol name and lists of StepSetup 
-# objects. The StepSetup objects represent a step in a protocol.
+# objects. The StepSetup objects represent a step in a protocol (see above).
 AUTOMATED_PROTOCOL_STEPS = [
         ("Demultiplexing and QC (HiSeq)",
             [
-                StepSetup("Demultiplexing (HiSeq)", "project")
+                StepSetup("NSC Demultiplexing (HiSeq)", "project")
             ])
         ]
 

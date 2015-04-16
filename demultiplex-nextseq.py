@@ -172,7 +172,7 @@ def get_sample_sheet(process, output_run_dir):
 
 
 def main(process_id):
-    os.umask(770)
+    os.umask(007)
     process = Process(nsc.lims, id=process_id)
 
     utilities.running(process)
@@ -209,9 +209,9 @@ def main(process_id):
             except KeyError:
                 pass
 
-            if ssheet_file:
+            if sample_sheet:
                 project_path = demultiplex.rename_projdir_ne_mi(runid, cfg.output_dir, sample_sheet)
-                sample_names = [sam['Sample_ID'] for sam in sample_sheet]
+                sample_names = [sam['Sample_ID'] for sam in sample_sheet['data']]
                 combine_fastq(sample_names, reads, project_path)
             undetermined_names = ["Undetermined"]
             undetermined_path = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
@@ -230,7 +230,6 @@ def main(process_id):
 
             if not success:
                 utilities.fail(process, "Failed to set UDFs")
-            else: # Processing (make, etc)
             
         else:
             utilities.fail(process, "Demultiplexing process exited with an error status")

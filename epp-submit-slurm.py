@@ -13,7 +13,7 @@ import argparse
 import subprocess
 from genologics.lims import *
 
-from library import nsc, utilities
+from common import nsc, utilities
 
 
 def submit_job(memory, nthreads, jobname, script, script_args):
