@@ -7,7 +7,9 @@
 
 
 import logging
-import subprocess, sys
+import subprocess
+import sys
+import time
 import datetime
 import locale # Not needed in 2.7, see display_int
 from operator import attrgetter
@@ -85,7 +87,7 @@ def get_demux_process(process):
     for s in sib_procs:
         io = s.input_output_maps
         for x in io:
-            output = io[1]
+            output = x[1]
             if output['output-type'] == "ResultFile" and\
                     output['output-generation-type'] == "PerReagentLabel":
                 return s
@@ -139,6 +141,16 @@ def upload_file(process, name, path = None, data = None):
 
 
 def running(process, status = None):
+    for i in xrange(100): # Prevent race condition with epp-submit-slurm.py
+        try:
+            job_id = process.udf[nsc.JOB_ID_UDF]
+            if job_id:
+                break
+        except KeyError:
+            pass
+        time.sleep(2)
+        process.get(force=True)
+
     if status:
         process.udf[nsc.JOB_STATUS_UDF] = 'Running ({0})'.format(status)
     else:
@@ -152,20 +164,21 @@ def fail(process, message):
     process.udf[nsc.JOB_STATUS_UDF] = 'Failed: ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ": " + message
     process.put()
 
-def success_finish(process):
+def success_finish(process, finish_step=True):
     """Called by background jobs (slurm) to declare that the task has been 
     completed successfully."""
 
     process.udf[nsc.JOB_STATUS_UDF] = 'Completed successfully ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     process.put()
 
-    try:
-        automation = process.all_inputs()[0].udf[nsc.AUTO_FLOWCELL_UDF]
-    except KeyError:
-        automation = False
+    if finish_step:
+        try:
+            automation = process.all_inputs()[0].udf[nsc.AUTO_FLOWCELL_UDF]
+        except KeyError:
+            automation = False
 
-    if automation:
-        finish_step(process.lims, process.id)
+        if automation:
+            finish_step(process.lims, process.id)
 
 
 locale.setlocale(locale.LC_ALL, 'en_US')

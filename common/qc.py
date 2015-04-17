@@ -89,9 +89,12 @@ def run_fastqc(files, demultiplex_dir, output_dir=None, max_threads=None):
     if output_dir:
         args += ["--outdir=" + output_dir]
     args += files
-    print "Running fastqc on", len(files), "files"
-    DEVNULL = open(os.devnull, 'wb') # discard output
-    rc = subprocess.call([nsc.FASTQC] + args, stdout=DEVNULL, cwd=demultiplex_dir)
+    if len(files) > 0:
+        print "Running fastqc on", len(files), "files"
+        DEVNULL = open(os.devnull, 'wb') # discard output
+        rc = subprocess.call([nsc.FASTQC] + args, stdout=DEVNULL, cwd=demultiplex_dir)
+    else:
+        print "No files provided for fastqc"
     
 
 
@@ -411,7 +414,9 @@ Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2
             out.write("%4.2f" % (lane.pf_ratio) + "\t")
             out.write(utilities.display_int(lane.raw_cluster_density) + '\t')
             out.write(utilities.display_int(lane.pf_cluster_density) + '\t')
-            if undetermined_file and not undetermined_file.empty:
+            if undetermined_file and\
+                   not undetermined_file.empty and\
+                   undetermined_file.stats.has_key('% of PF Clusters Per Lane'):
                 out.write("%4.2f" % (undetermined_file.stats['% of PF Clusters Per Lane'],) + "%\t")
             else:
                 out.write("-\t")
@@ -436,6 +441,7 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
     software_versions is a dict with (software name: version)
     software name: RTA, bcl2fastq
     """
+    os.umask(007)
 
     demultiplex_dir = os.path.abspath(input_demultiplex_dir)
     # Unaligned/QualityControl/
@@ -480,12 +486,20 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
     pool = Pool(int(threads))
     # Run one task for each fastq file, giving a sample reference and FastqFile as argument 
     # as well as the ones given above. Debug note: change pool.map to map for better errors.
-    map(generate_report_for_customer, [tuple(arg_pack + [s,f]) for s in samples for f in s.files if not f.empty]) 
+    pool.map(generate_report_for_customer, [tuple(arg_pack + [s,f]) for s in samples for f in s.files if not f.empty]) 
     
     # Generate md5sums for projects
     for p in projects:
         if p.proj_dir:
-            compute_md5(os.path.join(demultiplex_dir, p.proj_dir), threads, ["."])
+            paths = [
+                    re.sub(r"^{0}".format(re.escape(p.proj_dir)), "./", f.path)
+                        for s in p.samples for f in s.files
+                    ]
+            compute_md5(
+                    os.path.join(demultiplex_dir, p.proj_dir),
+                    threads,
+                    [f.path for s in p.samples for f in s.files]
+                    )
         else: # Project files are in root of demultiplexing dir
             compute_md5(demultiplex_dir, threads, ["./" + f.path for s in p.samples for f in s.files])
 

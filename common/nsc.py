@@ -49,7 +49,7 @@ class StepSetup:
         lanes can be processed together. flowcell requires all
         lanes together, project only includes lanes from the same
         project in any given job. TODO: do we need "lane", maybe
-        for CEES/Abel?
+        for CEES/Abel, to make more slurm jobs?
         """
         self.name = name
         self.grouping = grouping
@@ -59,10 +59,16 @@ class StepSetup:
 # The top-level items are tuples of protocol name and lists of StepSetup 
 # objects. The StepSetup objects represent a step in a protocol (see above).
 AUTOMATED_PROTOCOL_STEPS = [
-        ("Demultiplexing and QC (HiSeq)",
+            ("Illumina SBS (HiSeq GAIIx) 5.0",
             [
-                StepSetup("NSC Demultiplexing (HiSeq)", "project")
-            ])
+                StepSetup("NSC Demultiplexing (HiSeq)", "project"),
+                StepSetup("NSC Data Quality Reporting (HiSeq)", "project")
+            ]),
+            ("Illumina SBS (MiSeq) 5.0",
+            [
+                StepSetup("NSC Copy MiSeq Run", "flowcell"),
+                StepSetup("NSC Data Quality Reporting (Mi/NextSeq)", "flowcell")
+            ]),
         ]
 
 # System programs

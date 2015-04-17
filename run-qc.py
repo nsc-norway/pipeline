@@ -87,7 +87,7 @@ def main_lims(threads, process_id):
     pf_ratio = lane.udf['%PF R1'] / 100.0
     # Using 1 logical lane even for NS until we can extract data from each lane
     # independently
-    lane = qc.Lane(1, density_raw, density_pf, pf_ratio)
+    lane = qc.Lane(1, density_raw * 1000.0, density_pf * 1000.0, pf_ratio)
 
     info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane)
     qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
@@ -137,7 +137,9 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane,
     samples = []
     for sam_index, sam in enumerate(sample_sheet['data']):
         files = []
-        sample_name = sam['Sample_ID']
+        sample_name = sam['Sample_Name']
+        if not sample_name:
+            sample_name = sam['Sample_ID']
         for ir in xrange(1, n_reads+1):
             path = "{0}/{1}_S{2}_L00{3}_R{4}_001.fastq.gz".format(
                     project_dir, sample_name, str(sam_index + 1),
@@ -181,8 +183,8 @@ def get_ne_mi_seq_from_files(run_dir, instrument, lane):
                 )
 
     projects = []
-    basecalls_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "*_*.Project_*")
-    project_paths = glob.glob(basecalls_dir)
+    project_path_glob = os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "*_*.Project_*")
+    project_paths = glob.glob(project_path_glob)
     for pp in project_paths:
         p_dir = os.path.basename(pp)
         project_name = re.match("[\d]+_[A-Z0-9]+\.Project_(.*)", p_dir).group(1)

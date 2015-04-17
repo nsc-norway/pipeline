@@ -11,7 +11,13 @@ import datetime
 
 
 from genologics.lims import *
-from common import nsc, utilities, copyfiles, parse
+from common import (
+        nsc,
+        utilities,
+        copyfiles,
+        parse,
+        demultiplex
+        )
 
 
 def get_sample_sheet(run_dir):
@@ -37,10 +43,16 @@ def main(process_id):
         seq_process = utilities.get_sequencing_process(process)
         run_id = seq_process.udf['Run ID']
         run_dir = os.path.join(nsc.SECONDARY_STORAGE, run_id)
+        basecalls_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
         sample_sheet = get_sample_sheet(run_dir)
         if sample_sheet:
-            basecalls_dir = os.path.join(run_dir, "Data", "Intensitites", "BaseCalls")
-            rename_project_dirs(basecalls_dir, sample_sheet)
+            reads = [1]
+            try:
+                if seq_process.udf['Read 2 Cycles']:
+                    reads.append(2)
+            except KeyError:
+                pass
+            demultiplex.create_projdir_ne_mi(run_id, run_dir, sample_sheet, 1, reads)
 
         utilities.success_finish(process)
     else:

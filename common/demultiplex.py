@@ -72,20 +72,26 @@ def download_sample_sheet(process, save_dir):
         return None, None
 
 
-def rename_projdir_ne_mi(runid, output_dir, sample_sheet):
-    """Renames project directory if it exists."""
+def create_projdir_ne_mi(runid, output_dir, sample_sheet, lane, reads):
+    """Creates project directory and moves fastq files into it."""
 
     project_name = sample_sheet['header']['Experiment Name']
     
     basecalls_dir = os.path.join(output_dir, "Data", "Intensities", "BaseCalls") 
-    original_path = basecalls_dir + "/Project_" + project_name
     dir_name = parse.get_project_dir(runid, project_name)
-    new_path = basecalls_dir + "/" + dir_name
+    proj_path = basecalls_dir + "/" + dir_name
     try:
-        os.path.rename(original_path, new_path)
+        os.mkdir(proj_path)
     except OSError:
-        print "WARNING: Failed to rename output dir"
-
-    return new_path
-
+        pass
+    for i, sam in enumerate(sample_sheet['data']):
+        for r in reads:
+            sample_name = sam['Sample_Name']
+            if not sample_name:
+                sample_name = sam['Sample_ID']
+            basename = "{0}_S{1}_L00{2}_R{3}_001.fastq.gz".format(
+                    sample_name, str(i + 1), lane, r)
+            old_path = basecalls_dir + "/" + basename
+            new_path = proj_path + "/" + basename
+            os.rename(old_path, new_path)
 
