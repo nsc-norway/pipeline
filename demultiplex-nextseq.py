@@ -97,8 +97,7 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
                             ):
                         themap[(1, id, read)] = output['uri']
     return themap
-                
-                
+
 
 def combine_fastq(sample_names, reads, project_path):
     """Merge fastq files for all lanes. Delete originals."""
@@ -160,7 +159,7 @@ def copy_to_secondary():
 
 
 def get_sample_sheet(process, output_run_dir):
-    """Get sample sheet from LIMS"""
+    """Get sample sheet from LIMS or run directory."""
 
     ssheet_file, sample_sheet = download_sample_sheet(process, output_run_dir)
     if ssheet_file:

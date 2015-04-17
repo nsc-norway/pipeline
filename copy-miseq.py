@@ -11,11 +11,20 @@ import datetime
 
 
 from genologics.lims import *
-from common import nsc, utilities, copyfiles
+from common import nsc, utilities, copyfiles, parse
 
 
-def rename_project_dir():
-    pass
+def get_sample_sheet(run_dir):
+    try:
+        data = open(os.path.join(run_dir, "SampleSheet.csv")).read()
+        return parse.parse_ne_mi_seq_sample_sheet(data)
+    except IOError:
+        return None
+
+def rename_project_dirs():
+    proj_name = sample_sheet['header']['Experiment Name']
+    for i, sam in enumerate(sample_sheet['data']):
+        sample_name = sam['Sample_Name']
 
 
 def main(process_id):
@@ -28,8 +37,11 @@ def main(process_id):
         seq_process = utilities.get_sequencing_process(process)
         run_id = seq_process.udf['Run ID']
         run_dir = os.path.join(nsc.SECONDARY_STORAGE, run_id)
+        sample_sheet = get_sample_sheet(run_dir)
+        if sample_sheet:
+            basecalls_dir = os.path.join(run_dir, "Data", "Intensitites", "BaseCalls")
+            rename_project_dirs(basecalls_dir, sample_sheet)
 
-        rename_project_dir()
         utilities.success_finish(process)
     else:
         utilities.fail(process, 'rsync returned an error')
