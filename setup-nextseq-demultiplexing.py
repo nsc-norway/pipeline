@@ -1,4 +1,5 @@
-# Script to be called directly by EPP when starting the HiSeq demultiplexing step. 
+# Script to be called directly by EPP (not via slurm) when starting the NextSeq
+# demultiplexing step. 
 # Sets steering options for the demultiplexing job in UDFs on the demultiplexing 
 # process. The options are set based on the input samples. Other options which 
 # do not depend on the inputs should be set as defaults in the LIMS or in the 
@@ -12,7 +13,6 @@ from common import nsc, utilities
 
 
 # Key determined parameters:
-# - Sample sheet filtered to include the lanes of the demultiplexing process's inputs
 # - Use-bases-mask parameter
 
 def get_sample_sheet_data(cluster_proc):
@@ -50,17 +50,7 @@ def get_paths(process, seq_process):
         return None
 
     source_path = os.path.join(nsc.PRIMARY_STORAGE, run_id)
-    project = process.all_inputs()[0].samples[0].project
-
-    lanes = []
-    for i in process.all_inputs(unique=True):
-        lanes.append(i.location[1].split(':')[0])
-    
-    if len(lanes) == 8:
-        output_subdir = "Unaligned"
-    else:
-        output_subdir = "Unaligned_lane" + "".join(sorted(lanes))
-    dest_path = os.path.join(nsc.SECONDARY_STORAGE, run_id, output_subdir)
+    dest_path = os.path.join(nsc.SECONDARY_STORAGE, run_id)
 
     return (source_path, dest_path)
 
@@ -129,20 +119,14 @@ def compute_bases_mask(process, seq_proc):
 
 def main(process_id, sample_sheet_file):
     process = Process(nsc.lims, id=process_id)
-    # Get the clustering processes
-    parent_processes = process.parent_processes()
-    parent_pids = set(p.uri for p in parent_processes)
-    # This script can only handle the case when there is a single clustering process
-    if len(parent_pids) == 1:
-        logging.debug('Found the right number of parent processes')
-        cluster_proc = parent_processes[0]
-        seq_proc = utilities.get_sequencing_process(process)
+    seq_proc = utilities.get_sequencing_process(process)
 
+    if seq_proc:
         paths = get_paths(process, seq_proc)
         if paths:
             logging.debug('Found source and destination paths')
             process.udf[nsc.SOURCE_RUN_DIR_UDF] = paths[0]
-            process.udf[nsc.DEST_FASTQ_DIR_UDF] = paths[1]
+            process.udf[nsc.NS_OUTPUT_RUN_DIR_UDF] = paths[1]
         else:
             logging.debug('Unable to determine source and destination paths')
 
@@ -190,7 +174,6 @@ def main(process_id, sample_sheet_file):
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument('pid', help="Process LIMS-ID")
-    parser.add_argument('samplesheetfile', help="Sample sheet file to write")
 
     args = parser.parse_args()
     logging.basicConfig(level=logging.DEBUG)

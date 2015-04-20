@@ -118,7 +118,10 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane,
     with None because they are not available / we don't use them."""
 
     if not sample_sheet_path:
-        sample_sheet_path = os.path.join(run_dir, 'SampleSheet.csv')
+        if instrument == "miseq":
+            sample_sheet_path = os.path.join(run_dir, "Data", "Intensities", "BaseCalls", 'SampleSheet.csv')
+        elif instrument == "nextseq":
+            sample_sheet_path = os.path.join(run_dir, 'SampleSheet.csv')
 
     sample_sheet = parse.parse_ne_mi_seq_sample_sheet(open(sample_sheet_path).read())
     n_reads = len(sample_sheet['reads'])
