@@ -27,11 +27,6 @@ def get_sample_sheet(run_dir):
     except IOError:
         return None
 
-def rename_project_dirs():
-    proj_name = sample_sheet['header']['Experiment Name']
-    for i, sam in enumerate(sample_sheet['data']):
-        sample_name = sam['Sample_Name']
-
 
 def main(process_id):
     process = Process(nsc.lims, id=process_id)
