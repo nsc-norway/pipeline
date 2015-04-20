@@ -15,33 +15,6 @@ from common import nsc, utilities
 # Key determined parameters:
 # - Use-bases-mask parameter
 
-def get_sample_sheet_data(cluster_proc):
-    """Gets the sample sheet from the clustering process"""
-
-    outputs = cluster_proc.all_outputs(unique=True)
-    for o in outputs:
-        if o.output_type == 'ResultFile' and o.name == 'SampleSheet csv':
-            if len(o.files) == 1:
-                return o.files[0].download()
-    return None
-
-
-def extract_sample_sheet(sample_sheet, inputs):
-    """Extracts the lanes in the inputs from the sample sheet"""
-    
-    lanes = []
-    for i in inputs:
-        lanes.append(i.location[1].split(':')[0])
-
-    ss = sample_sheet.splitlines()
-    res = [ss[0]]
-    for row in ss[1:]:
-        columns = row.split(',')
-        if columns[1] in lanes:
-            res.append(row)
-
-    return "\r\n".join(res)
-
 
 def get_paths(process, seq_process):
     try:
@@ -53,68 +26,6 @@ def get_paths(process, seq_process):
     dest_path = os.path.join(nsc.SECONDARY_STORAGE, run_id)
 
     return (source_path, dest_path)
-
-
-
-def compute_bases_mask(process, seq_proc):
-    """Compute the --use-bases-mask option for fastq conversion. 
-    This option specifies how each imaging cycle is interpreted. It 
-    gives the number and order of data reads and index reads.
-    
-    The first argument is a reference to the current process, the second
-    is a reference to the corresponding sequencing process."""
-
-
-    # These are the properties of the run. The full data sequence is 
-    # always returned, but we set the index length and multiplicity.
-    # For this we also need to look up the properties of the input samples.  
-    try:
-        read_1_length = seq_proc.udf['Read 1 Cycles']
-    except KeyError:
-        return None
-
-    try:
-        read_2_length = seq_proc.udf['Read 2 Cycles']
-    except KeyError:
-        read_2_length = None
-
-    index_1_length = index_2_length = None
-    try:
-        index_1_length = seq_proc.udf['Index 1 Read Cycles']
-        index_2_length = seq_proc.udf['Index 2 Read Cycles']
-    except KeyError:
-        pass
-
-    # Get an example index sequence from the pool. Note that it takes an input
-    # from the demultiplexing process, not the sequencing, so we are sure to get
-    # the right kind of index.
-    index_sequence = utilities.get_index_sequence(process.all_inputs()[0])
-
-    if index_sequence and index_sequence != 'NoIndex':
-        indices = index_sequence.split('-') 
-        i1length = len(indices[0])
-        if len(indices) == 2:
-            i2length = len(indices[1])
-            pool_index_length = (i1length, i2length)
-        else:
-            pool_index_length = (i1length, 0)
-    else:
-        pool_index_length = (0, 0)
-
-    # Always use the full read length for data reads
-    use_bases_mask =  "y%d" % read_1_length
-    index_reads = [index_1_length, index_2_length]
-    for read_il, pool_il in zip(index_reads, pool_index_length):
-        if read_il:
-            use_bases_mask += ","
-            if pool_il > 0:
-                use_bases_mask += "I" + str(pool_il)
-            use_bases_mask += "n" * (read_il - pool_il)
-
-    if read_2_length:
-        use_bases_mask += ",y%d" % read_2_length
-
-    return use_bases_mask
 
 
 def main(process_id, sample_sheet_file):
@@ -130,43 +41,22 @@ def main(process_id, sample_sheet_file):
         else:
             logging.debug('Unable to determine source and destination paths')
 
-        # use-bases-mask
-        base_mask = compute_bases_mask(process, seq_proc)
-        if base_mask:
-            logging.debug('Determined bases mask')
-            process.udf[nsc.BASES_MASK_UDF] = base_mask
+        # compute number of threads for slurm job -- for NextSeq it is completely
+        # up to us, but using same logic as for HiSeq
+        reads = 2
+        try:
+            test = seq_proc.udf['Read 2 Cycles']
+        except:
+            reads = 1
 
-            # Compute number of threads for slurm job
-            reads = 2
-            try:
-                test = seq_proc.udf['Read 2 Cycles']
-            except:
-                reads = 1
-
-            n_threads = len(process.all_inputs(unique = True)) * reads
-            process.udf[nsc.THREADS_UDF] = n_threads
-        else:
-            logging.debug('Unable to determine bases mask')
+        n_threads = len(process.all_inputs(unique = True)) * reads
+        process.udf[nsc.THREADS_UDF] = n_threads
 
         process.put()
         logging.debug('Saved settings in the process')
 
-        # Sample sheet
-        sample_sheet = get_sample_sheet_data(cluster_proc)
-        if sample_sheet:
-            logging.debug('Found the sample sheet')
-            inputs = process.all_inputs(unique=True)
-            partial_sample_sheet = extract_sample_sheet(sample_sheet, inputs)
-            logging.debug('Found the sample sheet')
-            of = open(sample_sheet_file, 'w')
-            of.write(partial_sample_sheet)
-            of.close()
-        else: # not actually a failure if there is no sample sheet
-            print "Failed to find sample sheet"
-        
-
-    else: # number of parent processes not one
-        print "Invalid number of parent processes:", len(parent_pids)
+    else:
+        logging.warning("Couldn't find the NextSeq sequencing process")
         return 1
 
 

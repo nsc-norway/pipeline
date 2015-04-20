@@ -21,13 +21,14 @@ class Config:
 
 def get_config(process):
     """Configuration is stored in UDFs on the demultiplexing process. This
-    function loads them into a generic object."""
+    function loads them into a generic object.
+    
+    The options are set by """
 
     try:
         cfg = Config()
         cfg.n_threads = process.udf[nsc.THREADS_UDF]
         cfg.run_dir = process.udf[nsc.SOURCE_RUN_DIR_UDF]
-        cfg.bases_mask = process.udf[nsc.BASES_MASK_UDF]
         cfg.output_dir = process.udf[nsc.NS_OUTPUT_RUN_DIR_UDF]
     except KeyError:
         return None
@@ -36,6 +37,11 @@ def get_config(process):
         cfg.other_options = process.udf[nsc.OTHER_OPTIONS_UDF]
     except KeyError:
         cfg.other_options = None
+
+    try:
+        cfg.bases_mask = process.udf[nsc.BASES_MASK_UDF]
+    except KeyError:
+        cfg.bases_mask = None
 
     return cfg
 
@@ -86,8 +92,8 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
     analyte. Lane is always 1 for NS, but keeping it in for consistency."""
     themap = {}
     for entry in sample_sheet_data:
-        id = entry['Sample_ID']
-        input_limsid = entry['Description']
+        name = entry['Sample_Name']
+        input_limsid = entry['Sample_ID']
         input_analyte = Artifact(nsc.lims, id=input_limsid).samples[0]
         for input, output in process.input_output_maps:
             if input['uri'] == input_analyte:
@@ -95,7 +101,7 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
                     if output['uri'].name == nsc.NEXTSEQ_FASTQ_OUTPUT(
                             input_analyte.samples[0].name, read
                             ):
-                        themap[(1, id, read)] = output['uri']
+                        themap[(1, name, read)] = output['uri']
     return themap
 
 
