@@ -5,7 +5,7 @@ from genologics.config import *
 from ConfigParser import SafeConfigParser
 
 # UDFs used in the LIMS for tracking automatic processing
-AUTO_FLAG_UDF = "Automatic processing"
+AUTO_FLAG_UDF = "NSC Automatic processing"
 AUTO_FLOWCELL_UDF = "Automation lane groups"
 
 JOB_ID_UDF = "Job ID"
@@ -36,7 +36,7 @@ NEXTSEQ_FASTQ_OUTPUT = "{0} R{1} fastq"
 # Sequencing processes
 SEQ_PROCESSES=[
         ('hiseq', 'Illumina Sequencing (Illumina SBS) 5.0'),
-        ('nextseq', 'Something'),
+#        ('nextseq', 'Something'),
         ('miseq', 'MiSeq Run (MiSeq) 5.0')
         ]
 
