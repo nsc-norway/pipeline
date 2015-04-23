@@ -142,6 +142,8 @@ def upload_file(process, name, path = None, data = None):
 
 def running(process, status = None):
     for i in xrange(100): # Prevent race condition with epp-submit-slurm.py
+                          # and always refresh process to get the QC flags
+        process.get(force=True)
         try:
             job_id = process.udf[nsc.JOB_ID_UDF]
             if job_id:
@@ -149,7 +151,6 @@ def running(process, status = None):
         except KeyError:
             pass
         time.sleep(2)
-        process.get(force=True)
 
     if status:
         process.udf[nsc.JOB_STATUS_UDF] = 'Running ({0})'.format(status)
@@ -161,6 +162,7 @@ def running(process, status = None):
 def fail(process, message):
     """Report failure from background job"""
 
+    process.get(force=True)
     process.udf[nsc.JOB_STATUS_UDF] = 'Failed: ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ": " + message
     process.put()
 
@@ -168,6 +170,7 @@ def success_finish(process, finish_step=True):
     """Called by background jobs (slurm) to declare that the task has been 
     completed successfully."""
 
+    process.get(force=True)
     process.udf[nsc.JOB_STATUS_UDF] = 'Completed successfully ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     process.put()
 

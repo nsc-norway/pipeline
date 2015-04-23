@@ -12,6 +12,7 @@
 # data are kept in the LIMS.
 
 import sys
+import time
 import logging
 from argparse import ArgumentParser
 from collections import defaultdict
@@ -66,6 +67,7 @@ def mark_flowcell_projects(fc):
 
 
 def qc_flags_set(process):
+    # TODO: Determine if QC flags reset on completion -- seems so
     return not any(analyte.qc_flag == 'UNKNOWN' for analyte in process.all_inputs(unique=True))
 
 
@@ -78,8 +80,8 @@ def init_automation(lims, instrument, process):
     # Is the sequencing finished?
     finished = False
     try:
-        finished = process.udf['Dummy date field']
-        #finished = process.udf["Finish Date"] != ""
+        #finished = process.udf['Dummy date field']
+        finished = process.udf["Finish Date"] != ""
     except KeyError:
         pass
 
@@ -256,6 +258,19 @@ def start_automated_protocols(lims):
                 # Run scripts if configured
                 if setup.script:
                     for step in steps:
+                        # Wait for scripts to finish
+                        any_running = True
+                        while any_running:
+                            any_running = False
+                            step.get(force=True)
+                            print "number of program_status: ", len (step.program_status)
+                            for prog_stat in step.program_status:
+                                prog_stat.get(force=True)
+                                print "program status", prog_stat.status
+                                if prog_stat.status == "RUNNING":
+                                    any_running = True
+                            time.sleep(1)
+                        # Run the program
                         for ap in step.available_programs:
                             if ap.name == setup.script:
                                 ap.trigger()

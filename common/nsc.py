@@ -61,13 +61,14 @@ class StepSetup:
 AUTOMATED_PROTOCOL_STEPS = [
             ("Illumina SBS (HiSeq GAIIx) 5.0",
             [
-                StepSetup("NSC Demultiplexing (HiSeq)", "project"),
-                StepSetup("NSC Data Quality Reporting (HiSeq)", "project")
+                StepSetup("NSC Demultiplexing (HiSeq)", "project", "Submit demultiplexing job"),
+                StepSetup("NSC Data Quality Reporting (HiSeq)", "project", "Submit QC job"),
+                StepSetup("NSC Prepare for delivery", "project")
             ]),
             ("Illumina SBS (MiSeq) 5.0",
             [
-                StepSetup("NSC Copy MiSeq Run", "flowcell"),
-                StepSetup("NSC Data Quality Reporting (Mi/NextSeq)", "flowcell")
+                StepSetup("NSC Copy MiSeq Run", "flowcell", "Copy MiSeq Run"),
+                StepSetup("NSC Data Quality Reporting (Mi/NextSeq)", "flowcell", "Submit QC job")
             ]),
         ]
 
