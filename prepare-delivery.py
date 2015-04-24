@@ -9,9 +9,28 @@ import sys
 import os
 
 
+def deliver_local():
+    pass
+
+def deliver_harddrive():
+    pass
+
+def deliver_norstore():
+    pass
+
 
 def main(process_id):
-    pass
+    projects = set()
+    for i in process.all_inputs(unique=True):
+        projects.add(i.samples[0].project)
+
+    if len(projects) != 1:
+        print "Project error"
+        sys.exit(1)
+
+    project = next(projects)
+    delivery_type = None
+
 
 
 main(sys.argv[1])
