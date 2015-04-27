@@ -270,40 +270,43 @@ def generate_internal_html_report(quality_control_dir, samples):
         images = ["per_base_quality.png", "per_base_sequence_content.png", "per_sequence_quality.png", "per_base_n_content.png", "duplication_levels.png"]
     
         i = 0
-        for s in samples:
+        samples_files = sorted(
+                ((s,fi) for s in project.samples for fi in s.files),
+                key=lambda (s,f): (f.lane.id, s.name, f.read_num)
+                )
+        for fq, s in samples_files:
             subdir = "Sample_" + s.name
-            for fq in s.files:
-                fq_name = os.path.basename(fq.path)
-                fqc_dir = fastqc_dir(fq.path)
+            fq_name = os.path.basename(fq.path)
+            fqc_dir = fastqc_dir(fq.path)
 
-                cell1 = "<tr><td align=\"left\"><b>{fileName}<br/><br/>SampleName: {sampleName}<br/>Read Num: {nReads}</b></td>\n"
+            cell1 = "<tr><td align=\"left\"><b>{fileName}<br/><br/>SampleName: {sampleName}<br/>Read Num: {nReads}</b></td>\n"
+            if fq.empty:
+                n_reads = 0
+            else:
+                n_reads = fq.stats['# Reads PF']
+            out_file.write(cell1.format(
+                fileName=fq_name,
+                sampleName=s.name,
+                nReads=utilities.display_int(n_reads)
+                ))
+
+            for img in images:
                 if fq.empty:
-                    n_reads = 0
+                    out_file.write("<td></td>\n")
                 else:
-                    n_reads = fq.stats['# Reads PF']
-                out_file.write(cell1.format(
-                    fileName=fq_name,
-                    sampleName=s.name,
-                    nReads=utilities.display_int(n_reads)
-                    ))
-    
-                for img in images:
-                    if fq.empty:
-                        out_file.write("<td></td>\n")
-                    else:
-                        cell = "<td><a href=\"{subDir}/{fastqcDir}/Images/{image}\"><img src=\"{subDir}/{fastqcDir}/Images/{image}\" class=\"graph\" align=\"center\"/></a></td>\n"
-                        out_file.write(cell.format(subDir=subdir, fastqcDir=fqc_dir, image=img))
-    
-                
-                report_path = os.path.join(quality_control_dir, subdir, fqc_dir, "fastqc_report.html")
-                if not fq.empty:
-                    celln = "<td align=\"center\"><b><a href=\"#M{index}\">Overrepresented sequences</a></b></td>\n</tr>\n";
-                    out_file.write(celln.format(subDir=subdir, fileName=fq_name, index=i))
-                    overrepresented_seq_buffer += extract_format_overrepresented(report_path, fq_name, "M" + str(i))
-                else:
-                    out_file.write("<td></td>\n</tr>\n")
+                    cell = "<td><a href=\"{subDir}/{fastqcDir}/Images/{image}\"><img src=\"{subDir}/{fastqcDir}/Images/{image}\" class=\"graph\" align=\"center\"/></a></td>\n"
+                    out_file.write(cell.format(subDir=subdir, fastqcDir=fqc_dir, image=img))
 
-                i += 1
+            
+            report_path = os.path.join(quality_control_dir, subdir, fqc_dir, "fastqc_report.html")
+            if not fq.empty:
+                celln = "<td align=\"center\"><b><a href=\"#M{index}\">Overrepresented sequences</a></b></td>\n</tr>\n";
+                out_file.write(celln.format(subDir=subdir, fileName=fq_name, index=i))
+                overrepresented_seq_buffer += extract_format_overrepresented(report_path, fq_name, "M" + str(i))
+            else:
+                out_file.write("<td></td>\n</tr>\n")
+
+            i += 1
 
         out_file.write("</table>\n")
         out_file.write(overrepresented_seq_buffer)
