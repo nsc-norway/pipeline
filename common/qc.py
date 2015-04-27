@@ -495,11 +495,7 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
                     re.sub(r"^{0}".format(re.escape(p.proj_dir)), "./", f.path)
                         for s in p.samples for f in s.files
                     ]
-            compute_md5(
-                    os.path.join(demultiplex_dir, p.proj_dir),
-                    threads,
-                    [f.path for s in p.samples for f in s.files]
-                    )
+            compute_md5( os.path.join(demultiplex_dir, p.proj_dir), threads, paths)
         else: # Project files are in root of demultiplexing dir
             compute_md5(demultiplex_dir, threads, ["./" + f.path for s in p.samples for f in s.files])
 

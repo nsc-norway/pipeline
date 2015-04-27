@@ -128,17 +128,17 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
     flowcell_info = demultiplex_config.find("FlowcellInfo")
     fcid = flowcell_info.attrib['ID']
 
-    # List of samples
-    samples = []
+    # List of sample x lane
+    entries = []
     for lane in flowcell_info.findall("Lane"):
         for sample in lane.findall("Sample"):
             sd = dict(sample.attrib)
             sd['Lane'] = lane.attrib['Number']
-            samples.append(sd)
+            entries.append(sd)
 
-    # Project -> [Samples]
+    # Project -> [Sample x lane]
     project_entries = defaultdict(list)
-    for sample_entry in samples:
+    for sample_entry in entries:
         project_entries[sample_entry['ProjectId']].append(sample_entry)
 
     # Getting stats from Flowcell_demux_summary.xml (no longer using Demultiplex_stats.htm).
@@ -152,7 +152,7 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
         else:
             project_dir = parse.get_hiseq_project_dir(run_id, proj)
 
-        samples = []
+        samples = {}
         for e in entries:
             sample_dir = project_dir + "/Sample_" + e['SampleId']
             files = []
@@ -167,11 +167,15 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
                 f = qc.FastqFile(lane, ri, path, stats)
                 files.append(f)
 
-            s = qc.Sample(e['SampleId'], files)
-            samples.append(s)
+            sample = samples.get(e['SampleId'])
+            if not sample:
+                sample = qc.Sample(e['SampleId'], [])
+                samples[e['SampleId']] = sample
+
+            sample.files.append(files)
 
         # Project 
-        p = qc.Project(proj, project_dir, samples)
+        p = qc.Project(proj, project_dir, samples.values())
         projects.append(p)
 
     info = {"sw_versions": sw_versions}
