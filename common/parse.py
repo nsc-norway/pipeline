@@ -121,8 +121,9 @@ def get_hiseq_stats(demux_summary_file_path):
     lane_sum_pf_clusters = defaultdict(int)
     lane_sum_raw_clusters = defaultdict(int)
     for (lane, sample_id, iread), stats in demux_summary.items():
-        lane_sum_pf_clusters[lane] += stats['Pf']['ClusterCount']
-        lane_sum_raw_clusters[lane] += stats['Raw']['ClusterCount']
+        if iread == 1:
+            lane_sum_pf_clusters[lane] += stats['Pf']['ClusterCount']
+            lane_sum_raw_clusters[lane] += stats['Raw']['ClusterCount']
 
     result = {}
     for (lane_id, sample_id, iread), readstats in demux_summary.items():
