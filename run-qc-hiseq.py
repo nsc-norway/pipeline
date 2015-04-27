@@ -79,7 +79,7 @@ def main_lims(threads, process_id):
         n_pf = lane.udf['Clusters PF R1']
         density_pf = density_raw * n_pf / n_raw
         pf_ratio = lane.udf['%PF R1'] / 100.0
-        lanes[lane_id] = qc.Lane(lane_id, density_raw, density_pf, pf_ratio)
+        lanes[lane_id] = qc.Lane(lane_id, density_raw * 1000.0, density_pf * 1000.0, pf_ratio)
 
     info, projects = get_hiseq_qc_data(run_id, n_reads, lanes, demultiplex_dir)
     qc.qc_main(demultiplex_dir, projects, 'hiseq', run_id, info['sw_versions'], threads)
