@@ -18,12 +18,16 @@ MISMATCHES_UDF = "Number of mismatches"
 SOURCE_RUN_DIR_UDF = "Source run directory"
 DEST_FASTQ_DIR_UDF = "Fastq output directory"
 NS_OUTPUT_RUN_DIR_UDF = "Output run directory" #NextSeq
+COPY_MISEQ_DEST_UDF = "Copy run to"
 OTHER_OPTIONS_UDF = "Other options for configureBclToFastq"
 NS_OTHER_OPTIONS_UDF = "Other options for bcl2fastq"
 
 # Other UDFs 
 # On Analyte
 LANE_UNDETERMINED_UDF = "NSC % Undetermined Indices (PF)"
+# On Project
+DELIVERY_METHOD_UDF = "Delivery method"
+PROJECT_TYPE_UDF = "Project type"
 
 
 # Output files
@@ -90,12 +94,15 @@ CONFIGURE_BCL_TO_FASTQ="/data/common/tools/nscbin/configureBclToFastq.pl"
 MAKE="/usr/bin/make"
 BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
 FASTQC="/data/common/tools/nscbin/fastqc"
+# Some programs don't have to be put here, because they are standard on all 
+# machines: tar.
 
 # Paths
-PRIMARY_STORAGE = "/data/runScratch.boston"
-SECONDARY_STORAGE="/data/nsc.loki"
-LOG_DIR="/data/nsc.loki/automation/logs"
-SCRATCH_DIR="/data/nsc.loki/automation/run"
+PRIMARY_STORAGE = "/data/runScratch.boston"     # source data
+SECONDARY_STORAGE="/data/nsc.loki/test"         # location of demultiplexed files
+DELIVERY_DIR="/data/nsc.loki/test/delivery"          # used by prepare-delivery after QC
+LOG_DIR="/data/nsc.loki/automation/logs"        # for slurm jobs
+SCRATCH_DIR="/data/nsc.loki/automation/run"     # not used
 DO_COPY_METADATA_FILES=True
 
 

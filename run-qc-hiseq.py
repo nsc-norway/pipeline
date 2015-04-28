@@ -172,7 +172,7 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
                 sample = qc.Sample(e['SampleId'], [])
                 samples[e['SampleId']] = sample
 
-            sample.files.append(files)
+            sample.files += files
 
         # Project 
         p = qc.Project(proj, project_dir, samples.values())

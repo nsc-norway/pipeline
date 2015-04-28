@@ -271,10 +271,10 @@ def generate_internal_html_report(quality_control_dir, samples):
     
         i = 0
         samples_files = sorted(
-                ((s,fi) for s in project.samples for fi in s.files),
+                ((s,fi) for s in samples for fi in s.files),
                 key=lambda (s,f): (f.lane.id, s.name, f.read_num)
                 )
-        for fq, s in samples_files:
+        for s, fq in samples_files:
             subdir = "Sample_" + s.name
             fq_name = os.path.basename(fq.path)
             fqc_dir = fastqc_dir(fq.path)
@@ -435,7 +435,7 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
     i.e., Unaligned.
 
     projects is a list of Project objects containing references
-    to samples and files. See parse.py for Project, Sample and 
+    to samples and files. See above for Project, Sample and 
     FastqFile classes. This is a generalised specification of 
     the information in the sample sheet, valid for all Illumina
     instrument types. It also contains some data for the results, 
@@ -446,10 +446,11 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
     """
     os.umask(007)
 
+    # Unaligned
     demultiplex_dir = os.path.abspath(input_demultiplex_dir)
-    # Unaligned/QualityControl/
+    # Unaligned/QualityControl
     quality_control_dir = os.path.join(demultiplex_dir, "QualityControl")
-    # Unaligned/inHouseDataProcessing/QualityControl
+    # Unaligned/QualityControl/Delivery
     delivery_dir = quality_control_dir + "/Delivery"
     for d in [quality_control_dir, delivery_dir]:
         try:
@@ -495,7 +496,7 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
     for p in projects:
         if p.proj_dir:
             paths = [
-                    re.sub(r"^{0}".format(re.escape(p.proj_dir)), "./", f.path)
+                    re.sub(r"^{0}".format(re.escape(p.proj_dir)), ".", f.path)
                         for s in p.samples for f in s.files
                     ]
             compute_md5( os.path.join(demultiplex_dir, p.proj_dir), threads, paths)

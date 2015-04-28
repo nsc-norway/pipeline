@@ -47,7 +47,7 @@ def populate_results(process, ids_resultfile_map, demultiplex_stats):
         elif undetermined:
             analyte = inputs["{0}:1".format(lane)]
             analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
-            #analyte.put() TODO enable -- maybe on next run?
+            analyte.put()
 
 
 

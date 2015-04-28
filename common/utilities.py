@@ -184,11 +184,19 @@ def success_finish(process, finish_step=True):
             finish_step(process.lims, process.id)
 
 
+def get_sample_sheet_proj_name(seq_process, project):
+    """Get the project name as it would appear in the sample sheet.
+    Will become really complex if we allow other than [A-Za-z0-9\-] in 
+    sample sheet."""
+    return project.name
+
+
 locale.setlocale(locale.LC_ALL, 'en_US')
 def display_int(val):
     """Adds thousands separators. To be replaced with "{:,}".format(val) when 
     upgrading to Python 2.7"""
     return locale.format("%d", round(val), grouping=True)
+
 
 
 
@@ -206,6 +214,7 @@ else:
             return data[0]
         else:
             raise OSError(args[0] + ": " +str(rcode) +  data[1])
+
 
 
 

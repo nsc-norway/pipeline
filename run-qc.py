@@ -1,9 +1,11 @@
 #!/bin/env python
 # Quality control script
 
-# This is a manual interface to the QC library. No LIMS interaction is 
-# required, but the modules must be in place, as we haven't enforced 
-# a strict separation.
+# This script has both a manual interface and a LIMS interface to the QC
+# module. No LIMS interaction is required, but the modules must be in place,
+# as we haven't enforced a strict separation.
+
+
 
 import re
 import sys, os
