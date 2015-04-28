@@ -67,7 +67,7 @@ AUTOMATED_PROTOCOL_STEPS = [
             [
                 StepSetup("NSC Demultiplexing (HiSeq)", "project", "Submit demultiplexing job"),
                 StepSetup("NSC Data Quality Reporting (HiSeq)", "project", "Submit QC job"),
-                StepSetup("NSC Prepare for delivery", "project")
+                StepSetup("NSC Prepare for delivery", "project", "Submit delivery job")
             ]),
             ("Illumina SBS (MiSeq) 5.0",
             [
