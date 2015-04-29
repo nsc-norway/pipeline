@@ -172,7 +172,7 @@ def replace_multiple(replacedict, text):
 
 
 def tex_escape(s):
-    return re.sub(r"[^\da-zA-Z()+-. ]", lambda x: '\\' + x.group(0), s)
+    return re.sub(r"[^\d:a-zA-Z()+-. ]", lambda x: '\\' + x.group(0), s)
 
 
 def generate_report_for_customer(args):
