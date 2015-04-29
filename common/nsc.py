@@ -4,6 +4,14 @@ from genologics.lims import *
 from genologics.config import *
 from ConfigParser import SafeConfigParser
 
+# Configure prod or dev
+TAG="dev"
+
+if TAG == "prod":
+    BASE_DIR = "/data/nsc.loki/automation"
+elif TAG == "dev":
+    BASE_DIR = "/data/nsc.loki/automation/dev"
+
 # UDFs used in the LIMS for tracking automatic processing
 AUTO_FLAG_UDF = "NSC Automatic processing"
 AUTO_FLOWCELL_UDF = "Automation lane groups"
@@ -99,10 +107,14 @@ FASTQC="/data/common/tools/nscbin/fastqc"
 
 # Paths
 PRIMARY_STORAGE = "/data/runScratch.boston"     # source data
-SECONDARY_STORAGE="/data/nsc.loki/test"         # location of demultiplexed files
-DELIVERY_DIR="/data/nsc.loki/test/delivery"          # used by prepare-delivery after QC
-LOG_DIR="/data/nsc.loki/automation/logs"        # for slurm jobs
-SCRATCH_DIR="/data/nsc.loki/automation/run"     # not used
+if TAG == "prod":
+    SECONDARY_STORAGE="/data/nsc.loki"         # location of demultiplexed files
+    DELIVERY_DIR="/data/nsc.loki/delivery"     # used by prepare-delivery after QC
+elif TAG == "dev":
+    SECONDARY_STORAGE="/data/nsc.loki/test"    # location of demultiplexed files
+    DELIVERY_DIR="/data/nsc.loki/test/delivery"# used by prepare-delivery after QC
+LOG_DIR = BASE_DIR + "/logs"       # for slurm jobs
+SCRATCH_DIR = BASE_DIR + "/run"    # not used
 DO_COPY_METADATA_FILES=True
 
 
