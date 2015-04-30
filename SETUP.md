@@ -5,27 +5,48 @@ Setting up the LIMS for use of these scripts, etc.
 
 ## Server
 
-When slurm client is running on the LIMS servers (OUS): see nsc.py for two lines to add to `/etc/sudoers` to allow glsai user to run jobs as `seq-user`.
+When slurm client is running on the LIMS servers (OUS): see nsc.py for two lines to add
+to `/etc/sudoers` to allow glsai user to run jobs as `seq-user`.
 
 
 ## Compute nodes
 
-We have to save the credentials for the AI user somewhere accessible by the slurm jobs. On the closed network, we save it in the home directory of the `seq-user`.
+We have to save the credentials for the API user somewhere accessible by the slurm jobs.
+On the closed network at NSC/OUS, we save it in the home directory of the `seq-user`.
+
+    -rw-r-----. 1 seq-user seq-user 98 Mar 13 16:22 /home/seq-user/.genologicsrc
+
+Content of .genologicsrc:
+
+    [genologics]
+    BASEURI=http://<server>:8080
+    USERNAME=apiuser
+    PASSWORD=<api-password>
 
 
-## Protocol steps
+## Location of scripts
 
-### In ops interface:
-Data processing processes!:
-- Inputs: select analyte input, uncheck remove working status, except for final step of protocol
-- Output Types: Uncheck Analyte outupt
-Process UDFs:
-- Job ID: Numeric type, uncheck Users can enter and modify values
-- Job status: String type, and as above
+Scripts may be stored in a directory accessible to both the SLURM jobs and the glsai user.
+At NSC/OUS this is done by making glsai a member of the nsc-seq group locally on the LIMS
+servers (this may allow unauthorised users access to NSC internal volumes through the glsai
+user, to be reconsidered). The scripts directory is then set to be readable by the nsc-seq
+group. The configured script locations in Clarity then directly reference the scripts. 
 
-Process outputs: 
+(OUS) The scripts are located in `/data/nsc.loki/automation/pipeline` and the supporting 
+library by SciLifeLab in `/data/nsc.loki/automation/genologics`. The development versions
+are in `/data/nsc.loki/automation/dev/`.
 
-* Copy run directory
-    Copy run information which is not BCL and not fastq. 
-* Demultiplexing (HiSeq)
+
+## Clarity LIMS Configuration
+
+
+### Process types
+
+
+
+
+
+## Cron job
+
+Pass
 
