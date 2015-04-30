@@ -263,13 +263,12 @@ def start_automated_protocols(lims):
                         while any_running:
                             any_running = False
                             step.get(force=True)
-                            print "number of program_status: ", len (step.program_status)
                             for prog_stat in step.program_status:
                                 prog_stat.get(force=True)
-                                print "program status", prog_stat.status
                                 if prog_stat.status == "RUNNING":
                                     any_running = True
-                            time.sleep(1)
+                            if any_running:
+                                time.sleep(1)
                         # Run the program
                         for ap in step.available_programs:
                             if ap.name == setup.script:

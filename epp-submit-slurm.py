@@ -22,6 +22,7 @@ def submit_job(time, memory, nthreads, jobname, script, script_args):
             '--job-name=' + jobname, '--cpus-per-task=' + str(nthreads),
             '--time=' + time,
             '--mem=' + str(memory)]
+    args.append(nsc.WRAPPER_SCRIPT)
     args.append(script)
     args += script_args
     output = utilities.check_output(nsc.INVOKE_SBATCH_ARGLIST + args)
@@ -31,6 +32,7 @@ def submit_job(time, memory, nthreads, jobname, script, script_args):
 def post_job_id(process, job_id):
     process.udf[nsc.JOB_ID_UDF] = job_id
     process.udf[nsc.JOB_STATUS_UDF] = 'Submitted'
+    process.udf[nsc.JOB_STATE_CODE_UDF] = 'SUBMITTED'
     process.put()
 
 

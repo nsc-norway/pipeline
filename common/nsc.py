@@ -18,6 +18,7 @@ AUTO_FLOWCELL_UDF = "Automation lane groups"
 
 JOB_ID_UDF = "Job ID"
 JOB_STATUS_UDF = "Job status"
+JOB_STATE_CODE_UDF = "Job state code" #SUBMITTED,RUNNING,FAILED,COMPLETED,CANCELLED
 
 # UDFs for configuration and job steering (On process types)
 BASES_MASK_UDF = "Bases Mask"
@@ -36,8 +37,6 @@ PROCESS_UNDETERMINED_UDF = "Process undetermined indexes"
 LANE_UNDETERMINED_UDF = "NSC % Undetermined Indices (PF)"
 # On Project
 DELIVERY_METHOD_UDF = "Delivery method"
-PROJECT_TYPE_UDF = "Project type"
-
 
 # Output files
 CONFIGURE_LOG = "configureBclToFastq log"
@@ -49,7 +48,7 @@ NEXTSEQ_FASTQ_OUTPUT = "{0} R{1} fastq"
 # Sequencing processes
 SEQ_PROCESSES=[
         ('hiseq', 'Illumina Sequencing (Illumina SBS) 5.0'),
-#        ('nextseq', 'Something'),
+        ('nextseq', 'NextSeq Run (NextSeq) 1.0'),
         ('miseq', 'MiSeq Run (MiSeq) 5.0')
         ]
 
@@ -78,6 +77,10 @@ AUTOMATED_PROTOCOL_STEPS = [
                 StepSetup("NSC Data Quality Reporting (HiSeq)", "project", "Submit QC job"),
                 StepSetup("NSC Prepare for delivery", "project", "Submit delivery job")
             ]),
+            ("Illumina SBS (NextSeq) 1.0",
+            [
+                StepSetup("NSC Demultiplexing (NextSeq)", "flowcell", "Submit demultiplexing job")
+            ]),
             ("Illumina SBS (MiSeq) 5.0",
             [
                 StepSetup("NSC Copy MiSeq Run", "flowcell", "Copy MiSeq Run"),
@@ -92,11 +95,24 @@ PDFLATEX="/usr/bin/pdflatex"
 
 # Command line to run slurm
 # ** OUS net: need to add this to sudoers to allow glsai to run as seq-user **
+# The first example below essentially allows glsai to run any command as seq-user,
+# thus gaining access to the NSC storage volumes. I haven't found a good way to allow
+# the script to set
+# the resources etc., but restrict the command.
 #glsai   ALL=(seq-user)  NOPASSWD:/usr/bin/sbatch
+#glsai   ALL=(seq-user)  NOPASSWD:/usr/bin/scontrol -o show job *
+#glsai   ALL=(seq-user)  NOPASSWD:/usr/bin/scancel *
 #Defaults:glsai          !requiretty
 INVOKE_SBATCH_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/sbatch",
-        "-D", "/data/nsc.loki/automation/run"]
+        "-D", "/data/nsc.loki/automation/dev/run"]
+SCONTROL_STATUS_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/scontrol",
+        "-o", "show", "job"]
+SCANCEL_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/scancel"]
 
+if TAG == "prod":
+    WRAPPER_SCRIPT="/data/nsc.loki/automation/pipeline/slurm/ous-job.sh"
+elif TAG == "dev":
+    WRAPPER_SCRIPT="/data/nsc.loki/automation/dev/pipeline/slurm/ous-job.sh"
 
 # Data processing programs
 CONFIGURE_BCL_TO_FASTQ="/data/common/tools/nscbin/configureBclToFastq.pl"

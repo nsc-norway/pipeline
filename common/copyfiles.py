@@ -60,12 +60,7 @@ def rsync(source_path, destination_path, exclude):
     return code == 0
 
 
-def copy_files(process, instrument):
-    seq_process = utilities.get_sequencing_process(process)
-    # if it throws KeyError, AttributeError, etc., tough luck, handle 
-    # upstream
-    runid = seq_process.udf['Run ID']
-
+def copy_files(runid, instrument):
     destination = nsc.SECONDARY_STORAGE
     source = os.path.join(nsc.PRIMARY_STORAGE, runid) # No trailing slash
     if instrument == "hiseq":

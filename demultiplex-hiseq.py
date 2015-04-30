@@ -58,7 +58,7 @@ def run_demultiplexing(process, ssheet, bases_mask, n_threads, mismatches,
     args = ['--mismatches', str(mismatches)]
     args += ['--fastq-cluster-count', "0"]
     args += ['--sample-sheet', ssheet]
-    args += ['--use-bases-mask', bases_mask]
+    args += ['--use-bases-mask', str(bases_mask)]
     args += ['--output-dir', dest_run_dir]
     args += ['--input-dir', start_dir]
     if other_options:
@@ -161,8 +161,6 @@ def check_fastq_and_attach_files(id_resultfile_map, sample_sheet, projdirs, read
                 f.upload(fastq_path) # content of the file is the path
 
 
-
-
 def main(process_id):
     os.umask(007)
     process = Process(nsc.lims, id=process_id)
@@ -190,7 +188,7 @@ def main(process_id):
             utilities.running(process, "Copying run directory")
             if not copyfiles.copy_files(process, 'hiseq'):
                 utilities.fail(process, 'Unable to copy files')
-                return
+                return False
 
     success = False
     if cfg:

@@ -153,9 +153,10 @@ def running(process, status = None):
         time.sleep(2)
 
     if status:
-        process.udf[nsc.JOB_STATUS_UDF] = 'Running ({0})'.format(status)
+        process.udf[nsc.JOB_STATUS_UDF] = "Running ({0})".format(status)
     else:
-        process.udf[nsc.JOB_STATUS_UDF] = 'Running'
+        process.udf[nsc.JOB_STATUS_UDF] = "Running"
+    process.udf[nsc.JOB_STATE_CODE_UDF] = 'RUNNING'
     process.put()
 
 
@@ -163,7 +164,8 @@ def fail(process, message):
     """Report failure from background job"""
 
     process.get(force=True)
-    process.udf[nsc.JOB_STATUS_UDF] = 'Failed: ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ": " + message
+    process.udf[nsc.JOB_STATUS_UDF] = "Failed: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ": " + message
+    process.udf[nsc.JOB_STATE_CODE_UDF] = 'FAILED'
     process.put()
 
 def success_finish(process, finish_step=True):
@@ -172,6 +174,7 @@ def success_finish(process, finish_step=True):
 
     process.get(force=True)
     process.udf[nsc.JOB_STATUS_UDF] = 'Completed successfully ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    process.udf[nsc.JOB_STATE_CODE_UDF] = 'COMPLETED'
     process.put()
 
     if finish_step:
@@ -213,7 +216,7 @@ else:
         if rcode == 0:
             return data[0]
         else:
-            raise OSError(args[0] + ": " +str(rcode) +  data[1])
+            raise subprocess.CalledProcessError(args[0] + ": " +str(rcode) +  data[1])
 
 
 
