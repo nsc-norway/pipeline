@@ -108,7 +108,7 @@ def get_hiseq_sw_versions(demultiplex_config):
     return sw_versions
 
 
-def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
+def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir, include_undetermined = False):
     """Get HiSeq metadata about project, sample and files, including QC data. 
     Converted to the internal representation (model) classes defined above.
 
@@ -148,6 +148,9 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
     projects = []
     for proj, entries in project_entries.items():
         if re.match("Undetermined_indices$", proj):
+            if not include_undetermined:
+                continue
+
             project_dir = "Undetermined_indices"
         else:
             project_dir = parse.get_hiseq_project_dir(run_id, proj)
