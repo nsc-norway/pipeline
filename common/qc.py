@@ -172,7 +172,7 @@ def replace_multiple(replacedict, text):
 
 
 def tex_escape(s):
-    return re.sub(r"[^\da-zA-Z()+-. ]", lambda x: '\\' + x.group(0), s)
+    return re.sub(r"[^\d:a-zA-Z()+-. ]", lambda x: '\\' + x.group(0), s)
 
 
 def generate_report_for_customer(args):
@@ -270,40 +270,43 @@ def generate_internal_html_report(quality_control_dir, samples):
         images = ["per_base_quality.png", "per_base_sequence_content.png", "per_sequence_quality.png", "per_base_n_content.png", "duplication_levels.png"]
     
         i = 0
-        for s in samples:
+        samples_files = sorted(
+                ((s,fi) for s in samples for fi in s.files),
+                key=lambda (s,f): (f.lane.id, s.name, f.read_num)
+                )
+        for s, fq in samples_files:
             subdir = "Sample_" + s.name
-            for fq in s.files:
-                fq_name = os.path.basename(fq.path)
-                fqc_dir = fastqc_dir(fq.path)
+            fq_name = os.path.basename(fq.path)
+            fqc_dir = fastqc_dir(fq.path)
 
-                cell1 = "<tr><td align=\"left\"><b>{fileName}<br/><br/>SampleName: {sampleName}<br/>Read Num: {nReads}</b></td>\n"
+            cell1 = "<tr><td align=\"left\"><b>{fileName}<br/><br/>SampleName: {sampleName}<br/>Read Num: {nReads}</b></td>\n"
+            if fq.empty:
+                n_reads = 0
+            else:
+                n_reads = fq.stats['# Reads PF']
+            out_file.write(cell1.format(
+                fileName=fq_name,
+                sampleName=s.name,
+                nReads=utilities.display_int(n_reads)
+                ))
+
+            for img in images:
                 if fq.empty:
-                    n_reads = 0
+                    out_file.write("<td></td>\n")
                 else:
-                    n_reads = fq.stats['# Reads PF']
-                out_file.write(cell1.format(
-                    fileName=fq_name,
-                    sampleName=s.name,
-                    nReads=utilities.display_int(n_reads)
-                    ))
-    
-                for img in images:
-                    if fq.empty:
-                        out_file.write("<td></td>\n")
-                    else:
-                        cell = "<td><a href=\"{subDir}/{fastqcDir}/Images/{image}\"><img src=\"{subDir}/{fastqcDir}/Images/{image}\" class=\"graph\" align=\"center\"/></a></td>\n"
-                        out_file.write(cell.format(subDir=subdir, fastqcDir=fqc_dir, image=img))
-    
-                
-                report_path = os.path.join(quality_control_dir, subdir, fqc_dir, "fastqc_report.html")
-                if not fq.empty:
-                    celln = "<td align=\"center\"><b><a href=\"#M{index}\">Overrepresented sequences</a></b></td>\n</tr>\n";
-                    out_file.write(celln.format(subDir=subdir, fileName=fq_name, index=i))
-                    overrepresented_seq_buffer += extract_format_overrepresented(report_path, fq_name, "M" + str(i))
-                else:
-                    out_file.write("<td></td>\n</tr>\n")
+                    cell = "<td><a href=\"{subDir}/{fastqcDir}/Images/{image}\"><img src=\"{subDir}/{fastqcDir}/Images/{image}\" class=\"graph\" align=\"center\"/></a></td>\n"
+                    out_file.write(cell.format(subDir=subdir, fastqcDir=fqc_dir, image=img))
 
-                i += 1
+            
+            report_path = os.path.join(quality_control_dir, subdir, fqc_dir, "fastqc_report.html")
+            if not fq.empty:
+                celln = "<td align=\"center\"><b><a href=\"#M{index}\">Overrepresented sequences</a></b></td>\n</tr>\n";
+                out_file.write(celln.format(subDir=subdir, fileName=fq_name, index=i))
+                overrepresented_seq_buffer += extract_format_overrepresented(report_path, fq_name, "M" + str(i))
+            else:
+                out_file.write("<td></td>\n</tr>\n")
+
+            i += 1
 
         out_file.write("</table>\n")
         out_file.write(overrepresented_seq_buffer)
@@ -432,7 +435,7 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
     i.e., Unaligned.
 
     projects is a list of Project objects containing references
-    to samples and files. See parse.py for Project, Sample and 
+    to samples and files. See above for Project, Sample and 
     FastqFile classes. This is a generalised specification of 
     the information in the sample sheet, valid for all Illumina
     instrument types. It also contains some data for the results, 
@@ -443,10 +446,11 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
     """
     os.umask(007)
 
+    # Unaligned
     demultiplex_dir = os.path.abspath(input_demultiplex_dir)
-    # Unaligned/QualityControl/
+    # Unaligned/QualityControl
     quality_control_dir = os.path.join(demultiplex_dir, "QualityControl")
-    # Unaligned/inHouseDataProcessing/QualityControl
+    # Unaligned/QualityControl/Delivery
     delivery_dir = quality_control_dir + "/Delivery"
     for d in [quality_control_dir, delivery_dir]:
         try:
@@ -492,14 +496,10 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
     for p in projects:
         if p.proj_dir:
             paths = [
-                    re.sub(r"^{0}".format(re.escape(p.proj_dir)), "./", f.path)
+                    re.sub(r"^{0}".format(re.escape(p.proj_dir)), ".", f.path)
                         for s in p.samples for f in s.files
                     ]
-            compute_md5(
-                    os.path.join(demultiplex_dir, p.proj_dir),
-                    threads,
-                    [f.path for s in p.samples for f in s.files]
-                    )
+            compute_md5( os.path.join(demultiplex_dir, p.proj_dir), threads, paths)
         else: # Project files are in root of demultiplexing dir
             compute_md5(demultiplex_dir, threads, ["./" + f.path for s in p.samples for f in s.files])
 

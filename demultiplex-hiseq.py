@@ -48,17 +48,17 @@ def get_config(process):
 
 
 def run_demultiplexing(process, ssheet, bases_mask, n_threads, mismatches,
-        start_dir, dest_run_dir, other_options):
+        start_dir, dest_run_dir, log_dir, other_options):
     """First calls the configureFastqToBcl.py, then calls make in the fastq file directory."""
 
     os.chdir(start_dir)
-    cfg_log_name = os.path.join(nsc.LOG_DIR, "configureBclToFastq-" + process.id + ".log")
+    cfg_log_name = os.path.join(log_dir, "configureBclToFastq-" + process.id + ".log")
     log = open(cfg_log_name, "w")
     
     args = ['--mismatches', str(mismatches)]
     args += ['--fastq-cluster-count', "0"]
     args += ['--sample-sheet', ssheet]
-    args += ['--use-bases-mask', bases_mask]
+    args += ['--use-bases-mask', str(bases_mask)]
     args += ['--output-dir', dest_run_dir]
     args += ['--input-dir', start_dir]
     if other_options:
@@ -69,12 +69,11 @@ def run_demultiplexing(process, ssheet, bases_mask, n_threads, mismatches,
 
     log.close()
     utilities.upload_file(process, nsc.CONFIGURE_LOG, cfg_log_name)
-    shutil.copy(ssheet, dest_run_dir + "/SampleSheet-" + process.id + ".csv")
 
     if rcode == 0:
         os.chdir(dest_run_dir)
         args = ['-j' + str(n_threads)]
-        make_log_file = os.path.join(nsc.LOG_DIR, "make_" + process.id + ".log")
+        make_log_file = os.path.join(log_dir, "make_" + process.id + ".log")
 
         with open(make_log_file, "w") as log:
             rcode = subprocess.call([nsc.MAKE] + args, stdout=log, stderr=log)
@@ -114,6 +113,9 @@ def rename_project_directories(runid, unaligned_dir, sample_sheet):
 
 
 def make_id_resultfile_map(process, sample_sheet_data, reads):
+    """Make a map of
+    (lane, sample_name, read_num) => ResultFile
+    """
     themap = {}
     for entry in sample_sheet_data:
         lane = entry['Lane']
@@ -159,8 +161,6 @@ def check_fastq_and_attach_files(id_resultfile_map, sample_sheet, projdirs, read
                 f.upload(fastq_path) # content of the file is the path
 
 
-
-
 def main(process_id):
     os.umask(007)
     process = Process(nsc.lims, id=process_id)
@@ -173,11 +173,14 @@ def main(process_id):
     print "Demultiplexing job for LIMS process", process_id, ", run", runid
     destination = os.path.join(nsc.SECONDARY_STORAGE, runid)
 
+    log_base_dir = os.path.join(destination, "DemultiplexLogs")
+
     if nsc.DO_COPY_METADATA_FILES:
         already_existed = True
         try:
             os.mkdir(destination)
             already_existed = False
+            os.mkdir(log_base_dir)
         except OSError:
             pass
 
@@ -185,22 +188,25 @@ def main(process_id):
             utilities.running(process, "Copying run directory")
             if not copyfiles.copy_files(process, 'hiseq'):
                 utilities.fail(process, 'Unable to copy files')
-                return
+                return False
 
     success = False
     if cfg:
         start_dir = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
+        log_dir = os.path.join(log_base_dir, os.path.basename(cfg.dest_dir))
+        try:
+            os.mkdir(log_dir)
+        except OSError:
+            pass
     
-        ssheet_file,sample_sheet_data = demultiplex.download_sample_sheet(
-                process, nsc.SCRATCH_DIR
-                )
+        ssheet_file,sample_sheet_data = demultiplex.download_sample_sheet(process, log_dir)
         sample_sheet = parse.parse_hiseq_sample_sheet(sample_sheet_data)
     
         if ssheet_file:
             utilities.running(process, "Demultiplexing")
             process_ok = run_demultiplexing(process, ssheet_file, cfg.bases_mask,
                     cfg.n_threads, cfg.mismatches, start_dir, cfg.dest_dir,
-                    cfg.other_options)
+                    log_dir, cfg.other_options)
             if process_ok:
                 projdirs = rename_project_directories(runid, cfg.dest_dir, sample_sheet)
                 reads = [1]

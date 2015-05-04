@@ -79,7 +79,7 @@ def main_lims(threads, process_id):
         n_pf = lane.udf['Clusters PF R1']
         density_pf = density_raw * n_pf / n_raw
         pf_ratio = lane.udf['%PF R1'] / 100.0
-        lanes[lane_id] = qc.Lane(lane_id, density_raw, density_pf, pf_ratio)
+        lanes[lane_id] = qc.Lane(lane_id, density_raw * 1000.0, density_pf * 1000.0, pf_ratio)
 
     info, projects = get_hiseq_qc_data(run_id, n_reads, lanes, demultiplex_dir)
     qc.qc_main(demultiplex_dir, projects, 'hiseq', run_id, info['sw_versions'], threads)
@@ -108,7 +108,7 @@ def get_hiseq_sw_versions(demultiplex_config):
     return sw_versions
 
 
-def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
+def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir, include_undetermined = False):
     """Get HiSeq metadata about project, sample and files, including QC data. 
     Converted to the internal representation (model) classes defined above.
 
@@ -128,17 +128,17 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
     flowcell_info = demultiplex_config.find("FlowcellInfo")
     fcid = flowcell_info.attrib['ID']
 
-    # List of samples
-    samples = []
+    # List of sample x lane
+    entries = []
     for lane in flowcell_info.findall("Lane"):
         for sample in lane.findall("Sample"):
             sd = dict(sample.attrib)
             sd['Lane'] = lane.attrib['Number']
-            samples.append(sd)
+            entries.append(sd)
 
-    # Project -> [Samples]
+    # Project -> [Sample x lane]
     project_entries = defaultdict(list)
-    for sample_entry in samples:
+    for sample_entry in entries:
         project_entries[sample_entry['ProjectId']].append(sample_entry)
 
     # Getting stats from Flowcell_demux_summary.xml (no longer using Demultiplex_stats.htm).
@@ -148,11 +148,14 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
     projects = []
     for proj, entries in project_entries.items():
         if re.match("Undetermined_indices$", proj):
+            if not include_undetermined:
+                continue
+
             project_dir = "Undetermined_indices"
         else:
             project_dir = parse.get_hiseq_project_dir(run_id, proj)
 
-        samples = []
+        samples = {}
         for e in entries:
             sample_dir = project_dir + "/Sample_" + e['SampleId']
             files = []
@@ -167,11 +170,15 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir):
                 f = qc.FastqFile(lane, ri, path, stats)
                 files.append(f)
 
-            s = qc.Sample(e['SampleId'], files)
-            samples.append(s)
+            sample = samples.get(e['SampleId'])
+            if not sample:
+                sample = qc.Sample(e['SampleId'], [])
+                samples[e['SampleId']] = sample
+
+            sample.files += files
 
         # Project 
-        p = qc.Project(proj, project_dir, samples)
+        p = qc.Project(proj, project_dir, samples.values())
         projects.append(p)
 
     info = {"sw_versions": sw_versions}

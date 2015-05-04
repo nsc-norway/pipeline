@@ -32,13 +32,13 @@ def main(process_id):
     process = Process(nsc.lims, id=process_id)
     utilities.running(process, 'Copying files')
 
-    ok = copyfiles.copy_files(process, 'miseq')
+    seq_process = utilities.get_sequencing_process(process)
+    run_id = seq_process.udf['Run ID']
+    ok = copyfiles.copy_files(run_id, 'miseq')
     
     if ok:
-        seq_process = utilities.get_sequencing_process(process)
-        run_id = seq_process.udf['Run ID']
         run_dir = os.path.join(nsc.SECONDARY_STORAGE, run_id)
-        basecalls_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
+	process.udf[nsc.COPY_MISEQ_DEST_UDF] = run_dir
         sample_sheet = get_sample_sheet(run_dir)
         if sample_sheet:
             reads = [1]

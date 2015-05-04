@@ -66,9 +66,11 @@ def mark_flowcell_projects(fc):
     
 
 
-def qc_flags_set(process):
-    # TODO: Determine if QC flags reset on completion -- seems so
-    return not any(analyte.qc_flag == 'UNKNOWN' for analyte in process.all_inputs(unique=True))
+def set_qc_flags(process):
+    for ana in process.all_inputs(unique=True):
+        ana.qc_flag = "PASSED"
+        ana.put()
+
 
 
 def init_automation(lims, instrument, process):
@@ -87,25 +89,23 @@ def init_automation(lims, instrument, process):
 
     if finished:
         logging.debug("Sequencing is finished for process: " + process.id)
-        if qc_flags_set(process):
-            logging.debug("All QC flags are set for process: " + process.id)
-            logging.debug("Marking it for automation...")
+        logging.debug("Set the QC flags for process: " + process.id)
+        set_qc_flags(process)
+        logging.debug("Marking it for automation...")
 
-            # Mark the flow cell for automatic processing (all sequencer types)
-            mark_flowcell_projects(process.all_inputs()[0].location[0])
+        # Mark the flow cell for automatic processing (all sequencer types)
+        mark_flowcell_projects(process.all_inputs()[0].location[0])
 
-            logging.debug("Finishing sequencing step...")
-            # Finish the sequencing step
-            utilities.finish_step(lims, process.id)
+        logging.debug("Finishing sequencing step...")
+        # Finish the sequencing step
+        utilities.finish_step(lims, process.id)
 
-            # Automated processing now triggered, can remove flag so we don't 
-            # have to process it again.
-            logging.debug("Done. Removing automation checkbox.")
-            process.udf[nsc.AUTO_FLAG_UDF] = False
-            process.put()
-            logging.debug("Finished marking for automation")
-        else:
-            logging.debug("Not all QC flags set for process: " + process.id)
+        # Automated processing now triggered, can remove flag so we don't 
+        # have to process it again.
+        logging.debug("Done. Removing automation checkbox.")
+        process.udf[nsc.AUTO_FLAG_UDF] = False
+        process.put()
+        logging.debug("Finished marking for automation")
 
     else:
         logging.debug("Sequencing is not yet finished for process: " + process.id)
@@ -263,13 +263,12 @@ def start_automated_protocols(lims):
                         while any_running:
                             any_running = False
                             step.get(force=True)
-                            print "number of program_status: ", len (step.program_status)
                             for prog_stat in step.program_status:
                                 prog_stat.get(force=True)
-                                print "program status", prog_stat.status
                                 if prog_stat.status == "RUNNING":
                                     any_running = True
-                            time.sleep(1)
+                            if any_running:
+                                time.sleep(1)
                         # Run the program
                         for ap in step.available_programs:
                             if ap.name == setup.script:

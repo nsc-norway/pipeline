@@ -34,7 +34,7 @@ def get_config(process):
         return None
     # Optional
     try:
-        cfg.other_options = process.udf[nsc.OTHER_OPTIONS_UDF]
+        cfg.other_options = process.udf[nsc.NS_OTHER_OPTIONS_UDF]
     except KeyError:
         cfg.other_options = None
 
@@ -145,25 +145,6 @@ def attach_files(id_resultfile_map, sample_sheet_data, project_path, reads):
                 f.upload(out_path) # content of the file is the path
 
 
-def copy_to_secondary():
-    """Copy to secondary storage if required."""
-
-    # TODO !!! parameters? make one for hi/nextseq?
-    destination = os.path.join(nsc.SECONDARY_STORAGE, runid)
-    if nsc.DO_COPY_METADATA_FILES:
-        already_existed = True
-        try:
-            os.mkdir(destination)
-            already_existed = False
-        except OSError:
-            pass
-
-        if not already_existed:
-            if not copyfiles.copy_files(process, 'nextseq'):
-                utilities.fail(process, 'Unable to copy files')
-                return False
-
-
 def get_sample_sheet(process, output_run_dir):
     """Get sample sheet from LIMS or run directory."""
 
@@ -189,7 +170,22 @@ def main(process_id):
     runid = seq_proc.udf['Run ID']
 
     print "Demultiplexing process for LIMS process", process_id, ", NextSeq run", runid
-    copy_to_secondary()
+    log_base_dir = os.path.join(destination, "DemultiplexLogs")
+
+    if nsc.DO_COPY_METADATA_FILES:
+        already_existed = True
+        try:
+            os.mkdir(destination)
+            already_existed = False
+            os.mkdir(log_base_dir)
+        except OSError:
+            pass
+
+        if not already_existed:
+            utilities.running(process, "Copying run directory")
+            if not copyfiles.copy_files(process, 'hiseq'):
+                utilities.fail(process, 'Unable to copy files')
+                return False
 
     success = False
 

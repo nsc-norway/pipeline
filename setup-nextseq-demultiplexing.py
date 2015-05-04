@@ -13,7 +13,7 @@ from common import nsc, utilities
 
 
 # Key determined parameters:
-# - Use-bases-mask parameter
+# - In/out directory
 
 
 def get_paths(process, seq_process):
@@ -28,7 +28,7 @@ def get_paths(process, seq_process):
     return (source_path, dest_path)
 
 
-def main(process_id, sample_sheet_file):
+def main(process_id):
     process = Process(nsc.lims, id=process_id)
     seq_proc = utilities.get_sequencing_process(process)
 
@@ -41,17 +41,6 @@ def main(process_id, sample_sheet_file):
         else:
             logging.debug('Unable to determine source and destination paths')
 
-        # compute number of threads for slurm job -- for NextSeq it is completely
-        # up to us, but using same logic as for HiSeq
-        reads = 2
-        try:
-            test = seq_proc.udf['Read 2 Cycles']
-        except:
-            reads = 1
-
-        n_threads = len(process.all_inputs(unique = True)) * reads
-        process.udf[nsc.THREADS_UDF] = n_threads
-
         process.put()
         logging.debug('Saved settings in the process')
 
@@ -62,11 +51,7 @@ def main(process_id, sample_sheet_file):
 
 
 if __name__ == "__main__":
-    parser = ArgumentParser()
-    parser.add_argument('pid', help="Process LIMS-ID")
-
-    args = parser.parse_args()
     logging.basicConfig(level=logging.DEBUG)
     logging.debug('Starting "setup demultiplexing" script')
-    sys.exit(main(args.pid,args.samplesheetfile))
+    sys.exit(main(sys.argv[1]))
 

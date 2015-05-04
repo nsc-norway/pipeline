@@ -1,9 +1,11 @@
 #!/bin/env python
 # Quality control script
 
-# This is a manual interface to the QC library. No LIMS interaction is 
-# required, but the modules must be in place, as we haven't enforced 
-# a strict separation.
+# This script has both a manual interface and a LIMS interface to the QC
+# module. No LIMS interaction is required, but the modules must be in place,
+# as we haven't enforced a strict separation.
+
+
 
 import re
 import sys, os
@@ -15,7 +17,7 @@ from common import nsc, utilities, qc, parse
 
 
 
-def main(threads, run_dir, no_sample_sheet):
+def main(threads, run_dir, no_sample_sheet, process_undetermined):
     run_id = os.path.basename(os.path.realpath(run_dir))
     match = re.match(r"^\d{6}_(NS|M)[A-Z0-9]+_\d{4}_[A-Z0-9\-]+$", run_id)
     if not match:
@@ -43,7 +45,7 @@ def main(threads, run_dir, no_sample_sheet):
     if no_sample_sheet:
         info, projects = get_ne_mi_seq_from_files(run_dir, instrument, lane)
     else:
-        info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane)
+        info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane, process_undetermined)
 
     qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
 
@@ -89,7 +91,7 @@ def main_lims(threads, process_id):
     # independently
     lane = qc.Lane(1, density_raw * 1000.0, density_pf * 1000.0, pf_ratio)
 
-    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane)
+    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane, process.udf[nsc.PROCESS_UNDETERMINED_UDF])
     qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
     utilities.success_finish(process)
 
@@ -108,7 +110,7 @@ def get_sw_versions(run_dir):
 
 
 def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane,
-        sample_sheet_path=None):
+        sample_sheet_path=None, include_undetermined = False):
     """Get NextSeq or MiSeq QC model objects.
 
     Gets the info from the sample sheet. Works for indexed projects and for 
@@ -155,18 +157,22 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane,
 
     project = qc.Project(project_name, project_dir, samples)
 
-    unfiles = [
-            qc.FastqFile(
-                lane, ir, "Undetermined_S0_L00%s_R%d_001.fastq.gz" % (file_lane_id, ir),
-                stats.get((1, "unknown", ir))
-                )
-            for ir in xrange(1, n_reads + 1)
-            ]
-    unsample = qc.Sample("Undetermined", unfiles)
-    unproject = qc.Project("Undetermined_indices", None, [unsample])
+    if include_undetermined:
+        unfiles = [
+                qc.FastqFile(
+                    lane, ir, "Undetermined_S0_L00%s_R%d_001.fastq.gz" % (file_lane_id, ir),
+                    stats.get((1, "unknown", ir))
+                    )
+                for ir in xrange(1, n_reads + 1)
+                ]
+        unsample = qc.Sample("Undetermined", unfiles)
+        unproject = qc.Project("Undetermined_indices", None, [unsample])
+        projects = [project, unproject]
+    else:
+        projects = [project]
 
     info = {'sw_versions': get_sw_versions(run_dir)}
-    return info, [project, unproject]
+    return info, projects
     
 
 
@@ -176,7 +182,9 @@ def get_ne_mi_seq_from_files(run_dir, instrument, lane):
 
     This function looks for project directories and extracts infromation from 
     the directory structure / file names. It is less likely to crash than the above 
-    function, but also more likely to do something wrong."""
+    function, but also more likely to do something wrong.
+    
+    Undetermined is not included."""
 
     if instrument == "miseq":
         stats = {}
@@ -224,6 +232,7 @@ if __name__ == '__main__':
     parser.add_argument('--threads', type=int, default=None, help='Number of threads (cores)')
     parser.add_argument('--pid', default=None, help="Process-ID if running within LIMS")
     parser.add_argument('--no-sample-sheet', action='store_true', help="Run without sample sheet, look for files")
+    parser.add_argument('--process-undetermined', action='store_true', help="Process undetermined indexes")
     parser.add_argument('DIR', default=None, nargs='?', help="Run directory")
     args = parser.parse_args()
     threads = args.threads
@@ -242,7 +251,7 @@ if __name__ == '__main__':
             utilities.fail(process, "Unexpected: " + str(sys.exc_info()[1]))
             raise
     elif args.DIR and not args.pid:
-        main(threads, args.DIR, args.no_sample_sheet)
+        main(threads, args.DIR, args.no_sample_sheet, args.process_undetermined)
     else:
         print "Must specify either LIMS-ID of QC process or Unaligned (bcl2fastq output) directory"
         sys.exit(1)

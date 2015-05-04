@@ -4,12 +4,21 @@ from genologics.lims import *
 from genologics.config import *
 from ConfigParser import SafeConfigParser
 
+# Configure prod or dev
+TAG="dev"
+
+if TAG == "prod":
+    BASE_DIR = "/data/nsc.loki/automation"
+elif TAG == "dev":
+    BASE_DIR = "/data/nsc.loki/automation/dev"
+
 # UDFs used in the LIMS for tracking automatic processing
 AUTO_FLAG_UDF = "NSC Automatic processing"
 AUTO_FLOWCELL_UDF = "Automation lane groups"
 
 JOB_ID_UDF = "Job ID"
 JOB_STATUS_UDF = "Job status"
+JOB_STATE_CODE_UDF = "Job state code" #SUBMITTED,RUNNING,FAILED,COMPLETED,CANCELLED
 
 # UDFs for configuration and job steering (On process types)
 BASES_MASK_UDF = "Bases Mask"
@@ -18,13 +27,16 @@ MISMATCHES_UDF = "Number of mismatches"
 SOURCE_RUN_DIR_UDF = "Source run directory"
 DEST_FASTQ_DIR_UDF = "Fastq output directory"
 NS_OUTPUT_RUN_DIR_UDF = "Output run directory" #NextSeq
+COPY_MISEQ_DEST_UDF = "Copy run to"
 OTHER_OPTIONS_UDF = "Other options for configureBclToFastq"
 NS_OTHER_OPTIONS_UDF = "Other options for bcl2fastq"
+PROCESS_UNDETERMINED_UDF = "Process undetermined indexes"
 
 # Other UDFs 
 # On Analyte
 LANE_UNDETERMINED_UDF = "NSC % Undetermined Indices (PF)"
-
+# On Project
+DELIVERY_METHOD_UDF = "Delivery method"
 
 # Output files
 CONFIGURE_LOG = "configureBclToFastq log"
@@ -36,7 +48,7 @@ NEXTSEQ_FASTQ_OUTPUT = "{0} R{1} fastq"
 # Sequencing processes
 SEQ_PROCESSES=[
         ('hiseq', 'Illumina Sequencing (Illumina SBS) 5.0'),
-#        ('nextseq', 'Something'),
+        ('nextseq', 'NextSeq Run (NextSeq) 1.0'),
         ('miseq', 'MiSeq Run (MiSeq) 5.0')
         ]
 
@@ -63,7 +75,11 @@ AUTOMATED_PROTOCOL_STEPS = [
             [
                 StepSetup("NSC Demultiplexing (HiSeq)", "project", "Submit demultiplexing job"),
                 StepSetup("NSC Data Quality Reporting (HiSeq)", "project", "Submit QC job"),
-                StepSetup("NSC Prepare for delivery", "project")
+                StepSetup("NSC Prepare for delivery", "project", "Submit delivery job")
+            ]),
+            ("Illumina SBS (NextSeq) 1.0",
+            [
+                StepSetup("NSC Demultiplexing (NextSeq)", "flowcell", "Submit demultiplexing job")
             ]),
             ("Illumina SBS (MiSeq) 5.0",
             [
@@ -79,23 +95,43 @@ PDFLATEX="/usr/bin/pdflatex"
 
 # Command line to run slurm
 # ** OUS net: need to add this to sudoers to allow glsai to run as seq-user **
+# The first example below essentially allows glsai to run any command as seq-user,
+# thus gaining access to the NSC storage volumes. I haven't found a good way to allow
+# the script to set
+# the resources etc., but restrict the command.
 #glsai   ALL=(seq-user)  NOPASSWD:/usr/bin/sbatch
+#glsai   ALL=(seq-user)  NOPASSWD:/usr/bin/scontrol -o show job *
+#glsai   ALL=(seq-user)  NOPASSWD:/usr/bin/scancel *
 #Defaults:glsai          !requiretty
 INVOKE_SBATCH_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/sbatch",
-        "-D", "/data/nsc.loki/automation/run"]
+        "-D", "/data/nsc.loki/automation/dev/run"]
+SCONTROL_STATUS_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/scontrol",
+        "-o", "show", "job"]
+SCANCEL_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/scancel"]
 
+if TAG == "prod":
+    WRAPPER_SCRIPT="/data/nsc.loki/automation/pipeline/slurm/ous-job.sh"
+elif TAG == "dev":
+    WRAPPER_SCRIPT="/data/nsc.loki/automation/dev/pipeline/slurm/ous-job.sh"
 
 # Data processing programs
 CONFIGURE_BCL_TO_FASTQ="/data/common/tools/nscbin/configureBclToFastq.pl"
 MAKE="/usr/bin/make"
 BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
 FASTQC="/data/common/tools/nscbin/fastqc"
+# Some programs don't have to be put here, because they are standard on all 
+# machines: tar.
 
 # Paths
-PRIMARY_STORAGE = "/data/runScratch.boston"
-SECONDARY_STORAGE="/data/nsc.loki"
-LOG_DIR="/data/nsc.loki/automation/logs"
-SCRATCH_DIR="/data/nsc.loki/automation/run"
+PRIMARY_STORAGE = "/data/runScratch.boston"     # source data
+if TAG == "prod":
+    SECONDARY_STORAGE="/data/nsc.loki"         # location of demultiplexed files
+    DELIVERY_DIR="/data/nsc.loki/delivery"     # used by prepare-delivery after QC
+elif TAG == "dev":
+    SECONDARY_STORAGE="/data/nsc.loki/test"    # location of demultiplexed files
+    DELIVERY_DIR="/data/nsc.loki/test/delivery"# used by prepare-delivery after QC
+LOG_DIR = BASE_DIR + "/logs"       # for slurm jobs
+SCRATCH_DIR = BASE_DIR + "/run"    # not used
 DO_COPY_METADATA_FILES=True
 
 
