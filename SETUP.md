@@ -129,6 +129,58 @@ The "Cancel job" command is the same on all slurm-based process types: Name: Can
  - UDFs: Slurm UDFs.
 
 
+#### NSC Demultiplexing (NextSeq)
+ - Name: NSC Demultiplexing (NextSeq)
+ - Output types: Disable per input. Enable Shared outputs. Enable Outputs per Reagent Label.
+ - Output generation:
+   - Shared output: ResultFile: Fixed number=2, Name={LIST:SampleSheet csv,bcl2fastq log}
+   - O. per Input per reagent: Fixed number=2, Name={LIST:{SubmittedSampleName} R1 fastq,{SubmittedSampleName} R2 fastq}
+ - External programs:
+   - Name: Submit demultiplexing job. Command: /usr/bin/python /data/nsc.loki/automation/pipeline/epp-submit-slurm.py --pid={processLuid} --time=20:00:00 --threads={udf:Number of threads} --mem=2048 --thread-mem=512 --jobname={processLuid} /data/nsc.loki/automation/pipeline/demultiplex-nextseq.py {processLuid}
+   - Name: Set demultiplexing options. Command: /usr/bin/python /data/nsc.loki/automation/dev/pipeline/setup-nextseq-demultiplexing.py {processLuid} {compoundOutputFileLuid0}
+   - Cancel job command.
+  - UDFs: Slurm UDFs. Number of threads: Numeric, Source run directory: text, Fastq output directory: text, Other options for bcl2fastq: text, Bases Mask: text.
+
+
+### Protocols
+Create these protocols. The configuration is listed in line for each protocol step. On all
+protocol steps corresponding to slurm jobs, with slurm UDFs, the field "Job state code" 
+should be unchecked in the Record Details section.
+
+
+#### NSC Data processing for HiSeq
+Type: Data Analysis
+Capacity: 20 (approx. 20 lanes)
+Add the following protocol steps:
+ - NSC Demultiplexing (HiSeq)
+   Config: 
+    - Automation: Change Set demultiplexing options, set Auomatically initiated, on Record Details, when screen is entered
+ - NSC Data Quality Reporting (HiSeq)
+ - NSC Prepare for delivery
+
+
+#### NSC Data processing for NextSeq
+Type: Data Analysis
+Capacity: 5
+Add these protocol steps: 
+ - NSC Demultiplexing (NextSeq)
+   Config: 
+    - Automation: Change Set demultiplexing options, set Auomatically initiated, on Record Details, when screen is entered
+ - NSC Data Quality Reporting (Mi/NextSeq)
+ - NSC Prepare for delivery
+
+
+#### NSC Data processing for MiSeq
+Type: Data Analysis
+Capacity: 5
+ - NSC Copy MiSeq Run
+ - NSC Data Quality Reporting (Mi/NextSeq)
+ - NSC Prepare for delivery
+
+
+
+
+
 
 
 ## Cron job
