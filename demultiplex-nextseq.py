@@ -14,8 +14,6 @@ from genologics.lims import *
 import shutil
 from common import nsc, utilities, demultiplex, parse, copyfiles
 
-# TODO: Sample_ID is the LIMS ID, Sample_Name is the name
-
 class Config:
     pass
 
@@ -29,7 +27,7 @@ def get_config(process):
         cfg = Config()
         cfg.n_threads = process.udf[nsc.THREADS_UDF]
         cfg.run_dir = process.udf[nsc.SOURCE_RUN_DIR_UDF]
-        cfg.output_dir = process.udf[nsc.NS_OUTPUT_RUN_DIR_UDF]
+        cfg.output_dir = process.udf[nsc.DEST_FASTQ_DIR_UDF]
     except KeyError:
         return None
     # Optional
@@ -49,26 +47,26 @@ def get_config(process):
 def get_thread_args(n_threads, num_samples):
     # Computing number of threads: use a little more than we have, per illumina recommendation
     # Total is limited by slurm cpu binding anyway
-    base = n_threads * 1.2
-    loading = max(1, int(base * 0.08))
+    base = n_threads * 1.5
+    loading = int(max(1, base * 0.1))
     # No more write threads than 1 per sample
-    writing = max(1, min(num_samples, int(base * 0.08)))
+    writing = int(max(1, min(num_samples, base * 0.1)))
     remaining = base - loading - writing
-    processing = max(1, int(remaining * 0.7))
-    demultiplexing = max(1, remaining - processing)
-    return ['-r', loading, '-d', demultiplexing, '-p', processing, '-w', writing]
+    processing = int(max(1, remaining * 0.7))
+    demultiplexing = int(max(1, remaining - processing))
+    return ['-r', str(loading), '-d', str(demultiplexing),
+            '-p', str(processing), '-w', str(writing)]
 
 
-def run_demultiplexing(process, sample_sheet_path, num_samples, bases_mask, n_threads, 
-        input_dir, dest_run_dir, other_options):
+def run_demultiplexing(process, num_samples, bases_mask, n_threads, 
+        run_dir, input_dir, output_dir, other_options, log_dir):
     """Run bcl2fastq2."""
 
-    log_path = os.path.join(nsc.LOG_DIR, "bcl2fastq-" + process.id + ".log")
+    log_path = os.path.join(log_dir, "bcl2fastq-" + process.id + ".log")
     
-    args += ['--runfolder-dir', dest_run_dir]
-    args += ['--input-dir', input_dir]
-    if sample_sheet_path:
-        args += ['--sample-sheet', sample_sheet_path]
+    args = ['--runfolder-dir', run_dir]
+    args = ['--input-dir', input_run_dir]
+    args += ['--output-dir', output_dir]
     if bases_mask:
         args += ['--use-bases-mask', bases_mask]
     args += get_thread_args(n_threads, num_samples)
@@ -76,7 +74,7 @@ def run_demultiplexing(process, sample_sheet_path, num_samples, bases_mask, n_th
         args += re.split(" +", other_options)
 
     with open(log_path, "w") as log:
-        rcode = subprocess.call([nsc.BCL2FASTQ2] + args, cwd=run_dir, stdout=log, stderr=log)
+        rcode = subprocess.call([nsc.BCL2FASTQ2] + args, stdout=log, stderr=log)
 
     utilities.upload_file(process, nsc.BCL2FASTQ_LOG, log_path)
 
@@ -105,18 +103,18 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
     return themap
 
 
-def combine_fastq(sample_names, reads, project_path):
+def combine_fastq(sample_names, reads, path, first_index=1):
     """Merge fastq files for all lanes. Delete originals."""
 
     for sam_index, sample_name in enumerate(sample_names):
         for ir in reads:
             out_path = "{0}/{1}_S{2}_L00{3}_R{4}_001.fastq.gz".format(
-                                project_path, sample_name, str(sam_index + 1),
+                                path, sample_name, str(sam_index + first_index),
                                 "X", str(ir))
             with open(out_path, 'wb') as out:
                 for lane in xrange(1,5):
                     in_path = "{0}/{1}_S{2}_L00{3}_R{4}_001.fastq.gz".format(
-                                    project_path, sample_name, str(sam_index + 1),
+                                    path, sample_name, str(sam_index + first_index),
                                     lane, str(ir))
                     shutil.copyfileobj(open(in_path, 'rb'), out)
                     os.remove(in_path)
@@ -148,7 +146,7 @@ def attach_files(id_resultfile_map, sample_sheet_data, project_path, reads):
 def get_sample_sheet(process, output_run_dir):
     """Get sample sheet from LIMS or run directory."""
 
-    ssheet_file, sample_sheet = demultiplex.download_sample_sheet(process, output_run_dir)
+    ssheet_file, sample_sheet = demultiplex.download_sample_sheet(process, output_run_dir, False)
     if ssheet_file:
         return ssheet_file, sample_sheet
     elif os.path.exists(os.path.join(output_run_dir, "SampleSheet.csv")):
@@ -170,20 +168,21 @@ def main(process_id):
     runid = seq_proc.udf['Run ID']
 
     print "Demultiplexing process for LIMS process", process_id, ", NextSeq run", runid
-    log_base_dir = os.path.join(destination, "DemultiplexLogs")
+    destination = os.path.join(nsc.SECONDARY_STORAGE, runid)
+    log_dir = os.path.join(destination, "DemultiplexLogs")
 
     if nsc.DO_COPY_METADATA_FILES:
         already_existed = True
         try:
             os.mkdir(destination)
             already_existed = False
-            os.mkdir(log_base_dir)
+            os.mkdir(log_dir)
         except OSError:
             pass
 
         if not already_existed:
             utilities.running(process, "Copying run directory")
-            if not copyfiles.copy_files(process, 'hiseq'):
+            if not copyfiles.copy_files(runid, 'hiseq'):
                 utilities.fail(process, 'Unable to copy files')
                 return False
 
@@ -195,20 +194,22 @@ def main(process_id):
         # For the NS, the default is to get it from the run dir, and a sample sheet
         # will only be uploaded to the process if it needs to be overridden.
         # (so there's no way to specifically ignore a sample sheet if it exists)
-        ssheet_file, sample_sheet_content = get_sample_sheet(process, cfg.output_dir)
+        ssheet_file, sample_sheet_content = get_sample_sheet(process, destination)
 
-        if sample_sheet_data:
+        if sample_sheet_content:
             sample_sheet = parse.parse_ne_mi_seq_sample_sheet(sample_sheet_content)
             num_samples = len(sample_sheet['data'])
         else:
             sample_sheet = None
             num_samples = 1
 
-    
-        process_ok = run_demultiplexing(process, ssheet_file, num_samples,
-                cfg.bases_mask, cfg.n_threads, cfg.mismatches, cfg.run_dir, cfg.output_dir,
-                cfg.other_options)
-        
+        utilities.running(process, "Demultiplexing")
+        process_ok = True
+        input_dir = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
+        #process_ok = run_demultiplexing(process, num_samples,
+        #        cfg.bases_mask, cfg.n_threads, destination, input_dir, cfg.output_dir,
+        #        cfg.other_options, log_dir)
+        #
         if process_ok:
             reads = [1]
             try:
@@ -218,23 +219,27 @@ def main(process_id):
                 pass
 
             if sample_sheet:
-                project_path = demultiplex.rename_projdir_ne_mi(runid, cfg.output_dir, sample_sheet)
                 sample_names = [sam['Sample_ID'] for sam in sample_sheet['data']]
-                combine_fastq(sample_names, reads, project_path)
+                #combine_fastq(sample_names, reads, cfg.output_dir)
+                project_path = demultiplex.create_projdir_ne_mi(
+                        runid,
+                        cfg.output_dir,
+                        sample_sheet,
+                        "X",
+                        reads
+                        )
             undetermined_names = ["Undetermined"]
-            undetermined_path = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
-            combine_fastq(undetermined_names, reads, undetermined_path)
+            #combine_fastq(undetermined_names, reads, cfg.output_dir, 0)
 
             if ssheet_file:
-                id_res_map = make_id_resultfile_map(proces, sample_sheet['data'], reads)
-                attach_files(id_res_map, sample_sheet)
-
-            try:
-#TODO dest_dir / output_dir
-                success = demultiplex.populate_results(process, cfg.dest_dir)
-
-            except (IOError,KeyError):
-                success = False
+                id_res_map = make_id_resultfile_map(process, sample_sheet['data'], reads)
+                attach_files(id_res_map, sample_sheet['data'], project_path, reads)
+                try:
+                    path = os.path.join(cfg.output_dir, "Stats")
+                    stats = parse.get_nextseq_stats(path)
+                    success = demultiplex.populate_results(process, id_res_map, stats)
+                except (IOError,KeyError):
+                    success = False
 
             if not success:
                 utilities.fail(process, "Failed to set UDFs")

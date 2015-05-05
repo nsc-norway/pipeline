@@ -252,6 +252,9 @@ def get_nextseq_stats(stats_xml_file_path):
     """Function for the NextSeq, to compute the canonical stats for individual 
     output files -- one per sample per read.
 
+    Params: stats_xml_file_path: path to the directory containing the XML files
+    (Data/Intensities/BaseCalls/Stats)
+
     This function computes derived statistics based on the accumulated data 
     from the two above functions. The statistics are used in UDFs and the QC
     reporting, and are similar to those given in Demultiplex_stats.htm 
@@ -325,14 +328,15 @@ def parse_ne_mi_seq_sample_sheet(sample_sheet):
 
     # Will contain ['', Header 1, Data 1, Header 2, Data 2] where "header" are the 
     # things in []s
-    sections = re.split(r"(\[\w+\])[\r\n]+", sample_sheet)
+    sections = re.split(r"(\[\w+\])[,\r\n]+", sample_sheet)
+    # If sample sheet is edited in Excel it will contain commas after the [Header],,,
     result = {}
     for header, data in zip(sections[1::2], sections[2::2]):
         if header == "[Header]":
             result['header'] = {}
             for l in data.splitlines():
                 parts = l.split(",")
-                if len(parts) == 2:
+                if len(parts) >= 2:
                     result['header'][parts[0]] = parts[1]
         elif header == "[Reads]":
             result['reads'] = [int(c) for c in data.splitlines() if c.isdigit()]

@@ -23,7 +23,8 @@ def get_paths(process, seq_process):
         return None
 
     source_path = os.path.join(nsc.PRIMARY_STORAGE, run_id)
-    dest_path = os.path.join(nsc.SECONDARY_STORAGE, run_id)
+    dest_run_path = os.path.join(nsc.SECONDARY_STORAGE, run_id)
+    dest_path = os.path.join(dest_run_path, "Data", "Intensities", "BaseCalls")
 
     return (source_path, dest_path)
 
@@ -37,7 +38,7 @@ def main(process_id):
         if paths:
             logging.debug('Found source and destination paths')
             process.udf[nsc.SOURCE_RUN_DIR_UDF] = paths[0]
-            process.udf[nsc.NS_OUTPUT_RUN_DIR_UDF] = paths[1]
+            process.udf[nsc.DEST_FASTQ_DIR_UDF] = paths[1]
         else:
             logging.debug('Unable to determine source and destination paths')
 

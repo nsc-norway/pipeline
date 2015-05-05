@@ -47,7 +47,8 @@ def main(process_id):
                     reads.append(2)
             except KeyError:
                 pass
-            demultiplex.create_projdir_ne_mi(run_id, run_dir, sample_sheet, 1, reads)
+            basecalls_dir = os.path.join(output_dir, "Data", "Intensities", "BaseCalls") 
+            demultiplex.create_projdir_ne_mi(run_id, basecalls_dir, sample_sheet, 1, reads)
 
         utilities.success_finish(process)
     else:

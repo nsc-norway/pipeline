@@ -63,9 +63,9 @@ def main(process_id):
         proj_dir = parse.get_hiseq_project_dir(runid, project_name)
         project_path = os.path.join(demux_path, proj_dir)
     elif instrument == "nextseq":
-        output_rundir = utilities.get_demux_process(process).udf[nsc.NS_OUTPUT_RUN_DIR_UDF]
+        output_rundir = utilities.get_demux_process(process).udf[nsc.DEST_FASTQ_DIR_UDF]
         proj_dir = parse.get_project_dir(runid, project_name)
-        project_path = os.path.join(output_rundir, "Data", "Intensities", "BaseCalls", proj_dir)
+        project_path = os.path.join(output_rundir, proj_dir)
     elif instrument == "miseq":
         output_rundir = os.path.join(nsc.SECONDARY_STORAGE, runid) # not the best way...
         project_path = os.path.join(output_rundir, "Data", "Intensities", "BaseCalls", proj_dir)

@@ -25,7 +25,7 @@ def populate_results(process, ids_resultfile_map, demultiplex_stats):
     inputs = dict((i.location[1], i) for i in process.all_inputs(unique=True))
     if len(set(i.location[0] for i in inputs.values())) != 1:
         print "error: Wrong number of flowcells detected"
-        return
+        return False
 
     for coordinates, stats in demultiplex_stats.items():
         lane, sample_name, read = coordinates
@@ -49,9 +49,11 @@ def populate_results(process, ids_resultfile_map, demultiplex_stats):
             analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
             analyte.put()
 
+    return True
 
 
-def download_sample_sheet(process, save_dir):
+
+def download_sample_sheet(process, save_dir, append_limsid=True):
     """Downloads the demultiplexing process's sample sheet, which contains only
     samples for the requested project (added to the LIMS by setup-*-demultiplexing.py)."""
 
@@ -62,9 +64,10 @@ def download_sample_sheet(process, save_dir):
                 sample_sheet = o.files[0].download()
 
     if sample_sheet:
-        if process.id == "":
-            raise ValueError("Process ID is an empty string")
-        name = "SampleSheet-" + process.id + ".csv"
+        if append_limsid:
+            name = "SampleSheet-" + process.id + ".csv"
+        else:
+            name = "SampleSheet.csv"
         path = os.path.join(save_dir, name)
         file(path, 'w').write(sample_sheet)
         return path, sample_sheet
@@ -72,12 +75,11 @@ def download_sample_sheet(process, save_dir):
         return None, None
 
 
-def create_projdir_ne_mi(runid, output_dir, sample_sheet, lane, reads):
+def create_projdir_ne_mi(runid, basecalls_dir, sample_sheet, lane, reads):
     """Creates project directory and moves fastq files into it."""
 
     project_name = sample_sheet['header']['Experiment Name']
     
-    basecalls_dir = os.path.join(output_dir, "Data", "Intensities", "BaseCalls") 
     dir_name = parse.get_project_dir(runid, project_name)
     proj_path = basecalls_dir + "/" + dir_name
     try:

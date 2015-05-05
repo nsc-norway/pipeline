@@ -233,9 +233,7 @@ def main(process_id):
                     "Flowcell_demux_summary.xml"
                     )
                 demultiplex_stats = parse.get_hiseq_stats(fc_demux_summary_path) 
-                demultiplex.populate_results(process, id_resultfile_map, demultiplex_stats)
-
-                success = True
+                success = demultiplex.populate_results(process, id_resultfile_map, demultiplex_stats)
 
         else: # Sample sheet
             utilities.fail(process, "Can't get the sample sheet")
