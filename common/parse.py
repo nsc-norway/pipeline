@@ -309,7 +309,7 @@ def parse_csv_sample_sheet(sample_sheet):
     for l in lines[1:]:
         sam = {}
         for h, v in zip(headers, l.split(",")):
-            sam[h] = v
+            sam[h.replace("_", "")] = v
         samples.append(sam)
     return samples
 

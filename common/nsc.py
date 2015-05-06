@@ -2,6 +2,7 @@
 
 from genologics.lims import *
 from genologics.config import *
+import getpass
 from ConfigParser import SafeConfigParser
 
 # Configure prod or dev
@@ -137,7 +138,18 @@ DO_COPY_METADATA_FILES=True
 # Group of files written (TODO: not currently used)
 SET_GROUP='nsc-seq'
 
-lims = Lims(BASEURI,USERNAME,PASSWORD)
+if TAG == "dev":
+    lims = Lims(BASEURI,USERNAME,PASSWORD)
+elif TAG == "prod":
+    if getpass.getuser() == "seq-user":
+        pw_file = "/data/nsc.loki/automation/etc/seq-user/apiuser-password.txt"
+    elif getpass.getuser() == "glsai":
+        pw_file = "/opt/gls/clarity/users/glsai/apiuser-password.txt"
+    lims = Lims(
+            "http://ous-lims.ous.nsc.local:8080",
+            "apiuser",
+            open(pw_file).read().strip()
+            )
 
 
 config = SafeConfigParser({

@@ -12,6 +12,18 @@ import logging
 from common import nsc, utilities
 
 
+def get_sample_sheet_data(ddl_proc):
+    """Gets the sample sheet from the process where it is generated"""
+
+    outputs = ddl_proc.all_outputs(unique=True)
+    for o in outputs:
+        if o.output_type == 'ResultFile' and o.name == 'SampleSheet csv':
+            if len(o.files) == 1:
+                return o.files[0].download()
+    return None
+
+
+
 # Key determined parameters:
 # - In/out directory
 
@@ -29,9 +41,17 @@ def get_paths(process, seq_process):
     return (source_path, dest_path)
 
 
-def main(process_id):
+def main(process_id, sample_sheet_file):
     process = Process(nsc.lims, id=process_id)
     seq_proc = utilities.get_sequencing_process(process)
+    parent_processes = process.parent_processes()
+    parent_pids = set(p.uri for p in parent_processes)
+    # This script can only handle the case when there is a single clustering process
+    if len(parent_pids) == 1:
+        ddl_proc = parent_processes[0]
+        sample_sheet_data = get_sample_sheet_data(ddl_proc)
+        if sample_sheet_data:
+            open(sample_sheet_file, "w").write(sample_sheet_data)
 
     if seq_proc:
         paths = get_paths(process, seq_proc)
@@ -54,5 +74,5 @@ def main(process_id):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     logging.debug('Starting "setup demultiplexing" script')
-    sys.exit(main(sys.argv[1]))
+    sys.exit(main(sys.argv[1], sys.argv[2]))
 

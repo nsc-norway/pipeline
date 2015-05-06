@@ -8,6 +8,12 @@ Setting up the LIMS for use of these scripts, etc.
 When slurm client is running on the LIMS servers (OUS): see nsc.py for two lines to add
 to `/etc/sudoers` to allow glsai user to run jobs as `seq-user`.
 
+Add the glsai to UNIX groups if necessary. For OUS, add it to the nsc-seq group, so it
+can read the scripts. Use sudo vigr to add this to /etc/group:
+nsc-seq:x:163877:glsai
+and use sudo vigr -s to add this to /etc/gshadow:
+nsc-seq:!::glsai
+
 
 ## Compute nodes
 
@@ -22,6 +28,12 @@ Content of .genologicsrc:
     BASEURI=http://<server>:8080
     USERNAME=apiuser
     PASSWORD=<api-password>
+
+
+## Both LIMS servers and compute nodes
+Install these yum packages (dependencies): 
+python-argparse
+python-requests
 
 
 ## Location of scripts
@@ -143,7 +155,7 @@ The "Cancel job" command is the same on all slurm-based process types: Name: Can
    - Name: Submit demultiplexing job. Command: /usr/bin/python /data/nsc.loki/automation/pipeline/epp-submit-slurm.py --pid={processLuid} --time=20:00:00 --threads={udf:Number of threads} --mem=2048 --thread-mem=512 --jobname={processLuid} /data/nsc.loki/automation/pipeline/demultiplex-nextseq.py {processLuid}
    - Name: Set demultiplexing options. Command: /usr/bin/python /data/nsc.loki/automation/dev/pipeline/setup-nextseq-demultiplexing.py {processLuid} {compoundOutputFileLuid0}
    - Cancel job command.
-  - UDFs: Slurm UDFs. Number of threads: Numeric, Source run directory: text, Fastq output directory: text, Other options for bcl2fastq: text, Bases Mask: text.
+  - UDFs: Slurm UDFs. Number of threads: Numeric; check "Use first preset value as default"; add a preset value 10, Source run directory: text, Fastq output directory: text, Other options for bcl2fastq: text, Bases Mask: text.
 
 
 ### Protocols

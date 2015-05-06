@@ -88,9 +88,9 @@ def create_projdir_ne_mi(runid, basecalls_dir, sample_sheet, lane, reads):
         pass
     for i, sam in enumerate(sample_sheet['data']):
         for r in reads:
-            sample_name = sam['Sample_Name']
+            sample_name = sam['SampleName']
             if not sample_name:
-                sample_name = sam['Sample_ID']
+                sample_name = sam['SampleID']
             basename = "{0}_S{1}_L00{2}_R{3}_001.fastq.gz".format(
                     sample_name, str(i + 1), lane, r)
             old_path = basecalls_dir + "/" + basename
