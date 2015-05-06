@@ -151,6 +151,7 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane,
                     file_lane_id, str(ir))
             sample_stats = stats.get((1, sample_name, ir))
             files.append(qc.FastqFile(lane, ir, path, sample_stats))
+            print "file ", path
 
         sample = qc.Sample(sample_name, files)
         samples.append(sample)

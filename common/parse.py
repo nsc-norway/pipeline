@@ -339,7 +339,11 @@ def parse_ne_mi_seq_sample_sheet(sample_sheet):
                 if len(parts) >= 2:
                     result['header'][parts[0]] = parts[1]
         elif header == "[Reads]":
-            result['reads'] = [int(c) for c in data.splitlines() if c.isdigit()]
+            result['reads'] = []
+            for line in data.splitlines():
+                c = line.strip(",")
+                if c.isdigit():
+                    result['reads'].append(int(c))
         elif header == "[Data]":
             result['data'] = parse_csv_sample_sheet(data)
 

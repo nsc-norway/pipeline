@@ -204,12 +204,11 @@ def main(process_id):
             num_samples = 1
 
         utilities.running(process, "Demultiplexing")
-        process_ok = True
         input_dir = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
-        #process_ok = run_demultiplexing(process, num_samples,
-        #        cfg.bases_mask, cfg.n_threads, destination, input_dir, cfg.output_dir,
-        #        cfg.other_options, log_dir)
-        #
+        process_ok = run_demultiplexing(process, num_samples,
+                cfg.bases_mask, cfg.n_threads, destination, input_dir, cfg.output_dir,
+                cfg.other_options, log_dir)
+        
         if process_ok:
             reads = [1]
             try:
@@ -220,7 +219,7 @@ def main(process_id):
 
             if sample_sheet:
                 sample_names = [sam['Sample_ID'] for sam in sample_sheet['data']]
-                #combine_fastq(sample_names, reads, cfg.output_dir)
+                combine_fastq(sample_names, reads, cfg.output_dir)
                 project_path = demultiplex.create_projdir_ne_mi(
                         runid,
                         cfg.output_dir,
@@ -229,7 +228,7 @@ def main(process_id):
                         reads
                         )
             undetermined_names = ["Undetermined"]
-            #combine_fastq(undetermined_names, reads, cfg.output_dir, 0)
+            combine_fastq(undetermined_names, reads, cfg.output_dir, 0)
 
             if ssheet_file:
                 id_res_map = make_id_resultfile_map(process, sample_sheet['data'], reads)

@@ -110,6 +110,8 @@ The "Cancel job" command is the same on all slurm-based process types: Name: Can
 #### NSC Demultiplexing (HiSeq)
  - Name: NSC Demultiplexing (HiSeq) 
  - Output types: Disable per input. Enable Shared outputs. Enable Outputs per Reagent Label.
+ - Output details: Select output per reagent label, and check:
+   - Yield PF (Gb), %PF, # Reads, % of Raw Clusters Per Lane, % Perfect Index Reads, % One Mismatch Reads (Index), % Bases >= Q30, Ave Q Score.
  - Output generation:
    - Shared output: ResultFile: Fixed number=4, Name= {LIST:SampleSheet csv,configureBclToFastq log,make log,Demultiplex_stats.htm}
    - O. per Input per reagent: Fixed number=2, Name={LIST:{SubmittedSampleName} R1 fastq,{SubmittedSampleName} R2 fastq}
@@ -132,6 +134,8 @@ The "Cancel job" command is the same on all slurm-based process types: Name: Can
 #### NSC Demultiplexing (NextSeq)
  - Name: NSC Demultiplexing (NextSeq)
  - Output types: Disable per input. Enable Shared outputs. Enable Outputs per Reagent Label.
+ - Output details: Select output per reagent label, and check:
+   - Yield PF (Gb), %PF, # Reads, % of Raw Clusters Per Lane, % Perfect Index Reads, % One Mismatch Reads (Index), % Bases >= Q30, Ave Q Score.
  - Output generation:
    - Shared output: ResultFile: Fixed number=2, Name={LIST:SampleSheet csv,bcl2fastq log}
    - O. per Input per reagent: Fixed number=2, Name={LIST:{SubmittedSampleName} R1 fastq,{SubmittedSampleName} R2 fastq}
@@ -155,6 +159,7 @@ Add the following protocol steps:
  - NSC Demultiplexing (HiSeq)
    Config: 
     - Automation: Change Set demultiplexing options, set Auomatically initiated, on Record Details, when screen is entered
+    - Record Details: In Sample Details section, add / remove so the Selected Fields from the Sample measurement section are: # Reads, % of Raw Clusters Per Lane, % Bases >= Q30. Leave others as default.
  - NSC Data Quality Reporting (HiSeq)
  - NSC Prepare for delivery
 
@@ -166,6 +171,7 @@ Add these protocol steps:
  - NSC Demultiplexing (NextSeq)
    Config: 
     - Automation: Change Set demultiplexing options, set Auomatically initiated, on Record Details, when screen is entered
+    - Record Details: In Sample Details section, add / remove so the Selected Fields from the Sample measurement section are: # Reads, % of Raw Clusters Per Lane, % Bases >= Q30. Leave others as default.
  - NSC Data Quality Reporting (Mi/NextSeq)
  - NSC Prepare for delivery
 
