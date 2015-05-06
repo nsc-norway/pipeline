@@ -342,7 +342,7 @@ def parse_ne_mi_seq_sample_sheet(sample_sheet):
             result['reads'] = []
             for line in data.splitlines():
                 c = line.strip(",")
-                if c.isdigit():
+                if c.isdigit() and not int(c) == 0:
                     result['reads'].append(int(c))
         elif header == "[Data]":
             result['data'] = parse_csv_sample_sheet(data)
