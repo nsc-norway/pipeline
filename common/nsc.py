@@ -6,7 +6,7 @@ import getpass
 from ConfigParser import SafeConfigParser
 
 # Configure prod or dev
-TAG="dev"
+TAG="prod"
 
 if TAG == "prod":
     BASE_DIR = "/data/nsc.loki/automation"

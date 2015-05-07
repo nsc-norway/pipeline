@@ -98,24 +98,5 @@ def create_projdir_ne_mi(runid, basecalls_dir, sample_sheet, lane, reads):
             os.rename(old_path, new_path)
 
 
-def move_demultiplexing_results(sample_sheet, base_dir, lanes, reads, create_dir,
-        move_from, move_to, delete):
-    """MiSeq and NextSeq fastq re-organisation.
-    
-    Pattern based batch create/rename/delete function. Parameters for the patterns
-    are taken from the sample sheet and the lane ID.
-    """
-
-    create = sorted(set(create_dir.format(p) for p in params))
-    if create_dir:
-        for d in create:
-            os.mkdir(d)
-
-    if move_from and move_to:
-        move = set((move_from.format(p), move_to.format(p)) for p in params)
-
-    if delete:
-        delete_dirs = sorted(set(delete.format(p) for p in params))
-
 
 

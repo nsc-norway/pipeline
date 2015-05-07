@@ -175,7 +175,8 @@ def parse_ns_conversion_stats(conversion_stats_path):
     if root.tag != "Stats":
         raise RuntimeError("Expected XML element Stats, found " + root.tag)
     fc = root.find("Flowcell")
-    project = next(pro for pro in fc.findall("Project") if pro.attrib['name'] != "all")
+    project = next(pro for pro in fc.findall("Project")
+            if pro.attrib['name'] != "all" and pro.attrib['name'] != "default")
     samples = {}
     for sample in project.findall("Sample"):
         sample_id = sample.attrib['name']
@@ -233,7 +234,7 @@ def parse_ns_demultiplexing_stats(conversion_stats_path):
     # There are always two projects, "default" and "all". This code must be revised
     # if NS starts allowing independent projects, but for now we can just as easily get
     # the total sum of stats from the sample called "all" in the default project.
-    project = next(pro for pro in fc.findall("Project") if pro.attrib['name'] != "all")
+    project = next(pro for pro in fc.findall("Project") if pro.attrib['name'] != "all" and pro.attrib['name'] != "default")
     samples = {}
     for sample in project.findall("Sample"):
         sample_id = sample.attrib['name']

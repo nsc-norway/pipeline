@@ -92,32 +92,77 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
     for entry in sample_sheet_data:
         name = entry['samplename']
         input_limsid = entry['sampleid']
-        input_analyte = Artifact(nsc.lims, id=input_limsid).samples[0]
-        for input, output in process.input_output_maps:
-            if input['uri'] == input_analyte:
-                for read in reads:
-                    if output['uri'].name == nsc.NEXTSEQ_FASTQ_OUTPUT(
-                            input_analyte.samples[0].name, read
-                            ):
-                        themap[(1, name, read)] = output['uri']
+        input_sample = Artifact(nsc.lims, id=input_limsid).samples[0]
+        for output in process.all_outputs(unique=True):
+            for read in reads:
+                if output.name == nsc.NEXTSEQ_FASTQ_OUTPUT.format(
+                        input_sample.name, read
+                        ):
+                    themap[(1, name, read)] = output
     return themap
 
 
-def combine_fastq(sample_names, reads, path, first_index=1):
+def merge_fastq(source_files, dest_file):
     """Merge fastq files for all lanes. Delete originals."""
 
-    for sam_index, sample_name in enumerate(sample_names):
-        for ir in reads:
-            out_path = "{0}/{1}_S{2}_L00{3}_R{4}_001.fastq.gz".format(
-                                path, sample_name, str(sam_index + first_index),
-                                "X", str(ir))
-            with open(out_path, 'wb') as out:
-                for lane in xrange(1,5):
-                    in_path = "{0}/{1}_S{2}_L00{3}_R{4}_001.fastq.gz".format(
-                                    path, sample_name, str(sam_index + first_index),
-                                    lane, str(ir))
-                    shutil.copyfileobj(open(in_path, 'rb'), out)
-                    os.remove(in_path)
+    with open(dest_file, 'wb') as out:
+        for f in source_files:
+            shutil.copyfileobj(open(f, 'rb'), out)
+            os.remove(f)
+
+
+def move_and_combine_files(runid, output_dir, project_name, sample_sheet, reads):
+    proj_dir = parse.get_project_dir(runid, project_name)
+    project_path = output_dir + "/" + proj_dir
+    
+    params = []
+    for i, row in enumerate(sample_sheet):
+        for r in reads:
+            par = dict(row)
+            par['read'] = r
+            par['base'] = output_dir
+            par['index'] = i+1
+            par['project'] = project_name
+            par['project_path'] = project_path
+            params.append(par)
+
+    with_id_subdir = not all(p['sampleid'] == p['samplename'] for p in params)
+    for p in params:
+        input_files = [
+                "{samplename}_S{index}_L{lane}_R{read}_001.fastq.gz".format(
+                    lane=str(lane).zfill(3), **p
+                    )
+                for lane in xrange(1, 5)
+                ]
+        output_file = "{samplename}_S{index}_L00X_R{read}_001.fastq.gz".format(**p)
+        if with_id_subdir:
+            input_paths = [
+                    "{base}/{project}/{sampleid}/{filename}".format(filename=fn, **p)
+                    for fn in input_files
+                    ]
+        else:
+            input_paths = [
+                    "{base}/{project}/{filename}".format(filename=fn, **p)
+                    for fn in input_files
+                    ]
+
+        output_path = os.path.join(project_path, output_file) 
+        merge_fastq(input_paths, output_path)
+
+    for dpath in set("{base}/{project}/{sampleid}".format(**p) for p in params):
+        os.rmdir(dpath)
+    for dpath in set("{base}/{project}".format(**p) for p in params):
+        os.rmdir(dpath)
+
+    for read in reads:
+        undetermined_in = [
+                "{base}/Undetermined_S0_L{lane}_R{read}_001.fastq.gz".format(
+                    base=output_dir, lane=str(lane).zfill(3), read=read
+                    )
+                for lane in xrange(1, 5)
+                ]
+        undetermined_out = "{base}/Undetermined_S0_L00X_R{read}_001.fastq.gz".format(base=output_dir, read=read)
+        merge_fastq(undetermined_in, undetermined_out)
 
 
 def attach_files(id_resultfile_map, sample_sheet_data, project_path, reads):
@@ -218,19 +263,15 @@ def main(process_id):
                 pass
 
             if sample_sheet:
-                sample_names = [sam['sampleid'] for sam in sample_sheet['data']]
-                combine_fastq(sample_names, reads, cfg.output_dir)
-                project_path = demultiplex.create_projdir_ne_mi(
-                        runid,
-                        cfg.output_dir,
-                        sample_sheet,
-                        "X",
-                        reads
-                        )
-            undetermined_names = ["Undetermined"]
-            combine_fastq(undetermined_names, reads, cfg.output_dir, 0)
+                project_name = sample_sheet['header']['Experiment Name']
+                proj_dir = parse.get_project_dir(runid, project_name)
+                project_path = os.path.join(cfg.output_dir, proj_dir)
+                try:
+                    os.mkdir(project_path)
+                except OSError:
+                    pass
+                move_and_combine_files(runid, cfg.output_dir, project_name, sample_sheet['data'], reads)
 
-            if ssheet_file:
                 id_res_map = make_id_resultfile_map(process, sample_sheet['data'], reads)
                 attach_files(id_res_map, sample_sheet['data'], project_path, reads)
                 try:
