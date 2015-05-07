@@ -236,9 +236,8 @@ def main(process_id):
     cfg = get_config(process)
     if cfg:
         # Download sample sheet or get it from the root of the run directory
-        # For the NS, the default is to get it from the run dir, and a sample sheet
-        # will only be uploaded to the process if it needs to be overridden.
-        # (so there's no way to specifically ignore a sample sheet if it exists)
+        # For the NS, the setup-nextseq-demultiplexing script will copy the
+        # LIMS generated sample sheet to the demultiplexing process.
         ssheet_file, sample_sheet_content = get_sample_sheet(process, destination)
 
         if sample_sheet_content:
