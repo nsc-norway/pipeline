@@ -88,12 +88,34 @@ def create_projdir_ne_mi(runid, basecalls_dir, sample_sheet, lane, reads):
         pass
     for i, sam in enumerate(sample_sheet['data']):
         for r in reads:
-            sample_name = sam['SampleName']
+            sample_name = sam['samplename']
             if not sample_name:
-                sample_name = sam['SampleID']
+                sample_name = sam['sampleid']
             basename = "{0}_S{1}_L00{2}_R{3}_001.fastq.gz".format(
                     sample_name, str(i + 1), lane, r)
             old_path = basecalls_dir + "/" + basename
             new_path = proj_path + "/" + basename
             os.rename(old_path, new_path)
+
+
+def move_demultiplexing_results(sample_sheet, base_dir, lanes, reads, create_dir,
+        move_from, move_to, delete):
+    """MiSeq and NextSeq fastq re-organisation.
+    
+    Pattern based batch create/rename/delete function. Parameters for the patterns
+    are taken from the sample sheet and the lane ID.
+    """
+
+    create = sorted(set(create_dir.format(p) for p in params))
+    if create_dir:
+        for d in create:
+            os.mkdir(d)
+
+    if move_from and move_to:
+        move = set((move_from.format(p), move_to.format(p)) for p in params)
+
+    if delete:
+        delete_dirs = sorted(set(delete.format(p) for p in params))
+
+
 

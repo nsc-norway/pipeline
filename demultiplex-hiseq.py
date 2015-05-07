@@ -120,8 +120,8 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
     for entry in sample_sheet_data:
         lane = entry['Lane']
         lane_location = lane + ":1"
-        id = entry['SampleID']
-        input_limsid = entry['Description']
+        id = entry['sampleid']
+        input_limsid = entry['description']
         analyte = Artifact(nsc.lims, id=input_limsid)
         sample = analyte.samples[0]
         for input, output in process.input_output_maps:
@@ -140,13 +140,13 @@ def check_fastq_and_attach_files(id_resultfile_map, sample_sheet, projdirs, read
     """Attaches ResultFile outputs of the HiSeq demultiplexing process."""
 
     for sam in sample_sheet:
-        sample_dir = "Sample_" + sam['SampleID']
+        sample_dir = "Sample_" + sam['sampleid']
 
         for r in reads:
             fastq_name = "{0}_{1}_L{2}_R{3}_001.fastq.gz".format(
-                    sam['SampleID'], sam['Index'], sam['Lane'].zfill(3), r
+                    sam['sampleid'], sam['index'], sam['lane'].zfill(3), r
                     )
-            fastq_path = os.path.join(projdirs[sam['SampleProject']], sample_dir, fastq_name)
+            fastq_path = os.path.join(projdirs[sam['sampleproject']], sample_dir, fastq_name)
 
             # Continues even if file doesn't exist. This will be discovered
             # in other ways, preferring "robust" operation here.
@@ -154,7 +154,7 @@ def check_fastq_and_attach_files(id_resultfile_map, sample_sheet, projdirs, read
                 # The convention is to have the LIMS ID in the description field. If this fails, 
                 # there's not a lot more we can do, so the following line just crashes with an 
                 # exception (due to HTTP 404).
-                result_file_artifact = id_resultfile_map[(int(sam['Lane']), sam['SampleID'], r)]
+                result_file_artifact = id_resultfile_map[(int(sam['lane']), sam['sampleid'], r)]
                 pf = ProtoFile(nsc.lims, result_file_artifact, fastq_path + ".txt")
                 pf = nsc.lims.glsstorage(pf)
                 f = pf.post()
@@ -224,12 +224,12 @@ def main(process_id):
 
                 # Demultiplexing stats
                 demux_stats_path = os.path.join(
-                    cfg.dest_dir, "Basecall_Stats_" + sample_sheet[0]['FCID'], 
+                    cfg.dest_dir, "Basecall_Stats_" + sample_sheet[0]['fcid'], 
                     "Demultiplex_Stats.htm"
                     )
                 utilities.upload_file(process, "Demultiplex_stats.htm", path = demux_stats_path)
                 fc_demux_summary_path = os.path.join(
-                    cfg.dest_dir, "Basecall_Stats_" + sample_sheet[0]['FCID'], 
+                    cfg.dest_dir, "Basecall_Stats_" + sample_sheet[0]['fcid'], 
                     "Flowcell_demux_summary.xml"
                     )
                 demultiplex_stats = parse.get_hiseq_stats(fc_demux_summary_path) 

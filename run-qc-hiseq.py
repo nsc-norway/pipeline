@@ -139,7 +139,7 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir, include_undetermined = F
     # Project -> [Sample x lane]
     project_entries = defaultdict(list)
     for sample_entry in entries:
-        project_entries[sample_entry['ProjectId']].append(sample_entry)
+        project_entries[sample_entry['projectid']].append(sample_entry)
 
     # Getting stats from Flowcell_demux_summary.xml (no longer using Demultiplex_stats.htm).
     ds_path = os.path.join(root_dir, "Basecall_Stats_" + fcid, "Flowcell_demux_summary.xml")
@@ -157,23 +157,23 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir, include_undetermined = F
 
         samples = {}
         for e in entries:
-            sample_dir = project_dir + "/Sample_" + e['SampleId']
+            sample_dir = project_dir + "/Sample_" + e['sampleid']
             files = []
             for ri in xrange(1, n_reads + 1):
                 # Empty files will not have any stats, that's why we use get(), not []
-                stats = demux_sum.get((int(e['Lane']), e['SampleId'], ri))
+                stats = demux_sum.get((int(e['lane']), e['sampleid'], ri))
 
                 # FastqFile
                 path_t = sample_dir + "/{0}_{1}_L{2}_R{3}_001.fastq.gz"
-                path = path_t.format(e['SampleId'], e['Index'], e['Lane'].zfill(3), ri)
+                path = path_t.format(e['sampleid'], e['index'], e['lane'].zfill(3), ri)
                 lane = lanes[int(e['Lane'])]
                 f = qc.FastqFile(lane, ri, path, stats)
                 files.append(f)
 
-            sample = samples.get(e['SampleId'])
+            sample = samples.get(e['sampleid'])
             if not sample:
-                sample = qc.Sample(e['SampleId'], [])
-                samples[e['SampleId']] = sample
+                sample = qc.Sample(e['sampleid'], [])
+                samples[e['sampleid']] = sample
 
             sample.files += files
 

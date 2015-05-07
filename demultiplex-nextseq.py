@@ -90,8 +90,8 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
     analyte. Lane is always 1 for NS, but keeping it in for consistency."""
     themap = {}
     for entry in sample_sheet_data:
-        name = entry['SampleName']
-        input_limsid = entry['SampleID']
+        name = entry['samplename']
+        input_limsid = entry['sampleid']
         input_analyte = Artifact(nsc.lims, id=input_limsid).samples[0]
         for input, output in process.input_output_maps:
             if input['uri'] == input_analyte:
@@ -124,7 +124,7 @@ def attach_files(id_resultfile_map, sample_sheet_data, project_path, reads):
     """Attaches ResultFile outputs of the NextSeq demultiplexing process."""
 
     for sam_index, sam in enumerate(sample_sheet_data):
-        sample_name = sam['SampleID']
+        sample_name = sam['sampleid']
         for ir in reads:
             out_path = "{0}/{1}_S{2}_L00X_R{3}_001.fastq.gz".format(
                                 project_path, sample_name, str(sam_index + 1),
@@ -218,7 +218,7 @@ def main(process_id):
                 pass
 
             if sample_sheet:
-                sample_names = [sam['SampleID'] for sam in sample_sheet['data']]
+                sample_names = [sam['sampleid'] for sam in sample_sheet['data']]
                 combine_fastq(sample_names, reads, cfg.output_dir)
                 project_path = demultiplex.create_projdir_ne_mi(
                         runid,

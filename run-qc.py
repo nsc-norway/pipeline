@@ -142,9 +142,9 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane,
     samples = []
     for sam_index, sam in enumerate(sample_sheet['data']):
         files = []
-        sample_name = sam['SampleName']
+        sample_name = sam['samplename']
         if not sample_name:
-            sample_name = sam['SampleID']
+            sample_name = sam['sampleid']
         for ir in xrange(1, n_reads+1):
             path = "{0}/{1}_S{2}_L00{3}_R{4}_001.fastq.gz".format(
                     project_dir, sample_name, str(sam_index + 1),

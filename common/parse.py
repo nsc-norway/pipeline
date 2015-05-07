@@ -304,7 +304,7 @@ def get_nextseq_stats(stats_xml_file_path):
 
 def parse_csv_sample_sheet(sample_sheet):
     lines = sample_sheet.splitlines()
-    headers = lines[0].split(",")
+    headers = [x.lower() for x in lines[0].split(",")]
     samples = []
     for l in lines[1:]:
         sam = {}
