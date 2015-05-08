@@ -13,10 +13,13 @@
 	<img src="static/logo.png" class="logo" alt="NSC"/>
 </div>
 
-<div class="prep">
+{% for section in sections %}
+<div class="pending">
+	<span class="section-header">{{ section.name }}</span>
 Sample prep
 </div>
 
+{% endfor %}
 
 </body>
 </html>
