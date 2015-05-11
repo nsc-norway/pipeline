@@ -13,13 +13,45 @@
 	<img src="static/logo.png" class="logo" alt="NSC"/>
 </div>
 
-{% for section in sections %}
-<div class="pending">
-	<span class="section-header">{{ section.name }}</span>
+<h2 class="section-header">In prep / pending</h2>
+{% for project in before_sequencing %}
+<div class="project">
+	<span class="project-name">{{ project.name }}</span>
 Sample prep
 </div>
-
 {% endfor %}
 
+<h2 class="section-header">Sequencing</h2>
+{% for project in sequencing %}
+<div class="project">
+	<span class="project-name">{{ project.name }}</span>
+Sample prep
+</div>
+{% endfor %}
+
+<h2 class="section-header">Data processing</h2>
+{% for project in sequencing %}
+<div class="project">
+	<span class="project-name">{{ project.name }}</span>
+Sample prep
+</div>
+{% endfor %}
+
+<h2 class="section-header">Delivery</h2>
+{% for project in delivery %}
+<div class="project">
+	<span class="project-name">{{ project.name }}</span>
+
+	Project delivery
+</div>
+{% endfor %}
+
+<h2 class="section-header">Completed</h2>
+{% for project in completed_recent %}
+<div class="project">
+	<span class="project-name">{{ project.name }}</span>
+	<span class="subinfo">{{ project.completed_date }}</span>
+</div>
+{% endfor %}
 </body>
 </html>
