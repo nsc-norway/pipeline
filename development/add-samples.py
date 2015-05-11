@@ -24,8 +24,8 @@ def main(project_id, sample_sheet):
     ssheet_data = parse.parse_hiseq_sample_sheet(open(sys.argv[1]))
     
     for sam in ssheet_data:
-        sample_id = sam['SampleID']
-        index = sam['Index']
+        sample_id = sam['sampleid']
+        index = sam['index']
         if index:
             pass #TODO
         
