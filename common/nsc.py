@@ -43,7 +43,7 @@ CONFIGURE_LOG = "configureBclToFastq log"
 MAKE_LOG = "make log"
 BCL2FASTQ_LOG = "bcl2fastq log"
 HISEQ_FASTQ_OUTPUT = "{0} R{1} fastq"
-NEXTSEQ_FASTQ_OUTPUT = "{0} R{1} fastq"
+NEXTSEQ_FASTQ_OUTPUT = "{0} L{1} R{2} fastq"
 
 # Sequencing processes
 SEQ_PROCESSES=[

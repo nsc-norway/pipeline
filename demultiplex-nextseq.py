@@ -95,10 +95,11 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
         input_sample = Artifact(nsc.lims, id=input_limsid).samples[0]
         for output in process.all_outputs(unique=True):
             for read in reads:
-                if output.name == nsc.NEXTSEQ_FASTQ_OUTPUT.format(
-                        input_sample.name, read
-                        ):
-                    themap[(1, name, read)] = output
+                for lane in xrange(1, 5):
+                    if output.name == nsc.NEXTSEQ_FASTQ_OUTPUT.format(
+                            input_sample.name, lane, read
+                            ):
+                        themap[(lane, name, read)] = output
     return themap
 
 
@@ -163,29 +164,6 @@ def move_and_combine_files(runid, output_dir, project_name, sample_sheet, reads)
                 ]
         undetermined_out = "{base}/Undetermined_S0_L00X_R{read}_001.fastq.gz".format(base=output_dir, read=read)
         merge_fastq(undetermined_in, undetermined_out)
-
-
-def attach_files(id_resultfile_map, sample_sheet_data, project_path, reads):
-    """Attaches ResultFile outputs of the NextSeq demultiplexing process."""
-
-    for sam_index, sam in enumerate(sample_sheet_data):
-        sample_name = sam['sampleid']
-        for ir in reads:
-            out_path = "{0}/{1}_S{2}_L00X_R{3}_001.fastq.gz".format(
-                                project_path, sample_name, str(sam_index + 1),
-                                str(ir))
-            # Doesn't crash if file doesn't exist. This will be discovered
-            # in other ways, preferring "robust" operation here.
-            if os.path.exists(out_path):
-
-                # The convention is to have the LIMS ID in the description field. If this fails, 
-                # there's not a lot more we can do, so the following line just crashes with an 
-                # exception (HTTP 404).
-                result_file_artifact = id_resultfile_map[(1, sample_name, ir)]
-                pf = ProtoFile(nsc.lims, result_file_artifact, out_path)
-                pf = nsc.lims.glsstorage(pf)
-                f = pf.post()
-                f.upload(out_path) # content of the file is the path
 
 
 def get_sample_sheet(process, output_run_dir):
@@ -272,7 +250,6 @@ def main(process_id):
                 move_and_combine_files(runid, cfg.output_dir, project_name, sample_sheet['data'], reads)
 
                 id_res_map = make_id_resultfile_map(process, sample_sheet['data'], reads)
-                attach_files(id_res_map, sample_sheet['data'], project_path, reads)
                 try:
                     path = os.path.join(cfg.output_dir, "Stats")
                     stats = parse.get_nextseq_stats(path)
