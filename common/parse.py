@@ -99,7 +99,6 @@ def parse_demux_summary(demux_summary_file_path):
                             for stat in filtertype:
                                 stat_val = total[key][ft].get(stat.tag, 0)
                                 total[key][ft][stat.tag] = stat_val + int(stat.text)
-    
 
     return to_normal_dict(total)
 

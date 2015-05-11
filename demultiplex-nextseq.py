@@ -95,10 +95,11 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
         input_sample = Artifact(nsc.lims, id=input_limsid).samples[0]
         for output in process.all_outputs(unique=True):
             for read in reads:
-                if output.name == nsc.NEXTSEQ_FASTQ_OUTPUT.format(
-                        input_sample.name, read
-                        ):
-                    themap[(1, name, read)] = output
+                for lane in xrange(1, 5):
+                    if output.name == nsc.NEXTSEQ_FASTQ_OUTPUT.format(
+                            input_sample.name, lane, read
+                            ):
+                        themap[(lane, name, read)] = output
     return themap
 
 
