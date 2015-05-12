@@ -28,13 +28,21 @@ def populate_results(process, ids_resultfile_map, demultiplex_stats):
         return False
 
     for coordinates, stats in demultiplex_stats.items():
-        lane, sample_name, read = coordinates
+        if len(coordinates) > 1:
+            lane = coordinates[0]
+            sample_name = coordinates[1]
+        else:
+            sample_name = coordinates[0]
+
         lims_fastqfile = None
         try:
-            lims_fastqfile = ids_resultfile_map[(lane, sample_name, read)]
+            lims_fastqfile = ids_resultfile_map[coordinates]
             undetermined = False
         except KeyError:
-            undetermined = not not re.match(r"lane\d$", sample_name)
+            if sample_name:
+                undetermined = re.match(r"lane\d$", sample_name)
+            else:
+                undetermined = True
 
         if lims_fastqfile:
             for statname in udf_list:

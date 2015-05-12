@@ -94,25 +94,16 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
         input_limsid = entry['sampleid']
         input_sample = Artifact(nsc.lims, id=input_limsid).samples[0]
         for output in process.all_outputs(unique=True):
-            for read in reads:
-                for lane in xrange(1, 5):
-                    if output.name == nsc.NEXTSEQ_FASTQ_OUTPUT.format(
-                            input_sample.name, lane, read
-                            ):
-                        themap[(lane, name, read)] = output
+            #for read in reads:
+            #    for lane in xrange(1, 5):
+            if output.name == nsc.NEXTSEQ_FASTQ_OUTPUT.format(
+                    input_sample.name
+                    ):
+                themap[(name,)] = output
     return themap
 
 
-def merge_fastq(source_files, dest_file):
-    """Merge fastq files for all lanes. Delete originals."""
-
-    with open(dest_file, 'wb') as out:
-        for f in source_files:
-            shutil.copyfileobj(open(f, 'rb'), out)
-            os.remove(f)
-
-
-def move_and_combine_files(runid, output_dir, project_name, sample_sheet, reads):
+def move_files(runid, output_dir, project_name, sample_sheet, reads):
     proj_dir = parse.get_project_dir(runid, project_name)
     project_path = output_dir + "/" + proj_dir
     
@@ -129,41 +120,26 @@ def move_and_combine_files(runid, output_dir, project_name, sample_sheet, reads)
 
     with_id_subdir = not all(p['sampleid'] == p['samplename'] for p in params)
     for p in params:
-        input_files = [
+        files = [
                 "{samplename}_S{index}_L{lane}_R{read}_001.fastq.gz".format(
                     lane=str(lane).zfill(3), **p
                     )
                 for lane in xrange(1, 5)
                 ]
-        output_file = "{samplename}_S{index}_L00X_R{read}_001.fastq.gz".format(**p)
-        if with_id_subdir:
-            input_paths = [
-                    "{base}/{project}/{sampleid}/{filename}".format(filename=fn, **p)
-                    for fn in input_files
-                    ]
-        else:
-            input_paths = [
-                    "{base}/{project}/{filename}".format(filename=fn, **p)
-                    for fn in input_files
-                    ]
 
-        output_path = os.path.join(project_path, output_file) 
-        merge_fastq(input_paths, output_path)
+        for f in files:
+            if with_id_subdir:
+                input_path = "{base}/{project}/{sampleid}/{filename}".format(filename=fpath, **p)
+            else:
+                input_path = "{base}/{project}/{filename}".format(filename=fpath, **p)
+
+            output_path = os.path.join(project_path, f)
+            os.move(input_path, output_path)
 
     for dpath in set("{base}/{project}/{sampleid}".format(**p) for p in params):
         os.rmdir(dpath)
     for dpath in set("{base}/{project}".format(**p) for p in params):
         os.rmdir(dpath)
-
-    for read in reads:
-        undetermined_in = [
-                "{base}/Undetermined_S0_L{lane}_R{read}_001.fastq.gz".format(
-                    base=output_dir, lane=str(lane).zfill(3), read=read
-                    )
-                for lane in xrange(1, 5)
-                ]
-        undetermined_out = "{base}/Undetermined_S0_L00X_R{read}_001.fastq.gz".format(base=output_dir, read=read)
-        merge_fastq(undetermined_in, undetermined_out)
 
 
 def get_sample_sheet(process, output_run_dir):
@@ -247,12 +223,12 @@ def main(process_id):
                     os.mkdir(project_path)
                 except OSError:
                     pass
-                move_and_combine_files(runid, cfg.output_dir, project_name, sample_sheet['data'], reads)
+                move_files(runid, cfg.output_dir, project_name, sample_sheet['data'], reads)
 
                 id_res_map = make_id_resultfile_map(process, sample_sheet['data'], reads)
                 try:
                     path = os.path.join(cfg.output_dir, "Stats")
-                    stats = parse.get_nextseq_stats(path)
+                    stats = parse.get_nextseq_stats(path, aggregate_reads=True)
                     success = demultiplex.populate_results(process, id_res_map, stats)
                 except (IOError,KeyError):
                     success = False
