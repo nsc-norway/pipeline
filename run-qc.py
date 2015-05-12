@@ -42,10 +42,7 @@ def main(threads, run_dir, no_sample_sheet, process_undetermined):
         lane = qc.Lane(1, clus_den, clus_den * pf_ratio, pf_ratio)
 
     demultiplex_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
-    if no_sample_sheet:
-        info, projects = get_ne_mi_seq_from_files(run_dir, instrument, lane)
-    else:
-        info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane, process_undetermined)
+    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane, process_undetermined)
 
     qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
 
@@ -175,57 +172,6 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane,
     info = {'sw_versions': get_sw_versions(run_dir)}
     return info, projects
     
-
-
-def get_ne_mi_seq_from_files(run_dir, instrument, lane):
-    """Get NextSeq or MiSeq QC "model" objects for run, without using sample
-    sheet information.
-
-    This function looks for project directories and extracts infromation from 
-    the directory structure / file names. It is less likely to crash than the above 
-    function, but also more likely to do something wrong.
-    
-    Undetermined is not included."""
-
-    if instrument == "miseq":
-        stats = {}
-    elif instrument == "nextseq":
-        stats = parse.get_nextseq_stats(
-                os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats")
-                )
-
-    projects = []
-    project_path_glob = os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "*_*.Project_*")
-    project_paths = glob.glob(project_path_glob)
-    for pp in project_paths:
-        p_dir = os.path.basename(pp)
-        project_name = re.match("[\d]+_[A-Z0-9]+\.Project_(.*)", p_dir).group(1)
-
-        sample_files = defaultdict(list)
-
-        for filename in os.listdir(pp):
-            parts = re.match("(.*?)_S\d+_L00X_R(\d+)_001.fastq.gz$", filename)
-            if parts:
-                sample_name = parts.group(1)
-                read_n = int(parts.group(2))
-                sample_files[sample_name].append((read_n, filename))
-
-        samples = []
-        for sample_name, files in sample_files.items():
-            file_objects = []
-            for read_n, fname in files:
-                file_stats = stats[(1, sample_name, read_n)]
-                f = qc.FastqFile(lane, read_n, p_dir + "/" + fname, file_stats)
-                file_objects.append(f)
-
-            samples.append(qc.Sample(sample_name, file_objects))
-
-        projects.append(qc.Project(project_name, p_dir, samples))
-
-    info = {'sw_versions': get_sw_versions(run_dir)}
-    return info, projects
-
-
 
 
 if __name__ == '__main__':
