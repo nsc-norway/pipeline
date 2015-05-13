@@ -1,6 +1,8 @@
 # Finalise processing of run
 
 # Moves run directory into processed/ on primary storage
+# Using a slurm job is extreme overkill for what it does now,
+# but it's convenient to have the same setup as the other jobs.
 
 import sys
 import os
