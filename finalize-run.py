@@ -16,11 +16,12 @@ def main(process_id):
     inputs = process.all_inputs(unique=True)
     flowcells = set(i.location[0] for i in inputs)
     if len(flowcells) == 1 and \
-            len(inputs) == next(flowcells).occupied_wells:
+            len(inputs) == next(iter(flowcells)).occupied_wells:
 
         seq_process = utilities.get_sequencing_process(process)
 
         runid = seq_process.udf['Run ID']
+        print "Moving", runid, "to processed directory"
         os.rename(
                 os.path.join(nsc.PRIMARY_STORAGE, runid),
                 os.path.join(nsc.PRIMARY_STORAGE, "processed", runid)

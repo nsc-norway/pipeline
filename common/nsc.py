@@ -71,20 +71,26 @@ class StepSetup:
 # The top-level items are tuples of protocol name and lists of StepSetup 
 # objects. The StepSetup objects represent a step in a protocol (see above).
 AUTOMATED_PROTOCOL_STEPS = [
-            ("Illumina SBS (HiSeq GAIIx) 5.0",
+            ("NSC Data Processing for HiSeq",
             [
                 StepSetup("NSC Demultiplexing (HiSeq)", "project", "Submit demultiplexing job"),
                 StepSetup("NSC Data Quality Reporting (HiSeq)", "project", "Submit QC job"),
-                StepSetup("NSC Prepare for delivery", "project", "Submit delivery job")
+                StepSetup("NSC Prepare for delivery", "project", "Submit delivery job"),
+                StepSetup("NSC Finalize run", "flowcell", "Submit")
             ]),
-            ("Illumina SBS (NextSeq) 1.0",
+            ("NSC Data Processing for NextSeq",
             [
-                StepSetup("NSC Demultiplexing (NextSeq)", "flowcell", "Submit demultiplexing job")
+                StepSetup("NSC Demultiplexing (NextSeq)", "flowcell", "Submit demultiplexing job"),
+                StepSetup("NSC Data Quality Reporting (Mi/NextSeq)", "project", "Submit QC job"),
+                StepSetup("NSC Prepare for delivery", "project", "Submit delivery job"),
+                StepSetup("NSC Finalize run", "flowcell", "Submit")
             ]),
-            ("Illumina SBS (MiSeq) 5.0",
+            ("NSC Data Processing for MiSeq",
             [
                 StepSetup("NSC Copy MiSeq Run", "flowcell", "Copy MiSeq Run"),
-                StepSetup("NSC Data Quality Reporting (Mi/NextSeq)", "flowcell", "Submit QC job")
+                StepSetup("NSC Data Quality Reporting (Mi/NextSeq)", "flowcell", "Submit QC job"),
+                StepSetup("NSC Prepare for delivery", "project", "Submit delivery job"),
+                StepSetup("NSC Finalize run", "flowcell", "Submit")
             ]),
         ]
 
