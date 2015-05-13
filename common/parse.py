@@ -36,7 +36,7 @@ def to_normal_dict(dd):
         return dd
 
 
-def parse_demux_summary(demux_summary_file_path):
+def parse_demux_summary(demux_summary_file_path, aggregate_reads):
     """Get lane-read-level demultiplexing statistics from
     Flowcell_demux_summary.xml (sum over tile, multiple barcodes per sample).
     
@@ -80,7 +80,7 @@ def parse_demux_summary(demux_summary_file_path):
     return to_normal_dict(total)
 
 
-def get_hiseq_stats(demux_summary_file_path):
+def get_hiseq_stats(demux_summary_file_path, aggregate_reads):
     """Get the standard demultiplexing statistics for HiSeq based on the data in
     Flowcell_demux_summary.xml.
     
