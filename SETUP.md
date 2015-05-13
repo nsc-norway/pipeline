@@ -158,6 +158,15 @@ The "Cancel job" command is the same on all slurm-based process types: Name: Can
   - UDFs: Slurm UDFs. Number of threads: Numeric; check "Use first preset value as default"; add a preset value 10, Source run directory: text, Fastq output directory: text, Other options for bcl2fastq: text, Bases Mask: text.
 
 
+#### NSC Finalize run
+Process to 
+ - Name: NSC Finalize run
+ - Output types: Disable "per input".(none)
+ - External programs:
+   - Name: Submit. Command: /usr/bin/python /data/nsc.loki/automation/pipeline/epp-submit-slurm.py --pid={processLuid} --time=00:10 --threads=1 --mem=128 --jobname={processLuid} /data/nsc.loki/automation/pipeline/finalize-run.py {processLuid} 
+ - UDFs: Slurm UDFs.
+ 
+
 ### Protocols
 Create these protocols. The configuration is listed in line for each protocol step. On all
 protocol steps corresponding to slurm jobs, with slurm UDFs, the field "Job state code" 
