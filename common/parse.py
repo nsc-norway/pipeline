@@ -68,7 +68,10 @@ def parse_demux_summary(demux_summary_file_path, aggregate_reads):
                 for tile in barcode.findall("Tile"):
                     for read in tile.findall("Read"):
                         read_id = int(read.attrib['index'])
-                        key = (lane_id, sample_name, read_id)
+                        if aggregate_reads:
+                            key = (lane_id, sample_name, read_id)
+                        else:
+                            key = (lane_id, sample_name, read_id)
                         if not total.has_key(key):
                             total[key] = defaultdict(dict)
                         for filtertype in read:
@@ -80,7 +83,7 @@ def parse_demux_summary(demux_summary_file_path, aggregate_reads):
     return to_normal_dict(total)
 
 
-def get_hiseq_stats(demux_summary_file_path, aggregate_reads):
+def get_hiseq_stats(demux_summary_file_path, aggregate_reads=False):
     """Get the standard demultiplexing statistics for HiSeq based on the data in
     Flowcell_demux_summary.xml.
     
@@ -90,19 +93,27 @@ def get_hiseq_stats(demux_summary_file_path, aggregate_reads):
     See also: get_nextseq_stats.
     """
 
+    # each demux summary item has "coordinates", which is (lane, sample, read) or
+    # (lane, sample) if aggregate_reads is set
     demux_summary = parse_demux_summary(demux_summary_file_path)
     result = {}
     # lane_sum_clusters: { lane_id => number of clusters in lane } (for percentage per file)
     # Uses a single read, as # clusters is the same for all reads
     lane_sum_pf_clusters = defaultdict(int)
     lane_sum_raw_clusters = defaultdict(int)
-    for (lane, sample_id, iread), stats in demux_summary.items():
-        if iread == 1:
+    for coordinates, stats in demux_summary.items():
+        # First read if not aggregate (real number of clusters then)
+        # or sum of reads if doing the aggregate (note: gives 
+        # different results, if aggregate is set we sum up the number of 
+        # clusters)
+        if len(coordinates) <= 2 or coordinates[2] == 1:
+            lane = coordinates[0]
             lane_sum_pf_clusters[lane] += stats['Pf']['ClusterCount']
             lane_sum_raw_clusters[lane] += stats['Raw']['ClusterCount']
 
     result = {}
-    for (lane_id, sample_id, iread), readstats in demux_summary.items():
+    for coordinates, readstats in demux_summary.items():
+        lane_id = coordinates[0]
         pf = readstats['Pf']
         raw = readstats['Raw']
         stats = {}
@@ -124,7 +135,7 @@ def get_hiseq_stats(demux_summary_file_path, aggregate_reads):
         stats['% Bases >=Q30'] = pf['YieldQ30'] * 100.0 / pf['Yield']
         stats['Ave Q Score'] = pf['QualityScoreSum'] / pf['Yield']
         
-        result[(lane_id, sample_id, iread)] = stats
+        result[coordinates] = stats
 
     return result
 
