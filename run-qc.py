@@ -31,7 +31,7 @@ def main(threads, run_dir, no_sample_sheet, process_undetermined):
         lane_pf = parse.get_lane_cluster_density(pf_path)
         raw_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane.txt")
         lane_raw = parse.get_lane_cluster_density(raw_path)
-        lane = qc.Lane(1, lane_raw[1], lane_pf[1], lane_pf[1] / lane_raw[1])
+        lane = [qc.Lane(1, lane_raw[1], lane_pf[1], lane_pf[1] / lane_raw[1])]
 
     elif match.group(1) == "NS":
         instrument = "nextseq"
@@ -39,10 +39,10 @@ def main(threads, run_dir, no_sample_sheet, process_undetermined):
                 os.path.join(run_dir, "RunCompletionStatus.xml")).getroot()
         clus_den = float(run_completion.find("ClusterDensity").text)
         pf_ratio = float(run_completion.find("ClustersPassingFilter").text) / 100.0
-        lane = qc.Lane(1, clus_den, clus_den * pf_ratio, pf_ratio)
+        lane = [qc.Lane(1, clus_den, clus_den * pf_ratio, pf_ratio)]
 
     demultiplex_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
-    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane, process_undetermined)
+    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes, process_undetermined)
 
     qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
 
@@ -84,11 +84,12 @@ def main_lims(threads, process_id):
     n_pf = lane.udf['Clusters PF R1']
     density_pf = density_raw * n_pf / n_raw
     pf_ratio = lane.udf['%PF R1'] / 100.0
-    # Using 1 logical lane even for NS until we can extract data from each lane
-    # independently
-    lane = qc.Lane(1, density_raw * 1000.0, density_pf * 1000.0, pf_ratio)
+    if instrument == "miseq":
+        lanes = qc.Lane(1, density_raw * 1000.0, density_pf * 1000.0, pf_ratio)
+    else:
+        lanes = [qc.Lane(l, density_raw * 1000.0, density_pf * 1000.0, pf_ratio) for l in xrange(1,5)]
 
-    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane, process.udf[nsc.PROCESS_UNDETERMINED_UDF])
+    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes, process.udf[nsc.PROCESS_UNDETERMINED_UDF])
     qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
     utilities.success_finish(process)
 
@@ -106,7 +107,7 @@ def get_sw_versions(run_dir):
     return [("RTA", rta_ver)]
 
 
-def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane,
+def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
         sample_sheet_path=None, include_undetermined = False):
     """Get NextSeq or MiSeq QC model objects.
 
@@ -128,10 +129,8 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane,
     project_dir = parse.get_project_dir(run_id, project_name)
 
     if instrument == "miseq":
-        file_lane_id = "1"
         stats = {}
     elif instrument == "nextseq":
-        file_lane_id = "X"
         stats = parse.get_nextseq_stats(
                 os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats")
                 )
@@ -142,13 +141,14 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane,
         sample_name = sam['samplename']
         if not sample_name:
             sample_name = sam['sampleid']
-        for ir in xrange(1, n_reads+1):
-            path = "{0}/{1}_S{2}_L00{3}_R{4}_001.fastq.gz".format(
-                    project_dir, sample_name, str(sam_index + 1),
-                    file_lane_id, str(ir))
-            sample_stats = stats.get((1, sample_name, ir))
-            files.append(qc.FastqFile(lane, ir, path, sample_stats))
-            print "file ", path
+        for lane in lanes:
+            for ir in xrange(1, n_reads+1):
+                path = "{0}/{1}_S{2}_L00{3}_R{4}_001.fastq.gz".format(
+                        project_dir, sample_name, str(sam_index + 1),
+                        lane.id, ir)
+                file_stats = stats.get((lane.id, sample_name, ir))
+                files.append(qc.FastqFile(lane, ir, path, file_stats))
+                print "file ", path
 
         sample = qc.Sample(sample_name, files)
         samples.append(sample)
@@ -158,10 +158,10 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lane,
     if include_undetermined:
         unfiles = [
                 qc.FastqFile(
-                    lane, ir, "Undetermined_S0_L00%s_R%d_001.fastq.gz" % (file_lane_id, ir),
-                    stats.get((1, "unknown", ir))
+                    lane, ir, "Undetermined_S0_L00%s_R%d_001.fastq.gz" % (lane.id, ir),
+                    stats.get((lane.id, None, ir))
                     )
-                for ir in xrange(1, n_reads + 1)
+                for ir in xrange(1, n_reads + 1) for lane in lanes
                 ]
         unsample = qc.Sample("Undetermined", unfiles)
         unproject = qc.Project("Undetermined_indices", None, [unsample])
