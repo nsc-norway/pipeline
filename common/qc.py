@@ -126,7 +126,10 @@ def move_fastqc_results(quality_control_dir, sample):
             fastqc_output = os.path.join(quality_control_dir, fastqc_result_dir_name)
             # Don't need the zip, as we have the uncompressed version.
             if os.path.exists(fastqc_output):
-                os.remove(os.path.join(quality_control_dir, fastqc_result_dir_name + ".zip"))
+                try:
+                    os.remove(os.path.join(quality_control_dir, fastqc_result_dir_name + ".zip"))
+                except OSError:
+                    pass
         
                 # Move from root fastqc to sample directory
                 dst_file = os.path.join(sample_dir, fastqc_result_dir_name)
@@ -150,7 +153,10 @@ def update_stats_fastqc(quality_control_dir, sample):
                     total = re.match("Total Sequences\t(\d+)", l)
                     if total:
                         if f.stats and f.stats.get('# Reads PF'):
-                            assert f.stats['# Reads PF'] == int(total.group(1))
+                            assert f.stats['# Reads PF'] == int(total.group(1)),\
+                                "file: %s: reads from fastqc: %d, reads from stats: %d" % (
+                                            f.path, int(total.group(1)), f.stats['# Reads PF']
+                                            )
                         else:
                             if not f.stats:
                                 f.stats = {}
@@ -476,7 +482,7 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
     # Run FastQC
     # First output all fastqc results into QualityControl, them move them
     # in place later
-    run_fastqc(non_empty_files, demultiplex_dir, output_dir=quality_control_dir, max_threads=threads) 
+    ###run_fastqc(non_empty_files, demultiplex_dir, output_dir=quality_control_dir, max_threads=threads) 
     samples = [sam for pro in projects for sam in pro.samples]
     for s in samples:
        move_fastqc_results(quality_control_dir, s)
@@ -499,7 +505,7 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
                     re.sub(r"^{0}".format(re.escape(p.proj_dir)), ".", f.path)
                         for s in p.samples for f in s.files
                     ]
-            compute_md5( os.path.join(demultiplex_dir, p.proj_dir), threads, paths)
+            ###compute_md5( os.path.join(demultiplex_dir, p.proj_dir), threads, paths)
         else: # Project files are in root of demultiplexing dir
             compute_md5(demultiplex_dir, threads, ["./" + f.path for s in p.samples for f in s.files])
 

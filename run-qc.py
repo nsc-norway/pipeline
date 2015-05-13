@@ -138,7 +138,8 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
         stats = {}
     elif instrument == "nextseq":
         stats = parse.get_nextseq_stats(
-                os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats")
+                os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats"),
+                aggregate_lanes=False
                 )
 
     samples = []
