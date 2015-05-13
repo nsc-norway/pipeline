@@ -15,14 +15,19 @@ from common import nsc, utilities
 # - Sample sheet filtered to include the lanes of the demultiplexing process's inputs
 # - Use-bases-mask parameter
 
-def get_sample_sheet_data(cluster_proc):
+def get_sample_sheet_data(cluster_proc, fcid):
     """Gets the sample sheet from the clustering process"""
 
     outputs = cluster_proc.all_outputs(unique=True)
-    for o in outputs:
-        if o.output_type == 'ResultFile' and o.name == 'SampleSheet csv':
-            if len(o.files) == 1:
-                return o.files[0].download()
+    for io in cluster_proc.input_output_maps:
+        if io[0]['uri'].location[0].name == fcid:
+            o = io[1]
+            if o['output-type'] == 'ResultFile' and o['output-generation-type'] == 'PerAllInputs':
+                input = io[0]['uri']
+                output = o['uri']
+                if o.name == 'SampleSheet csv':
+                    if len(o.files) == 1:
+                        return o.files[0].download()
     return None
 
 
@@ -165,17 +170,22 @@ def main(process_id, sample_sheet_file):
         logging.debug('Saved settings in the process')
 
         # Sample sheet
-        sample_sheet = get_sample_sheet_data(cluster_proc)
-        if sample_sheet:
-            logging.debug('Found the sample sheet')
-            inputs = process.all_inputs(unique=True)
-            partial_sample_sheet = extract_sample_sheet(sample_sheet, inputs)
-            logging.debug('Found the sample sheet')
-            of = open(sample_sheet_file, 'w')
-            of.write(partial_sample_sheet)
-            of.close()
-        else: # not actually a failure if there is no sample sheet
-            print "Failed to find sample sheet"
+        try:
+            fcid = seq_proc.udf['Flow Cell ID']
+        except KeyError:
+            fcid = None
+        if fcid:
+            sample_sheet = get_sample_sheet_data(cluster_proc, fcid)
+            if sample_sheet:
+                logging.debug('Found the sample sheet')
+                inputs = process.all_inputs(unique=True)
+                partial_sample_sheet = extract_sample_sheet(sample_sheet, inputs)
+                logging.debug('Found the sample sheet')
+                of = open(sample_sheet_file, 'w')
+                of.write(partial_sample_sheet)
+                of.close()
+            else: # not actually a failure if there is no sample sheet
+                print "Failed to find sample sheet"
         
 
     else: # number of parent processes not one
