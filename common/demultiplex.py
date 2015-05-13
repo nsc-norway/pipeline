@@ -32,11 +32,14 @@ def populate_results(process, ids_resultfile_map, demultiplex_stats):
             lane = coordinates[0]
             sample_name = coordinates[1]
         else:
+            lane = 1
             sample_name = coordinates[0]
 
         lims_fastqfile = None
+        print coordinates
         try:
             lims_fastqfile = ids_resultfile_map[coordinates]
+            print lims_fastqfile
             undetermined = False
         except KeyError:
             if sample_name:
@@ -53,9 +56,17 @@ def populate_results(process, ids_resultfile_map, demultiplex_stats):
             lims_fastqfile.put()
     
         elif undetermined:
-            analyte = inputs["{0}:1".format(lane)]
-            analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
-            analyte.put()
+            try:
+                analyte = inputs['{0}:1'.format(lane)]
+            except KeyError:
+                if len(inputs) == 1:
+                    # NextSeq: flow cell has position A:1
+                    analyte = inputs['A:1']
+                else:
+                    raise
+            # Can't set this UDF, don't know why...
+            #analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
+            #analyte.put()
 
     return True
 

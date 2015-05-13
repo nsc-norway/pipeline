@@ -1,7 +1,9 @@
 import re
 import os
+import itertools
 from xml.etree import ElementTree
 from collections import defaultdict
+from Counter import Counter
 
 
 ###################### HI/MISEQ METRICS #######################
@@ -144,7 +146,7 @@ def get_hiseq_stats(demux_summary_file_path, aggregate_reads=False):
 
 ###################### NEXTSEQ METRICS #######################
 
-def parse_ns_conversion_stats(conversion_stats_path, aggregate_reads):
+def parse_ns_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_reads):
     """Get "conversion stats" from the NextSeq stats.
 
     Loops over the comprehensive tree structure of the ConversionStats.xml
@@ -154,14 +156,18 @@ def parse_ns_conversion_stats(conversion_stats_path, aggregate_reads):
     which are the same for both reads are replicated in the values for both reads.
 
     {
-        (Sample name, read) => ( {sample stats}, {sample stats PF} )
+        (coordinates) => ( {sample stats}, {sample stats PF} )
     }
 
-    If aggregate_reads is specified, the stats for both reads are combined, and
-    the returned dict is only indexed by sample name.
-    {
-        (Sample name) => ( {sample stats}, {sample stats PF} )
-    }
+    Depending on the aggregate_X parameters, the coordinates can be:
+     (1, sample name, 1)
+     (lane, sample name, 1)
+     (lane, sample name, read)
+
+    Note: aggregating over lane but not read number is supported, but other code will
+    expect that lane is the first parameter if len(coordinates) > 1.
+
+    Undetermined indexes are reported as sample name = None.
     """
     xmltree = ElementTree.parse(conversion_stats_path)
     root = xmltree.getroot()
@@ -174,21 +180,25 @@ def parse_ns_conversion_stats(conversion_stats_path, aggregate_reads):
         elif pro.attrib['name'] != "all":
             project = pro
     
+    # We compute the most general coordinate first, and then take the 
+    # aggregates (sum) later.
     samples = {}
     for is_undetermined, project in [(False, project), (True, default_project)]:
         for sample in project.findall("Sample"):
             if is_undetermined:
                 sample_id = None
+                if not sample.attrib['name'] == "unknown":
+                    continue
             else:
                 sample_id = sample.attrib['name']
             # stats_* are indexed by filter type (pf/raw) then by the read index (then will
             # be re-organised in the return value)
-            stats_pf = defaultdict(int)
-            stats_raw = defaultdict(int)
-            read_stats_pf = {}
-            read_stats_raw = {}
             barcode = next(bar for bar in sample.findall("Barcode") if bar.attrib['name'] == 'all')
             for lane in barcode.findall("Lane"):
+                stats_pf = defaultdict(int)
+                stats_raw = defaultdict(int)
+                read_stats_pf = {}
+                read_stats_raw = {}
                 for tile in lane.findall("Tile"):
                     for filtertype in tile:
                         ft = filtertype.tag
@@ -211,24 +221,42 @@ def parse_ns_conversion_stats(conversion_stats_path, aggregate_reads):
                                 for stat in read_or_cc:
                                     rst[iread][stat.tag] += int(stat.text)
 
-            if aggregate_reads:
-                for iread in read_stats_pf.keys():
-                    for k, v in read_stats_pf[iread].items():
-                        stats_pf[k] += v
-                    for k, v in read_stats_raw[iread].items():
-                        stats_raw[k] += v
-                    samples[(sample_id,)] = (stats_raw, stats_pf)
-            else:
+                lane_id = int(lane.attrib['number'])
                 for iread in read_stats_pf.keys():
                     # Include the read-independent stats into per-read stats
                     read_stats_pf[iread].update(stats_pf)
                     read_stats_raw[iread].update(stats_raw)
-                    samples[(sample_id, iread)] = (read_stats_raw[iread], read_stats_pf[iread])
+                    samples[(lane_id, sample_id, iread)] = (read_stats_raw[iread], read_stats_pf[iread])
+
+    # sorry
+    if aggregate_lanes:
+        # sorted samples by 
+        sort_samples = sorted(samples.items(), key=lambda x: x[0][1:])
+        samples = {}
+        for key, group in itertools.groupby(sort_samples, key=lambda x: x[0][1:]):
+            stats_raw = Counter()
+            stats_pf = Counter()
+            for key, (row_raw, row_pf) in group:
+                stats_raw.update(row_raw)
+                stats_pf.update(row_pf)
+            samples[(1,) + key[1:]] = dict(stats_raw), dict(stats_pf)
+
+    if aggregate_reads:
+        # sorted samples by 
+        sort_samples = sorted(samples.items(), key=lambda x: x[0][:-1])
+        samples = {}
+        for key, group in itertools.groupby(sort_samples, key=lambda x: x[0][:-1]):
+            stats_raw = Counter()
+            stats_pf = Counter()
+            for key, (row_raw, row_pf) in group:
+                stats_raw.update(row_raw)
+                stats_pf.update(row_pf)
+            samples[key[:-1] + (1,)] = dict(stats_raw), dict(stats_pf)
 
     return samples
 
 
-def parse_ns_demultiplexing_stats(conversion_stats_path):
+def parse_ns_demultiplexing_stats(conversion_stats_path, aggregate_lanes):
     """Sum up "demultiplexing stats" from the NextSeq stats directory.
     
     Contains information about barcode reads for the NextSeq. The returned 
@@ -236,8 +264,12 @@ def parse_ns_demultiplexing_stats(conversion_stats_path):
     sample None, which corresponds to undetermined indexes.
     
     Returns: {
-         (sample name) => {stats}
-    }  """
+         (lane, sample name) => {stats}
+    } 
+    or {
+         (1, sample name) => {stats}
+    } 
+    """
     xmltree = ElementTree.parse(conversion_stats_path)
     root = xmltree.getroot()
     if root.tag != "Stats":
@@ -255,27 +287,42 @@ def parse_ns_demultiplexing_stats(conversion_stats_path):
     samples = {}
     for sample in project.findall("Sample"):
         sample_id = sample.attrib['name']
-        stats = defaultdict(int)
         # only look at barcode="all"
         barcode = next(bar for bar in sample.findall("Barcode") if bar.attrib['name'] == 'all')
+        if aggregate_lanes:
+            stats = defaultdict(int)
+            key = (1, sample_id)
         for lane in barcode.findall("Lane"):
+            if not aggregate_lanes:
+                stats = defaultdict(int)
+                key = (int(lane.attrib['number']), sample_id)
+
             for stat in lane:
                 stats[stat.tag] += int(stat.text)
 
+            samples[key] = stats
+
         samples[sample_id] = stats
     # Undetermined
-    stats = defaultdict(int)
-    sample = next(sam for sam in default_project.findall("Sample") if sam.attrib['name'] == "Unknown")
+    sample = next(sam for sam in default_project.findall("Sample") if sam.attrib['name'] == "unknown")
     barcode = next(bar for bar in sample.findall("Barcode") if bar.attrib['name'] == 'all')
+    stats = defaultdict(int)
     for lane in barcode.findall("Lane"):
+        if aggregate_lanes:
+            key = (1, None)
+        else:
+            key = (int(lane.attrib['number']), None)
+            stats = defaultdict(int)
+
         for stat in lane:
             stats[stat.tag] += int(stat.text)
-    samples[None] = stats
+
+        samples[key] = stats
 
     return samples
 
 
-def get_nextseq_stats(stats_xml_file_path, aggregate_reads=False):
+def get_nextseq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_reads=False):
     """Function for the NextSeq, to compute the canonical stats for individual 
     output files -- one per sample per read.
 
@@ -291,26 +338,37 @@ def get_nextseq_stats(stats_xml_file_path, aggregate_reads=False):
     being a dict indexed by the stats name:
     { (lane (=1), sample name, read) => {stat => value} }
     """
+
+    if aggregate_lanes:
+        lanes = (1,)
+    else:
+        lanes = (1,2,3,4)
     
     demultiplexing_stats = parse_ns_demultiplexing_stats(
-            os.path.join(stats_xml_file_path, "DemultiplexingStats.xml")
+            os.path.join(stats_xml_file_path, "DemultiplexingStats.xml"),
+            aggregate_lanes
             )
     conversion_stats = parse_ns_conversion_stats(
             os.path.join(stats_xml_file_path, "ConversionStats.xml"),
-            aggregate_reads
+            aggregate_lanes, aggregate_reads
             )
 
-    all_raw_reads = conversion_stats[("all", 1)][0]['ClusterCount']
-    all_pf_reads = conversion_stats[("all", 1)][1]['ClusterCount']
+    # Totals
+    all_raw_reads = dict(
+            (lane, conversion_stats[(lane, "all", 1)][0]['ClusterCount'] +
+                conversion_stats[(lane, None, 1)][0]['ClusterCount'])
+            for lane in lanes
+            )
+    all_pf_reads = dict(
+            (lane, conversion_stats[(lane, "all", 1)][1]['ClusterCount'] +
+                conversion_stats[(lane, None, 1)][1]['ClusterCount'])
+            for lane in lanes
+            )
+
     result = {}
-    # Coordinates: (sample)       if aggregate_reads
-    #              (sample, read) otherwise
     for coordinates in conversion_stats.keys():
-        if aggregate_reads:
-            sample = coordinates
-        else:
-            sample, read = coordinates
-        de_s = demultiplexing_stats[sample]
+        lane, sample, read = coordinates
+        de_s = demultiplexing_stats[(lane, sample)]
         con_s_raw, con_s_pf = conversion_stats[coordinates]
 
         stats = {}
@@ -321,8 +379,8 @@ def get_nextseq_stats(stats_xml_file_path, aggregate_reads=False):
             stats['%PF'] = con_s_pf['ClusterCount'] * 100.0 / con_s_raw['ClusterCount']
         else:
             stats['%PF'] = "100.0%"
-        stats['% of Raw Clusters Per Lane'] = con_s_raw['ClusterCount'] * 100.0 / all_raw_reads
-        stats['% of PF Clusters Per Lane'] = con_s_pf['ClusterCount'] * 100.0 / all_pf_reads
+        stats['% of Raw Clusters Per Lane'] = con_s_raw['ClusterCount'] * 100.0 / all_raw_reads[lane]
+        stats['% of PF Clusters Per Lane'] = con_s_pf['ClusterCount'] * 100.0 / all_pf_reads[lane]
         stats['% Perfect Index Read'] = de_s['PerfectBarcodeCount'] * 100.0 / de_s['BarcodeCount']
         stats['% One Mismatch Reads (Index)'] = de_s['OneMismatchBarcodeCount'] * 100.0 / de_s['BarcodeCount']
         stats['% Bases >=Q30'] = con_s_pf['YieldQ30'] * 100.0 / con_s_pf['Yield']

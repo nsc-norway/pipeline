@@ -99,7 +99,7 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
             if output.name == nsc.NEXTSEQ_FASTQ_OUTPUT.format(
                     input_sample.name
                     ):
-                themap[(name,)] = output
+                themap[(1,name,1)] = output
     return themap
 
 
@@ -129,12 +129,13 @@ def move_files(runid, output_dir, project_name, sample_sheet, reads):
 
         for f in files:
             if with_id_subdir:
-                input_path = "{base}/{project}/{sampleid}/{filename}".format(filename=fpath, **p)
+                input_path = "{base}/{project}/{sampleid}/{filename}".format(filename=f, **p)
             else:
-                input_path = "{base}/{project}/{filename}".format(filename=fpath, **p)
+                input_path = "{base}/{project}/{filename}".format(filename=f, **p)
 
             output_path = os.path.join(project_path, f)
-            os.move(input_path, output_path)
+            print "in", input_path, "out", output_path
+            os.rename(input_path, output_path)
 
     for dpath in set("{base}/{project}/{sampleid}".format(**p) for p in params):
         os.rmdir(dpath)
@@ -206,6 +207,7 @@ def main(process_id):
         process_ok = run_demultiplexing(process, num_samples,
                 cfg.bases_mask, cfg.n_threads, destination, input_dir, cfg.output_dir,
                 cfg.other_options, log_dir)
+        process_ok = True
         
         if process_ok:
             reads = [1]
@@ -216,7 +218,10 @@ def main(process_id):
                 pass
 
             if sample_sheet:
-                project_name = sample_sheet['header']['Experiment Name']
+                try:
+                    project_name = sample_sheet['data'][0]['project']
+                except KeyError:
+                    project_name = sample_sheet['header']['Experiment Name']
                 proj_dir = parse.get_project_dir(runid, project_name)
                 project_path = os.path.join(cfg.output_dir, proj_dir)
                 try:
@@ -226,12 +231,9 @@ def main(process_id):
                 move_files(runid, cfg.output_dir, project_name, sample_sheet['data'], reads)
 
                 id_res_map = make_id_resultfile_map(process, sample_sheet['data'], reads)
-                try:
-                    path = os.path.join(cfg.output_dir, "Stats")
-                    stats = parse.get_nextseq_stats(path, aggregate_reads=True)
-                    success = demultiplex.populate_results(process, id_res_map, stats)
-                except (IOError,KeyError):
-                    success = False
+                path = os.path.join(cfg.output_dir, "Stats")
+                stats = parse.get_nextseq_stats(path, aggregate_lanes=True, aggregate_reads=True)
+                success = demultiplex.populate_results(process, id_res_map, stats)
 
             if not success:
                 utilities.fail(process, "Failed to set UDFs")
