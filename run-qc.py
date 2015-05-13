@@ -31,7 +31,7 @@ def main(threads, run_dir, no_sample_sheet, process_undetermined):
         lane_pf = parse.get_lane_cluster_density(pf_path)
         raw_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane.txt")
         lane_raw = parse.get_lane_cluster_density(raw_path)
-        lane = [qc.Lane(1, lane_raw[1], lane_pf[1], lane_pf[1] / lane_raw[1])]
+        lanes = [qc.Lane(1, lane_raw[1], lane_pf[1], lane_pf[1] / lane_raw[1])]
 
     elif match.group(1) == "NS":
         instrument = "nextseq"
@@ -39,10 +39,11 @@ def main(threads, run_dir, no_sample_sheet, process_undetermined):
                 os.path.join(run_dir, "RunCompletionStatus.xml")).getroot()
         clus_den = float(run_completion.find("ClusterDensity").text)
         pf_ratio = float(run_completion.find("ClustersPassingFilter").text) / 100.0
-        lane = [qc.Lane(1, clus_den, clus_den * pf_ratio, pf_ratio)]
+        lanes = [qc.Lane(l, clus_den, clus_den * pf_ratio, pf_ratio) for l in (1,2,3,4)]
 
     demultiplex_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
-    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes, process_undetermined)
+    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes, 
+            include_undetermined=process_undetermined)
 
     qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
 
@@ -87,9 +88,10 @@ def main_lims(threads, process_id):
     if instrument == "miseq":
         lanes = qc.Lane(1, density_raw * 1000.0, density_pf * 1000.0, pf_ratio)
     else:
-        lanes = [qc.Lane(l, density_raw * 1000.0, density_pf * 1000.0, pf_ratio) for l in xrange(1,5)]
+        lanes = [qc.Lane(l, density_raw * 1000.0, density_pf * 1000.0, pf_ratio) for l in (1,2,3,4)]
 
-    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes, process.udf[nsc.PROCESS_UNDETERMINED_UDF])
+    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
+            include_undetermined=process.udf[nsc.PROCESS_UNDETERMINED_UDF])
     qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
     utilities.success_finish(process)
 
@@ -125,7 +127,11 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
 
     sample_sheet = parse.parse_ne_mi_seq_sample_sheet(open(sample_sheet_path).read())
     n_reads = len(sample_sheet['reads'])
-    project_name = sample_sheet['header']['Experiment Name']
+    try:
+        project_name = sample_sheet['data'][0]['project']
+    except KeyError: 
+        project_name = sample_sheet['header']['Experiment Name']
+
     project_dir = parse.get_project_dir(run_id, project_name)
 
     if instrument == "miseq":
