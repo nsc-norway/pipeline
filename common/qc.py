@@ -482,7 +482,7 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
     # Run FastQC
     # First output all fastqc results into QualityControl, them move them
     # in place later
-    ###run_fastqc(non_empty_files, demultiplex_dir, output_dir=quality_control_dir, max_threads=threads) 
+    run_fastqc(non_empty_files, demultiplex_dir, output_dir=quality_control_dir, max_threads=threads) 
     samples = [sam for pro in projects for sam in pro.samples]
     for s in samples:
        move_fastqc_results(quality_control_dir, s)
@@ -505,7 +505,7 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
                     re.sub(r"^{0}".format(re.escape(p.proj_dir)), ".", f.path)
                         for s in p.samples for f in s.files
                     ]
-            ###compute_md5( os.path.join(demultiplex_dir, p.proj_dir), threads, paths)
+            compute_md5( os.path.join(demultiplex_dir, p.proj_dir), threads, paths)
         else: # Project files are in root of demultiplexing dir
             compute_md5(demultiplex_dir, threads, ["./" + f.path for s in p.samples for f in s.files])
 

@@ -157,7 +157,6 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir, include_undetermined = F
 
         samples = {}
         for e in entries:
-            print e
             sample_dir = project_dir + "/Sample_" + e['SampleId']
             files = []
             for ri in xrange(1, n_reads + 1):
