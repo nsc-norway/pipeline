@@ -139,7 +139,7 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir, include_undetermined = F
     # Project -> [Sample x lane]
     project_entries = defaultdict(list)
     for sample_entry in entries:
-        project_entries[sample_entry['projectid']].append(sample_entry)
+        project_entries[sample_entry['ProjectId']].append(sample_entry)
 
     # Getting stats from Flowcell_demux_summary.xml (no longer using Demultiplex_stats.htm).
     ds_path = os.path.join(root_dir, "Basecall_Stats_" + fcid, "Flowcell_demux_summary.xml")
