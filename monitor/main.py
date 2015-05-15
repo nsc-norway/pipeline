@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from genologics.lims import *
 from genologics import config
 import datetime
