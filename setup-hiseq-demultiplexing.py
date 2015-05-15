@@ -4,7 +4,7 @@
 # do not depend on the inputs should be set as defaults in the LIMS or in the 
 # NSC configuration file.
 
-import sys, os
+import sys, os, re
 from argparse import ArgumentParser
 from genologics.lims import *
 import logging
@@ -61,7 +61,8 @@ def get_paths(process, seq_process):
     for i in process.all_inputs(unique=True):
         lanes.append(i.location[1].split(':')[0])
     
-    output_subdir = "Unaligned_L" + "".join(sorted(lanes)) + "_" + project.name
+    mang_proj_name = re.sub(r"[^A-Za-z0-9\-]", "_", project.name)
+    output_subdir = "Unaligned_L" + "".join(sorted(lanes)) + "_" + mang_proj_name
     dest_path = os.path.join(nsc.SECONDARY_STORAGE, run_id, output_subdir)
 
     return (source_path, dest_path)

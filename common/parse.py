@@ -97,7 +97,7 @@ def get_hiseq_stats(demux_summary_file_path, aggregate_reads=False):
 
     # each demux summary item has "coordinates", which is (lane, sample, read) or
     # (lane, sample) if aggregate_reads is set
-    demux_summary = parse_demux_summary(demux_summary_file_path)
+    demux_summary = parse_demux_summary(demux_summary_file_path, aggregate_reads)
     result = {}
     # lane_sum_clusters: { lane_id => number of clusters in lane } (for percentage per file)
     # Uses a single read, as # clusters is the same for all reads

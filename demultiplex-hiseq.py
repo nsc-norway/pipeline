@@ -186,7 +186,7 @@ def main(process_id):
 
         if not already_existed:
             utilities.running(process, "Copying run directory")
-            if not copyfiles.copy_files(process, 'hiseq'):
+            if not copyfiles.copy_files(runid, 'hiseq'):
                 utilities.fail(process, 'Unable to copy files')
                 return False
 
