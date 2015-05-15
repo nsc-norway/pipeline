@@ -38,7 +38,7 @@ def main(threads, demultiplex_dir):
     dm_path = glob.glob(os.path.join(
         demultiplex_dir, "Basecall_Stats_*", "Flowcell_demux_summary.xml"
         ))[0]
-    demux_summary = parse.parse_demux_summary(dm_path)
+    demux_summary = parse.parse_demux_summary(dm_path, False)
     # Number of reads: take the first sample and lane, count the reads (kind of a
     # lame way to do it, but it avoids the need for another file parser)
     n_reads = max(k[2] for k in demux_summary.keys())
