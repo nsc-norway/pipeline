@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from genologics.lims import *
 from genologics import config
 import datetime
@@ -40,22 +40,27 @@ def get_completed_projects(projects):
 
 @app.route('/')
 def get_main():
-    lims = Lims(config.BASEURI, config.USERNAME, config.PASSWORD)
-    active_projects = lims.get_projects(udf={'Progress': 'Delivered'})
-    show_date = datetime.date.today + datetime.timedelta(days=-30)
-    completed_projects = lims.get_projects(
-            open_date=show_date,
-            udf={'Progress': 'Delivered'}
-            )
+    try:
+        lims = Lims(config.BASEURI, config.USERNAME, config.PASSWORD)
+    except:
+        return "Failed to open connection to LIMS"
+    #active_projects = lims.get_projects(udf={'Progress': 'Delivered'})
+    show_date = datetime.date.today() + datetime.timedelta(days=-30)
+    #completed_projects = lims.get_projects(
+    #        open_date=show_date,
+    #        udf={'Progress': 'Delivered'}
+    #        )
 
-    pending = get_before_sequencing(active_projects)
-    sequencing = get_sequencing(active_projects)
-    data = get_data_processing()
-    completed = get_completed_projects(completed_projects)
+    #pending = get_before_sequencing(active_projects)
+    #sequencing = get_sequencing(active_projects)
+    #data = get_data_processing()
+    #completed = get_completed_projects(completed_projects)
 
 
-    # TODO: how to pass the parameters
+    ## TODO: how to pass the parameters
     return render_template('project-list.xhtml', server="ous-lims")
 
 if __name__ == '__main__':
+    app.debug = True
     app.run()
+
