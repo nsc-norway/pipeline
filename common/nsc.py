@@ -6,7 +6,7 @@ import getpass
 from ConfigParser import SafeConfigParser
 
 # Configure prod or dev
-TAG="dev"
+TAG="prod"
 
 if TAG == "prod":
     BASE_DIR = "/data/nsc.loki/automation"
@@ -151,6 +151,7 @@ elif TAG == "prod":
         pw_file = "/data/nsc.loki/automation/etc/seq-user/apiuser-password.txt"
     elif getpass.getuser() == "glsai":
         pw_file = "/opt/gls/clarity/users/glsai/apiuser-password.txt"
+
     lims = Lims(
             "http://ous-lims.ous.nsc.local:8080",
             "apiuser",

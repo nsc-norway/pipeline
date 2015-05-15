@@ -131,7 +131,7 @@ The "Cancel job" command is the same on all slurm-based process types: Name: Can
    - Name: Submit demultiplexing job. Command: /usr/bin/python /data/nsc.loki/automation/pipeline/epp-submit-slurm.py --pid={processLuid} --time=20:00:00 --threads={udf:Number of threads} --mem=2048 --thread-mem=512 --jobname={processLuid} /data/nsc.loki/automation/pipeline/demultiplex-hiseq.py {processLuid}
    - Name: Set demultiplexing options. Command: /usr/bin/python /data/nsc.loki/automation/pipeline/setup-hiseq-demultiplexing.py {processLuid} {compoundOutputFileLuid0}
    - Cancel job command.
- - UDFs: Slurm UDFs, Bases Mask: text, Number of mismatches: numeric, Source run directory: text, Fastq output directory: text, Number of threads: numeric, Other options for configureBclToFastq: text.
+ - UDFs: Slurm UDFs, Bases Mask: text, Number of mismatches: numeric; use first preset as default; add 1 as preset, Source run directory: text, Fastq output directory: text, Number of threads: numeric, Other options for configureBclToFastq: text.
 
 
 #### NSC Prepare for delivery
