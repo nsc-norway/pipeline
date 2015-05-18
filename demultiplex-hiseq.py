@@ -100,7 +100,7 @@ def rename_project_directories(runid, unaligned_dir, sample_sheet):
     renamed directories."""
 
 
-    projects = set(sam['SampleProject'] for sam in sample_sheet)
+    projects = set(sam['sampleproject'] for sam in sample_sheet)
     projdir = {}
     for pro in projects:
         original = os.path.join(unaligned_dir, "Project_" + pro)
@@ -118,7 +118,7 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
     """
     themap = {}
     for entry in sample_sheet_data:
-        lane = entry['Lane']
+        lane = entry['lane']
         lane_location = lane + ":1"
         id = entry['sampleid']
         input_limsid = entry['description']
@@ -204,10 +204,12 @@ def main(process_id):
     
         if ssheet_file:
             utilities.running(process, "Demultiplexing")
-            process_ok = run_demultiplexing(process, ssheet_file, cfg.bases_mask,
-                    cfg.n_threads, cfg.mismatches, start_dir, cfg.dest_dir,
-                    log_dir, cfg.other_options)
+            #process_ok = run_demultiplexing(process, ssheet_file, cfg.bases_mask,
+            #        cfg.n_threads, cfg.mismatches, start_dir, cfg.dest_dir,
+            #        log_dir, cfg.other_options)
+            process_ok = True
             if process_ok:
+                utilities.running(process, "Saving stats")
                 projdirs = rename_project_directories(runid, cfg.dest_dir, sample_sheet)
                 reads = [1]
                 try:

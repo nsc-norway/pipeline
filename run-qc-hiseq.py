@@ -108,7 +108,7 @@ def get_hiseq_sw_versions(demultiplex_config):
     return sw_versions
 
 
-def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir, include_undetermined = False):
+def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir, include_undetermined = True):
     """Get HiSeq metadata about project, sample and files, including QC data. 
     Converted to the internal representation (model) classes defined above.
 
