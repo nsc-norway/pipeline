@@ -67,6 +67,7 @@ def main(process_id):
         proj_dir = parse.get_project_dir(runid, project_name)
         project_path = os.path.join(output_rundir, proj_dir)
     elif instrument == "miseq":
+        proj_dir = parse.get_project_dir(runid, project_name)
         output_rundir = os.path.join(nsc.SECONDARY_STORAGE, runid) # not the best way...
         project_path = os.path.join(output_rundir, "Data", "Intensities", "BaseCalls", proj_dir)
 
