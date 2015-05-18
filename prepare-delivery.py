@@ -28,7 +28,6 @@ def delivery_norstore(project_name, source_path):
     """Create a tar file"""
 
     project_dir = os.path.basename(source_path).rstrip("/")
-    parent_path = os.path.dirname(source_path)
     save_path = os.path.join(nsc.DELIVERY_DIR, project_dir)
     try:
         os.mkdir(save_path)
@@ -39,7 +38,7 @@ def delivery_norstore(project_name, source_path):
     subprocess.check_call(args, cwd=os.path.dirname(source_path)) # dirname = parent dir
     with open(save_path + "/md5sum.txt", "w") as md5file:
         # would use normal md5sum, but we have md5deep as a dependency already
-        subprocess.check_call([nsc.MD5DEEP, tarname], cwd=parent_path, stdout=md5file)
+        subprocess.check_call([nsc.MD5DEEP, tarname], cwd=save_path, stdout=md5file)
 
 
 def main(process_id):
