@@ -43,8 +43,9 @@ def main(threads, demultiplex_dir):
     # lame way to do it, but it avoids the need for another file parser)
     n_reads = max(k[2] for k in demux_summary.keys())
     print "Number of non-index reads:", n_reads
+    print "Including undetermined indexes for QC analysis"
 
-    info, projects = get_hiseq_qc_data(run_id, n_reads, lanes, demultiplex_dir)
+    info, projects = get_hiseq_qc_data(run_id, n_reads, lanes, demultiplex_dir, True)
     qc.qc_main(demultiplex_dir, projects, 'hiseq', run_id, info['sw_versions'], threads)
 
 
@@ -81,7 +82,7 @@ def main_lims(threads, process_id):
         pf_ratio = lane.udf['%PF R1'] / 100.0
         lanes[lane_id] = qc.Lane(lane_id, density_raw * 1000.0, density_pf * 1000.0, pf_ratio)
 
-    info, projects = get_hiseq_qc_data(run_id, n_reads, lanes, demultiplex_dir)
+    info, projects = get_hiseq_qc_data(run_id, n_reads, lanes, demultiplex_dir, process.udf[nsc.PROCESS_UNDETERMINED_UDF])
     qc.qc_main(demultiplex_dir, projects, 'hiseq', run_id, info['sw_versions'], threads)
 
     utilities.success_finish(process)
