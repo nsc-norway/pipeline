@@ -25,10 +25,11 @@ class Project(object):
       for MiSeq and NextSeq
     samples: list of samples
     """
-    def __init__(self, name, proj_dir, samples=[]):
+    def __init__(self, name, proj_dir, samples=[], is_undetermined=False):
         self.name = name
         self.proj_dir = proj_dir
         self.samples = samples
+        self.is_undetermined = is_undetermined
 
 
 class Sample(object):
@@ -500,14 +501,15 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
     
     # Generate md5sums for projects
     for p in projects:
-        if p.proj_dir:
-            paths = [
-                    re.sub(r"^{0}".format(re.escape(p.proj_dir)), ".", f.path)
-                        for s in p.samples for f in s.files
-                    ]
-            compute_md5( os.path.join(demultiplex_dir, p.proj_dir), threads, paths)
-        else: # Project files are in root of demultiplexing dir
-            compute_md5(demultiplex_dir, threads, ["./" + f.path for s in p.samples for f in s.files])
+        if not p.is_undetermined:
+            if p.proj_dir:
+                paths = [
+                        re.sub(r"^{0}".format(re.escape(p.proj_dir)), ".", f.path)
+                            for s in p.samples for f in s.files
+                        ]
+                compute_md5( os.path.join(demultiplex_dir, p.proj_dir), threads, paths)
+            else: # Project files are in root of demultiplexing dir
+                compute_md5(demultiplex_dir, threads, ["./" + f.path for s in p.samples for f in s.files])
 
     # Generate internal reports
     generate_internal_html_report(quality_control_dir, samples)

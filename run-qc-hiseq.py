@@ -148,7 +148,8 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir, include_undetermined = T
 
     projects = []
     for proj, entries in project_entries.items():
-        if re.match("Undetermined_indices$", proj):
+        undetermined = re.match("Undetermined_indices$", proj)
+        if undetermined:
             if not include_undetermined:
                 continue
 
@@ -179,7 +180,7 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir, include_undetermined = T
             sample.files += files
 
         # Project 
-        p = qc.Project(proj, project_dir, samples.values())
+        p = qc.Project(proj, project_dir, samples.values(), is_undetermined=undetermined)
         projects.append(p)
 
     info = {"sw_versions": sw_versions}
