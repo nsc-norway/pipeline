@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from genologics.lims import *
-from genologics import config
+import nsc
 import datetime
 
 # Project / Sample progress tagging
@@ -8,7 +8,7 @@ import datetime
 # The Progress UDF of the Sample is set by Clarity LIMS on various stages.
 
 
-# Obviously, different samples can be in different workflows
+# Different samples can be in different workflows
 # Project 
 # |- Sample 1 -> W1
 # |- Sample 2 -> W1, W2
@@ -19,8 +19,8 @@ import datetime
 # |- Sample 2
 # |          |- Artifact 1 in workflow 1
 # |          |- Artifact 2 in workflow 2
-# |          \- Artifact 3 in workflow 1
-# \- Sample 3
+# |          \_ Artifact 3 in workflow 1
+# \_ Sample 3
 
 # When a (submitted) sample is added to a workflow, an artifact for that sample is 
 # automatically generated. Each artifact can have derived samples for them, which
@@ -37,7 +37,7 @@ import datetime
 #    the evaluated or pending state is no longer relevant.
 
 # Algorithm for determining the progress:
-
+# 
 
 
 
@@ -58,11 +58,9 @@ class ProjectInfo(object):
         self.total = total
 
 
-def get_before_sequencing():
-    pass
-
 def get_sequencing():
-    pass
+    for instr, process in nsc.SEQ_PROCESSES:
+        ps = nsc.lims.get_processes(type=process)
 
 def get_data_processing():
     pass
@@ -78,10 +76,6 @@ def get_completed_projects(projects):
 
 @app.route('/')
 def get_main():
-    try:
-        lims = Lims(config.BASEURI, config.USERNAME, config.PASSWORD)
-    except:
-        return "Failed to open connection to LIMS"
     #active_projects = lims.get_projects(udf={'Progress': 'Delivered'})
     show_date = datetime.date.today() + datetime.timedelta(days=-30)
     #completed_projects = lims.get_projects(
