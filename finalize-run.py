@@ -21,8 +21,11 @@ def main(process_id):
             len(inputs) == next(iter(flowcells)).occupied_wells:
 
         fc = next(iter(flowcells))
-        del fc.udf[nsc.AUTO_FLOWCELL_UDF]
-        fc.put()
+        try:
+            del fc.udf[nsc.AUTO_FLOWCELL_UDF]
+            fc.put()
+        except KeyError:
+            pass # in case it was not marked for automation
 
         seq_process = utilities.get_sequencing_process(process)
 
