@@ -372,19 +372,22 @@ def get_nextseq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_reads
         con_s_raw, con_s_pf = conversion_stats[coordinates]
 
         stats = {}
-        stats['# Reads'] = con_s_raw['ClusterCount']
-        stats['# Reads PF'] = con_s_pf['ClusterCount']
-        stats['Yield PF (Gb)'] = con_s_pf['Yield'] / 1e9
-        if con_s_raw['ClusterCount'] > 0:
-            stats['%PF'] = con_s_pf['ClusterCount'] * 100.0 / con_s_raw['ClusterCount']
-        else:
-            stats['%PF'] = "100.0%"
-        stats['% of Raw Clusters Per Lane'] = con_s_raw['ClusterCount'] * 100.0 / all_raw_reads[lane]
-        stats['% of PF Clusters Per Lane'] = con_s_pf['ClusterCount'] * 100.0 / all_pf_reads[lane]
-        stats['% Perfect Index Read'] = de_s['PerfectBarcodeCount'] * 100.0 / de_s['BarcodeCount']
-        stats['% One Mismatch Reads (Index)'] = de_s['OneMismatchBarcodeCount'] * 100.0 / de_s['BarcodeCount']
-        stats['% Bases >=Q30'] = con_s_pf['YieldQ30'] * 100.0 / con_s_pf['Yield']
-        stats['Ave Q Score'] = con_s_pf['QualityScoreSum'] / con_s_pf['Yield']
+        try:
+            stats['# Reads'] = con_s_raw['ClusterCount']
+            stats['# Reads PF'] = con_s_pf['ClusterCount']
+            stats['Yield PF (Gb)'] = con_s_pf['Yield'] / 1e9
+            if con_s_raw['ClusterCount'] > 0:
+                stats['%PF'] = con_s_pf['ClusterCount'] * 100.0 / con_s_raw['ClusterCount']
+            else:
+                stats['%PF'] = "100.0%"
+            stats['% of Raw Clusters Per Lane'] = con_s_raw['ClusterCount'] * 100.0 / all_raw_reads[lane]
+            stats['% of PF Clusters Per Lane'] = con_s_pf['ClusterCount'] * 100.0 / all_pf_reads[lane]
+            stats['% Perfect Index Read'] = de_s['PerfectBarcodeCount'] * 100.0 / de_s['BarcodeCount']
+            stats['% One Mismatch Reads (Index)'] = de_s['OneMismatchBarcodeCount'] * 100.0 / de_s['BarcodeCount']
+            stats['% Bases >=Q30'] = con_s_pf['YieldQ30'] * 100.0 / con_s_pf['Yield']
+            stats['Ave Q Score'] = con_s_pf['QualityScoreSum'] / con_s_pf['Yield']
+        except ZeroDivisionError:
+            print "Warning: division by zero"
         result[coordinates] = stats
 
     return result

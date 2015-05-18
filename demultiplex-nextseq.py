@@ -207,7 +207,7 @@ def main(process_id):
         process_ok = run_demultiplexing(process, num_samples,
                 cfg.bases_mask, cfg.n_threads, destination, input_dir, cfg.output_dir,
                 cfg.other_options, log_dir)
-        process_ok = True
+        #process_ok = True
         
         if process_ok:
             reads = [1]
