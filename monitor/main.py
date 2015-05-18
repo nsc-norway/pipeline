@@ -7,8 +7,14 @@ import datetime
 # ---------------------------------
 
 # Method for generating the progress overview:
-# 
-
+# 1. Queues:   Queue resources are queried via the API to fetch 
+#              samples which are queued for a step
+# 2. Processes:Process types which should be monitored have a boolean 
+#              UDF called "Monitor", with a default of true. This program
+#              queries the API for any process of a given type, with the 
+#              Monitor flag set. The Monitor flag is only used by this 
+#              program. It is cleared if the process should no longer be
+#              monitored.
 
 
 app = Flask(__name__)
