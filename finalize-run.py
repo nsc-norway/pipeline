@@ -20,6 +20,10 @@ def main(process_id):
     if len(flowcells) == 1 and \
             len(inputs) == next(iter(flowcells)).occupied_wells:
 
+        fc = next(iter(flowcells))
+        del fc.udf[nsc.AUTO_FLOWCELL_UDF]
+        fc.put()
+
         seq_process = utilities.get_sequencing_process(process)
 
         runid = seq_process.udf['Run ID']
