@@ -143,6 +143,54 @@ def move_files(runid, output_dir, project_name, sample_sheet, reads):
         os.rmdir(dpath)
 
 
+def merge_fastq(source_files, dest_file):
+    with open(dest_file, 'wb') as out:
+        for f in source_files:
+            shutil.copyfileobj(open(f, 'rb'), out)
+
+
+def merge_files(runid, output_dir, project_name, sample_sheet, reads):
+    proj_dir = parse.get_project_dir(runid, project_name)
+    project_path = output_dir + "/" + proj_dir
+    
+    params = []
+    for i, row in enumerate(sample_sheet):
+        for r in reads:
+            par = dict(row)
+            par['read'] = r
+            par['base'] = output_dir
+            par['index'] = i+1
+            par['project'] = project_name
+            par['project_path'] = project_path
+            params.append(par)
+
+    with_id_subdir = not all(p['sampleid'] == p['samplename'] for p in params)
+    for p in params:
+        file_name = "{samplename}_S{index}_L{lane}_R{read}_001.fastq.gz"
+        files = [ file_name.format( lane=str(lane).zfill(3), **p) for lane in xrange(1, 5) ]
+        out_file = file_name.format(lane="00X", **p)
+
+        input_paths = []
+        for f in files:
+            if with_id_subdir:
+                input_path = "{base}/{project}/{sampleid}/{filename}".format(filename=f, **p)
+            else:
+                input_path = "{base}/{project}/{filename}".format(filename=f, **p)
+            input_paths.append(input_path)
+        output_path = os.path.join(project_path, f)
+
+        merge_fastq(input_paths, output_path)
+
+        #for ip in input_paths:
+        #    os.remove(ip)
+
+    #for dpath in set("{base}/{project}/{sampleid}".format(**p) for p in params):
+    #    os.rmdir(dpath)
+    #for dpath in set("{base}/{project}".format(**p) for p in params):
+    #    os.rmdir(dpath)
+
+
+
 def get_sample_sheet(process, output_run_dir):
     """Get sample sheet from LIMS or run directory."""
 
