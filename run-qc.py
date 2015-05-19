@@ -39,7 +39,10 @@ def main(threads, run_dir, no_sample_sheet, process_undetermined):
                 os.path.join(run_dir, "RunCompletionStatus.xml")).getroot()
         clus_den = float(run_completion.find("ClusterDensity").text)
         pf_ratio = float(run_completion.find("ClustersPassingFilter").text) / 100.0
-        lanes = [qc.Lane(l, clus_den, clus_den * pf_ratio, pf_ratio) for l in (1,2,3,4)]
+        #lanes = [qc.Lane(l, clus_den, clus_den * pf_ratio, pf_ratio) for l in (1,2,3,4)]
+        # For merged files:
+        lanes = [qc.Lane("X", clus_den, clus_den * pf_ratio, pf_ratio)]
+
 
     demultiplex_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
     info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes, 
@@ -88,7 +91,9 @@ def main_lims(threads, process_id):
     if instrument == "miseq":
         lanes = qc.Lane(1, density_raw * 1000.0, density_pf * 1000.0, pf_ratio)
     else:
-        lanes = [qc.Lane(l, density_raw * 1000.0, density_pf * 1000.0, pf_ratio) for l in (1,2,3,4)]
+        #lanes = [qc.Lane(l, density_raw * 1000.0, density_pf * 1000.0, pf_ratio) for l in (1,2,3,4)]
+        # Merged lane fastq files
+        lanes = [qc.Lane("X", density_raw * 1000.0, density_pf * 1000.0, pf_ratio)]
 
     info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
             include_undetermined=process.udf[nsc.PROCESS_UNDETERMINED_UDF])
@@ -110,7 +115,7 @@ def get_sw_versions(run_dir):
 
 
 def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
-        sample_sheet_path=None, include_undetermined = False):
+        sample_sheet_path=None, include_undetermined=False):
     """Get NextSeq or MiSeq QC model objects.
 
     Gets the info from the sample sheet. Works for indexed projects and for 
@@ -150,9 +155,9 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
             sample_name = sam['sampleid']
         for lane in lanes:
             for ir in xrange(1, n_reads+1):
-                path = "{0}/{1}_S{2}_L00{3}_R{4}_001.fastq.gz".format(
+                path = "{0}/{1}_S{2}_{3}_R{4}_001.fastq.gz".format(
                         project_dir, sample_name, str(sam_index + 1),
-                        lane.id, ir)
+                        str(lane_id).zfill(3), ir)
                 file_stats = stats.get((lane.id, sample_name, ir))
                 files.append(qc.FastqFile(lane, ir, path, file_stats))
                 print "file ", path
@@ -165,7 +170,7 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
     if include_undetermined:
         unfiles = [
                 qc.FastqFile(
-                    lane, ir, "Undetermined_S0_L00%s_R%d_001.fastq.gz" % (lane.id, ir),
+                    lane, ir, "Undetermined_S0_L%s_R%d_001.fastq.gz" % (str(lane.id).zfill(3), ir),
                     stats.get((lane.id, None, ir))
                     )
                 for ir in xrange(1, n_reads + 1) for lane in lanes
@@ -207,7 +212,7 @@ if __name__ == '__main__':
     elif args.DIR and not args.pid:
         main(threads, args.DIR, args.no_sample_sheet, args.process_undetermined)
     else:
-        print "Must specify either LIMS-ID of QC process or Unaligned (bcl2fastq output) directory"
+        print "Must specify either LIMS-ID of QC process or bcl2fastq2 output directory"
         sys.exit(1)
 
 

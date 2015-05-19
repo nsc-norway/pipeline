@@ -239,7 +239,7 @@ def parse_ns_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_
             for key, (row_raw, row_pf) in group:
                 stats_raw.update(row_raw)
                 stats_pf.update(row_pf)
-            samples[(1,) + key[1:]] = dict(stats_raw), dict(stats_pf)
+            samples[("X",) + key[1:]] = dict(stats_raw), dict(stats_pf)
 
     if aggregate_reads:
         # sorted samples by 
@@ -267,7 +267,7 @@ def parse_ns_demultiplexing_stats(conversion_stats_path, aggregate_lanes):
          (lane, sample name) => {stats}
     } 
     or {
-         (1, sample name) => {stats}
+         ("X", sample name) => {stats}
     } 
     """
     xmltree = ElementTree.parse(conversion_stats_path)
@@ -309,7 +309,7 @@ def parse_ns_demultiplexing_stats(conversion_stats_path, aggregate_lanes):
     stats = defaultdict(int)
     for lane in barcode.findall("Lane"):
         if aggregate_lanes:
-            key = (1, None)
+            key = ("X", None)
         else:
             key = (int(lane.attrib['number']), None)
             stats = defaultdict(int)
@@ -340,7 +340,7 @@ def get_nextseq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_reads
     """
 
     if aggregate_lanes:
-        lanes = (1,)
+        lanes = ("X",)
     else:
         lanes = (1,2,3,4)
     

@@ -32,7 +32,7 @@ def populate_results(process, ids_resultfile_map, demultiplex_stats):
             lane = coordinates[0]
             sample_name = coordinates[1]
         else:
-            lane = 1
+            lane = "X"
             sample_name = coordinates[0]
 
         lims_fastqfile = None
