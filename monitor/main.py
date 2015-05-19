@@ -2,6 +2,8 @@ from flask import Flask, render_template
 from genologics.lims import *
 import nsc
 import datetime
+import threading
+from functools import partial
 
 # Project / Sample progress
 # ---------------------------------
@@ -16,11 +18,47 @@ import datetime
 #              program. It is cleared if the process should no longer be
 #              monitored.
 
-
 app = Flask(__name__)
 
+COMPLETED_DAYS = 30
 
-class ProjectInfo(object):
+INSTRUMENTS = ["HiSeq", "NextSeq", "MiSeq"]
+# [ (Protocol, Step) ]
+SEQUENCING = [
+        ("Illumina SBS (HiSeq GAIIx) 5.0", "Illumina Sequencing (Illumina SBS) 5.0"),
+        ("Illumina SBS (NextSeq) 1.0", "NextSeq Run (NextSeq) 1.0"),
+        ("Illumina SBS (NextSeq) 1.0", "NextSeq Run (NextSeq) 1.0")
+        ]
+
+# [ (Protocol, (Step, Step, Step)) ]
+DATA_PROCESSING = [
+        ("NSC Data processing for HiSeq", (
+            "NSC Demultiplexing (HiSeq)",
+            "NSC Data Quality Reporting (HiSeq)"
+            )),
+        ]
+
+queues = {}
+
+def init_application():
+    # We get queue instances as part of the initialisation, then keep them
+    # in the queues dict. (looking up queues is time consuming)
+    for protocol, protocol_steps in DATA_PROCESSING:
+        proto = nsc.lims.get_protocols(name=protocol)[0]
+        for step_name in protocol_steps:
+            for ps in proto.steps:
+                if step_name == ps.name:
+                    queues[(protocol, step_name)] = ps.queue()
+    for protocol, protocol_step in SEQUENCING:
+        proto = nsc.lims.get_protocols(name=protocol)[0]
+        for ps in proto.steps:
+            if protocol_step == ps.name:
+                queues[(protocol, protocol_step)] = ps.queue()
+
+
+
+
+class ProjectStatus(object):
     """Represents the progress / status of each project"""
 
     def __init__(
@@ -33,16 +71,65 @@ class ProjectInfo(object):
         self.status = status
         self.total = total
 
+class QueueState(object):
+    def __init__(self, protocol, step, num):
+        self.protocol = protocol
+        self.step = step
+        self.num = num
 
-def get_sequencing():
-    for instr, process in nsc.SEQ_PROCESSES:
-        ps = nsc.lims.get_processes(type=process)
+class SimpleSequencerRun(object):
+    def __init__(self, project):
+        self.project = project
 
-def get_data_processing():
-    pass
 
-def get_delivery():
-    pass
+
+def get_queue(protocol, step):
+    q = queues[(protocol, step)]
+    q.get(force=True)
+    if len(q.artifacts) > 0:
+        return QueueState(protocol, step, len(q.artifacts))
+
+
+def background_clear_monitor(completed):
+    for proc in completed:
+        proc.udf['Monitor'] = False
+        proc.put()
+
+
+def get_processes(process_name):
+    procs = nsc.lims.get_processes(type=process_name, udf={'Monitor': True})
+    completed = []
+    result = []
+    for proc in procs:
+        step = Step(nsc.lims, id=proc.id)
+        if step.current_state == "COMPLETED":
+            completed.append(proc)
+        else:
+            result.append(proc)
+
+    if completed:
+        clear_task = partial(background_clear_monitor, completed)
+        t = threading.Thread(target = clear_task)
+        t.run()
+    return result
+
+
+def read_mi_next_seq(process):
+    try:
+        project = process.all_inputs()[0].samples[0].project.name
+    except IndexError:
+        return SimpleSequencerRun("")
+
+    return SimpleSequencerRun(project)
+
+def read_hiseq(process):
+    return None
+
+
+def get_sequencing(protocol, process_name, read_function):
+    procs = get_processes(process_name)
+    return [read_function(proc) for proc in procs]
+
 
 def get_completed_projects(projects):
     return [
@@ -52,8 +139,12 @@ def get_completed_projects(projects):
 
 @app.route('/')
 def get_main():
-    #active_projects = lims.get_projects(udf={'Progress': 'Delivered'})
-    show_date = datetime.date.today() + datetime.timedelta(days=-30)
+    
+    seq_queues = [get_queue(*proc) for proc in SEQUENCING]
+    seq = [get_sequencing(SEQUENCING[0], read_hiseq)] +\
+            [get_sequencing(sp, read_mi_next_seq) for sp in SEQUENCING[1:]]
+
+    show_date = datetime.date.today() + datetime.timedelta(days=-COMPLETED_DAYS)
     #completed_projects = lims.get_projects(
     #        open_date=show_date,
     #        udf={'Progress': 'Delivered'}
@@ -66,9 +157,16 @@ def get_main():
 
 
     ## TODO: how to pass the parameters
-    return render_template('project-list.xhtml', server="ous-lims")
+    return render_template(
+            'project-list.xhtml',
+            server=nsc.lims.baseuri,
+            completedays=COMPLETED_DAYS,
+            seq_queues=seq_queues,
+            sequencing=seq
+            )
 
 if __name__ == '__main__':
     app.debug = True
+    init_application()
     app.run()
 

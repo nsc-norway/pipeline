@@ -6,47 +6,68 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Project overview</title>
+<link rel="stylesheet" href="static/style.css" type="text/css"/>
 </head>
 <body>
 
 <div class="header">
 	<img src="static/logo.png" class="logo" alt="NSC"/>
+	<div class="header-text">
+		<h1 class="title">Monitoring page</h1>
+       		Server: {{ server }}</div>
+	</div>
+	<div style="clear: both;"/>
 </div>
 
-<h2 class="section-header">In prep / pending</h2>
-{% for project in before_sequencing %}
-<div class="project">
-	<span class="project-name">{{ project.name }}</span>
-Sample prep
-</div>
-{% endfor %}
-
+<div class="section">
 <h2 class="section-header">Sequencing</h2>
-{% for project in sequencing %}
-<div class="project">
-	<span class="project-name">{{ project.name }}</span>
-Sample prep
-</div>
+<table class="main-table">
+<tr>
+<th>HiSeq</th>
+<th>NextSeq</th>
+<th>MiSeq</th>
+</tr>
+
+<tr>
+{% for sq in seq_queues %}
+<td>
+	{% if sq %}
+	<div class="box">
+	<h4 class="box-header">{{ seq_queues[i].step }}</h4>
+	Queued: {{ sq.num }}
+	</div>
+	{% endif %}
+</td>
+{% endfor %}
+</tr>
+
+
+<tr>
+{% for seq in sequencing[0:1] %}
+<td>
+{% for proc in seq %}
+	<div class="box">
+	<h4 class="box-header">Started: {{ proc.start_date }}</h4>
+	Queued: {{ sequencing[i].num }}
+	</div>
 {% endfor %}
+</td>
+{% endfor %}
+
+</tr>
+
+</table>
+
+</div>
+<div style="clear: both;"/>
+
 
 <h2 class="section-header">Data processing</h2>
-{% for project in sequencing %}
-<div class="project">
-	<span class="project-name">{{ project.name }}</span>
-Sample prep
-</div>
-{% endfor %}
+
 
 <h2 class="section-header">Delivery</h2>
-{% for project in delivery %}
-<div class="project">
-	<span class="project-name">{{ project.name }}</span>
 
-	Project delivery
-</div>
-{% endfor %}
-
-<h2 class="section-header">Completed</h2>
+<h2 class="section-header">Completed (last {{ completedays }} days)</h2>
 {% for project in completed_recent %}
 <div class="project">
 	<span class="project-name">{{ project.name }}</span>
