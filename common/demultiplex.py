@@ -63,7 +63,7 @@ def populate_results(process, ids_resultfile_map, demultiplex_stats):
                 else:
                     raise
             # Can't set this UDF, don't know why...
-            #analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
+            #analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of Raw Clusters Per Lane']
             #analyte.put()
 
     return True
