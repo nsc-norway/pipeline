@@ -13,7 +13,7 @@
 <div class="header">
 	<img src="static/logo.png" class="logo" alt="NSC"/>
 	<div class="header-text">
-		<h1 class="title">Monitoring page</h1>
+		<h1 class="title">Sequencing data status</h1>
        		Server: {{ server }}</div>
 	</div>
 	<div style="clear: both;"/>
@@ -47,8 +47,24 @@
 <td>
 {% for proc in seq %}
 	<div class="box">
-	<h4 class="box-header">Started: {{ proc.start_date }}</h4>
-	Queued: {{ sequencing[i].num }}
+		<h4 class="box-header">
+		<a href="{{proc.url}}">Started: {{ proc.start_date }}</a>
+		</h4>
+	Queued: {{ proc.num }}
+	</div>
+{% endfor %}
+</td>
+{% endfor %}
+
+
+{% for seq in sequencing[1:] %}
+<td>
+{% for proc in seq %}
+	<div class="box">
+	<h4 class="box-header">
+	<a href="{{proc.url}}">{{ proc.project }}</a>
+	</h4>
+	Queued: {{ proc.num }}
 	</div>
 {% endfor %}
 </td>

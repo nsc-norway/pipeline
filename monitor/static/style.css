@@ -44,7 +44,7 @@ h2.section-header {
 	font-weight: normal;
 	font-size: 1.3em;
 	background-color: #DDEEFF;
-	margin-bottom: 0;
+	margin-bottom: 0.5em;
 }
 
 table.main-table {
@@ -52,17 +52,20 @@ table.main-table {
 }
 
 table.main-table th {
-	margin: 0;
+	width: 33%;
 	background-color: #FFFFDD;
 	border: 1px solid #DDDD55;
+	margin: 0;
 }
 
 table.main-table td {
 	margin: 0;
+	padding: 0;
 }
 
 div.box {
 	border: 1px solid #999999;
+	padding: 0.2em 0.5em;
 }
 
 h3.col-header {
