@@ -151,12 +151,15 @@ elif TAG == "prod":
         pw_file = "/data/nsc.loki/automation/etc/seq-user/apiuser-password.txt"
     elif getpass.getuser() == "glsai":
         pw_file = "/opt/gls/clarity/users/glsai/apiuser-password.txt"
-
-    lims = Lims(
-            "http://ous-lims.ous.nsc.local:8080",
-            "apiuser",
-            open(pw_file).read().strip()
-            )
+    else:
+        pw_file = None
+    
+    if pw_file: # make sure this can load w/o pw file, for non-lims tasks
+        lims = Lims(
+                "http://ous-lims.ous.nsc.local:8080",
+                "apiuser",
+                open(pw_file).read().strip()
+                )
 
 
 config = SafeConfigParser({
