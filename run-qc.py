@@ -155,9 +155,9 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
             sample_name = sam['sampleid']
         for lane in lanes:
             for ir in xrange(1, n_reads+1):
-                path = "{0}/{1}_S{2}_{3}_R{4}_001.fastq.gz".format(
+                path = "{0}/{1}_S{2}_L{3}_R{4}_001.fastq.gz".format(
                         project_dir, sample_name, str(sam_index + 1),
-                        str(lane_id).zfill(3), ir)
+                        str(lane.id).zfill(3), ir)
                 file_stats = stats.get((lane.id, sample_name, ir))
                 files.append(qc.FastqFile(lane, ir, path, file_stats))
                 print "file ", path

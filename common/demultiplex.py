@@ -36,10 +36,8 @@ def populate_results(process, ids_resultfile_map, demultiplex_stats):
             sample_name = coordinates[0]
 
         lims_fastqfile = None
-        print coordinates
         try:
             lims_fastqfile = ids_resultfile_map[coordinates]
-            print lims_fastqfile
             undetermined = False
         except KeyError:
             if sample_name:

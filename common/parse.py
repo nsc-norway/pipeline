@@ -291,7 +291,7 @@ def parse_ns_demultiplexing_stats(conversion_stats_path, aggregate_lanes):
         barcode = next(bar for bar in sample.findall("Barcode") if bar.attrib['name'] == 'all')
         if aggregate_lanes:
             stats = defaultdict(int)
-            key = (1, sample_id)
+            key = ("X", sample_id)
         for lane in barcode.findall("Lane"):
             if not aggregate_lanes:
                 stats = defaultdict(int)
