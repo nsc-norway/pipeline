@@ -1,15 +1,40 @@
-#!/bin/env python
+#!/usr/bin/python
 # Quality control script
 
 # This is a manual interface to the QC library. No LIMS interaction is 
 # required, but the modules must be in place, as we haven't enforced 
 # a strict separation.
 
+# SBATCH HEADERS FOR NON-LIMS SLURM OPERATION
+# (for lims it uses the wrapper script in slurm/)
+#SBATCH --account=nsc
+#SBATCH --qos=high
+#SBATCH --partition=main
+#SBATCH --time=1-0
+
+# Job resources.
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=4G
+
+# Set performance options:
+#SBATCH --mem_bind=local
+#SBATCH --hint=compute_bound
+#SBATCH --hint=multithread
+# END SBATCH OPTIONS
+
+
+
 import re
 import sys, os
 import argparse, glob
 from collections import defaultdict
 from xml.etree import ElementTree
+
+if "--sbatch" in sys.argv:
+    # Hacky way...
+    sys.path.insert(0, "/data/nsc.loki/automation/pipeline")
+
 from genologics.lims import *
 from common import nsc, utilities, qc, parse
 
@@ -193,17 +218,15 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir, include_undetermined = T
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--threads', type=int, default=None, help='Number of threads (cores)')
+    parser.add_argument('--threads', type=int, default=1, help='Number of threads (cores)')
     parser.add_argument('--pid', default=None, help="Process-ID if running within LIMS")
+    parser.add_argument('--sbatch', default=False, action='store_true', help="Running under sbatch (not working well)")
     parser.add_argument('DIR', nargs='?', default=None, help="Demultiplexed data directory (Unaligned)")
     args = parser.parse_args()
     threads = args.threads
-    if not threads:
-        try:
-            threads = int(os.environ['SLURM_CPUS_ON_NODE'])
-            print "Threads from slurm: ", threads
-        except KeyError:
-            threads = 1
+    if args.sbatch:
+        threads = int(os.environ['SLURM_CPUS_ON_NODE'])
+        print "Threads from slurm: ", threads
 
     if args.pid and not args.DIR:
         try:

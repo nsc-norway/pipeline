@@ -1,7 +1,6 @@
 # NSC-specific configuration
 
 from genologics.lims import *
-from genologics.config import *
 import getpass
 from ConfigParser import SafeConfigParser
 
@@ -145,6 +144,7 @@ DO_COPY_METADATA_FILES=True
 SET_GROUP='nsc-seq'
 
 if TAG == "dev":
+    from genologics.config import *
     lims = Lims(BASEURI,USERNAME,PASSWORD)
 elif TAG == "prod":
     if getpass.getuser() == "seq-user":
