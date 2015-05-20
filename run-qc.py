@@ -118,8 +118,9 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
         sample_sheet_path=None, include_undetermined=False):
     """Get NextSeq or MiSeq QC model objects.
 
-    Gets the info from the sample sheet. Works for indexed projects and for 
-    projects with no index, but with an entry in the sample sheet.
+    Gets the info from the sample sheet and demultiplexing stats. Works for
+    indexed projects and for projects with no index, but with an entry in the
+    sample sheet.
     
     This is limited compared to the HiSeq version -- many fields are filled
     with None because they are not available / we don't use them."""
@@ -144,7 +145,7 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
     elif instrument == "nextseq":
         stats = parse.get_nextseq_stats(
                 os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats"),
-                aggregate_lanes=False
+                aggregate_lanes=True
                 )
 
     samples = []

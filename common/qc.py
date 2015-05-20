@@ -507,12 +507,12 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
                         re.sub(r"^{0}".format(re.escape(p.proj_dir)), ".", f.path)
                             for s in p.samples for f in s.files
                         ]
-                pdf_paths = [re.sub(r".fastq.gz$", ".qc.pdf", p) for p in paths]
+                pdf_paths = [re.sub(r".fastq.gz$", ".qc.pdf", path) for path in paths]
                 compute_md5(os.path.join(demultiplex_dir, p.proj_dir), threads, paths + pdf_paths)
             else: # Project files are in root of demultiplexing dir
                 paths = [f.path for s in p.samples for f in s.files]
                 pdf_paths = [re.sub(r".fastq.gz$", ".qc.pdf", path) for path in paths]
-                compute_md5(demultiplex_dir, threads, ["./" + p for p in paths + pdf_paths])
+                compute_md5(demultiplex_dir, threads, ["./" + path for path in paths + pdf_paths])
 
     # Generate internal reports
     generate_internal_html_report(quality_control_dir, samples)
