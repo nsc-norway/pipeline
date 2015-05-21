@@ -191,7 +191,7 @@ def merge_files(runid, output_dir, project_name, sample_sheet, reads):
     #for dpath in set("{base}/{project}".format(**p) for p in params):
     #    os.rmdir(dpath)
 
-def merge_undetermined(output_dir, reads):
+def merge_undetermined(output_dir, project_dir, reads):
     
     for read in reads:
         undetermined_files_in = [
@@ -212,14 +212,10 @@ def merge_undetermined(output_dir, reads):
         #    os.remove(f)
 
         # Temporary: for keeping unmerged "undetermined" files
-        try:
-            os.mkdir(os.path.join(output_dir, "Undetermined"))
-        except OSError:
-            pass
         for f in undetermined_files_in:
             os.rename(
                     os.path.join(output_dir, f),
-                    os.path.join(output_dir, "Undetermined", f)
+                    os.path.join(output_dir, project_dir, f)
                     )
 
 
@@ -311,7 +307,7 @@ def main(process_id):
                     pass
                 utilities.running(process, "Merging outputs")
                 merge_files(runid, cfg.output_dir, project_name, sample_sheet['data'], reads)
-                merge_undetermined(cfg.output_dir, reads)
+                merge_undetermined(cfg.output_dir, project_name, reads)
 
                 utilities.running(process, "Gathering statistics")
                 id_res_map = make_id_resultfile_map(process, sample_sheet['data'], reads)
