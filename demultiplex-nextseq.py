@@ -178,7 +178,8 @@ def merge_files(runid, output_dir, project_name, sample_sheet, reads):
             else:
                 input_path = "{base}/{project}/{filename}".format(filename=f, **p)
             input_paths.append(input_path)
-        output_path = os.path.join(project_path, f)
+
+        output_path = os.path.join(project_path, out_file)
 
         merge_fastq(input_paths, output_path)
 
@@ -195,13 +196,13 @@ def merge_undetermined(output_dir, reads):
     for read in reads:
         undetermined_files_in = [
                 "Undetermined_S0_L{lane}_R{read}_001.fastq.gz".format(
-                    base=output_dir, lane=lane, read=read
+                    base=output_dir, lane=str(lane).zfill(3), read=read
                     )
                 for lane in (1,2,3,4)
                 ]
-        dest_file = ["{base}/Undetermined_S0_L00X_R{read}_001.fastq.gz".format(
+        dest_file = "{base}/Undetermined_S0_L00X_R{read}_001.fastq.gz".format(
                     base=output_dir, read=read
-                    )]
+                    )
         merge_fastq(
                 [os.path.join(output_dir, f) for f in undetermined_files_in],
                 dest_file
@@ -284,10 +285,10 @@ def main(process_id):
 
         utilities.running(process, "Demultiplexing")
         input_dir = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
-        #process_ok = run_demultiplexing(process, num_samples,
-        #        cfg.bases_mask, cfg.n_threads, destination, input_dir, cfg.output_dir,
-        #        cfg.other_options, log_dir)
-        process_ok = True
+        process_ok = run_demultiplexing(process, num_samples,
+                cfg.bases_mask, cfg.n_threads, destination, input_dir, cfg.output_dir,
+                cfg.other_options, log_dir)
+        #process_ok = True
         
         if process_ok:
             reads = [1]
@@ -308,9 +309,11 @@ def main(process_id):
                     os.mkdir(project_path)
                 except OSError:
                     pass
-                #merge_files(runid, cfg.output_dir, project_name, sample_sheet['data'], reads)
-                #merge_undetermined(runid, cfg.output_dir, project_name, sample_sheet['data'], reads)
+                utilities.running(process, "Merging outputs")
+                merge_files(runid, cfg.output_dir, project_name, sample_sheet['data'], reads)
+                merge_undetermined(cfg.output_dir, reads)
 
+                utilities.running(process, "Gathering statistics")
                 id_res_map = make_id_resultfile_map(process, sample_sheet['data'], reads)
                 path = os.path.join(cfg.output_dir, "Stats")
                 stats = parse.get_nextseq_stats(path, aggregate_lanes=True, aggregate_reads=True)
