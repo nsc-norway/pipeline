@@ -57,32 +57,45 @@ def init_application():
                 queues[(protocol, protocol_step)] = ps.queue()
 
 
-
-
-class ProjectStatus(object):
-    """Represents the progress / status of each project"""
-
-    def __init__(
-            self, name, completed_date = None,
-            step = None, status = None, total = None
-            ):
-        self.name = name
-        self.completed_date = completed_date
-        self.step = step
-        self.status = status
-        self.total = total
-
 class QueueState(object):
     def __init__(self, protocol, step, num):
         self.protocol = protocol
         self.step = step
         self.num = num
 
+
+class Project(object):
+    def __init__(self, url, name):
+        self.url = url
+        self.name = name
+
+
 class SimpleSequencerRun(object):
     def __init__(self, url, project):
         self.url = url
         self.project = project
 
+
+class ProcessInfo(object):
+    def __init__(self, url, experiment_name, projects, status):
+        self.url = url
+        self.experiment_name = experiment_name
+        self.projects = projects
+        self.runid = runid
+        self.status = status
+
+
+class HiSeqRun(ProcessInfo):
+    def __init__(self, url, experiment_name, projects, status, runid, current_cycle, num_cycles):
+        super(HiSeqRun, self).__init__(url, experiment_name, projects, runid, status)
+        self.runid = runid
+        self.current_cycle = current_cycle
+        self.num_cycles = num_cycles
+
+
+class PostSequencingProcess(ProcessInfo):
+    def __init__(self, url, experiment_name, projects, runid, status):
+        pass
 
 
 def get_queue(protocol, step):
@@ -108,11 +121,11 @@ def get_processes(process_name):
             completed.append(proc)
         else:
             result.append(proc)
-
     if completed:
         clear_task = partial(background_clear_monitor, completed)
         t = threading.Thread(target = clear_task)
         t.run()
+
     return result
 
 
@@ -121,15 +134,48 @@ def proc_url(process_id):
     second_part_limsid = re.match(r"[\d]+-([\d]+)$", process_id).group(1)
     return "{0}clarity/work-details/{1}".format(ui_server, second_part_limsid)
 
+
+def read_project(lims_project):
+    url = "{0}clarity/work-details/{1}".format(ui_server, second_part_limsid)
+    TODO: Project url
+    return Project(url, name)
+
+
 def read_mi_next_seq(process):
     try:
-        project = process.all_inputs()[0].samples[0].project.name
+        project = get_project(process.all_inputs()[0].samples[0].project)
     except IndexError:
         return SimpleSequencerRun("")
     return SimpleSequencerRun(proc_url(process.id), project)
 
+
 def read_hiseq(process):
-    return None
+    url = proc_url(process.id)
+    try:
+        expt_name = process.udf['Experiment Name']
+    except KeyError:
+        expt_name = "[Unknown experiment]"
+    lims_projects = set(
+            art.samples[0].project
+            for art in process.all_inputs()
+            )
+    projects = [read_project(p) for p in lims_projects]
+    try:
+        runid = process.udf['Run ID']
+        cycles = process.udf['Cycle'].split(" of ")
+    except KeyError:
+        runid = ""
+        cycles = (0,0)
+    
+    status = "unknown"
+    return HiSeqRun(
+            url, expt_name, projects, status, runid,
+            cycles[0], cycles[1]
+            )
+
+
+def read_after_sequencing_process(process):
+    pass
 
 
 def get_sequencing(process_name, read_function):
