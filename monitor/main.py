@@ -94,8 +94,8 @@ class HiSeqRun(ProcessInfo):
 
 
 class PostSequencingProcess(ProcessInfo):
-    def __init__(self, url, experiment_name, projects, runid, status):
-        pass
+    def __init__(self, url, experiment_name, projects, status):
+        super(PostSequencingProcess, self).__init__(self, url, experiment_name, projects, status)
 
 
 def get_queue(protocol, step):
