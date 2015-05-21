@@ -1,1 +1,0 @@
-../common/nsc.py

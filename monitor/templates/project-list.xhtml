@@ -5,7 +5,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Project overview</title>
+<title>NSC overview</title>
 <link rel="stylesheet" href="static/style.css" type="text/css"/>
 </head>
 <body>
@@ -23,72 +23,110 @@
 <h2 class="section-header">Sequencing</h2>
 <table class="main-table">
 <tr>
-<th>HiSeq</th>
-<th>NextSeq</th>
-<th>MiSeq</th>
+{% for instr in instruments %}
+<th class="main">{{ instr }}</th>
+{% endfor %}
 </tr>
 
 <tr>
-{% for sq in seq_queues %}
+{% for data in sequencing %}
 <td>
-	{% if sq %}
+{% if data[0] %}
+<div class="box">
+<h4 class="box-header"><a href="{{ data[0].url }}">Queue: {{ data[0].step }}</a></h4>
+Queued: {{ data[0].num }}
+</div>
+{% endif %}
+
+
+{% for proc in data[1] %}
 	<div class="box">
-	<h4 class="box-header">{{ seq_queues[i].step }}</h4>
-	Queued: {{ sq.num }}
+	<h4 class="box-header">
+		<a href="{{ proc.url }}">{{ proc.experiment_name }}</a>
+	</h4>
+	<table><tr>
+			<td>Run:</td><td>
+			{% if proc.runid %}
+			<a href="{{ proc.url }}">{{ proc.runid }}</a>
+			{% endif %}</td>
+		</tr><tr>
+			<td>Project:</td><td>
+				<a href="{{ proc.projects[0].url }}">
+				{{ proc.projects[0].name }}</a>
+			</td>
+		</tr>
+		{% for proj in proc.projects[1:] %}
+		<tr>
+			<td></td><td>
+				<a href="{{ proj.url }}">{{ proj.name }}</a></td>
+		</tr>
+		{% endfor %}
+		<tr>
+			<td>Status:</td><td>{{ proc.status }}</td>
+		</tr>
+	</table>
 	</div>
-	{% endif %}
+{% endfor %}
 </td>
 {% endfor %}
 </tr>
-
-
-<tr>
-{% for seq in sequencing[0:1] %}
-<td>
-{% for proc in seq %}
-	<div class="box">
-		<h4 class="box-header">
-		<a href="{{proc.url}}">Started: {{ proc.start_date }}</a>
-		</h4>
-	Queued: {{ proc.num }}
-	</div>
-{% endfor %}
-</td>
-{% endfor %}
-
-
-{% for seq in sequencing[1:] %}
-<td>
-{% for proc in seq %}
-	<div class="box">
-	<h4 class="box-header">
-	<a href="{{proc.url}}">{{ proc.project }}</a>
-	</h4>
-	Queued: {{ proc.num }}
-	</div>
-{% endfor %}
-</td>
-{% endfor %}
-
-</tr>
-
 </table>
 
 </div>
-<div style="clear: both;"/>
 
+<h2 class="section-header">Data processing/analysis</h2>
 
-<h2 class="section-header">Data processing</h2>
+<table class="main-table">
+<tr>
+{% for boxes in post_sequencing %}
+<td>
 
+{% for item in boxes %}
 
-<h2 class="section-header">Delivery</h2>
-
-<h2 class="section-header">Completed (last {{ completedays }} days)</h2>
-{% for project in completed_recent %}
-<div class="project">
-	<span class="project-name">{{ project.name }}</span>
-	<span class="subinfo">{{ project.completed_date }}</span>
+{% if item.is_queue %}
+<div class="box">
+<h4 class="box-header"><a href="{{ item.url }}">Queue: {{ item.step }}</a></h4>
+Queued: {{ item.num }}
 </div>
-{% endfor %}
+
+{% else %}
+
+<div class="box">
+<h4 class="box-header">
+	<a href="{{ item.url }}">{{ item.name }}</a>
+</h4>
+<table><tr>
+		<td>Run:</td><td>
+		{% if item.runid %}
+		<a href="{{ item.seq_url }}">{{ item.runid }}</a>
+		{% else %}
+		<a href="{{ item.seq_url }}">(unknown)</a>
+		{% endif %}</td>
+	</tr><tr>
+		<td>Project:</td><td>
+			<a href="{{ item.projects[0].url }}">
+			{{ item.projects[0].name }}</a>
+		</td>
+	</tr>
+	{% for proj in item.projects[1:] %}
+	<tr>
+		<td></td><td>
+			<a href="{{ proj.url }}">{{ proj.name }}</a></td>
+	</tr>
+	{% endfor %}
+	<tr>
+		<td>Status:</td><td>{{ item.status }}</td>
+	</tr>
+</table>
+</div>
+
+{% endif %}
+{% endfor %}
+</td>
+{% endfor %}
+</tr>
+</table>
+
+
 </body>
 </html>

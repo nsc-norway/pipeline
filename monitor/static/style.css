@@ -51,7 +51,7 @@ table.main-table {
 	width: 100%;
 }
 
-table.main-table th {
+table.main-table th.main {
 	width: 33%;
 	background-color: #FFFFDD;
 	border: 1px solid #DDDD55;
@@ -59,13 +59,17 @@ table.main-table th {
 }
 
 table.main-table td {
+	width: 33%;
+	vertical-align: top;
 	margin: 0;
 	padding: 0;
 }
 
 div.box {
 	border: 1px solid #999999;
-	padding: 0.2em 0.5em;
+	padding: 0.4em 0.5em;
+	margin: 0.5em 0.1em;
+	min-height: 6em;
 }
 
 h3.col-header {
@@ -80,5 +84,8 @@ h3.col-header {
 h4.box-header {
 	text-align: center;
 	font-size: 1em;
-	margin: 0.05em;
+	margin: 0.2em;
+	margin-bottom: 0.5em;
 }
+
+

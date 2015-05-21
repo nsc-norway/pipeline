@@ -1,7 +1,8 @@
 from flask import Flask, render_template
 from genologics.lims import *
 import re
-import nsc
+import requests
+from common import nsc, utilities
 import datetime
 import threading
 from functools import partial
@@ -21,8 +22,6 @@ from functools import partial
 
 app = Flask(__name__)
 
-COMPLETED_DAYS = 30
-
 INSTRUMENTS = ["HiSeq", "NextSeq", "MiSeq"]
 # [ (Protocol, Step) ]
 SEQUENCING = [
@@ -35,11 +34,27 @@ SEQUENCING = [
 DATA_PROCESSING = [
         ("NSC Data processing for HiSeq", (
             "NSC Demultiplexing (HiSeq)",
-            "NSC Data Quality Reporting (HiSeq)"
+            "NSC Data Quality Reporting (HiSeq)",
+            "NSC Prepare for delivery",
+            "NSC Finalize run"
+            )),
+        ("NSC Data processing for NextSeq", (
+            "NSC Demultiplexing (NextSeq)",
+            "NSC Data Quality Reporting (Mi/NextSeq)",
+            "NSC Prepare for delivery",
+            "NSC Finalize run"
+            )),
+        ("NSC Data processing for MiSeq", (
+            "NSC Copy MiSeq Run",
+            "NSC Data Quality Reporting (Mi/NextSeq)",
+            "NSC Prepare for delivery",
+            "NSC Finalize run"
             )),
         ]
 
+
 queues = {}
+sequencing_process_type = []
 
 def init_application():
     # We get queue instances as part of the initialisation, then keep them
@@ -55,13 +70,16 @@ def init_application():
         for ps in proto.steps:
             if protocol_step == ps.name:
                 queues[(protocol, protocol_step)] = ps.queue()
+                sequencing_process_type.append(ps.process_type)
 
 
 class QueueState(object):
-    def __init__(self, protocol, step, num):
+    def __init__(self, url, protocol, step, num):
+        self.url = url
         self.protocol = protocol
         self.step = step
         self.num = num
+        self.is_queue = True
 
 
 class Project(object):
@@ -70,43 +88,29 @@ class Project(object):
         self.name = name
 
 
-class SimpleSequencerRun(object):
-    def __init__(self, url, project):
-        self.url = url
-        self.project = project
-
-
 class ProcessInfo(object):
-    def __init__(self, url, experiment_name, projects, status):
+    def __init__(self, name, url, experiment_name, projects, status, seq_url, runid):
+        self.name = name
         self.url = url
         self.experiment_name = experiment_name
         self.projects = projects
-        self.runid = runid
         self.status = status
-
-
-class HiSeqRun(ProcessInfo):
-    def __init__(self, url, experiment_name, projects, status, runid, current_cycle, num_cycles):
-        super(HiSeqRun, self).__init__(url, experiment_name, projects, runid, status)
+        self.seq_url = seq_url
         self.runid = runid
-        self.current_cycle = current_cycle
-        self.num_cycles = num_cycles
-
-
-class PostSequencingProcess(ProcessInfo):
-    def __init__(self, url, experiment_name, projects, status):
-        super(PostSequencingProcess, self).__init__(self, url, experiment_name, projects, status)
+        self.is_queue = False
 
 
 def get_queue(protocol, step):
     q = queues[(protocol, step)]
     q.get(force=True)
     if len(q.artifacts) > 0:
-        return QueueState(protocol, step, len(q.artifacts))
+        url = "{0}clarity/queue/{1}".format(ui_server, q.id)
+        return QueueState(url, protocol, step, len(q.artifacts))
 
 
 def background_clear_monitor(completed):
     for proc in completed:
+        print "Disabling monitoring for", proc.id
         proc.udf['Monitor'] = False
         proc.put()
 
@@ -117,10 +121,15 @@ def get_processes(process_name):
     result = []
     for proc in procs:
         step = Step(nsc.lims, id=proc.id)
-        if step.current_state == "COMPLETED":
-            completed.append(proc)
-        else:
-            result.append(proc)
+        try:
+            if step.current_state.upper() == "COMPLETED":
+                completed.append(proc)
+            else:
+                result.append(proc)
+        except requests.exceptions.HTTPError:
+            # If the process has no associated step, skip it
+            #completed.append(proc)
+            print "No step for", proc.id
     if completed:
         clear_task = partial(background_clear_monitor, completed)
         t = threading.Thread(target = clear_task)
@@ -136,20 +145,27 @@ def proc_url(process_id):
 
 
 def read_project(lims_project):
-    url = "{0}clarity/work-details/{1}".format(ui_server, second_part_limsid)
-    TODO: Project url
-    return Project(url, name)
+    url = "{0}clarity/search?scope=Project&query={1}".format(ui_server, lims_project.id)
+    return Project(url, lims_project.name)
 
 
 def read_mi_next_seq(process):
     try:
-        project = get_project(process.all_inputs()[0].samples[0].project)
+        project = read_project(process.all_inputs()[0].samples[0].project)
     except IndexError:
         return SimpleSequencerRun("")
     return SimpleSequencerRun(proc_url(process.id), project)
 
 
-def read_hiseq(process):
+def get_projects(process):
+    lims_projects = set(
+            art.samples[0].project
+            for art in process.all_inputs()
+            )
+    return [read_project(p) for p in lims_projects]
+
+
+def read_sequencing(process_name, process):
     url = proc_url(process.id)
     try:
         expt_name = process.udf['Experiment Name']
@@ -159,35 +175,46 @@ def read_hiseq(process):
             art.samples[0].project
             for art in process.all_inputs()
             )
-    projects = [read_project(p) for p in lims_projects]
+    projects = get_projects(process)
     try:
         runid = process.udf['Run ID']
-        cycles = process.udf['Cycle'].split(" of ")
     except KeyError:
         runid = ""
-        cycles = (0,0)
-    
-    status = "unknown"
-    return HiSeqRun(
-            url, expt_name, projects, status, runid,
-            cycles[0], cycles[1]
+    try:
+        status = process.udf['Status']
+    except KeyError:
+        status = "Pending/running"
+
+    return ProcessInfo(
+            process_name, url, expt_name, projects, status, url, runid
             )
 
 
-def read_after_sequencing_process(process):
-    pass
-
-
-def get_sequencing(process_name, read_function):
+def get_sequencing(process_name):
     procs = get_processes(process_name)
-    return [read_function(proc) for proc in procs]
+    return [read_sequencing(process_name, proc) for proc in procs]
 
 
-def get_completed_projects(projects):
-    return [
-            ProjectInfo(pro.name, pro.close_date) for pro in projects
-            ]
+def read_post_sequencing_process(process_name, process, sequencing_process):
+    url = proc_url(process.id)
+    seq_url = proc_url(sequencing_process.id)
+    try:
+        runid = sequencing_process.udf['Run ID']
+        expt_name = sequencing_process.udf['Experiment Name']
+    except (KeyError, TypeError):
+        runid = ""
+        expt_name = ""
+    projects = get_projects(process)
 
+    try:
+        status = process.udf['Job status']
+    except KeyError:
+        status = "Open"
+
+
+    return ProcessInfo(
+            process_name, url, expt_name, projects, status, seq_url, runid
+            )
 
 @app.route('/')
 def get_main():
@@ -203,28 +230,32 @@ def get_main():
         ui_server = nsc.lims.baseuri
 
     seq_queues = [get_queue(*proc) for proc in SEQUENCING]
-    seq = [get_sequencing(SEQUENCING[0][1], read_hiseq)] +\
-            [get_sequencing(sp[1], read_mi_next_seq) for sp in SEQUENCING[1:]]
+    sequencing = [get_sequencing(sp[1]) for sp in SEQUENCING]
 
-    show_date = datetime.date.today() + datetime.timedelta(days=-COMPLETED_DAYS)
-    #completed_projects = lims.get_projects(
-    #        open_date=show_date,
-    #        udf={'Progress': 'Delivered'}
-    #        )
+    post_sequencing = []
+    # One workflow for each sequencer type
+    for index, (wf, steps) in enumerate(DATA_PROCESSING):
+        machine_items = [] # all processes, queues, for a type of sequencing machine
+        for step in steps:
+            q = get_queue(wf, step)
+            if q:
+                machine_items.append(q)
+            processes = get_processes(step)
+            for process in processes:
+                sequencing_process = utilities.get_sequencing_process(process)
+                if sequencing_process.type == sequencing_process_type[index]:
+                    machine_items.append(read_post_sequencing_process(
+                        step, process, sequencing_process
+                        ))
+        post_sequencing.append(machine_items)
+        
 
-    #pending = get_before_sequencing(active_projects)
-    #sequencing = get_sequencing(active_projects)
-    #data = get_data_processing()
-    #completed = get_completed_projects(completed_projects)
-
-
-    print seq
     return render_template(
             'project-list.xhtml',
             server=nsc.lims.baseuri,
-            completedays=COMPLETED_DAYS,
-            seq_queues=seq_queues,
-            sequencing=seq
+            sequencing=zip(seq_queues, sequencing),
+            post_sequencing=post_sequencing,
+            instruments=INSTRUMENTS
             )
 
 if __name__ == '__main__':
