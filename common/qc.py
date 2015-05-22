@@ -327,7 +327,7 @@ def write_sample_info_table(output_path, runid, project):
         out.write('Email for ' + project.name + "\n")
         out.write('--------------------------------		\n\n')
         nsamples = len(project.samples)
-        out.write('Sequence ready for download - sequencing run ' + runid + ' - ' + project.name + ' (' + str(nsamples) + ' samples)\n\n')
+        out.write('Sequence ready for download - sequencing run ' + runid + ' - Project_' + project.name + ' (' + str(nsamples) + ' samples)\n\n')
 
         files = sorted(
                 ((s,fi) for s in project.samples for fi in s.files),
