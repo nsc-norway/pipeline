@@ -250,13 +250,14 @@ def get_main():
         post_sequencing.append(machine_items)
         
 
-    return render_template(
+    body = render_template(
             'project-list.xhtml',
             server=nsc.lims.baseuri,
             sequencing=zip(seq_queues, sequencing),
             post_sequencing=post_sequencing,
             instruments=INSTRUMENTS
             )
+    return (body, 200, {'Refresh': '300'})
 
 if __name__ == '__main__':
     init_application()
