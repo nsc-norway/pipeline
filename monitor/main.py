@@ -114,25 +114,35 @@ def background_clear_monitor(completed):
         proc.udf['Monitor'] = False
         proc.put()
 
+def is_step_completed(proc):
+    step = Step(nsc.lims, id=proc.id)
+    try:
+        step.get(force=True)
+    except requests.exceptions.HTTPError:
+        # If the process has no associated step, skip it
+        #completed.append(proc)
+        print "No step for", proc.id
+    else:
+        if step.current_state.upper() == "COMPLETED":
+            return True
 
-def get_processes(process_name):
+def is_sequencing_complete(proc):
+    try:
+        return proc.udf['Finish Date'] != None
+    except KeyError:
+        return False
+
+def get_processes(process_name, complete_condition=is_step_completed):
     procs = nsc.lims.get_processes(type=process_name, udf={'Monitor': True})
     completed = []
     result = []
     for proc in procs:
-        step = Step(nsc.lims, id=proc.id)
-        try:
-            step.get(force=True)
-        except requests.exceptions.HTTPError:
-            # If the process has no associated step, skip it
-            #completed.append(proc)
-            print "No step for", proc.id
+        proc.get(force=True)
+        if complete_condition(proc):
+            completed.append(proc)
         else:
-            if step.current_state.upper() == "COMPLETED":
-                completed.append(proc)
-            else:
-                result.append(proc)
-                proc.get(force=True)
+            result.append(proc)
+
     if completed:
         clear_task = partial(background_clear_monitor, completed)
         t = threading.Thread(target = clear_task)
@@ -191,7 +201,7 @@ def read_sequencing(process_name, process):
 
 
 def get_sequencing(process_name):
-    procs = get_processes(process_name)
+    procs = get_processes(process_name, is_sequencing_complete)
     return [read_sequencing(process_name, proc) for proc in procs]
 
 
