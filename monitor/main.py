@@ -259,7 +259,7 @@ def get_main():
             )
 
 if __name__ == '__main__':
-    app.debug = True
+    app.debug = True # TODO: remove debug
     init_application()
     app.run()
 
