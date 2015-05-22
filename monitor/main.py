@@ -122,14 +122,17 @@ def get_processes(process_name):
     for proc in procs:
         step = Step(nsc.lims, id=proc.id)
         try:
-            if step.current_state.upper() == "COMPLETED":
-                completed.append(proc)
-            else:
-                result.append(proc)
+            step.get(force=True)
         except requests.exceptions.HTTPError:
             # If the process has no associated step, skip it
             #completed.append(proc)
             print "No step for", proc.id
+        else:
+            if step.current_state.upper() == "COMPLETED":
+                completed.append(proc)
+            else:
+                result.append(proc)
+                proc.get(force=True)
     if completed:
         clear_task = partial(background_clear_monitor, completed)
         t = threading.Thread(target = clear_task)
@@ -259,7 +262,6 @@ def get_main():
             )
 
 if __name__ == '__main__':
-    app.debug = True # TODO: remove debug
     init_application()
     app.run()
 
