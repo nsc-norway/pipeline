@@ -128,7 +128,8 @@ def is_step_completed(proc):
 
 def is_sequencing_complete(proc):
     try:
-        return proc.udf['Finish Date'] != None
+        if proc.udf['Finish Date'] != None:
+            return is_step_completed(proc)
     except KeyError:
         return False
 
