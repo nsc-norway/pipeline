@@ -205,7 +205,7 @@ class error_reporter():
 
         if self.process_id:
             process = Process(nsc.lims, id=self.process_id)
-            utilities.fail(process, str(sys.exc_info()[1]))
+            utilities.fail(process, sys.exc_info()[0].__name__ + " " + str(sys.exc_info()[1]))
 
         return False # re-raise exception
 
