@@ -337,13 +337,9 @@ def main(process_id):
 
 if __name__ == "__main__":
     if len(sys.argv) >= 2:
-        try:
+        with utilities.error_reporter():
             ok = main(sys.argv[1])
-        except:
-            process = Process(nsc.lims, id = sys.argv[1])
-            utilities.fail(process, "Unexpected: " + str(sys.exc_info()[1]))
-            raise
-        sys.exit(ok)
+            sys.exit(0 if ok else 1)
     else:
         print "use: demultiplex-nextseq.py <process-id>"
         sys.exit(1)

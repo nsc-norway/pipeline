@@ -1,10 +1,9 @@
-#------------------------------#
-# Workflow management          #
-#------------------------------#
+#--------------------------------------#
+# Utilities for LIMS status tracking   #
+#--------------------------------------#
 
-# Manages workflow steps in the LIMS. This mainly centers around the 
-# step API resource. Completing and starting steps.
-
+# Various utility functions for managing workflow progress,
+# navigating between processes, and status tracking.
 
 import logging
 import subprocess
@@ -197,14 +196,16 @@ class error_reporter():
         pass
 
     def __exit__(self, type, value, traceback):
-        if not process_id:
-            if len(sys.argv) == 2:
-                process_id = sys.argv[1]
-            else:
-                return False
+        if type is None:
+            return True
 
-        process = Process(nsc.lims, id=process_id)
-        utilities.fail(process, str(sys.exc_info()[1]))
+        if not self.process_id:
+            if len(sys.argv) == 2:
+                self.process_id = sys.argv[1]
+
+        if self.process_id:
+            process = Process(nsc.lims, id=self.process_id)
+            utilities.fail(process, str(sys.exc_info()[1]))
 
         return False # re-raise exception
 

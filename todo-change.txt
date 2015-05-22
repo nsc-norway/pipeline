@@ -1,0 +1,5 @@
+copy-miseq
+qc-hiseq
+run-qc
+prepare-delivery
+finalize-run

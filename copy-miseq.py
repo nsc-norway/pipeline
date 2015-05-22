@@ -58,11 +58,7 @@ def main(process_id):
 
 
 if __name__ == '__main__':
-    try:
+    with utilities.error_reporter():
         ok = main(sys.argv[1])
-    except:
-        process = Process(nsc.lims, id = sys.argv[1])
-        utilities.fail(process, "Unexpected: " + str(sys.exc_info()[1]))
-        raise
-    sys.exit(0 if ok else 1)
+        sys.exit(0 if ok else 1)
 
