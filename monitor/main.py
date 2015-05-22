@@ -89,10 +89,10 @@ class Project(object):
 
 
 class ProcessInfo(object):
-    def __init__(self, name, url, experiment_name, projects, status, seq_url, runid):
+    def __init__(self, name, url, flowcell_id, projects, status, seq_url, runid):
         self.name = name
         self.url = url
-        self.experiment_name = experiment_name
+        self.flowcell_id = flowcell_id
         self.projects = projects
         self.status = status
         self.seq_url = seq_url
@@ -170,10 +170,7 @@ def get_projects(process):
 
 def read_sequencing(process_name, process):
     url = proc_url(process.id)
-    try:
-        expt_name = process.udf['Experiment Name']
-    except KeyError:
-        expt_name = "[Unknown experiment]"
+    flowcell_id = process.all_inputs()[0].location[0].name
     lims_projects = set(
             art.samples[0].project
             for art in process.all_inputs()
@@ -189,7 +186,7 @@ def read_sequencing(process_name, process):
         status = "Pending/running"
 
     return ProcessInfo(
-            process_name, url, expt_name, projects, status, url, runid
+            process_name, url, flowcell_id, projects, status, url, runid
             )
 
 
@@ -201,9 +198,9 @@ def get_sequencing(process_name):
 def read_post_sequencing_process(process_name, process, sequencing_process):
     url = proc_url(process.id)
     seq_url = proc_url(sequencing_process.id)
+    #flowcell_id = process.all_inputs()[0].location[0].name
     try:
         runid = sequencing_process.udf['Run ID']
-        expt_name = sequencing_process.udf['Experiment Name']
     except (KeyError, TypeError):
         runid = ""
         expt_name = ""
@@ -216,7 +213,7 @@ def read_post_sequencing_process(process_name, process, sequencing_process):
 
 
     return ProcessInfo(
-            process_name, url, expt_name, projects, status, seq_url, runid
+            process_name, url, None, projects, status, seq_url, runid
             )
 
 @app.route('/')
@@ -263,5 +260,5 @@ def get_main():
 
 if __name__ == '__main__':
     init_application()
-    app.run()
+    app.run(host="0.0.0.0")
 

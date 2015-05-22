@@ -42,7 +42,7 @@ Queued: {{ data[0].num }}
 {% for proc in data[1] %}
 	<div class="box">
 	<h4 class="box-header">
-		<a href="{{ proc.url }}">{{ proc.experiment_name }}</a>
+		<a href="{{ proc.url }}">{{ proc.flowcell_id }}</a>
 	</h4>
 	<table><tr>
 			<td>Run:</td><td>
@@ -127,6 +127,8 @@ Queued: {{ item.num }}
 </tr>
 </table>
 
+<h2 class="section-header">Recently completed projects</h2>
+TODO
 
 </body>
 </html>
