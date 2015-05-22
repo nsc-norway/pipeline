@@ -30,7 +30,7 @@
 
 <tr>
 {% for data in sequencing %}
-<td>
+<td class="main">
 {% if data[0] %}
 <div class="box">
 <h4 class="box-header"><a href="{{ data[0].url }}">Queue: {{ data[0].step }}</a></h4>
@@ -45,7 +45,7 @@ Queued: {{ data[0].num }}
 		<a href="{{ proc.url }}">{{ proc.flowcell_id }}</a>
 	</h4>
 	<table><tr>
-			<td>Run:</td><td>
+			<td class="label-col">Run:</td><td>
 			{% if proc.runid %}
 			<a href="{{ proc.url }}">{{ proc.runid }}</a>
 			{% endif %}</td>
@@ -79,7 +79,7 @@ Queued: {{ data[0].num }}
 <table class="main-table">
 <tr>
 {% for boxes in post_sequencing %}
-<td>
+<td class="main">
 
 {% for item in boxes %}
 
@@ -96,7 +96,7 @@ Queued: {{ item.num }}
 	<a href="{{ item.url }}">{{ item.name }}</a>
 </h4>
 <table><tr>
-		<td>Run:</td><td>
+		<td class="label-col">Run:</td><td>
 		{% if item.runid %}
 		<a href="{{ item.seq_url }}">{{ item.runid }}</a>
 		{% else %}

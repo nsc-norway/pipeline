@@ -58,11 +58,15 @@ table.main-table th.main {
 	margin: 0;
 }
 
-table.main-table td {
+table.main-table td.main {
 	width: 33%;
 	vertical-align: top;
 	margin: 0;
 	padding: 0;
+}
+
+td.label-col {
+	width: 5em;
 }
 
 div.box {
