@@ -188,12 +188,24 @@ def success_finish(process, finish_step=True):
 
 
 class error_reporter():
+    """Context manager for reporting error status when exceptions occur"""
+
     def __init__(self, process_id = None):
-        pass
+        self.process_id = process_id
+
     def __enter__(self):
         pass
+
     def __exit__(self, type, value, traceback):
-        process = 
+        if not process_id:
+            if len(sys.argv) == 2:
+                process_id = sys.argv[1]
+            else:
+                return False
+
+        process = Process(nsc.lims, id=process_id)
+        utilities.fail(process, str(sys.exc_info()[1]))
+
         return False # re-raise exception
 
 
