@@ -229,12 +229,8 @@ if __name__ == '__main__':
         print "Threads from slurm: ", threads
 
     if args.pid and not args.DIR:
-        try:
+        with utilities.error_reporter(args.pid):
             main_lims(threads, args.pid)
-        except:
-            process = Process(nsc.lims, id=args.pid)
-            utilities.fail(process, "Unexpected: " + str(sys.exc_info()[1]))
-            raise
     elif args.DIR and not args.pid:
         main(threads, args.DIR)
     else:

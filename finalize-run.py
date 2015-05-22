@@ -41,12 +41,7 @@ def main(process_id):
         utilities.fail(process, "Need all inputs of a single flowcell as input")
 
 
-try:
+with utilities.error_reporter():
     main(sys.argv[1])
-except:
-    if len(sys.argv) > 1:
-        process = Process(nsc.lims, id=sys.argv[1])
-        utilities.fail(process, "Unexpected: " + str(sys.exc_info()[1]))
-    raise
     
 
