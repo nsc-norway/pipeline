@@ -187,6 +187,16 @@ def success_finish(process, finish_step=True):
             finish_step(process.lims, process.id)
 
 
+class error_reporter():
+    def __init__(self, process_id = None):
+        pass
+    def __enter__(self):
+        pass
+    def __exit__(self, type, value, traceback):
+        process = 
+        return False # re-raise exception
+
+
 def get_sample_sheet_proj_name(seq_process, project):
     """Get the project name as it would appear in the sample sheet.
     Will become really complex if we allow other than [A-Za-z0-9\-] in 
