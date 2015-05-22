@@ -76,6 +76,10 @@ div.box {
 	min-height: 6em;
 }
 
+div.box p {
+	padding: 1px;
+}
+
 h3.col-header {
 	text-align: center;
 	font-weight: normal;

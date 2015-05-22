@@ -1,4 +1,4 @@
- <?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -34,7 +34,7 @@
 {% if data[0] %}
 <div class="box">
 <h4 class="box-header"><a href="{{ data[0].url }}">Queue: {{ data[0].step }}</a></h4>
-Queued: {{ data[0].num }}
+<p>Queued: {{ data[0].num }}</p>
 </div>
 {% endif %}
 
@@ -86,7 +86,7 @@ Queued: {{ data[0].num }}
 {% if item.is_queue %}
 <div class="box">
 <h4 class="box-header"><a href="{{ item.url }}">Queue: {{ item.step }}</a></h4>
-Queued: {{ item.num }}
+<p>Queued: {{ item.num }}</p>
 </div>
 
 {% else %}
