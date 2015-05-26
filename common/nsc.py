@@ -19,6 +19,7 @@ AUTO_FLOWCELL_UDF = "Automation lane groups"
 JOB_ID_UDF = "Job ID"
 JOB_STATUS_UDF = "Job status"
 JOB_STATE_CODE_UDF = "Job state code" #SUBMITTED,RUNNING,FAILED,COMPLETED,CANCELLED
+ERROR_DETAILS_UDF = "Error details"
 
 # UDFs for configuration and job steering (On process types)
 BASES_MASK_UDF = "Bases Mask"
