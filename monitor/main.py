@@ -262,7 +262,7 @@ def get_main():
         
 
     body = render_template(
-            'project-list.xhtml',
+            'processes.xhtml',
             server=nsc.lims.baseuri,
             sequencing=zip(seq_queues, sequencing),
             post_sequencing=post_sequencing,
