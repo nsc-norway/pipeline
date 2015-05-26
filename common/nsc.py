@@ -151,6 +151,8 @@ elif TAG == "prod":
         pw_file = "/data/nsc.loki/automation/etc/seq-user/apiuser-password.txt"
     elif getpass.getuser() == "glsai":
         pw_file = "/opt/gls/clarity/users/glsai/apiuser-password.txt"
+    elif getpass.getuser() == "limsweb":
+        pw_file = "/var/www/limsweb/private/password"
     else:
         pw_file = None
     
