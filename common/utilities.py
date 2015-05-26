@@ -10,6 +10,8 @@ import subprocess
 import sys
 import time
 import datetime
+import traceback
+import requests
 import locale # Not needed in 2.7, see display_int
 from operator import attrgetter
 from genologics.lims import *
@@ -159,13 +161,19 @@ def running(process, status = None):
     process.put()
 
 
-def fail(process, message):
+def fail(process, message, extra_info = None):
     """Report failure from background job"""
 
     process.get(force=True)
     process.udf[nsc.JOB_STATUS_UDF] = "Failed: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ": " + message
     process.udf[nsc.JOB_STATE_CODE_UDF] = 'FAILED'
     process.put()
+    if extra_info:
+        try:
+            process.udf[nsc.ERROR_DETAILS_UDF] = extra_info
+            process.put()
+        except (KeyError,requests.exceptions.HTTPError):
+            pass
 
 def success_finish(process, finish_step=True):
     """Called by background jobs (slurm) to declare that the task has been 
@@ -195,9 +203,11 @@ class error_reporter():
     def __enter__(self):
         pass
 
-    def __exit__(self, type, value, traceback):
-        if type is None:
+    def __exit__(self, etype, value, tb):
+        if etype is None:
             return True
+        elif etype == SystemExit:
+            return False
 
         if not self.process_id:
             if len(sys.argv) == 2:
@@ -205,7 +215,8 @@ class error_reporter():
 
         if self.process_id:
             process = Process(nsc.lims, id=self.process_id)
-            utilities.fail(process, sys.exc_info()[0].__name__ + " " + str(sys.exc_info()[1]))
+            fail(process, etype.__name__ + " " + str(value),
+                    "\n".join(traceback.format_exception(etype, value, tb)))
 
         return False # re-raise exception
 

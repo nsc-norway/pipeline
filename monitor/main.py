@@ -270,7 +270,7 @@ def get_main():
             )
     return (body, 200, {'Refresh': '300'})
 
+init_application()
 if __name__ == '__main__':
-    init_application()
     app.run(host="0.0.0.0", port=5001)
 
