@@ -68,6 +68,7 @@ def mark_flowcell_projects(fc):
 
 def set_qc_flags(process):
     for ana in process.all_inputs(unique=True):
+        ana.get()
         ana.qc_flag = "PASSED"
         ana.put()
 
@@ -265,7 +266,7 @@ def start_automated_protocols(lims):
                             step.get(force=True)
                             for prog_stat in step.program_status:
                                 prog_stat.get(force=True)
-                                if prog_stat.status == "RUNNING":
+                                if prog_stat.status in ("RUNNING", "QUEUED"):
                                     any_running = True
                             if any_running:
                                 time.sleep(1)

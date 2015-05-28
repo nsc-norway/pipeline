@@ -21,6 +21,7 @@ from functools import partial
 #              monitored.
 
 app = Flask(__name__)
+app.debug=True
 
 INSTRUMENTS = ["HiSeq", "NextSeq", "MiSeq"]
 # [ (Protocol, Step) ]
@@ -89,7 +90,7 @@ class Project(object):
 
 
 class ProcessInfo(object):
-    def __init__(self, name, url, flowcell_id, projects, status, seq_url, runid):
+    def __init__(self, name, url, flowcell_id, projects, status, seq_url, runid, finished=None):
         self.name = name
         self.url = url
         self.flowcell_id = flowcell_id
@@ -97,6 +98,7 @@ class ProcessInfo(object):
         self.status = status
         self.seq_url = seq_url
         self.runid = runid
+        self.finished = finished
         self.is_queue = False
 
 
@@ -118,18 +120,15 @@ def is_step_completed(proc):
     step = Step(nsc.lims, id=proc.id)
     try:
         step.get(force=True)
+        return step.current_state.upper() == "COMPLETED"
     except requests.exceptions.HTTPError:
         # If the process has no associated step, skip it
-        #completed.append(proc)
         print "No step for", proc.id
-    else:
-        if step.current_state.upper() == "COMPLETED":
-            return True
+	return False
 
 def is_sequencing_complete(proc):
     try:
-        if proc.udf['Finish Date'] != None:
-            return is_step_completed(proc)
+        return proc.udf['Finish Date'] != None and is_step_completed(proc)
     except KeyError:
         return False
 
@@ -182,6 +181,13 @@ def get_projects(process):
 def read_sequencing(process_name, process):
     url = proc_url(process.id)
     flowcell_id = process.all_inputs()[0].location[0].name
+    if "NextSeq" in process_name:
+        step = Step(nsc.lims, id=process.id)
+        for lot in step.reagent_lots:
+            if lot.reagent_kit.name == "NextSeq 500 FC v1":
+                flowcell_id = lot.name
+    if "MiSeq" in process_name:
+        pass
     lims_projects = set(
             art.samples[0].project
             for art in process.all_inputs()
@@ -195,9 +201,13 @@ def read_sequencing(process_name, process):
         status = process.udf['Status']
     except KeyError:
         status = "Pending/running"
+    try:
+        finished = process.udf['Finish Date']
+    except KeyError:
+        finished = ""
 
     return ProcessInfo(
-            process_name, url, flowcell_id, projects, status, url, runid
+            process_name, url, flowcell_id, projects, status, url, runid, finished
             )
 
 

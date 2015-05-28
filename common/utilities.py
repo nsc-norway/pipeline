@@ -34,7 +34,7 @@ def finish_step(lims, process_id):
         finish_protocol = len(next_elements) == 0
         if len(next_elements) == 1:
             next_step = next_elements[0].step
-        else:
+        elif len(next_elements) > 1:
             raise Exception("There are multiple options for next step, don't know what to do.")
     
         # Set next action for each sample
