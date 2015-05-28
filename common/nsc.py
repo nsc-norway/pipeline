@@ -71,21 +71,21 @@ class StepSetup:
 # The top-level items are tuples of protocol name and lists of StepSetup 
 # objects. The StepSetup objects represent a step in a protocol (see above).
 AUTOMATED_PROTOCOL_STEPS = [
-            ("NSC Data Processing for HiSeq",
+            ("NSC Data processing for HiSeq",
             [
                 StepSetup("NSC Demultiplexing (HiSeq)", "project", "Submit demultiplexing job"),
                 StepSetup("NSC Data Quality Reporting (HiSeq)", "project", "Submit QC job"),
                 StepSetup("NSC Prepare for delivery", "project", "Submit delivery job"),
                 StepSetup("NSC Finalize run", "flowcell", "Submit")
             ]),
-            ("NSC Data Processing for NextSeq",
+            ("NSC Data processing for NextSeq",
             [
                 StepSetup("NSC Demultiplexing (NextSeq)", "flowcell", "Submit demultiplexing job"),
                 StepSetup("NSC Data Quality Reporting (Mi/NextSeq)", "project", "Submit QC job"),
                 StepSetup("NSC Prepare for delivery", "project", "Submit delivery job"),
                 StepSetup("NSC Finalize run", "flowcell", "Submit")
             ]),
-            ("NSC Data Processing for MiSeq",
+            ("NSC Data processing for MiSeq",
             [
                 StepSetup("NSC Copy MiSeq Run", "flowcell", "Copy MiSeq Run"),
                 StepSetup("NSC Data Quality Reporting (Mi/NextSeq)", "flowcell", "Submit QC job"),
