@@ -180,6 +180,13 @@ def get_projects(process):
 def read_sequencing(process_name, process):
     url = proc_url(process.id)
     flowcell_id = process.all_inputs()[0].location[0].name
+    if "NextSeq" in process_name:
+        step = Step(nsc.lims, id=process.id)
+        for lot in step.reagent_lots:
+            if lot.reagent_kit.name == "NextSeq 500 FC v1":
+                flowcell_id = lot.name
+    if "MiSeq" in process_name:
+        pass
     lims_projects = set(
             art.samples[0].project
             for art in process.all_inputs()
