@@ -237,6 +237,12 @@ def read_post_sequencing_process(process_name, process, sequencing_process):
             process_name, url, None, projects, status, seq_url, runid
             )
 
+
+def get_recently_completed_runs():
+    flowcells = lims.get_containers(udf={})
+
+
+
 @app.route('/')
 def get_main():
     global ui_server
