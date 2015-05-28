@@ -204,10 +204,10 @@ def main(process_id):
     
         if ssheet_file:
             utilities.running(process, "Demultiplexing")
-            #process_ok = run_demultiplexing(process, ssheet_file, cfg.bases_mask,
-            #        cfg.n_threads, cfg.mismatches, start_dir, cfg.dest_dir,
-            #        log_dir, cfg.other_options)
-            process_ok = True
+            process_ok = run_demultiplexing(process, ssheet_file, cfg.bases_mask,
+                    cfg.n_threads, cfg.mismatches, start_dir, cfg.dest_dir,
+                    log_dir, cfg.other_options)
+            #process_ok = True
             if process_ok:
                 utilities.running(process, "Saving stats")
                 projdirs = rename_project_directories(runid, cfg.dest_dir, sample_sheet)
