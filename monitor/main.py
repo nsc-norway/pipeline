@@ -21,6 +21,7 @@ from functools import partial
 #              monitored.
 
 app = Flask(__name__)
+app.debug=True
 
 INSTRUMENTS = ["HiSeq", "NextSeq", "MiSeq"]
 # [ (Protocol, Step) ]
@@ -118,18 +119,15 @@ def is_step_completed(proc):
     step = Step(nsc.lims, id=proc.id)
     try:
         step.get(force=True)
+        return step.current_state.upper() == "COMPLETED"
     except requests.exceptions.HTTPError:
         # If the process has no associated step, skip it
-        #completed.append(proc)
         print "No step for", proc.id
-    else:
-        if step.current_state.upper() == "COMPLETED":
-            return True
+	return False
 
 def is_sequencing_complete(proc):
     try:
-        if proc.udf['Finish Date'] != None:
-            return is_step_completed(proc)
+        return proc.udf['Finish Date'] != None and is_step_completed(proc)
     except KeyError:
         return False
 
