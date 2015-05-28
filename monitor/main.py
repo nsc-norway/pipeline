@@ -90,7 +90,7 @@ class Project(object):
 
 
 class ProcessInfo(object):
-    def __init__(self, name, url, flowcell_id, projects, status, seq_url, runid):
+    def __init__(self, name, url, flowcell_id, projects, status, seq_url, runid, finished=None):
         self.name = name
         self.url = url
         self.flowcell_id = flowcell_id
@@ -98,6 +98,7 @@ class ProcessInfo(object):
         self.status = status
         self.seq_url = seq_url
         self.runid = runid
+        self.finished = finished
         self.is_queue = False
 
 
@@ -200,9 +201,13 @@ def read_sequencing(process_name, process):
         status = process.udf['Status']
     except KeyError:
         status = "Pending/running"
+    try:
+        finished = process.udf['Finish Date']
+    except KeyError:
+        finished = ""
 
     return ProcessInfo(
-            process_name, url, flowcell_id, projects, status, url, runid
+            process_name, url, flowcell_id, projects, status, url, runid, finished
             )
 
 
