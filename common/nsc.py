@@ -37,6 +37,8 @@ PROCESS_UNDETERMINED_UDF = "Process undetermined indexes"
 LANE_UNDETERMINED_UDF = "NSC % Undetermined Indices (PF)"
 # On Project
 DELIVERY_METHOD_UDF = "Delivery method"
+# On Container
+RECENTLY_COMPLETED_UDF = "Recently completed"
 
 # Output files
 CONFIGURE_LOG = "configureBclToFastq log"

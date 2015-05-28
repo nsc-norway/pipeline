@@ -7,6 +7,7 @@
 import sys
 import os
 import subprocess
+from datetime import date
 from genologics.lims import *
 from common import nsc, parse, utilities
 
@@ -23,9 +24,10 @@ def main(process_id):
         fc = next(iter(flowcells))
         try:
             del fc.udf[nsc.AUTO_FLOWCELL_UDF]
-            fc.put()
         except KeyError:
             pass # in case it was not marked for automation
+        fc.udf[nsc.RECENTLY_COMPLETED_UDF] = str(date.today())
+        fc.put()
 
         seq_process = utilities.get_sequencing_process(process)
 

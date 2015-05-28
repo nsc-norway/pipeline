@@ -3,6 +3,10 @@
 Setting up the LIMS for use of these scripts, etc.
 
 
+For the overview page, see the SETUP instruction in the monitor/ directory, in addition
+to the ones given here.
+
+
 ## Server
 
 When slurm client is running on the LIMS servers (OUS): see nsc.py for two lines to add
@@ -65,6 +69,10 @@ available.
 
 #### Container
  - `Automation lane groups` -- Single line text. List of lanes which can be run together, used by auto.py.
+ - `Recently completed` -- Single line text. Date at which the processing of this run was completed. Helper field for overview page.
+   [ ] Shown in tables
+   [ ] User can enter values via GUI
+   TODO <<< Figure this one out
 
 #### Project
  - `Delivery method` -- Single line text. For the prepare-delivery.py script. Should be one of User HDD, New HDD, Norstore, Transfer to diagnostics.
