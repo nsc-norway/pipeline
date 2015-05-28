@@ -20,14 +20,17 @@ def get_sample_sheet_data(cluster_proc, fcid):
 
     outputs = cluster_proc.all_outputs(unique=True)
     for io in cluster_proc.input_output_maps:
-        if io[0]['uri'].location[0].name == fcid:
-            o = io[1]
-            if o['output-type'] == 'ResultFile' and o['output-generation-type'] == 'PerAllInputs':
-                input = io[0]['uri']
-                output = o['uri']
-                if o.name == 'SampleSheet csv':
-                    if len(o.files) == 1:
-                        return o.files[0].download()
+        i = io[0]
+
+        o = io[1]
+        if o['output-type'] == 'ResultFile' and\
+                o['output-generation-type'] == 'PerAllInputs':
+            if o['uri'].name == 'SampleSheet csv':
+                if len(o['uri'].files) == 1:
+                    data = o['uri'].files[0].download()
+                    lines = data.splitlines()
+                    if len(lines) >= 2 and lines[1].startswith(fcid+","):
+                        return data
     return None
 
 
