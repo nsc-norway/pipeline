@@ -186,7 +186,7 @@ def success_finish(process, finish_step=True):
 
     if finish_step:
         try:
-            automation = process.all_inputs()[0].udf[nsc.AUTO_FLOWCELL_UDF]
+            automation = process.all_inputs()[0].location[0].udf[nsc.AUTO_FLOWCELL_UDF]
         except KeyError:
             automation = False
 
