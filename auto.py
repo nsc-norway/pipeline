@@ -186,7 +186,7 @@ def get_input_flowcell(queue):
     flowcell_groups = []
     for fcid,inputs in flowcell_inputs.items():
         logging.debug("Checking flowcell " + fcid)
-        fc = inputs.location[0]
+        fc = inputs[0].location[0]
 
         auto_udf = fc.udf[nsc.AUTO_FLOWCELL_UDF]
         lanes = auto_udf.replace("|", ",").split(",")
