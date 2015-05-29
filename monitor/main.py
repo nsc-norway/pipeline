@@ -239,7 +239,20 @@ def read_post_sequencing_process(process_name, process, sequencing_process):
 
 
 def get_recently_completed_runs():
-    flowcells = lims.get_containers(udf={})
+    # Look for any flowcells which have a value for this udf
+    flowcells = lims.get_containers(
+            udf={nsc.RECENTLY_COMPLETED_UDF+".!": 0},
+            type=[
+                "Illumina Flow Cell",
+                "NextSeq Reagent Cartridge", 
+                "MiSeq Reagent Cartridge"
+                ]
+            )
+
+    for fc in flowcells:
+        date = date. fc.udf[nsc.RECENTLY_COMPLETED_UDF]
+
+
 
 
 
