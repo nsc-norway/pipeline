@@ -241,7 +241,7 @@ def read_post_sequencing_process(process_name, process, sequencing_process):
 def get_recently_completed_runs():
     # Look for any flowcells which have a value for this udf
     flowcells = lims.get_containers(
-            udf={nsc.RECENTLY_COMPLETED_UDF+".!": 0},
+            udf={nsc.RECENTLY_COMPLETED_UDF: True},
             type=[
                 "Illumina Flow Cell",
                 "NextSeq Reagent Cartridge", 
@@ -249,8 +249,9 @@ def get_recently_completed_runs():
                 ]
             )
 
+
     for fc in flowcells:
-        date = date. fc.udf[nsc.RECENTLY_COMPLETED_UDF]
+        date = datetime.strptime(fc.udf[nsc.PROCESSED_DATE_UDF])
 
 
 

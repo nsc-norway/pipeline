@@ -39,6 +39,7 @@ LANE_UNDETERMINED_UDF = "NSC % Undetermined Indices (PF)"
 DELIVERY_METHOD_UDF = "Delivery method"
 # On Container
 RECENTLY_COMPLETED_UDF = "Recently completed"
+PROCESSED_DATE_UDF = "Processing completed date"
 
 # Output files
 CONFIGURE_LOG = "configureBclToFastq log"
