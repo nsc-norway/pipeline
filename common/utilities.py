@@ -175,7 +175,7 @@ def fail(process, message, extra_info = None):
         except (KeyError,requests.exceptions.HTTPError):
             pass
 
-def success_finish(process, finish_step=True):
+def success_finish(process, do_finish_step=True):
     """Called by background jobs (slurm) to declare that the task has been 
     completed successfully."""
 
@@ -184,7 +184,7 @@ def success_finish(process, finish_step=True):
     process.udf[nsc.JOB_STATE_CODE_UDF] = 'COMPLETED'
     process.put()
 
-    if finish_step:
+    if do_finish_step:
         try:
             automation = process.all_inputs()[0].location[0].udf[nsc.AUTO_FLOWCELL_UDF]
         except KeyError:
