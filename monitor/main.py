@@ -6,6 +6,7 @@ from common import nsc, utilities
 import datetime
 import threading
 from functools import partial
+from collections import defaultdict
 
 # Project / Sample progress
 # ---------------------------------
@@ -103,11 +104,17 @@ class ProcessInfo(object):
 
 
 def get_queue(protocol, step):
+    """Get a single QueueState object if there are some samples in the queue,
+    else returns None.
+
+    Assumes that refresh is already done (done by batch request)"""
+
     q = queues[(protocol, step)]
-    q.get(force=True)
     if len(q.artifacts) > 0:
         url = "{0}clarity/queue/{1}".format(ui_server, q.id)
         return QueueState(url, protocol, step, len(q.artifacts))
+    else:
+        return None
 
 
 def background_clear_monitor(completed):
@@ -116,29 +123,37 @@ def background_clear_monitor(completed):
         proc.udf['Monitor'] = False
         proc.put()
 
-def is_step_completed(proc):
-    step = Step(nsc.lims, id=proc.id)
+
+def is_step_completed(proc, step):
+    """Check if the state of this Step is completed.
+
+    Does not refresh the step, this should be done by a batch request
+    prior to calling is_step_completed.
+    """
     try:
-        step.get(force=True)
         return step.current_state.upper() == "COMPLETED"
     except requests.exceptions.HTTPError:
         # If the process has no associated step, skip it
-        print "No step for", proc.id
+        print "No step for", step.id
 	return False
 
-def is_sequencing_complete(proc):
+
+def is_sequencing_complete(proc, step):
     try:
-        return proc.udf['Finish Date'] != None and is_step_completed(proc)
+        return proc.udf['Finish Date'] != None and is_step_completed(proc, step)
     except KeyError:
         return False
 
+
 def get_processes(process_name, complete_condition=is_step_completed):
     procs = nsc.lims.get_processes(type=process_name, udf={'Monitor': True})
+    nsc.lims.get_batch(procs)
+    steps = [Step(nsc.lims, id=proc.id) for proc in procs]
+    nsc.lims.get_batch(steps)
     completed = []
     result = []
-    for proc in procs:
-        proc.get(force=True)
-        if complete_condition(proc):
+    for proc, step in zip(procs, steps):
+        if complete_condition(proc, step):
             completed.append(proc)
         else:
             result.append(proc)
@@ -213,7 +228,7 @@ def read_sequencing(process_name, process):
 
 def get_sequencing(process_name):
     procs = get_processes(process_name, is_sequencing_complete)
-    return [read_sequencing(process_name, proc) for proc in procs]
+    return 
 
 
 def read_post_sequencing_process(process_name, process, sequencing_process):
@@ -238,20 +253,48 @@ def read_post_sequencing_process(process_name, process, sequencing_process):
             )
 
 
+
+def get_recent_run(fc):
+    
+    
+
+
 def get_recently_completed_runs():
     # Look for any flowcells which have a value for this udf
-    flowcells = lims.get_containers(
-            udf={nsc.RECENTLY_COMPLETED_UDF: True},
-            type=[
+    FLOWCELL_TYPES = [
                 "Illumina Flow Cell",
                 "NextSeq Reagent Cartridge", 
                 "MiSeq Reagent Cartridge"
                 ]
+    flowcells = nsc.lims.get_containers(
+            udf={nsc.RECENTLY_COMPLETED_UDF: True},
+            type=FLOWCELL_TYPES
             )
 
 
+    cutoff_date = datetime.date.today() - datetime.timedelta(days=30)
+    results = [[],[],[]]
     for fc in flowcells:
-        date = datetime.strptime(fc.udf[nsc.PROCESSED_DATE_UDF])
+        try:
+            date_str = fc.udf[nsc.PROCESSED_DATE_UDF]
+            date = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+        except (KeyError, ValueError):
+            date = None
+
+        if date < cutoff_date:
+            fc.udf[nsc.RECENTLY_COMPLETED_UDF] = False
+            fc.put()
+        else:
+            # Container types will be cached, so the extra entity request is
+            # not a problem
+            instrument_index = FLOWCELL_TYPES.index(fc.type.name)
+            sequencing_process = nsc.lims.get_processes(
+                    type=SEQUENCING[instrument_index][1],
+                    inputartifactlimsid=next(fc.placements)
+                    )
+            results[instrument_index].append(get_recent_run(fc))
+        
+    return results
 
 
 
@@ -270,23 +313,55 @@ def get_main():
     except KeyError:
         ui_server = nsc.lims.baseuri
 
-    seq_queues = [get_queue(*proc) for proc in SEQUENCING]
-    sequencing = [get_sequencing(sp[1]) for sp in SEQUENCING]
+    # Refresh all queues
+    nsc.lims.get_batch(q for q in queues)
 
+    seq_queues = [get_queue(*proc) for proc in SEQUENCING]
+
+    all_process_types = [i[1] for i in SEQUENCING] +\
+                [procname for wfname, proclist in DATA_PROCESSING for procname in proclist]
+
+    # Get a list of all processes
+    monitored_process_list = nsc.lims.get_processes(udf={'Monitor': True], type=all_proces_types)
+    # Refresh data for all processes (need this for almost all monitored procs, so
+    # doing a batch request)
+    processes_with_data = nsc.lims.get_batch(monitored_process_list)
+    # Need Steps to see if COMPLETED, this loads them into cache
+    nsc.lims.get_batch(Step(nsc.lims, id=p.id) for p in processes_with_data)
+
+    seq_processes = defaultdict(list)
+    post_processes = defaultdict(list)
+    for p in processes_with_data:
+        if p.type.name in seq_procs:
+            if is_sequencing_completed(p):
+                seq_processes[p.type.name].append(p)
+       else:
+           if is_process_completed(p):
+               post_processes[p.type.name]
+
+
+
+    # List of three elements -- Hi,Next,MiSeq, each contains a list of 
+    # sequencing processes
+    sequencing = [
+        [read_sequencing(sp[1], proc) for proc in processes[sp[1]]]
+        for sp in SEQUENCING]
+
+
+    # List of three sequencer types (containing lists within them)
     post_sequencing = []
     # One workflow for each sequencer type
-    for index, (wf, steps) in enumerate(DATA_PROCESSING):
+    for index, (wf, step_names) in enumerate(DATA_PROCESSING):
         machine_items = [] # all processes, queues, for a type of sequencing machine
-        for step in steps:
-            q = get_queue(wf, step)
+        for step_name in step_names:
+            q = get_queue(wf, step_name)
             if q:
                 machine_items.append(q)
-            processes = get_processes(step)
-            for process in processes:
+            for process in processes[step_name]:
                 sequencing_process = utilities.get_sequencing_process(process)
                 if sequencing_process.type == sequencing_process_type[index]:
                     machine_items.append(read_post_sequencing_process(
-                        step, process, sequencing_process
+                        step_name, process, sequencing_process
                         ))
         post_sequencing.append(machine_items)
         
