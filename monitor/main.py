@@ -56,7 +56,7 @@ DATA_PROCESSING = [
 
 
 queues = {}
-sequencing_process_type = []
+recent_run_cache = {}
 
 def init_application():
     # We get queue instances as part of the initialisation, then keep them
@@ -103,6 +103,14 @@ class ProcessInfo(object):
         self.is_queue = False
 
 
+class CompletedRunInfo(object):
+    def __init__(self, url, runid, projects, date):
+        self.url = url
+        self.runid = runid
+        self.projects = projects
+        self.date = date
+
+
 def get_queue(protocol, step):
     """Get a single QueueState object if there are some samples in the queue,
     else returns None.
@@ -119,7 +127,6 @@ def get_queue(protocol, step):
 
 def background_clear_monitor(completed):
     for proc in completed:
-        print "Disabling monitoring for", proc.id
         proc.udf['Monitor'] = False
         proc.put()
 
@@ -143,27 +150,6 @@ def is_sequencing_complete(proc, step):
         return proc.udf['Finish Date'] != None and is_step_completed(proc, step)
     except KeyError:
         return False
-
-
-def get_processes(process_name, complete_condition=is_step_completed):
-    procs = nsc.lims.get_processes(type=process_name, udf={'Monitor': True})
-    nsc.lims.get_batch(procs)
-    steps = [Step(nsc.lims, id=proc.id) for proc in procs]
-    nsc.lims.get_batch(steps)
-    completed = []
-    result = []
-    for proc, step in zip(procs, steps):
-        if complete_condition(proc, step):
-            completed.append(proc)
-        else:
-            result.append(proc)
-
-    if completed:
-        clear_task = partial(background_clear_monitor, completed)
-        t = threading.Thread(target = clear_task)
-        t.run()
-
-    return result
 
 
 def proc_url(process_id):
@@ -226,11 +212,6 @@ def read_sequencing(process_name, process):
             )
 
 
-def get_sequencing(process_name):
-    procs = get_processes(process_name, is_sequencing_complete)
-    return 
-
-
 def read_post_sequencing_process(process_name, process, sequencing_process):
     url = proc_url(process.id)
     seq_url = proc_url(sequencing_process.id)
@@ -255,7 +236,27 @@ def read_post_sequencing_process(process_name, process, sequencing_process):
 
 
 def get_recent_run(fc):
+    """Get the monitoring page's internal representation of a completed run.
+    This will initiate a *lot* of requests, but it's just once per run
+    (flowcell).
     
+    Caching should be done by the caller."""
+
+    sequencing_process = nsc.lims.get_processes(
+            type=SEQUENCING[instrument_index][1],
+            inputartifactlimsid=next(fc.placements)
+            )
+
+    url = proc_url(sequencing_process.id)
+    runid = sequencing_proceess.udf['Run ID']
+    projects = get_projects(sequencing_process)
+
+    return CompletedRunInfo(
+            url,
+            runid,
+            list(projects),
+            fc.udf[nsc.PROCESSED_DATE_UDF]
+            )
     
 
 
@@ -279,20 +280,27 @@ def get_recently_completed_runs():
             date_str = fc.udf[nsc.PROCESSED_DATE_UDF]
             date = datetime.datetime.strptime(date_str, "%Y-%m-%d")
         except (KeyError, ValueError):
-            date = None
+            date = cutoff_date
 
-        if date < cutoff_date:
+        if date <= cutoff_date:
+            try:
+                del recent_run_cache[fc.id]
+            except KeyError:
+                pass
             fc.udf[nsc.RECENTLY_COMPLETED_UDF] = False
             fc.put()
         else:
-            # Container types will be cached, so the extra entity request is
-            # not a problem
+            run_info = recent_run_cache.get(fc.id)
             instrument_index = FLOWCELL_TYPES.index(fc.type.name)
-            sequencing_process = nsc.lims.get_processes(
-                    type=SEQUENCING[instrument_index][1],
-                    inputartifactlimsid=next(fc.placements)
-                    )
-            results[instrument_index].append(get_recent_run(fc))
+
+            if not run_info:
+                # Container types will be cached, so the extra entity request 
+                # (for type) is not a problem
+                run_info = get_recent_run(fc)
+                recent_run_cache[fc.id] = run_info
+
+            results[instrument_index].append(run_info)
+
         
     return results
 
@@ -322,7 +330,7 @@ def get_main():
                 [procname for wfname, proclist in DATA_PROCESSING for procname in proclist]
 
     # Get a list of all processes
-    monitored_process_list = nsc.lims.get_processes(udf={'Monitor': True], type=all_proces_types)
+    monitored_process_list = nsc.lims.get_processes(udf={'Monitor': True}, type=all_proces_types)
     # Refresh data for all processes (need this for almost all monitored procs, so
     # doing a batch request)
     processes_with_data = nsc.lims.get_batch(monitored_process_list)
@@ -331,14 +339,23 @@ def get_main():
 
     seq_processes = defaultdict(list)
     post_processes = defaultdict(list)
+    completed = []
     for p in processes_with_data:
         if p.type.name in seq_procs:
             if is_sequencing_completed(p):
+                completed.append(p)
+            else:
                 seq_processes[p.type.name].append(p)
-       else:
-           if is_process_completed(p):
-               post_processes[p.type.name]
 
+        else:
+            if is_process_completed(p):
+                completed.append(p)
+            else:
+                post_processes[p.type.name]
+
+    clear_task = partial(background_clear_monitor, completed)
+    t = threading.Thread(target = clear_task)
+    t.run()
 
 
     # List of three elements -- Hi,Next,MiSeq, each contains a list of 
@@ -366,11 +383,14 @@ def get_main():
         post_sequencing.append(machine_items)
         
 
+    recently_completed = get_recently_completed_runs()
+
     body = render_template(
             'processes.xhtml',
             server=nsc.lims.baseuri,
             sequencing=zip(seq_queues, sequencing),
             post_sequencing=post_sequencing,
+            recently_completed=recently_completed,
             instruments=INSTRUMENTS
             )
     return (body, 200, {'Refresh': '300'})

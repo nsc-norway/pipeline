@@ -130,8 +130,43 @@
 </tr>
 </table>
 
+
 <h2 class="section-header">Recently completed projects</h2>
-Coming in the next release:)
+
+<table class="main-table">
+<tr>
+{% for boxes in recently_completed %}
+<td class="main">
+
+{% for item in boxes %}
+
+<div class="box">
+<h4 class="box-header">
+	<a href="{{ item.url }}">{{ item.runid }}</a>
+</h4>
+<table>  <tr>
+		<td class="label-col">Processed date:</td>
+		<td>{{ item.date }}<td>
+	</tr><tr>
+		<td>Project:</td><td>
+			<a href="{{ item.projects[0].url }}">
+			{{ item.projects[0].name }}</a>
+		</td>
+	</tr>
+	{% for proj in item.projects[1:] %}
+	<tr>
+		<td></td><td>
+			<a href="{{ proj.url }}">{{ proj.name }}</a></td>
+	</tr>
+	{% endfor %}
+</table>
+</div>
+
+{% endfor %}
+</td>
+{% endfor %}
+</tr>
+</table>
 
 </body>
 </html>
