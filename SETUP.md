@@ -65,20 +65,26 @@ available.
 ### UDFs on existing Clarity objects
 
 #### Analyte
- - `NSC % Undetermined Indices (PF)` -- Numeric, 1 decimal place. Information field for the undetermined percentage on a lane.
+ - `NSC % Undetermined Indices (PF)` -- Numeric, 1 decimal place. Information field
+    for the undetermined percentage on a lane.
 
 #### Container
- - `Automation lane groups` -- Single line text. List of lanes which can be run together, used by auto.py.
+ - `Automation lane groups` -- Single line text. List of lanes which can be run together,
+    used by auto.py.
  - `Recently completed` -- Check Box. Helper field for overview page. Use defaults.
- - `Processing completed date` -- Date. Date at which the Finalize Run step was run. Helper field for overview page.
+ - `Processing completed date` -- Date. Date at which the Finalize Run step was run. Helper
+   field for overview page.
 
 #### Project
- - `Delivery method` -- Single line text. For the prepare-delivery.py script. Should be one of User HDD, New HDD, Norstore, Transfer to diagnostics.
+ - `Delivery method` -- Single line text. For the prepare-delivery.py script. Should be one
+   of User HDD, New HDD, Norstore, Transfer to diagnostics.
 
 #### Genologics-provided process types
 
- - `NSC Automatic processing` -- Check box. Enables automatic processing for all projects in a given sequencing run. Used by auto.py.
-   - Process types: Illumina Sequencing (Illumina SBS) 5.0, MiSeq Run (MiSeq) 5.0, NextSeq Run (NextSeq) 1.0
+ - `NSC Automatic processing` -- Check box. Enables automatic processing for all projects
+   in a given sequencing run. Used by auto.py.
+   - Process types: Illumina Sequencing (Illumina SBS) 5.0, MiSeq Run (MiSeq) 5.0,
+     NextSeq Run (NextSeq) 1.0
 
 ### New process types
 
@@ -96,7 +102,9 @@ Implicit settings for external programs:
 If an external program is required, please check the box at the top of the screeen. For
 each external program, the Channel Name should always be limsserver.
 
-These UDFs are present on all process types which submit slurm jobs: `Job ID`: Numeric, uncheck users can enter values, `Job status`: single line text, uncheck users can enter values, `Job state code`: single line text, uncheck users can enter values.
+These UDFs are present on all process types which submit slurm jobs: `Job ID`: Numeric,
+uncheck users can enter values, `Job status`: single line text, uncheck users can enter
+values, `Job state code`: single line text, uncheck users can enter values.
 
 The "Cancel job" command is the same on all slurm-based process types: Name: Cancel job. Command: /usr/bin/python /data/nsc.loki/automation/pipeline/kill-slurm.py {processLuid}.
 
