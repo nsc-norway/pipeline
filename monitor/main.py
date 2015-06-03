@@ -273,8 +273,7 @@ def get_recently_completed_runs():
     results = [[],[],[]]
     for fc in flowcells:
         try:
-            date_str = fc.udf[nsc.PROCESSED_DATE_UDF]
-            date = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+            date = fc.udf[nsc.PROCESSED_DATE_UDF]
         except (KeyError, ValueError):
             date = cutoff_date
 

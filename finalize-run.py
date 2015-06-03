@@ -26,7 +26,8 @@ def main(process_id):
             del fc.udf[nsc.AUTO_FLOWCELL_UDF]
         except KeyError:
             pass # in case it was not marked for automation
-        fc.udf[nsc.RECENTLY_COMPLETED_UDF] = date.today().strftime("%Y-%m-%d")
+        fc.udf[nsc.RECENTLY_COMPLETED_UDF] = True
+        fc.udf[nsc.PROCESSED_DATE_UDF] = date.today()
         fc.put()
 
         seq_process = utilities.get_sequencing_process(process)
