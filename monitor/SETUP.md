@@ -3,8 +3,8 @@
 This monitoring system needs a custom UDF to track which processes
 are "open". This is done to prevent the need to load all processes
 for every request. It also requires the UDFs provided by Genologics
-and the Slurm job UDFs (currently only: Job status). See other 
-SETUP files.
+and the Slurm job UDFs (currently: Job status, Recently completed, 
+Processing completed date). See other SETUP files.  
 
 Check out main.py. For each process type in the following arrays,
 add a UDF as specified below:

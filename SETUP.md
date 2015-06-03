@@ -69,10 +69,8 @@ available.
 
 #### Container
  - `Automation lane groups` -- Single line text. List of lanes which can be run together, used by auto.py.
- - `Recently completed` -- Single line text. Date at which the processing of this run was completed. Helper field for overview page.
-   [ ] Shown in tables
-   [ ] User can enter values via GUI
-   TODO <<< Figure this one out
+ - `Recently completed` -- Check Box. Helper field for overview page. Use defaults.
+ - `Processing completed date` -- Date. Date at which the Finalize Run step was run. Helper field for overview page.
 
 #### Project
  - `Delivery method` -- Single line text. For the prepare-delivery.py script. Should be one of User HDD, New HDD, Norstore, Transfer to diagnostics.
