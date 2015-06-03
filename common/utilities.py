@@ -250,7 +250,7 @@ else:
         if rcode == 0:
             return data[0]
         else:
-            raise subprocess.CalledProcessError(args[0] + ": " +str(rcode) +  data[1])
+            raise subprocess.CalledProcessError(rcode, args[0] + ": " +str(rcode) +  data[1])
 
 
 

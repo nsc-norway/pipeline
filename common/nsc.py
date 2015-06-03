@@ -114,8 +114,7 @@ PDFLATEX="/usr/bin/pdflatex"
 #Defaults:glsai          !requiretty
 INVOKE_SBATCH_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/sbatch",
         "-D", "/data/nsc.loki/automation/dev/run"]
-SCONTROL_STATUS_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/scontrol",
-        "-o", "show", "job"]
+SCONTROL_STATUS_ARGLIST=["/usr/bin/scontrol", "-o", "show", "job"]
 SCANCEL_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/scancel"]
 
 if TAG == "prod":
