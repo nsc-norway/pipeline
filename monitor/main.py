@@ -57,6 +57,7 @@ DATA_PROCESSING = [
 
 queues = {}
 recent_run_cache = {}
+sequencing_process_type = []
 
 def init_application():
     # We get queue instances as part of the initialisation, then keep them
@@ -137,15 +138,10 @@ def is_step_completed(proc, step):
     Does not refresh the step, this should be done by a batch request
     prior to calling is_step_completed.
     """
-    try:
-        return step.current_state.upper() == "COMPLETED"
-    except requests.exceptions.HTTPError:
-        # If the process has no associated step, skip it
-        print "No step for", step.id
-	return False
+    return step.current_state.upper() == "COMPLETED"
 
 
-def is_sequencing_complete(proc, step):
+def is_sequencing_completed(proc, step):
     try:
         return proc.udf['Finish Date'] != None and is_step_completed(proc, step)
     except KeyError:
@@ -305,6 +301,14 @@ def get_recently_completed_runs():
     return results
 
 
+def get_batch(instances):
+    """Lame replacement for batch call, API only support batch resources for 
+    some few types of objects."""
+    for instance in instances:
+        instance.get(force=True)
+
+    return instances
+
 
 
 
@@ -322,36 +326,43 @@ def get_main():
         ui_server = nsc.lims.baseuri
 
     # Refresh all queues
-    nsc.lims.get_batch(q for q in queues)
+    get_batch(q for q in queues.values())
 
     seq_queues = [get_queue(*proc) for proc in SEQUENCING]
 
-    all_process_types = [i[1] for i in SEQUENCING] +\
+    seq_procs = [i[1] for i in SEQUENCING]
+    all_process_types = seq_procs +\
                 [procname for wfname, proclist in DATA_PROCESSING for procname in proclist]
 
-    # Get a list of all processes
-    monitored_process_list = nsc.lims.get_processes(udf={'Monitor': True}, type=all_proces_types)
+    # Get a list of all processes 
+    # Of course it can't be this efficient :( Multiple process types not supported
+    #monitored_process_list = nsc.lims.get_processes(udf={'Monitor': True}, type=all_process_types)
+    monitored_process_list = []
+    for ptype in set(all_process_types):
+        monitored_process_list += nsc.lims.get_processes(udf={'Monitor': True}, type=ptype)
+
     # Refresh data for all processes (need this for almost all monitored procs, so
     # doing a batch request)
-    processes_with_data = nsc.lims.get_batch(monitored_process_list)
+    processes_with_data = get_batch(monitored_process_list)
     # Need Steps to see if COMPLETED, this loads them into cache
-    nsc.lims.get_batch(Step(nsc.lims, id=p.id) for p in processes_with_data)
+    steps = [Step(nsc.lims, id=p.id) for p in processes_with_data]
+    get_batch(steps)
 
     seq_processes = defaultdict(list)
     post_processes = defaultdict(list)
     completed = []
-    for p in processes_with_data:
+    for p, step in zip(processes_with_data, steps):
         if p.type.name in seq_procs:
-            if is_sequencing_completed(p):
+            if is_sequencing_completed(p, step):
                 completed.append(p)
             else:
                 seq_processes[p.type.name].append(p)
 
         else:
-            if is_process_completed(p):
+            if is_step_completed(p, step):
                 completed.append(p)
             else:
-                post_processes[p.type.name]
+                post_processes[p.type.name].append(p)
 
     clear_task = partial(background_clear_monitor, completed)
     t = threading.Thread(target = clear_task)
@@ -361,8 +372,10 @@ def get_main():
     # List of three elements -- Hi,Next,MiSeq, each contains a list of 
     # sequencing processes
     sequencing = [
-        [read_sequencing(sp[1], proc) for proc in processes[sp[1]]]
-        for sp in SEQUENCING]
+        [read_sequencing(sp[1], proc) 
+            for proc in seq_processes[sp[1]]]
+            for sp in SEQUENCING
+        ]
 
 
     # List of three sequencer types (containing lists within them)
@@ -374,7 +387,7 @@ def get_main():
             q = get_queue(wf, step_name)
             if q:
                 machine_items.append(q)
-            for process in processes[step_name]:
+            for process in post_processes[step_name]:
                 sequencing_process = utilities.get_sequencing_process(process)
                 if sequencing_process.type == sequencing_process_type[index]:
                     machine_items.append(read_post_sequencing_process(
