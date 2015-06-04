@@ -86,14 +86,14 @@ def run_fastqc(files, demultiplex_dir, output_dir=None, max_threads=None):
     """Run fastqc on a set of fastq files"""
     args = []
     if max_threads:
-        args += ['--threads=' + str(max_threads), '--quiet']
+        args += ['--threads=' + str(max_threads)]
     if output_dir:
         args += ["--outdir=" + output_dir]
     args += files
     if len(files) > 0:
         print "Running fastqc on", len(files), "files"
         DEVNULL = open(os.devnull, 'wb') # discard output
-        rc = subprocess.call([nsc.FASTQC] + args, stdout=DEVNULL, cwd=demultiplex_dir)
+        rc = subprocess.call([nsc.FASTQC] + args, cwd=demultiplex_dir)
     else:
         print "No files provided for fastqc"
     
