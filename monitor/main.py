@@ -25,6 +25,13 @@ app = Flask(__name__)
 app.debug=True
 
 INSTRUMENTS = ["HiSeq", "NextSeq", "MiSeq"]
+# With indexes into INSTRUMENTS array
+FLOWCELL_INSTRUMENTS = {
+	"Illumina Flow Cell": 0,
+	"Illumina Rapid Flow Cell": 0,
+	"NextSeq Reagent Cartridge": 1, 
+	"MiSeq Reagent Cartridge": 2
+	}
 # [ (Protocol, Step) ]
 SEQUENCING = [
         ("Illumina SBS (HiSeq GAIIx) 5.0", "Illumina Sequencing (Illumina SBS) 5.0"),
@@ -259,14 +266,9 @@ def get_recent_run(fc, instrument_index):
 
 def get_recently_completed_runs():
     # Look for any flowcells which have a value for this udf
-    FLOWCELL_TYPES = [
-                "Illumina Flow Cell",
-                "NextSeq Reagent Cartridge", 
-                "MiSeq Reagent Cartridge"
-                ]
     flowcells = nsc.lims.get_containers(
             udf={nsc.RECENTLY_COMPLETED_UDF: True},
-            type=FLOWCELL_TYPES
+            type=FLOWCELL_INSTRUMENTS.keys()
             )
 
 
@@ -275,7 +277,7 @@ def get_recently_completed_runs():
     for fc in flowcells:
         try:
             date = fc.udf[nsc.PROCESSED_DATE_UDF]
-        except (KeyError, ValueError):
+        except KeyError:
             date = cutoff_date
 
         if date <= cutoff_date:
@@ -287,7 +289,7 @@ def get_recently_completed_runs():
             fc.put()
         else:
             run_info = recent_run_cache.get(fc.id)
-            instrument_index = FLOWCELL_TYPES.index(fc.type.name)
+            instrument_index = FLOWCELL_INSTRUMENTS[fc.type.name]
 
             if not run_info:
                 # Container types will be cached, so the extra entity request 
