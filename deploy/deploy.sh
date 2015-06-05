@@ -18,9 +18,15 @@ do
 		source_dir=/data/nsc.loki/automation/dev/$repo
 		pushd $source_dir > /dev/null
 		git archive $1 | (pushd $deploy_dir; tar vx ; popd)
-		chmod -R a+rX $deploy_dir
-		chgrp -R nsc-seq $deploy_dir
 		popd > /dev/null
+
+		TEMP=`mktemp`
+		sed 's/^TAG="dev"$/TAG="prod"/' $deploy_dir/common/nsc.py > $TEMP
+		mv $TEMP $deploy_dir/common/nsc.py
+
+		chmod -R a+rX,a-w $deploy_dir
+		chgrp -R nsc-seq $deploy_dir
+
 		rm -rf $deploy_dir.2
 	done
 done

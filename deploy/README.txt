@@ -16,8 +16,8 @@ The production code and template files are stored in two places:
 
 These are essentially identical copies. The former is used by the LIMS integration and
 automation logic. The latter is used by the "overview" web interface. (it is necessary to
-have two parallel installations because the web server cannot access the "pipeline" 
-directory)
+have two parallel installations because the web server cannot and should not be able to 
+access nsc.loki)
 
 
 ## Procedure ##
@@ -38,4 +38,5 @@ directory)
    $ ./deploy.sh <TAG>
 
 
+3. Restart the http service if making changes to the web page.
 
