@@ -90,16 +90,16 @@ def init_automation(lims, instrument, process):
 
     if finished:
         logging.debug("Sequencing is finished for process: " + process.id)
-        logging.debug("Set the QC flags for process: " + process.id)
-        set_qc_flags(process)
-        logging.debug("Marking it for automation...")
 
+        logging.debug("Marking flowcell for automation...")
         # Mark the flow cell for automatic processing (all sequencer types)
         mark_flowcell_projects(process.all_inputs()[0].location[0])
 
         # Finish the sequencing step for NextSeq, which has data analysis in the
         # same workflow
         if instrument == "nextseq":
+            logging.debug("Set the QC flags for process: " + process.id)
+            set_qc_flags(process)
             logging.debug("Finishing sequencing step...")
             utilities.finish_step(lims, process.id)
 
