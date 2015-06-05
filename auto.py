@@ -97,9 +97,11 @@ def init_automation(lims, instrument, process):
         # Mark the flow cell for automatic processing (all sequencer types)
         mark_flowcell_projects(process.all_inputs()[0].location[0])
 
-        logging.debug("Finishing sequencing step...")
-        # Finish the sequencing step
-        utilities.finish_step(lims, process.id)
+        # Finish the sequencing step for NextSeq, which has data analysis in the
+        # same workflow
+        if instrument == "nextseq":
+            logging.debug("Finishing sequencing step...")
+            utilities.finish_step(lims, process.id)
 
         # Automated processing now triggered, can remove flag so we don't 
         # have to process it again.
