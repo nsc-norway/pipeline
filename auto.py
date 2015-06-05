@@ -280,7 +280,8 @@ def start_automated_protocols(lims):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
+    if nsc.TAG == "dev":
+        logging.basicConfig(level=logging.DEBUG)
     logging.debug("auto.py Workflow management script")
     check_new_processes(nsc.lims)
     start_automated_protocols(nsc.lims)

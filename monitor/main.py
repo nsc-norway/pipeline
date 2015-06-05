@@ -22,7 +22,8 @@ from collections import defaultdict
 #              monitored.
 
 app = Flask(__name__)
-app.debug=True
+if nsc.TAG == "dev":
+    app.debug=True
 
 INSTRUMENTS = ["HiSeq", "NextSeq", "MiSeq"]
 # With indexes into INSTRUMENTS array
