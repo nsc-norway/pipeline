@@ -6,12 +6,35 @@
 # as we haven't enforced a strict separation.
 
 
+# SBATCH HEADERS FOR NON-LIMS SLURM OPERATION
+# (for lims it uses the wrapper script in slurm/)
+#SBATCH --account=nsc
+#SBATCH --qos=high
+#SBATCH --partition=main
+#SBATCH --time=1-0
+
+# Job resources.
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=4G
+
+# Set performance options:
+#SBATCH --mem_bind=local
+#SBATCH --hint=compute_bound
+#SBATCH --hint=multithread
+# END SBATCH OPTIONS
+
 
 import re
 import sys, os
 import argparse, glob
 from collections import defaultdict
 from xml.etree import ElementTree
+
+if "--sbatch" in sys.argv:
+    # Hacky way...
+    sys.path.insert(0, "/data/nsc.loki/automation/pipeline")
+
 from genologics.lims import *
 from common import nsc, utilities, qc, parse
 
@@ -32,6 +55,7 @@ def main(threads, run_dir, no_sample_sheet, process_undetermined):
         raw_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane.txt")
         lane_raw = parse.get_lane_cluster_density(raw_path)
         lanes = [qc.Lane(1, lane_raw[1], lane_pf[1], lane_pf[1] / lane_raw[1])]
+        use_merged_lanes = False
 
     elif match.group(1) == "NS":
         instrument = "nextseq"
@@ -42,10 +66,11 @@ def main(threads, run_dir, no_sample_sheet, process_undetermined):
         #lanes = [qc.Lane(l, clus_den, clus_den * pf_ratio, pf_ratio) for l in (1,2,3,4)]
         # For merged files:
         lanes = [qc.Lane("X", clus_den, clus_den * pf_ratio, pf_ratio)]
+        use_merged_lanes = True
 
 
     demultiplex_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
-    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes, 
+    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes, use_merged_lanes,
             include_undetermined=process_undetermined)
 
     qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
@@ -89,13 +114,15 @@ def main_lims(threads, process_id):
     density_pf = density_raw * n_pf / n_raw
     pf_ratio = lane.udf['%PF R1'] / 100.0
     if instrument == "miseq":
-        lanes = qc.Lane(1, density_raw * 1000.0, density_pf * 1000.0, pf_ratio)
+        lanes = [qc.Lane(1, density_raw * 1000.0, density_pf * 1000.0, pf_ratio)]
+        use_merged_lanes = False
     else:
         #lanes = [qc.Lane(l, density_raw * 1000.0, density_pf * 1000.0, pf_ratio) for l in (1,2,3,4)]
         # Merged lane fastq files
         lanes = [qc.Lane("X", density_raw * 1000.0, density_pf * 1000.0, pf_ratio)]
+        use_merged_lanes = True
 
-    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
+    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes, use_merged_lanes,
             include_undetermined=process.udf[nsc.PROCESS_UNDETERMINED_UDF])
     qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
     utilities.success_finish(process)
@@ -114,7 +141,7 @@ def get_sw_versions(run_dir):
     return [("RTA", rta_ver)]
 
 
-def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
+def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes, merged_lanes=False,
         sample_sheet_path=None, include_undetermined=False):
     """Get NextSeq or MiSeq QC model objects.
 
@@ -156,9 +183,14 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
             sample_name = sam['sampleid']
         for lane in lanes:
             for ir in xrange(1, n_reads+1):
-                path = "{0}/{1}_S{2}_L{3}_R{4}_001.fastq.gz".format(
-                        project_dir, sample_name, str(sam_index + 1),
-                        str(lane.id).zfill(3), ir)
+                if merged_lanes:
+                    path = "{0}/{1}_S{2}_R{3}_001.fastq.gz".format(
+                            project_dir, sample_name, str(sam_index + 1), ir
+                            )
+                else:
+                    path = "{0}/{1}_S{2}_L{3}_R{4}_001.fastq.gz".format(
+                            project_dir, sample_name, str(sam_index + 1),
+                            str(lane.id).zfill(3), ir)
                 file_stats = stats.get((lane.id, sample_name, ir))
                 files.append(qc.FastqFile(lane, ir, path, file_stats))
                 print "file ", path
@@ -189,6 +221,7 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--sbatch', default=False, action='store_true', help="Running under sbatch (not working well)")
     parser.add_argument('--threads', type=int, default=None, help='Number of threads (cores)')
     parser.add_argument('--pid', default=None, help="Process-ID if running within LIMS")
     parser.add_argument('--no-sample-sheet', action='store_true', help="Run without sample sheet, look for files")
@@ -196,12 +229,9 @@ if __name__ == '__main__':
     parser.add_argument('DIR', default=None, nargs='?', help="Run directory")
     args = parser.parse_args()
     threads = args.threads
-    if not threads:
-        try:
-            threads = int(os.environ['SLURM_CPUS_ON_NODE'])
-            print "Threads from slurm: ", threads
-        except KeyError:
-            threads = 1
+    if args.sbatch:
+        threads = int(os.environ['SLURM_CPUS_ON_NODE'])
+        print "Threads from slurm: ", threads
 
     if args.pid and not args.DIR:
         with utilities.error_reporter(args.pid):

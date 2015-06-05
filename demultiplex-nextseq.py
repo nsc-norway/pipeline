@@ -64,7 +64,7 @@ def run_demultiplexing(process, num_samples, bases_mask, n_threads,
 
     log_path = os.path.join(log_dir, "bcl2fastq-" + process.id + ".log")
     
-    args = ['--runfolder-dir', run_dir]
+    args = ['--no-lane-splitting', '--runfolder-dir', run_dir]
     args += ['--input-dir', input_dir]
     args += ['--output-dir', output_dir]
     if bases_mask:
@@ -103,59 +103,12 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
     return themap
 
 
-## Deprecated -- for use when fastq should not be merged
-##def move_files(runid, output_dir, project_name, sample_sheet, reads):
-##    proj_dir = parse.get_project_dir(runid, project_name)
-##    project_path = output_dir + "/" + proj_dir
-##    
-##    params = []
-##    for i, row in enumerate(sample_sheet):
-##        for r in reads:
-##            par = dict(row)
-##            par['read'] = r
-##            par['base'] = output_dir
-##            par['index'] = i+1
-##            par['project'] = project_name
-##            par['project_path'] = project_path
-##            params.append(par)
-##
-##    with_id_subdir = not all(p['sampleid'] == p['samplename'] for p in params)
-##    for p in params:
-##        files = [
-##                "{samplename}_S{index}_L{lane}_R{read}_001.fastq.gz".format(
-##                    lane=str(lane).zfill(3), **p
-##                    )
-##                for lane in xrange(1, 5)
-##                ]
-##
-##        for f in files:
-##            if with_id_subdir:
-##                input_path = "{base}/{project}/{sampleid}/{filename}".format(filename=f, **p)
-##            else:
-##                input_path = "{base}/{project}/{filename}".format(filename=f, **p)
-##
-##            output_path = os.path.join(project_path, f)
-##            print "in", input_path, "out", output_path
-##            os.rename(input_path, output_path)
-##
-##    for dpath in set("{base}/{project}/{sampleid}".format(**p) for p in params):
-##        os.rmdir(dpath)
-##    for dpath in set("{base}/{project}".format(**p) for p in params):
-##        os.rmdir(dpath)
-
-
-def merge_fastq(source_files, dest_file):
-    with open(dest_file, 'wb') as out:
-        for f in source_files:
-            shutil.copyfileobj(open(f, 'rb'), out)
-
-
-def merge_files(runid, output_dir, project_name, sample_sheet, reads):
+def move_files(runid, output_dir, project_name, sample_sheet_data, reads):
     proj_dir = parse.get_project_dir(runid, project_name)
     project_path = output_dir + "/" + proj_dir
     
     params = []
-    for i, row in enumerate(sample_sheet):
+    for i, row in enumerate(sample_sheet_data):
         for r in reads:
             par = dict(row)
             par['read'] = r
@@ -167,56 +120,21 @@ def merge_files(runid, output_dir, project_name, sample_sheet, reads):
 
     with_id_subdir = not all(p['sampleid'] == p['samplename'] for p in params)
     for p in params:
-        file_name = "{samplename}_S{index}_L{lane}_R{read}_001.fastq.gz"
-        files = [ file_name.format( lane=str(lane).zfill(3), **p) for lane in xrange(1, 5) ]
-        out_file = file_name.format(lane="00X", **p)
+        f = "{samplename}_S{index}_R{read}_001.fastq.gz".format( **p)
 
-        input_paths = []
-        for f in files:
-            if with_id_subdir:
-                input_path = "{base}/{project}/{sampleid}/{filename}".format(filename=f, **p)
-            else:
-                input_path = "{base}/{project}/{filename}".format(filename=f, **p)
-            input_paths.append(input_path)
+        if with_id_subdir:
+            input_path = "{base}/{project}/{sampleid}/{filename}".format(filename=f, **p)
+        else:
+            input_path = "{base}/{project}/{filename}".format(filename=f, **p)
 
-        output_path = os.path.join(project_path, out_file)
+        output_path = os.path.join(project_path, f)
+        print "in", input_path, "out", output_path
+        os.rename(input_path, output_path)
 
-        merge_fastq(input_paths, output_path)
-
-        #for ip in input_paths:
-        #    os.remove(ip)
-
-    #for dpath in set("{base}/{project}/{sampleid}".format(**p) for p in params):
-    #    os.rmdir(dpath)
-    #for dpath in set("{base}/{project}".format(**p) for p in params):
-    #    os.rmdir(dpath)
-
-def merge_undetermined(output_dir, project_dir, reads):
-    
-    for read in reads:
-        undetermined_files_in = [
-                "Undetermined_S0_L{lane}_R{read}_001.fastq.gz".format(
-                    base=output_dir, lane=str(lane).zfill(3), read=read
-                    )
-                for lane in (1,2,3,4)
-                ]
-        dest_file = "{base}/Undetermined_S0_L00X_R{read}_001.fastq.gz".format(
-                    base=output_dir, read=read
-                    )
-        merge_fastq(
-                [os.path.join(output_dir, f) for f in undetermined_files_in],
-                dest_file
-                )
-
-        #for f in undetermined_files_in:
-        #    os.remove(f)
-
-        # Temporary: for keeping unmerged "undetermined" files
-        for f in undetermined_files_in:
-            os.rename(
-                    os.path.join(output_dir, f),
-                    os.path.join(output_dir, project_dir, f)
-                    )
+    for dpath in set("{base}/{project}/{sampleid}".format(**p) for p in params):
+        os.rmdir(dpath)
+    for dpath in set("{base}/{project}".format(**p) for p in params):
+        os.rmdir(dpath)
 
 
 
@@ -305,9 +223,8 @@ def main(process_id):
                     os.mkdir(project_path)
                 except OSError:
                     pass
-                utilities.running(process, "Merging outputs")
-                merge_files(runid, cfg.output_dir, project_name, sample_sheet['data'], reads)
-                merge_undetermined(cfg.output_dir, project_name, reads)
+                # Move files into directory for project, no subdirectory with LIMS ID
+                move_files(runid, cfg.output_dir, project_name, sample_sheet['data'], reads)
 
                 utilities.running(process, "Gathering statistics")
                 id_res_map = make_id_resultfile_map(process, sample_sheet['data'], reads)

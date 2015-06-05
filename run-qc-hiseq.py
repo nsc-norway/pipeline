@@ -74,7 +74,7 @@ def main(threads, demultiplex_dir):
     qc.qc_main(demultiplex_dir, projects, 'hiseq', run_id, info['sw_versions'], threads)
 
 
-def main_lims(threads, process_id):
+def main_lims(process_id):
     """LIMS-based QC wrapper. 
     
     To be run in slurm job, called via epp-submit-slurm.py."""
@@ -82,6 +82,7 @@ def main_lims(threads, process_id):
     process = Process(nsc.lims, id=process_id)
 
     utilities.running(process)
+    threads = process.udf[nsc.THREADS_UDF]
 
     seq_process = utilities.get_sequencing_process(process)
     demux_process = utilities.get_demux_process(process)
@@ -230,7 +231,7 @@ if __name__ == '__main__':
 
     if args.pid and not args.DIR:
         with utilities.error_reporter(args.pid):
-            main_lims(threads, args.pid)
+            main_lims(args.pid)
     elif args.DIR and not args.pid:
         main(threads, args.DIR)
     else:

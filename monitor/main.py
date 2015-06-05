@@ -25,6 +25,13 @@ app = Flask(__name__)
 app.debug=True
 
 INSTRUMENTS = ["HiSeq", "NextSeq", "MiSeq"]
+# With indexes into INSTRUMENTS array
+FLOWCELL_INSTRUMENTS = {
+	"Illumina Flow Cell": 0,
+	"Illumina Rapid Flow Cell": 0,
+	"NextSeq Reagent Cartridge": 1, 
+	"MiSeq Reagent Cartridge": 2
+	}
 # [ (Protocol, Step) ]
 SEQUENCING = [
         ("Illumina SBS (HiSeq GAIIx) 5.0", "Illumina Sequencing (Illumina SBS) 5.0"),
@@ -231,20 +238,21 @@ def read_post_sequencing_process(process_name, process, sequencing_process):
 
 
 
-def get_recent_run(fc):
+def get_recent_run(fc, instrument_index):
     """Get the monitoring page's internal representation of a completed run.
     This will initiate a *lot* of requests, but it's just once per run
     (flowcell).
     
     Caching should be done by the caller."""
 
-    sequencing_process = nsc.lims.get_processes(
+    print fc.placements.values()[0]
+    sequencing_process = next(iter(nsc.lims.get_processes(
             type=SEQUENCING[instrument_index][1],
-            inputartifactlimsid=next(fc.placements)
-            )
+            inputartifactlimsid=fc.placements.values()[0].id
+            )))
 
     url = proc_url(sequencing_process.id)
-    runid = sequencing_proceess.udf['Run ID']
+    runid = sequencing_process.udf['Run ID']
     projects = get_projects(sequencing_process)
 
     return CompletedRunInfo(
@@ -258,14 +266,9 @@ def get_recent_run(fc):
 
 def get_recently_completed_runs():
     # Look for any flowcells which have a value for this udf
-    FLOWCELL_TYPES = [
-                "Illumina Flow Cell",
-                "NextSeq Reagent Cartridge", 
-                "MiSeq Reagent Cartridge"
-                ]
     flowcells = nsc.lims.get_containers(
             udf={nsc.RECENTLY_COMPLETED_UDF: True},
-            type=FLOWCELL_TYPES
+            type=FLOWCELL_INSTRUMENTS.keys()
             )
 
 
@@ -274,7 +277,7 @@ def get_recently_completed_runs():
     for fc in flowcells:
         try:
             date = fc.udf[nsc.PROCESSED_DATE_UDF]
-        except (KeyError, ValueError):
+        except KeyError:
             date = cutoff_date
 
         if date <= cutoff_date:
@@ -286,12 +289,12 @@ def get_recently_completed_runs():
             fc.put()
         else:
             run_info = recent_run_cache.get(fc.id)
-            instrument_index = FLOWCELL_TYPES.index(fc.type.name)
+            instrument_index = FLOWCELL_INSTRUMENTS[fc.type.name]
 
             if not run_info:
                 # Container types will be cached, so the extra entity request 
                 # (for type) is not a problem
-                run_info = get_recent_run(fc)
+                run_info = get_recent_run(fc, instrument_index)
                 recent_run_cache[fc.id] = run_info
 
             results[instrument_index].append(run_info)
