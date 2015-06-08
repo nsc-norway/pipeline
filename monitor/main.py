@@ -275,7 +275,7 @@ def get_recently_completed_runs():
 
     cutoff_date = datetime.date.today() - datetime.timedelta(days=30)
     results = [[],[],[]]
-    for fc in flowcells:
+    for fc in reversed(flowcells):
         try:
             date = fc.udf[nsc.PROCESSED_DATE_UDF]
         except KeyError:
