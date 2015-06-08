@@ -201,13 +201,22 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes, merged_lanes=F
     project = qc.Project(project_name, project_dir, samples)
 
     if include_undetermined:
-        unfiles = [
-                qc.FastqFile(
-                    lane, ir, "Undetermined_S0_L%s_R%d_001.fastq.gz" % (str(lane.id).zfill(3), ir),
-                    stats.get((lane.id, None, ir))
-                    )
-                for ir in xrange(1, n_reads + 1) for lane in lanes
-                ]
+        if merged_lanes:
+            unfiles = [
+                    qc.FastqFile(
+                        lane, ir, "Undetermined_S0_R%d_001.fastq.gz" % (ir),
+                        stats.get((lane.id, None, ir))
+                        )
+                    for ir in xrange(1, n_reads + 1) for lane in lanes
+                    ]
+        else:
+            unfiles = [
+                    qc.FastqFile(
+                        lane, ir, "Undetermined_S0_L%s_R%d_001.fastq.gz" % (str(lane.id).zfill(3), ir),
+                        stats.get((lane.id, None, ir))
+                        )
+                    for ir in xrange(1, n_reads + 1) for lane in lanes
+                    ]
         unsample = qc.Sample("Undetermined", unfiles)
         unproject = qc.Project("Undetermined_indices", None, [unsample], is_undetermined=True)
         projects = [project, unproject]
@@ -229,9 +238,11 @@ if __name__ == '__main__':
     parser.add_argument('DIR', default=None, nargs='?', help="Run directory")
     args = parser.parse_args()
     threads = args.threads
-    if args.sbatch:
+    try:
         threads = int(os.environ['SLURM_CPUS_ON_NODE'])
         print "Threads from slurm: ", threads
+    except KeyError:
+        pass
 
     if args.pid and not args.DIR:
         with utilities.error_reporter(args.pid):

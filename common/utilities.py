@@ -89,7 +89,7 @@ def get_demux_process(process):
         io = s.input_output_maps
         for x in io:
             output = x[1]
-            if output['output-type'] == "ResultFile" and\
+            if output and output['output-type'] == "ResultFile" and\
                     output['output-generation-type'] == "PerReagentLabel":
                 return s
     
