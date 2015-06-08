@@ -22,6 +22,7 @@ def main(process_id):
             len(inputs) == next(iter(flowcells)).occupied_wells:
 
         fc = next(iter(flowcells))
+        fc.get()
         try:
             del fc.udf[nsc.AUTO_FLOWCELL_UDF]
         except KeyError:
