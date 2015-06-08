@@ -219,7 +219,7 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes, merged_lanes=F
                     ]
         unsample = qc.Sample("Undetermined", unfiles)
         unproject = qc.Project("Undetermined_indices", None, [unsample], is_undetermined=True)
-        projects = [project, unproject]
+        projects = [unproject, project]
     else:
         projects = [project]
 
