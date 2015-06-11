@@ -48,11 +48,13 @@ class Lane(object):
     For MiSeq and NextSeq there is only one lane (NextSeq's lanes aren't
     independent).."""
 
-    def __init__(self, id, raw_cluster_density, pf_cluster_density, pf_ratio):
+    def __init__(self, id, raw_cluster_density, pf_cluster_density, pf_ratio,
+            is_merged=False):
         self.id = id
         self.raw_cluster_density = raw_cluster_density
         self.pf_cluster_density = pf_cluster_density
         self.pf_ratio = pf_ratio
+        self.is_merged = is_merged
 
 
 class FastqFile(object):
@@ -182,6 +184,14 @@ def tex_escape(s):
     return re.sub(r"[^\d:a-zA-Z()+-. ]", lambda x: '\\' + x.group(0), s)
 
 
+def qc_pdf_name(run_id, fastq):
+    report_root_name = re.sub(".fastq.gz$", ".qc", os.path.basename(fastq.path))
+    if fastq.lane.is_merged:
+        return "{0}.{1}.pdf".format(run_id, report_root_name)
+    else:
+        return "{0}.{1}.{2}.pdf".format(run_id, fastq.lane.id, report_root_name)
+
+
 def generate_report_for_customer(args):
     """Generate PDF report for a fastq file.
 
@@ -207,17 +217,14 @@ def generate_report_for_customer(args):
         '__TemplateDir__': template_dir
             }
 
-    #report_root_name = ".".join((run_id, str(fastq.lane.id), "Sample_" + sample.name,
-    #        "Read" + str(fastq.read_num), "qc"))
-    report_root_name = re.sub(".fastq.gz$", ".qc", os.path.basename(fastq.path))
-    fname = report_root_name + ".tex"
+    fname = re.sub(".fastq.gz$", ".qc", os.path.basename(fastq.path)) + ".tex"
     with open(pdf_dir + "/" + fname, "w") as of:
         of.write(replace_multiple(replacements, template))
 
     DEVNULL = open(os.devnull, 'wb') # discard output
     subprocess.check_call([nsc.PDFLATEX, '-shell-escape', fname], stdout=DEVNULL, stdin=DEVNULL, cwd=pdf_dir)
 
-    pdfname = report_root_name + ".pdf"
+    pdfname = qc_pdf_name(run_id, fastq)
     shutil.copyfile(pdf_dir + "/" + pdfname, os.path.join(fastq_dir, os.path.dirname(fastq.path), pdfname))
     os.rename(pdf_dir + "/" + pdfname, quality_control_dir + "/" + pdfname)
 
@@ -507,7 +514,13 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
                         re.sub(r"^{0}".format(re.escape(p.proj_dir)), ".", f.path)
                             for s in p.samples for f in s.files
                         ]
-                pdf_paths = [re.sub(r".fastq.gz$", ".qc.pdf", path) for path in paths]
+                # PDFs are in same directory as fastq file, with a special name given by 
+                # qc_pdf_name
+                pdf_paths = [
+                        re.sub(r"^{0}".format(re.escape(p.proj_dir)), ".",
+                            os.path.join(os.path.dirname(f.path), qc_pdf_name(run_id, f)))
+                            for s in p.samples for f in s.files
+                        ]
                 compute_md5(os.path.join(demultiplex_dir, p.proj_dir), threads, paths + pdf_paths)
             else: # Project files are in root of demultiplexing dir
                 paths = [f.path for s in p.samples for f in s.files]
