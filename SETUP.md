@@ -79,12 +79,22 @@ available.
  - `Delivery method` -- Single line text. For the prepare-delivery.py script. Should be one
    of User HDD, New HDD, Norstore, Transfer to diagnostics.
 
+#### ResultFile
+ - `% of PF Clusters Per Lane` -- Numeric. (useful to track this, on NextSeq, Raw != PF)
+
 #### Genologics-provided process types
 
- - `NSC Automatic processing` -- Check box. Enables automatic processing for all projects
-   in a given sequencing run. Used by auto.py.
-   - Process types: Illumina Sequencing (Illumina SBS) 5.0, MiSeq Run (MiSeq) 5.0,
-     NextSeq Run (NextSeq) 1.0
+  - Process types: Illumina Sequencing (Illumina SBS) 5.0, MiSeq Run (MiSeq) 5.0,
+    NextSeq Run (NextSeq) 1.0. Add this UDF:
+    - `NSC Automatic processing` -- Check box. Enables automatic processing for all projects
+      in a given sequencing run. Used by auto.py.
+
+  - Process types: Denature, Dilute and Load Sample (MiSeq) 5.0, Denature, 
+        Denature, Dilute and Load Sample (NextSeq) 1.0,
+        Cluster Generation (Illumina SBS) 5.0
+    - In ops. interface, Output Details screen, check the detail called
+      "NSC % Undetermined Indices (PF)"
+    (this makes it possible to set the undetermined indexes later)
 
 ### New process types
 
@@ -137,7 +147,7 @@ The "Cancel job" command is the same on all slurm-based process types: Name: Can
  - Name: NSC Demultiplexing (HiSeq) 
  - Output types: Disable per input. Enable Shared outputs. Enable Outputs per Reagent Label.
  - Output details: Select output per reagent label, and check:
-   - Yield PF (Gb), %PF, # Reads, % of Raw Clusters Per Lane, % Perfect Index Reads, % One Mismatch Reads (Index), % Bases >= Q30, Ave Q Score.
+   - Yield PF (Gb), %PF, # Reads, % of Raw Clusters Per Lane, % of PF Clusters Per Lane, % Perfect Index Reads, % One Mismatch Reads (Index), % Bases >= Q30, Ave Q Score.
  - Output generation:
    - Shared output: ResultFile: Fixed number=4, Name= {LIST:SampleSheet csv,configureBclToFastq log,make log,Demultiplex_stats.htm}
    - O. per Input per reagent: Fixed number=2, Name={LIST:{SubmittedSampleName} R1 fastq,{SubmittedSampleName} R2 fastq}
@@ -161,7 +171,7 @@ The "Cancel job" command is the same on all slurm-based process types: Name: Can
  - Name: NSC Demultiplexing (NextSeq)
  - Output types: Disable per input. Enable Shared outputs. Enable Outputs per Reagent Label.
  - Output details: Select output per reagent label, and check:
-   - Yield PF (Gb), %PF, # Reads, % of Raw Clusters Per Lane, % Perfect Index Reads, % One Mismatch Reads (Index), % Bases >= Q30, Ave Q Score.
+   - Yield PF (Gb), %PF, # Reads, % of Raw Clusters Per Lane, % of PF Clusters Per Lane, % Perfect Index Reads, % One Mismatch Reads (Index), % Bases >= Q30, Ave Q Score.
  - Output generation:
    - Shared output: ResultFile: Fixed number=2, Name={LIST:SampleSheet csv,bcl2fastq log}
    - O. per Input per reagent: Fixed number=2, Name={LIST:{SubmittedSampleName} R1 fastq,{SubmittedSampleName} R2 fastq}

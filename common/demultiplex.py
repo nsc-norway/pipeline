@@ -13,6 +13,7 @@ import parse
 
 udf_list = [
         '# Reads', 'Yield PF (Gb)', '% of Raw Clusters Per Lane',
+        '% of PF Clusters Per Lane',
         '% Perfect Index Read', 'One Mismatch Reads (Index)',
         '% Bases >=Q30', 'Ave Q Score'
         ]
@@ -62,9 +63,8 @@ def populate_results(process, ids_resultfile_map, demultiplex_stats):
                     analyte = inputs['A:1']
                 else:
                     raise
-            # Can't set this UDF, don't know why...
-            #analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of Raw Clusters Per Lane']
-            #analyte.put()
+            analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
+            analyte.put()
 
     return True
 
