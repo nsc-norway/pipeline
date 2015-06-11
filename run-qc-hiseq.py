@@ -56,7 +56,7 @@ def main(threads, demultiplex_dir):
     lane_raw = parse.get_lane_cluster_density(raw_path)
     lanes = {}
     for l in lane_raw.keys():
-        lanes[l] = qc.Lane(l, lane_raw[l], lane_pf[l], lane_pf[l] / lane_raw[l])
+        lanes[l] = qc.Lane(l, lane_raw[l], lane_pf[l], lane_pf[l] / lane_raw[l], False)
     print "Number of lanes to process:", len(lanes)
 
     # Parse demux summary just to get the number of reads
@@ -106,7 +106,7 @@ def main_lims(process_id):
         n_pf = lane.udf['Clusters PF R1']
         density_pf = density_raw * n_pf / n_raw
         pf_ratio = lane.udf['%PF R1'] / 100.0
-        lanes[lane_id] = qc.Lane(lane_id, density_raw * 1000.0, density_pf * 1000.0, pf_ratio)
+        lanes[lane_id] = qc.Lane(lane_id, density_raw * 1000.0, density_pf * 1000.0, pf_ratio, False)
 
     info, projects = get_hiseq_qc_data(run_id, n_reads, lanes, demultiplex_dir, process.udf[nsc.PROCESS_UNDETERMINED_UDF])
     qc.qc_main(demultiplex_dir, projects, 'hiseq', run_id, info['sw_versions'], threads)

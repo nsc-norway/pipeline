@@ -54,8 +54,7 @@ def main(threads, run_dir, no_sample_sheet, process_undetermined):
         lane_pf = parse.get_lane_cluster_density(pf_path)
         raw_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane.txt")
         lane_raw = parse.get_lane_cluster_density(raw_path)
-        lanes = [qc.Lane(1, lane_raw[1], lane_pf[1], lane_pf[1] / lane_raw[1])]
-        use_merged_lanes = False
+        lanes = [qc.Lane(1, lane_raw[1], lane_pf[1], lane_pf[1] / lane_raw[1], False)]
 
     elif match.group(1) == "NS":
         instrument = "nextseq"
@@ -65,12 +64,11 @@ def main(threads, run_dir, no_sample_sheet, process_undetermined):
         pf_ratio = float(run_completion.find("ClustersPassingFilter").text) / 100.0
         #lanes = [qc.Lane(l, clus_den, clus_den * pf_ratio, pf_ratio) for l in (1,2,3,4)]
         # For merged files:
-        lanes = [qc.Lane("X", clus_den, clus_den * pf_ratio, pf_ratio)]
-        use_merged_lanes = True
+        lanes = [qc.Lane("X", clus_den, clus_den * pf_ratio, pf_ratio, True)]
 
 
     demultiplex_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
-    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes, use_merged_lanes,
+    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
             include_undetermined=process_undetermined)
 
     qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
@@ -114,15 +112,13 @@ def main_lims(threads, process_id):
     density_pf = density_raw * n_pf / n_raw
     pf_ratio = lane.udf['%PF R1'] / 100.0
     if instrument == "miseq":
-        lanes = [qc.Lane(1, density_raw * 1000.0, density_pf * 1000.0, pf_ratio)]
-        use_merged_lanes = False
+        lanes = [qc.Lane(1, density_raw * 1000.0, density_pf * 1000.0, pf_ratio, False)]
     else:
         #lanes = [qc.Lane(l, density_raw * 1000.0, density_pf * 1000.0, pf_ratio) for l in (1,2,3,4)]
         # Merged lane fastq files
-        lanes = [qc.Lane("X", density_raw * 1000.0, density_pf * 1000.0, pf_ratio)]
-        use_merged_lanes = True
+        lanes = [qc.Lane("X", density_raw * 1000.0, density_pf * 1000.0, pf_ratio, True)]
 
-    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes, use_merged_lanes,
+    info, projects = get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
             include_undetermined=process.udf[nsc.PROCESS_UNDETERMINED_UDF])
     qc.qc_main(demultiplex_dir, projects, instrument, run_id, info['sw_versions'], threads)
     utilities.success_finish(process)
@@ -141,7 +137,7 @@ def get_sw_versions(run_dir):
     return [("RTA", rta_ver)]
 
 
-def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes, merged_lanes=False,
+def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
         sample_sheet_path=None, include_undetermined=False):
     """Get NextSeq or MiSeq QC model objects.
 
@@ -183,7 +179,7 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes, merged_lanes=F
             sample_name = sam['sampleid']
         for lane in lanes:
             for ir in xrange(1, n_reads+1):
-                if merged_lanes:
+                if lane.is_merged:
                     path = "{0}/{1}_S{2}_R{3}_001.fastq.gz".format(
                             project_dir, sample_name, str(sam_index + 1), ir
                             )
@@ -201,7 +197,7 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes, merged_lanes=F
     project = qc.Project(project_name, project_dir, samples)
 
     if include_undetermined:
-        if merged_lanes:
+        if lanes[0].is_merged:
             unfiles = [
                     qc.FastqFile(
                         lane, ir, "Undetermined_S0_R%d_001.fastq.gz" % (ir),
