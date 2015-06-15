@@ -78,21 +78,21 @@ AUTOMATED_PROTOCOL_STEPS = [
             [
                 StepSetup("NSC Demultiplexing (HiSeq)", "project", "Submit demultiplexing job"),
                 StepSetup("NSC Data Quality Reporting (HiSeq)", "project", "Submit QC job"),
-                StepSetup("NSC Prepare for delivery", "project", "Submit delivery job"),
+                StepSetup("NSC Delivery", "project", "Submit delivery job"),
                 StepSetup("NSC Finalize run", "flowcell", "Submit")
             ]),
             ("NSC Data processing for NextSeq",
             [
                 StepSetup("NSC Demultiplexing (NextSeq)", "flowcell", "Submit demultiplexing job"),
                 StepSetup("NSC Data Quality Reporting (Mi/NextSeq)", "project", "Submit QC job"),
-                StepSetup("NSC Prepare for delivery", "project", "Submit delivery job"),
+                StepSetup("NSC Delivery", "project", "Submit delivery job"),
                 StepSetup("NSC Finalize run", "flowcell", "Submit")
             ]),
             ("NSC Data processing for MiSeq",
             [
                 StepSetup("NSC Copy MiSeq Run", "flowcell", "Copy MiSeq Run"),
                 StepSetup("NSC Data Quality Reporting (Mi/NextSeq)", "flowcell", "Submit QC job"),
-                StepSetup("NSC Prepare for delivery", "project", "Submit delivery job"),
+                StepSetup("NSC Delivery", "project", "Submit delivery job"),
                 StepSetup("NSC Finalize run", "flowcell", "Submit")
             ]),
         ]
