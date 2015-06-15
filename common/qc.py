@@ -217,16 +217,18 @@ def generate_report_for_customer(args):
         '__TemplateDir__': template_dir
             }
 
-    fname = re.sub(".fastq.gz$", ".qc", os.path.basename(fastq.path)) + ".tex"
+    rootname = re.sub(".fastq.gz$", ".qc", os.path.basename(fastq.path))
+    fname = rootname + ".tex"
     with open(pdf_dir + "/" + fname, "w") as of:
         of.write(replace_multiple(replacements, template))
 
     DEVNULL = open(os.devnull, 'wb') # discard output
     subprocess.check_call([nsc.PDFLATEX, '-shell-escape', fname], stdout=DEVNULL, stdin=DEVNULL, cwd=pdf_dir)
 
+    orig_pdfname = rootname + ".pdf"
     pdfname = qc_pdf_name(run_id, fastq)
-    shutil.copyfile(pdf_dir + "/" + pdfname, os.path.join(fastq_dir, os.path.dirname(fastq.path), pdfname))
-    os.rename(pdf_dir + "/" + pdfname, quality_control_dir + "/" + pdfname)
+    shutil.copyfile(pdf_dir + "/" + orig_pdfname, os.path.join(fastq_dir, os.path.dirname(fastq.path), pdfname))
+    os.rename(pdf_dir + "/" + orig_pdfname, quality_control_dir + "/" + pdfname)
 
 
 def compute_md5(proj_dir, threads, files):
