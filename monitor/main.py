@@ -45,19 +45,19 @@ DATA_PROCESSING = [
         ("NSC Data processing for HiSeq", (
             "NSC Demultiplexing (HiSeq)",
             "NSC Data Quality Reporting (HiSeq)",
-            "NSC Prepare for delivery",
+            "NSC Delivery",
             "NSC Finalize run"
             )),
         ("NSC Data processing for NextSeq", (
             "NSC Demultiplexing (NextSeq)",
             "NSC Data Quality Reporting (Mi/NextSeq)",
-            "NSC Prepare for delivery",
+            "NSC Delivery",
             "NSC Finalize run"
             )),
         ("NSC Data processing for MiSeq", (
             "NSC Copy MiSeq Run",
             "NSC Data Quality Reporting (Mi/NextSeq)",
-            "NSC Prepare for delivery",
+            "NSC Delivery",
             "NSC Finalize run"
             )),
         ]
