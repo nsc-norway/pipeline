@@ -78,7 +78,7 @@ def main(process_id):
         delivery_norstore(project_name, project_path)
     elif delivery_type == "Transfer to diagnostics":
         delivery_diag(project_name, project_path)
-    utilities.success_finish(process)
+    utilities.success_finish(process, do_finish_step=False)
 
 
 with utilities.error_reporter():

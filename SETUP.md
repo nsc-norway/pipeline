@@ -158,8 +158,8 @@ The "Cancel job" command is the same on all slurm-based process types: Name: Can
  - UDFs: Slurm UDFs, Bases Mask: text, Number of mismatches: numeric; use first preset as default; add 1 as preset, Source run directory: text, Fastq output directory: text, Number of threads: numeric, Other options for configureBclToFastq: text.
 
 
-#### NSC Prepare for delivery
- - Name: NSC Prepare for delivery
+#### NSC Delivery
+ - Name: NSC Delivery
  - Output types: none.
  - External programs:
    - Name: Submit delivery job. Command: /usr/bin/python /data/nsc.loki/automation/pipeline/epp-submit-slurm.py --pid={processLuid} --time=20:00:00 --threads=1 --mem=1024 --jobname={processLuid} /data/nsc.loki/automation/pipeline/prepare-delivery.py {processLuid}
@@ -206,7 +206,8 @@ Add the following protocol steps:
     - Automation: Change Set demultiplexing options, set Auomatically initiated, on Record Details, when screen is entered
     - Record Details: In Sample Details section, add / remove so the Selected Fields from the Sample measurement section are: # Reads, % of Raw Clusters Per Lane, % Bases >= Q30. Leave others as default.
  - NSC Data Quality Reporting (HiSeq)
- - NSC Prepare for delivery
+ - NSC Delivery
+   Config: make it a QC step
 
 
 #### NSC Data processing for NextSeq
@@ -218,7 +219,8 @@ Add these protocol steps:
     - Automation: Change Set demultiplexing options, set Auomatically initiated, on Record Details, when screen is entered
     - Record Details: In Sample Details section, add / remove so the Selected Fields from the Sample measurement section are: # Reads, % of Raw Clusters Per Lane, % Bases >= Q30. Leave others as default.
  - NSC Data Quality Reporting (Mi/NextSeq)
- - NSC Prepare for delivery
+ - NSC Delivery
+   Config: make it a QC step
 
 
 #### NSC Data processing for MiSeq
@@ -226,7 +228,8 @@ Type: Data Analysis
 Capacity: 5
  - NSC Copy MiSeq Run
  - NSC Data Quality Reporting (Mi/NextSeq)
- - NSC Prepare for delivery
+ - NSC Delivery
+   Config: make it a QC step
 
 
 
