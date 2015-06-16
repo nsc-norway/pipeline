@@ -423,7 +423,7 @@ def go_eval():
         id_second_part = processes[-1].id.split("-")[1]
         return redirect("{0}clarity/work-complete/{1}".format(ui_server, id_second_part))
     else:
-        return Response("Sorry, project evaluation not found for" + project_name, mimetype="text/plain")
+        return Response("Sorry, project evaluation not found for " + project_name, mimetype="text/plain")
 
 
 init_application()
