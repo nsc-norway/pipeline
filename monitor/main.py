@@ -245,7 +245,6 @@ def get_recent_run(fc, instrument_index):
     
     Caching should be done by the caller."""
 
-    print fc.placements.values()[0]
     sequencing_process = next(iter(nsc.lims.get_processes(
             type=SEQUENCING[instrument_index][1],
             inputartifactlimsid=fc.placements.values()[0].id
