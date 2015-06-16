@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for, request, Response
 from genologics.lims import *
 import re
 import requests
@@ -62,6 +62,7 @@ DATA_PROCESSING = [
             )),
         ]
 
+PROJECT_EVALUATION = "Project Evaluation Step"
 
 queues = {}
 recent_run_cache = {}
@@ -94,8 +95,9 @@ class QueueState(object):
 
 
 class Project(object):
-    def __init__(self, url, name):
+    def __init__(self, url, name, eval_url):
         self.url = url
+        self.eval_url = eval_url
         self.name = name
 
 
@@ -164,7 +166,8 @@ def proc_url(process_id):
 
 def read_project(lims_project):
     url = "{0}clarity/search?scope=Project&query={1}".format(ui_server, lims_project.id)
-    return Project(url, lims_project.name)
+    eval_url = url_for('go_eval', project_name = lims_project.name)
+    return Project(url, lims_project.name, eval_url)
 
 
 def read_mi_next_seq(process):
@@ -410,6 +413,18 @@ def get_main():
             instruments=INSTRUMENTS
             )
     return (body, 200, {'Refresh': '300'})
+
+
+@app.route('/go-eval')
+def go_eval():
+    project_name = request.args.get('project_name')
+    processes = nsc.lims.get_processes(projectname=project_name, type=PROJECT_EVALUATION)
+    if len(processes) > 0:
+        id_second_part = processes[-1].id.split("-")[1]
+        return redirect("{0}clarity/work-complete/{1}".format(ui_server, id_second_part))
+    else:
+        return Response("Sorry, project evaluation not found for" + project_name, mimetype="text/plain")
+
 
 init_application()
 if __name__ == '__main__':
