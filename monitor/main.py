@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, Response
+from flask import Flask, render_template, url_for, request, Response, redirect
 from genologics.lims import *
 import re
 import requests
