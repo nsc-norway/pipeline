@@ -416,8 +416,8 @@ def go_eval():
     project_name = request.args.get('project_name')
     processes = nsc.lims.get_processes(projectname=project_name, type=PROJECT_EVALUATION)
     if len(processes) > 0:
-        id_second_part = processes[-1].id.split("-")[1]
-        return redirect("{0}clarity/work-complete/{1}".format(ui_server, id_second_part))
+        url = complete_url(processes[-1].id)
+        return redirect(url)
     else:
         return Response("Sorry, project evaluation not found for " + project_name, mimetype="text/plain")
 
