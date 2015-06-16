@@ -32,7 +32,6 @@ def main(process_id):
         fc.put()
 
         seq_process = utilities.get_sequencing_process(process)
-
         runid = seq_process.udf['Run ID']
         if all(input.qc_flag == 'PASSED' for lane in inputs):
             print "Moving", runid, "to processed directory"
