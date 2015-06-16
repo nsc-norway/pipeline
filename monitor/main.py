@@ -163,19 +163,15 @@ def proc_url(process_id):
     second_part_limsid = re.match(r"[\d]+-([\d]+)$", process_id).group(1)
     return "{0}clarity/work-details/{1}".format(ui_server, second_part_limsid)
 
+def complete_url(process_id):
+    global ui_server
+    second_part_limsid = re.match(r"[\d]+-([\d]+)$", process_id).group(1)
+    return "{0}clarity/work-complete/{1}".format(ui_server, second_part_limsid)
 
 def read_project(lims_project):
     url = "{0}clarity/search?scope=Project&query={1}".format(ui_server, lims_project.id)
     eval_url = url_for('go_eval', project_name = lims_project.name)
     return Project(url, lims_project.name, eval_url)
-
-
-def read_mi_next_seq(process):
-    try:
-        project = read_project(process.all_inputs()[0].samples[0].project)
-    except IndexError:
-        return SimpleSequencerRun("")
-    return SimpleSequencerRun(proc_url(process.id), project)
 
 
 def get_projects(process):
@@ -221,7 +217,7 @@ def read_sequencing(process_name, process):
 
 def read_post_sequencing_process(process_name, process, sequencing_process):
     url = proc_url(process.id)
-    seq_url = proc_url(sequencing_process.id)
+    seq_url = complete_url(sequencing_process.id)
     #flowcell_id = process.all_inputs()[0].location[0].name
     try:
         runid = sequencing_process.udf['Run ID']
@@ -255,7 +251,7 @@ def get_recent_run(fc, instrument_index):
             inputartifactlimsid=fc.placements.values()[0].id
             )))
 
-    url = proc_url(sequencing_process.id)
+    url = complete_url(sequencing_process.id)
     runid = sequencing_process.udf['Run ID']
     projects = get_projects(sequencing_process)
 
