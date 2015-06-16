@@ -34,11 +34,12 @@ def main(process_id):
         seq_process = utilities.get_sequencing_process(process)
 
         runid = seq_process.udf['Run ID']
-        print "Moving", runid, "to processed directory"
-        os.rename(
-                os.path.join(nsc.PRIMARY_STORAGE, runid),
-                os.path.join(nsc.PRIMARY_STORAGE, "processed", runid)
-                )
+        if all(input.qc_flag == 'PASSED' for lane in inputs):
+            print "Moving", runid, "to processed directory"
+            os.rename(
+                    os.path.join(nsc.PRIMARY_STORAGE, runid),
+                    os.path.join(nsc.PRIMARY_STORAGE, "processed", runid)
+                    )
 
         utilities.success_finish(process)
     else:
