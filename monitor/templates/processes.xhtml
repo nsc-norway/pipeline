@@ -111,13 +111,15 @@
 	</tr><tr>
 		<td>Project:</td><td>
 			<a href="{{ item.projects[0].url }}">
-			{{ item.projects[0].name }}</a>
+			{{ item.projects[0].name }}</a> 
+			<a href="{{ item.projects[0].eval_url }}">[E]</a>
 		</td>
 	</tr>
 	{% for proj in item.projects[1:] %}
 	<tr>
 		<td></td><td>
-			<a href="{{ proj.url }}">{{ proj.name }}</a></td>
+			<a href="{{ proj.url }}">{{ proj.name }}</a> 
+			<a href="{{ proj.eval_url }}">[E]</a></td>
 	</tr>
 	{% endfor %}
 	<tr>
