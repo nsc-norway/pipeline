@@ -37,3 +37,6 @@ do
 	cp $TEMP $deploy_dir/common/nsc.py
 	rm $TEMP
 done
+
+ln -s /data/nsc.loki/automation/secure.py /data/nsc.loki/automation/pipeline/common/secure.py
+

@@ -11,6 +11,11 @@ import re
 import subprocess
 from genologics.lims import *
 from common import nsc, parse, utilities
+if nsc.TAG == "prod":
+    from common import secure
+else:
+    print "Using dummy security module"
+    from common import secure_dummy as secure
 
 
 def delivery_diag(project_name, source_path):
@@ -23,7 +28,7 @@ def delivery_diag(project_name, source_path):
 def delivery_harddrive(project_name, source_path):
     subprocess.check_call(["/bin/cp", "-rl", source_path, nsc.DELIVERY_DIR])
 
-def delivery_norstore(project_name, source_path):
+def delivery_norstore(process, project_name, source_path):
     """Create a tar file"""
 
     project_dir = os.path.basename(source_path).rstrip("/")
@@ -46,7 +51,7 @@ def delivery_norstore(project_name, source_path):
     name = match.group(1)
     proj_type = match.group(2)
     username = name.lower() + "-" + proj_type.lower()
-    password = TODO
+    password = secure.norstore_password(process)
     
     htaccess = """\
 AuthUserFile /norstore_osl/projects/N59012K/www/hts-nonsecure.uio.no/{project_dir}/.htpasswd
@@ -103,7 +108,7 @@ def main(process_id):
     elif delivery_type == "User HDD" or delivery_type == "New HDD":
         delivery_harddrive(project, project_path)
     elif delivery_type == "Norstore":
-        delivery_norstore(project_name, project_path)
+        delivery_norstore(process, project_name, project_path)
 
     utilities.success_finish(process, do_finish_step=False)
 
