@@ -28,7 +28,7 @@ def finish_step(lims, process_id):
 
     step = Step(lims, id=process_id)
 
-    if step.current_state != 'Completed':
+    if step.current_state.lower() != 'completed':
 
         next_elements = step.configuration.transitions
         finish_protocol = len(next_elements) == 0
@@ -49,7 +49,7 @@ def finish_step(lims, process_id):
         while step.current_state in ['Record Details', 'Assign Next Steps']:
             step.advance()
     
-        if step.current_state != 'Completed':
+        if step.current_state.lower() != 'completed':
             raise Exception("Failed to finish the step. It is in state " + step.current_state)
 
 

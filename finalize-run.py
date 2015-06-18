@@ -12,18 +12,14 @@ from genologics.lims import *
 from common import nsc, parse, utilities
 
 
-def finish(process, fc):
-    try:
-        del fc.udf[nsc.AUTO_FLOWCELL_UDF]
-    except KeyError:
-        pass # in case it was not marked for automation
+def finish_run(process, fc):
     fc.udf[nsc.RECENTLY_COMPLETED_UDF] = True
     fc.udf[nsc.PROCESSED_DATE_UDF] = date.today()
     fc.put()
 
     seq_process = utilities.get_sequencing_process(process)
     runid = seq_process.udf['Run ID']
-    if all(input.qc_flag == 'PASSED' for lane in fc.placements.values()):
+    if all(lane.qc_flag == 'PASSED' for lane in fc.placements.values()):
         print "Moving", runid, "to processed directory"
         os.rename(
                 os.path.join(nsc.PRIMARY_STORAGE, runid),
@@ -42,14 +38,23 @@ def main(process_id):
     if len(flowcells) == 1:
         fc = next(iter(flowcells))
         fc.get()
+        try:
+            del fc.udf[nsc.AUTO_FLOWCELL_UDF]
+            automation = True
+        except KeyError:
+            automation = False
 
         # Don't run if not all QC pass lanes are here
         fc_lanes = fc.placements.values()
         ok_lanes = set(l for l in fc_lanes if l.qc_flag == 'PASSED')
         
         if set(inputs) >= ok_lanes:
-            finish(process, fc)
-            utilities.success_finish(process)
+            finish_run(process, fc)
+            # Can't use the standard function to complete this step, as the automation
+            # flag is already cleared above. Instead we call finish_step manually.
+            utilities.success_finish(process, False)
+            if automation:
+                utilities.finish_step(nsc.lims, process.id)
         else:
             utilities.fail(process, "Need all QC passed inputs of a single flowcell as input")
     else:
@@ -58,5 +63,4 @@ def main(process_id):
 
 with utilities.error_reporter():
     main(sys.argv[1])
-    
 

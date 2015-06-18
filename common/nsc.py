@@ -37,6 +37,7 @@ PROCESS_UNDETERMINED_UDF = "Process undetermined indexes"
 LANE_UNDETERMINED_UDF = "NSC % Undetermined Indices (PF)"
 # On Project
 DELIVERY_METHOD_UDF = "Delivery method"
+PROJECT_TYPE_UDF = "Project type"
 # On Container
 RECENTLY_COMPLETED_UDF = "Recently completed"
 PROCESSED_DATE_UDF = "Processing completed date"
@@ -135,9 +136,12 @@ PRIMARY_STORAGE = "/data/runScratch.boston"     # source data
 if TAG == "prod":
     SECONDARY_STORAGE="/data/nsc.loki"         # location of demultiplexed files
     DELIVERY_DIR="/data/nsc.loki/delivery"     # used by prepare-delivery after QC
+    DIAGNOSTICS_DELIVERY = "/data/diag/nscDelivery"
 elif TAG == "dev":
     SECONDARY_STORAGE="/data/nsc.loki/test"    # location of demultiplexed files
     DELIVERY_DIR="/data/nsc.loki/test/delivery"# used by prepare-delivery after QC
+    DIAGNOSTICS_DELIVERY = "/data/nsc.loki/test/diag"
+    
 LOG_DIR = BASE_DIR + "/logs"       # for slurm jobs
 SCRATCH_DIR = BASE_DIR + "/run"    # not used
 DO_COPY_METADATA_FILES=True

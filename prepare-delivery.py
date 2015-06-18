@@ -7,15 +7,14 @@
 
 import sys
 import os
+import re
 import subprocess
 from genologics.lims import *
 from common import nsc, parse, utilities
 
 
-DIAGNOSTICS_DELIVERY = "/data/nsc.loki/test/diag"
-
 def delivery_diag(project_name, source_path):
-    args = [nsc.RSYNC, '-rltW', '--chmod=ug+rwX,o-rwx'] # or chmod 660
+    args = [nsc.RSYNC, '-rltW', '--chmod=ug+rwX,o-rwx'] # chmod 660
     args += [source_path.rstrip("/"), DIAGNOSTICS_DELIVERY]
     # (If there is trouble, see note in copyfiles.py about SELinux and rsync)
     subprocess.check_call(args)
@@ -36,9 +35,34 @@ def delivery_norstore(project_name, source_path):
     tarname = project_dir + ".tar"
     args = ["/bin/tar", "cf", save_path + "/" + tarname , project_dir]
     subprocess.check_call(args, cwd=os.path.dirname(source_path)) # dirname = parent dir
-    with open(save_path + "/md5sum.txt", "w") as md5file:
+    #md5_path = os.path.join(nsc.DELIVERY_DIR, project_dir + "md5sum.txt")
+    md5_path = os.path.join(save_path + "/md5sum.txt")
+    with open(md5_path, "w") as md5file:
         # would use normal md5sum, but we have md5deep as a dependency already
         subprocess.check_call([nsc.MD5DEEP, "-l", tarname], cwd=save_path, stdout=md5file)
+
+    # Generate username / password files
+    match = re.match("^([^-])+-(.*)-\d\d\d\d-\d\d-\d\d", project_name)
+    name = match.group(1)
+    proj_type = match.group(2)
+    username = name.lower() + "-" + proj_type.lower()
+    password = TODO
+    
+    htaccess = """\
+AuthUserFile /norstore_osl/projects/N59012K/www/hts-nonsecure.uio.no/{project_dir}/.htpasswd
+AuthGroupFile /dev/null
+AuthName ByPassword
+AuthType Basic
+
+<Limit GET>
+require user {username}
+</Limit>
+    """.format(project_dir=project_dir, username=username)
+    open(save_path + "/.htaccess", "w").write(htaccess)
+
+    htpasswd = "{username}:{password}\n".format(username=username, password=password)
+    open(save_path + "/.htpasswd", "w").write(htpasswd)
+    
 
 
 def main(process_id):
@@ -72,12 +96,15 @@ def main(process_id):
         project_path = os.path.join(output_rundir, "Data", "Intensities", "BaseCalls", proj_dir)
 
     delivery_type = project.udf[nsc.DELIVERY_METHOD_UDF]
-    if delivery_type == "User HDD" or delivery_type == "New HDD":
+    project_type = project.udf[nsc.PROJECT_TYPE_UDF]
+
+    if project_type == "Diagnostics":
+        delivery_diag(project_name, project_path)
+    elif delivery_type == "User HDD" or delivery_type == "New HDD":
         delivery_harddrive(project, project_path)
     elif delivery_type == "Norstore":
         delivery_norstore(project_name, project_path)
-    elif delivery_type == "Transfer to diagnostics":
-        delivery_diag(project_name, project_path)
+
     utilities.success_finish(process, do_finish_step=False)
 
 
