@@ -9,6 +9,7 @@ import sys
 import os
 import re
 import subprocess
+import crypt
 from genologics.lims import *
 from common import nsc, parse, utilities
 if nsc.TAG == "prod":
@@ -52,6 +53,7 @@ def delivery_norstore(process, project_name, source_path):
     proj_type = match.group(2)
     username = name.lower() + "-" + proj_type.lower()
     password = secure.get_norstore_password(process)
+    crypt_pw = crypt.crypt(password)
     
     htaccess = """\
 AuthUserFile /norstore_osl/projects/N59012K/www/hts-nonsecure.uio.no/{project_dir}/.htpasswd
@@ -65,7 +67,7 @@ require user {username}
     """.format(project_dir=project_dir, username=username)
     open(save_path + "/.htaccess", "w").write(htaccess)
 
-    htpasswd = "{username}:{password}\n".format(username=username, password=password)
+    htpasswd = "{username}:{crypt_pw}\n".format(username=username, crypt_pw=crypt_pw)
     open(save_path + "/.htpasswd", "w").write(htpasswd)
     
 
