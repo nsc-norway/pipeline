@@ -51,7 +51,7 @@ def delivery_norstore(process, project_name, source_path):
     name = match.group(1)
     proj_type = match.group(2)
     username = name.lower() + "-" + proj_type.lower()
-    password = secure.norstore_password(process)
+    password = secure.get_norstore_password(process)
     
     htaccess = """\
 AuthUserFile /norstore_osl/projects/N59012K/www/hts-nonsecure.uio.no/{project_dir}/.htpasswd
