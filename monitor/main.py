@@ -36,11 +36,11 @@ FLOWCELL_INSTRUMENTS = {
 # [ (Protocol, Step) ]
 SEQUENCING = [
         ("Illumina SBS (HiSeq GAIIx) 5.0", "Illumina Sequencing (Illumina SBS) 5.0"),
-        ("Illumina SBS (HiSeq) NSC 1.0", "Illumina Sequencing (Illumina SBS) 5.0"),
+        #("Illumina SBS (HiSeq) NSC 1.0", "Illumina Sequencing (Illumina SBS) 5.0"),
         ("Illumina SBS (NextSeq) 1.0", "NextSeq Run (NextSeq) 1.0"),
-        ("Illumina SBS (NextSeq) NSC 1.0", "NextSeq Run (NextSeq) 1.0"),
+        #("Illumina SBS (NextSeq) NSC 1.0", "NextSeq Run (NextSeq) 1.0"),
         ("Illumina SBS (MiSeq) 5.0", "MiSeq Run (MiSeq) 5.0"),
-        ("Illumina SBS (MiSeq) NSC 1.0", "MiSeq Run (MiSeq) 5.0")
+        #("Illumina SBS (MiSeq) NSC 1.0", "MiSeq Run (MiSeq) 5.0")
         ]
 
 # [ (Protocol, (Step, Step, Step)) ]
