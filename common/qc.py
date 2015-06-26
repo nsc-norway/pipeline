@@ -86,7 +86,7 @@ class FastqFile(object):
 ############### FASTQC ################
 def run_fastqc(files, demultiplex_dir, output_dir=None, max_threads=None):
     """Run fastqc on a set of fastq files"""
-    args = []
+    args = ['--extract']
     if max_threads:
         args += ['--threads=' + str(max_threads)]
     if output_dir:
