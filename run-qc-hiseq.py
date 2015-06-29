@@ -137,7 +137,7 @@ def get_hiseq_sw_versions(demultiplex_config):
 
 def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir, include_undetermined = True):
     """Get HiSeq metadata about project, sample and files, including QC data. 
-    Converted to the internal representation (model) classes defined above.
+    Converted to the internal representation (model) classes defined in common/qc.py.
 
     n_reads is the number of sequence read passes, 1 or 2 (paired end)
 
@@ -221,7 +221,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--threads', type=int, default=1, help='Number of threads (cores)')
     parser.add_argument('--pid', default=None, help="Process-ID if running within LIMS")
-    parser.add_argument('--sbatch', default=False, action='store_true', help="Running under sbatch (not working well)")
+    parser.add_argument('--sbatch', default=False, action='store_true', help="Running under sbatch")
     parser.add_argument('DIR', nargs='?', default=None, help="Demultiplexed data directory (Unaligned)")
     args = parser.parse_args()
     threads = args.threads
