@@ -194,6 +194,7 @@ def get_input_flowcell(queue):
             auto_udf = fc.udf[nsc.AUTO_FLOWCELL_UDF]
         except KeyError:
             logging.debug("Flowcell was not marked for automation")
+            continue
 
         lanes = auto_udf.replace("|", ",").split(",")
         have_input_ids = [i.id for i in inputs]
