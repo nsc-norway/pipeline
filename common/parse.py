@@ -174,11 +174,16 @@ def parse_ns_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_
     if root.tag != "Stats":
         raise RuntimeError("Expected XML element Stats, found " + root.tag)
     fc = root.find("Flowcell")
+
+    project = None
     for pro in fc.findall("Project"):
         if pro.attrib['name'] == "default":
             default_project = pro
         elif pro.attrib['name'] != "all":
             project = pro
+
+    if not project:
+        project = default_project
     
     # We compute the most general coordinate first, and then take the 
     # aggregates (sum) later.
@@ -277,11 +282,15 @@ def parse_ns_demultiplexing_stats(conversion_stats_path, aggregate_lanes):
     fc = root.find("Flowcell")
     # There are always two projects, "default" and "all". This code must be revised
     # if NS starts allowing independent projects.
+    project = None
     for pro in fc.findall("Project"):
         if pro.attrib['name'] == "default":
             default_project = pro
         elif pro.attrib['name'] != "all":
             project = pro
+
+    if not project:
+        project = default_project
 
     # Real samples
     samples = {}

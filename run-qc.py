@@ -230,7 +230,7 @@ if __name__ == '__main__':
     parser.add_argument('--threads', type=int, default=None, help='Number of threads (cores)')
     parser.add_argument('--pid', default=None, help="Process-ID if running within LIMS")
     parser.add_argument('--no-sample-sheet', action='store_true', help="Run without sample sheet, look for files")
-    parser.add_argument('--process-undetermined', action='store_true', help="Process undetermined indexes")
+    parser.add_argument('--no-process-undetermined', action='store_true', help="Do not process undetermined indexes")
     parser.add_argument('DIR', default=None, nargs='?', help="Run directory")
     args = parser.parse_args()
     threads = args.threads
@@ -245,7 +245,7 @@ if __name__ == '__main__':
             main_lims(threads, args.pid)
 
     elif args.DIR and not args.pid:
-        main(threads, args.DIR, args.no_sample_sheet, args.process_undetermined)
+        main(threads, args.DIR, args.no_sample_sheet, not args.no_process_undetermined)
     else:
         print "Must specify either LIMS-ID of QC process or bcl2fastq2 output directory"
         sys.exit(1)
