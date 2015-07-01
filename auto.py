@@ -190,7 +190,11 @@ def get_input_flowcell(queue):
         logging.debug("Checking flowcell " + fcid)
         fc = inputs[0].location[0]
 
-        auto_udf = fc.udf[nsc.AUTO_FLOWCELL_UDF]
+        try:
+            auto_udf = fc.udf[nsc.AUTO_FLOWCELL_UDF]
+        except KeyError:
+            logging.debug("Flowcell was not marked for automation")
+
         lanes = auto_udf.replace("|", ",").split(",")
         have_input_ids = [i.id for i in inputs]
         
