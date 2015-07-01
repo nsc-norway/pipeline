@@ -227,7 +227,7 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--sbatch', default=False, action='store_true', help="Running under sbatch (not working well)")
-    parser.add_argument('--threads', type=int, default=None, help='Number of threads (cores)')
+    parser.add_argument('--threads', type=int, default=1, help='Number of threads (cores)')
     parser.add_argument('--pid', default=None, help="Process-ID if running within LIMS")
     parser.add_argument('--no-sample-sheet', action='store_true', help="Run without sample sheet, look for files")
     parser.add_argument('--no-process-undetermined', action='store_true', help="Do not process undetermined indexes")
