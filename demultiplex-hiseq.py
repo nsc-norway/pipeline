@@ -136,30 +136,6 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
 
 
 
-def check_fastq_and_attach_files(id_resultfile_map, sample_sheet, projdirs, reads):
-    """Attaches ResultFile outputs of the HiSeq demultiplexing process."""
-
-    for sam in sample_sheet:
-        sample_dir = "Sample_" + sam['sampleid']
-
-        for r in reads:
-            fastq_name = "{0}_{1}_L{2}_R{3}_001.fastq.gz".format(
-                    sam['sampleid'], sam['index'], sam['lane'].zfill(3), r
-                    )
-            fastq_path = os.path.join(projdirs[sam['sampleproject']], sample_dir, fastq_name)
-
-            # Continues even if file doesn't exist. This will be discovered
-            # in other ways, preferring "robust" operation here.
-            if os.path.exists(fastq_path):
-                # The convention is to have the LIMS ID in the description field. If this fails, 
-                # there's not a lot more we can do, so the following line just crashes with an 
-                # exception (due to HTTP 404).
-                result_file_artifact = id_resultfile_map[(int(sam['lane']), sam['sampleid'], r)]
-                pf = ProtoFile(nsc.lims, result_file_artifact, fastq_path + ".txt")
-                pf = nsc.lims.glsstorage(pf)
-                f = pf.post()
-                f.upload(fastq_path) # content of the file is the path
-
 
 def main(process_id):
     os.umask(007)
@@ -219,9 +195,6 @@ def main(process_id):
                     pass
                 id_resultfile_map = make_id_resultfile_map(
                         process, sample_sheet, reads
-                        )
-                check_fastq_and_attach_files(
-                        id_resultfile_map, sample_sheet, projdirs, reads
                         )
 
                 # Demultiplexing stats
