@@ -93,6 +93,18 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
         name = entry['samplename']
         input_limsid = entry['sampleid']
         input_sample = Artifact(nsc.lims, id=input_limsid).samples[0]
+        try:
+            input_sample.get()
+        except requests.exceptions.HTTPError as e:
+            # If the sample is not pooled, we'll get the Sample LIMSID in the 
+            # sample sheet, not the Analyte LIMSID. So we request the sample 
+            # with this ID.
+            if e.response.status_code == 404:
+                input_sample = Sample(nsc.lims, id=input_limsid)
+                input_sample.get()
+            else:
+                raise
+
         for output in process.all_outputs(unique=True):
             #for read in reads:
             #    for lane in xrange(1, 5):
@@ -199,10 +211,10 @@ def main(process_id):
 
         utilities.running(process, "Demultiplexing")
         input_dir = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
-        process_ok = run_demultiplexing(process, num_samples,
-                cfg.bases_mask, cfg.n_threads, destination, input_dir, cfg.output_dir,
-                cfg.other_options, log_dir)
-        #process_ok = True
+        #process_ok = run_demultiplexing(process, num_samples,
+        #        cfg.bases_mask, cfg.n_threads, destination, input_dir, cfg.output_dir,
+        #        cfg.other_options, log_dir)
+        process_ok = True
         
         if process_ok:
             reads = [1]
@@ -224,7 +236,7 @@ def main(process_id):
                 except OSError:
                     pass
                 # Move files into directory for project, no subdirectory with LIMS ID
-                move_files(runid, cfg.output_dir, project_name, sample_sheet['data'], reads)
+                #move_files(runid, cfg.output_dir, project_name, sample_sheet['data'], reads)
 
                 utilities.running(process, "Gathering statistics")
                 id_res_map = make_id_resultfile_map(process, sample_sheet['data'], reads)
