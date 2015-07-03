@@ -12,6 +12,7 @@ import sys, os, re
 import subprocess
 from genologics.lims import *
 import shutil
+import requests
 from common import nsc, utilities, demultiplex, parse, copyfiles
 
 class Config:
@@ -92,18 +93,16 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
     for entry in sample_sheet_data:
         name = entry['samplename']
         input_limsid = entry['sampleid']
-        input_sample = Artifact(nsc.lims, id=input_limsid).samples[0]
         try:
-            input_sample.get()
+            input_sample = Artifact(nsc.lims, id=input_limsid).samples[0]
         except requests.exceptions.HTTPError as e:
             # If the sample is not pooled, we'll get the Sample LIMSID in the 
             # sample sheet, not the Analyte LIMSID. So we request the sample 
             # with this ID.
-            if e.response.status_code == 404:
-                input_sample = Sample(nsc.lims, id=input_limsid)
-                input_sample.get()
-            else:
-                raise
+            # Would only do this for 404, but there is no e.response.status_code
+            # (that is, e.response is None)
+            input_sample = Sample(nsc.lims, id=input_limsid)
+            input_sample.get()
 
         for output in process.all_outputs(unique=True):
             #for read in reads:
