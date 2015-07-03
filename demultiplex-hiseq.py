@@ -21,6 +21,7 @@ import subprocess
 from genologics.lims import *
 import shutil
 from common import nsc, utilities, demultiplex, parse, copyfiles
+import requests
 
 class Config:
     pass
@@ -122,8 +123,13 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
         lane_location = lane + ":1"
         id = entry['sampleid']
         input_limsid = entry['description']
-        analyte = Artifact(nsc.lims, id=input_limsid)
-        sample = analyte.samples[0]
+        try:
+            analyte = Artifact(nsc.lims, id=input_limsid)
+            sample = analyte.samples[0]
+        except requests.exceptions.HTTPError:
+            sample = Sample(nsc.lims, id=input_limsid)
+            sample.get()
+
         for input, output in process.input_output_maps:
             # note: "uri" indexes refer to the entities themselves
             if input['uri'].location[1] == lane_location:
