@@ -110,7 +110,7 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
             if output.name == nsc.NEXTSEQ_FASTQ_OUTPUT.format(
                     input_sample.name
                     ):
-                themap[("X",name,1)] = output
+                themap[("X",input_limsid,1)] = output
     return themap
 
 
