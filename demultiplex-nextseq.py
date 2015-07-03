@@ -211,10 +211,10 @@ def main(process_id):
 
         utilities.running(process, "Demultiplexing")
         input_dir = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
-        #process_ok = run_demultiplexing(process, num_samples,
-        #        cfg.bases_mask, cfg.n_threads, destination, input_dir, cfg.output_dir,
-        #        cfg.other_options, log_dir)
-        process_ok = True
+        process_ok = run_demultiplexing(process, num_samples,
+                cfg.bases_mask, cfg.n_threads, destination, input_dir, cfg.output_dir,
+                cfg.other_options, log_dir)
+        #process_ok = True
         
         if process_ok:
             reads = [1]
@@ -236,7 +236,7 @@ def main(process_id):
                 except OSError:
                     pass
                 # Move files into directory for project, no subdirectory with LIMS ID
-                #move_files(runid, cfg.output_dir, project_name, sample_sheet['data'], reads)
+                move_files(runid, cfg.output_dir, project_name, sample_sheet['data'], reads)
 
                 utilities.running(process, "Gathering statistics")
                 id_res_map = make_id_resultfile_map(process, sample_sheet['data'], reads)
