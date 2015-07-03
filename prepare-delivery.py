@@ -21,7 +21,7 @@ else:
 
 def delivery_diag(project_name, source_path):
     args = [nsc.RSYNC, '-rltW', '--chmod=ug+rwX,o-rwx'] # chmod 660
-    args += [source_path.rstrip("/"), DIAGNOSTICS_DELIVERY]
+    args += [source_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
     # (If there is trouble, see note in copyfiles.py about SELinux and rsync)
     subprocess.check_call(args)
     
