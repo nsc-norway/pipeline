@@ -376,7 +376,10 @@ def write_internal_sample_table(output_path, runid, projects):
                         out.write("%4.2f" % (0,) + "%\t")
                         out.write("0\t")
                     else:
-                        out.write("%4.2f" % (f.stats.get('% of Raw Clusters Per Lane', 0)) + "%\t")
+                        if f.stats.has_key('% of Raw Clusters Per Lane'):
+                            out.write("%4.2f" % (f.stats.['% of Raw Clusters Per Lane']) + "%\t")
+                        else:
+                            out.write("%4.2f" % (f.stats.get('% of PF Clusters Per Lane', 0)) + "%\t")
                         out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
                     out.write("ok\t\tok\n")
 
@@ -433,10 +436,14 @@ Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2
             out.write("%4.2f" % (lane.pf_ratio) + "\t")
             out.write(utilities.display_int(lane.raw_cluster_density) + '\t')
             out.write(utilities.display_int(lane.pf_cluster_density) + '\t')
-            if undetermined_file and\
-                   not undetermined_file.empty and\
-                   undetermined_file.stats.has_key('% of Raw Clusters Per Lane'):
-                out.write("%4.2f" % (undetermined_file.stats['% of Raw Clusters Per Lane'],) + "%\t")
+            if undetermined_file and not undetermined_file.empty:
+                if undetermined_file.stats.has_key('% of Raw Clusters Per Lane'):
+                    out.write("%4.2f" % (undetermined_file.stats['% of Raw Clusters Per Lane'],) + "%\t")
+                elif undetermined_file.stats.has_key('% of PF Clusters Per Lane'):
+                    print "Warning: No info about % raw clusters per lane, using PF clusters."
+                    out.write("%4.2f" % (undetermined_file.stats['% of PF Clusters Per Lane'],) + "%\t")
+                else:
+                    out.write("-\t")
             else:
                 out.write("-\t")
             out.write("ok\n")
