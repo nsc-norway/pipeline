@@ -377,7 +377,7 @@ def write_internal_sample_table(output_path, runid, projects):
                         out.write("0\t")
                     else:
                         if f.stats.has_key('% of Raw Clusters Per Lane'):
-                            out.write("%4.2f" % (f.stats.['% of Raw Clusters Per Lane']) + "%\t")
+                            out.write("%4.2f" % (f.stats['% of Raw Clusters Per Lane']) + "%\t")
                         else:
                             out.write("%4.2f" % (f.stats.get('% of PF Clusters Per Lane', 0)) + "%\t")
                         out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
