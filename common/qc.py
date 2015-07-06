@@ -449,6 +449,13 @@ Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2
             out.write("ok\n")
 
 
+def compute_stats_from_fastqc(samples):
+    total = sum(f.stats.get('# Reads PF', 0) for s in samples for f in s.files if f.read_num == 1)
+    for s in samples:
+        for f in s.files:
+            f.stats['% of PF Clusters Per Lane'] = f.stats.get('# Reads PF') / total
+
+
 def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
         software_versions, threads = 1):
     """QC on demultiplexed data. Can be run per project, don't need
@@ -500,12 +507,16 @@ def qc_main(input_demultiplex_dir, projects, instrument_type, run_id,
     # First output all fastqc results into QualityControl, them move them
     # in place later
     run_fastqc(non_empty_files, demultiplex_dir, output_dir=quality_control_dir, max_threads=threads) 
+
     samples = [sam for pro in projects for sam in pro.samples]
     for s in samples:
        move_fastqc_results(quality_control_dir, s)
        # Get number of sequences. For (Mi|Next)Seq this is the only way to 
        # get this stat, for HiSeq this acts as a cross check.
        update_stats_fastqc(quality_control_dir, s)
+
+    if instrument_type == "miseq":
+        compute_stats_from_fastqc(samples)
 
     # Generate PDF reports in parallel
     template = open(template_dir + "/reportTemplate_indLane_v4.tex").read()
