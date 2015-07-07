@@ -35,7 +35,7 @@ def check_job(process):
         try:
             info = utilities.check_output(args)
             state_match = re.search(r"\bJobState=([A-Z]+)\b", info)
-            failed = state_match.group(1) not in ('RUNNING', 'SUBMITTED')
+            failed = state_match.group(1) not in ('RUNNING', 'PENDING')
         except subprocess.CalledProcessError:
             failed = True
 
