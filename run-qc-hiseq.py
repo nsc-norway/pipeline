@@ -193,7 +193,8 @@ def get_hiseq_qc_data(run_id, n_reads, lanes, root_dir, include_undetermined = T
 
                 # FastqFile
                 path_t = sample_dir + "/{0}_{1}_L{2}_R{3}_001.fastq.gz"
-                path = path_t.format(e['SampleId'], e['Index'], e['Lane'].zfill(3), ri)
+                fixed_sample_name = e['SampleId'].replace("_", "-")
+                path = path_t.format(fixed_sample_name, e['Index'], e['Lane'].zfill(3), ri)
                 lane = lanes[int(e['Lane'])]
                 f = qc.FastqFile(lane, ri, path, stats)
                 files.append(f)

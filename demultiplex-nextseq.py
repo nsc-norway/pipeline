@@ -122,6 +122,8 @@ def move_files(runid, output_dir, project_name, sample_sheet_data, reads):
     for i, row in enumerate(sample_sheet_data):
         for r in reads:
             par = dict(row)
+            par['samplename'] = par['samplename'].replace("_", "-")
+
             par['read'] = r
             par['base'] = output_dir
             par['index'] = i+1
