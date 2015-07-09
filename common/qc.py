@@ -247,30 +247,25 @@ def extract_format_overrepresented(fqc_report, fastqfile, index):
         found_over = False
         buf = ""
 
-        for l in reportfile:
-            if "No overrepresented sequences" in l:
-                return """\
+        data = reportfile.read()
+        if "No overrepresented sequences" in data:
+            return """\
 <h2 id="{id}">{laneName}</h2>
 <div style="font:10pt courier">
 <p>No overrepresented sequences</p>
 <p></p>
 </div>
 """.format(id=index, laneName=fastqfile)
-            elif found_over:
-                if "<table>" in l:
-                    buf += '<table border="1">\n'
-                elif "</table>" in l:
-                    buf += l
-                    break
-                else:
-                    buf += l
-            elif "Overrepresented sequences</h2>" in l:
-                found_over = True
+        else:
+            body_m = re.search("Overrepresented sequences</h2>.*?<table>(.*?)</table>", data, re.DOTALL)
+            if body_m:
                 buf += '<h2 id="{id}">{laneName}</h2>\n'.format(id=index, laneName=fastqfile)
                 buf += '<p></p>\n'
                 buf += '<div style="font: 10pt courier;">\n'
+                buf += '<table border="1">\n'
+                buf += body_m.group(1)
+                buf += "</table></div>\n"
 
-        buf += "</div>\n"
         return buf
 
 
