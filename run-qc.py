@@ -181,12 +181,12 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
             for ir in xrange(1, n_reads+1):
                 if lane.is_merged:
                     path = "{0}/{1}_S{2}_R{3}_001.fastq.gz".format(
-                            project_dir, sample_name.replace("_", "-"),
+                            project_dir, sample_name
                             str(sam_index + 1), ir
                             )
                 else:
                     path = "{0}/{1}_S{2}_L{3}_R{4}_001.fastq.gz".format(
-                            project_dir, sample_name.replace("_", "-"),
+                            project_dir, sample_name
                             str(sam_index + 1), str(lane.id).zfill(3), ir)
                 file_stats = stats.get((lane.id, sam['sampleid'], ir))
                 files.append(qc.FastqFile(lane, ir, path, file_stats))
