@@ -238,6 +238,8 @@ Capacity: 5
 
 
 ## Cron job
+These cron jobs can be run on any computer with access to the LIMS API and slurm.
 
-Pass
+13   */2 * *  * seq-user  /usr/bin/python /data/nsc.loki/automation/pipeline/check-crashed-job.py
+*/10 *  *  *  * seq-user  /usr/bin/python /data/nsc.loki/automation/pipeline/auto.py
 
