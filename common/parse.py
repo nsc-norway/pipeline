@@ -408,6 +408,8 @@ def get_miseq_totals(run_stats):
 
     totals = {}
     for tag in [
+            'NumberOfClustersPF',
+            'NumberOfClustersRaw',
             'NumberOfUnalignedClusters',
             'NumberOfUnalignedClustersPF',
             'NumberOfUnindexedClusters',
@@ -440,8 +442,9 @@ def parse_generate_fastq(generate_fastq_path, num_reads=1, aggregate_reads=False
 
     The main_dict is indexed by (sample_id,) (tuple with one element) if
     aggregate_reads is set, or (sample_id, read) if aggregate_reads is not set.
-    { (sample id,) => { stat name => value } }
-    { (sample id, read) => { stat name => value } }
+    { (lane, sample id,) => { stat name => value } }
+    { (lane, sample id, read) => { stat name => value } }
+    lane is always 1 (included to have same format as for HiSeq)
     
     Undetermined is represented as sample_id = None.
     """
@@ -453,8 +456,15 @@ def parse_generate_fastq(generate_fastq_path, num_reads=1, aggregate_reads=False
 
     totals_dict = get_miseq_totals(root.findall("RunStats")[0])
 
-    overall = root.findall("OverallSamples")[0]
     samples = {}
+    # Undetermined first
+    for i_read in range(1, num_reads+1):
+        stats = {}
+        stats['NumberOfClustersRaw'] = totals_dict['NumberOfUnindexedClusters']
+        stats['NumberOfClustersPF'] = totals_dict['NumberOfUnindexedClustersPF']
+        samples[(1, None, i_read)] = stats
+
+    overall = root.findall("OverallSamples")[0]
     for sample_xml in overall.findall("SummarizedSampleStatistics"):
         sample_id = sample_xml.findall("SampleID")[0].text
 
@@ -464,7 +474,7 @@ def parse_generate_fastq(generate_fastq_path, num_reads=1, aggregate_reads=False
             indexes = [(sample_id,)]
             factor = num_reads
         else:
-            indexes = [(sample_id, i) for i in range(1, num_reads+1)]
+            indexes = [(1, sample_id, i) for i in range(1, num_reads+1)]
             factor = 1
 
         sample_stats = {}
@@ -477,6 +487,7 @@ def parse_generate_fastq(generate_fastq_path, num_reads=1, aggregate_reads=False
         for index in indexes:
             samples[index] = sample_stats
 
+    
     return totals_dict, samples
 
 
@@ -504,17 +515,26 @@ def get_miseq_stats(generate_fastq_path, num_reads, aggregate_reads):
             )
 
     # Check: compute totals by summing up samples
-    all_raw_reads = sum(
+    all_raw_clusters = sum(
             d["NumberOfClustersRaw"]
             for c,d in samples.items()
+            if c[-1] == 1 # Read 1, or sum of reads if aggregate
             )
-    all_pf_reads = sum(
+    all_pf_clusters = sum(
             d["NumberOfClustersPF"]
             for c,d in samples.items()
+            if c[-1] == 1
             )
+
     # Check that stats for all samples add up to the totals
-    assert(all_raw_reads == overall["NumberOfUnalignedClusters"] * num_reads
-            and all_pf_reads ==  overall["NumberOfUnalignedClustersPF"] * num_reads)
+    if aggregate_reads:
+        factor = num_reads
+    else:
+        factor = 1
+    num_raw = overall["NumberOfClustersRaw"] * factor
+    num_pf = overall["NumberOfClustersPF"] * factor
+    assert(all_raw_clusters == num_raw)
+    assert(all_pf_clusters == num_pf)
 
     result = {}
     for coordinates, xml_stats in samples.items():
@@ -528,8 +548,8 @@ def get_miseq_stats(generate_fastq_path, num_reads, aggregate_reads):
                 stats['%PF'] = xml_stats['NumberOfClustersPF'] * 100.0 / xml_stats['NumberOfClustersRaw']
             else:
                 stats['%PF'] = "100.0%"
-            stats['% of Raw Clusters Per Lane'] = xml_stats['NumberOfClustersRaw'] * 100.0 / all_raw_reads
-            stats['% of PF Clusters Per Lane'] = xml_stats['NumberOfClustersPF'] * 100.0 / all_pf_reads
+            stats['% of Raw Clusters Per Lane'] = xml_stats['NumberOfClustersRaw'] * 100.0 / all_raw_clusters
+            stats['% of PF Clusters Per Lane'] = xml_stats['NumberOfClustersPF'] * 100.0 / all_pf_clusters
         except ZeroDivisionError:
             print "Warning: division by zero"
         result[coordinates] = stats
