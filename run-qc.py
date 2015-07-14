@@ -164,7 +164,11 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
     project_dir = parse.get_project_dir(run_id, project_name)
 
     if instrument == "miseq":
-        stats = {}
+        stats = parse.get_miseq_stats(
+                os.path.join(run_dir, "GenerateFASTQRunStatistics.xml"),
+                num_reads=n_reads,
+                aggregate_lanes=True
+                )
     elif instrument == "nextseq":
         stats = parse.get_nextseq_stats(
                 os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats"),
