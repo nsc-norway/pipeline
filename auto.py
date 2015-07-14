@@ -283,21 +283,6 @@ def start_automated_protocols(lims):
                                 ap.trigger()
 
 
-def finish_steps():
-    """Check all automated process types to see if they can be closed or
-    if any more scripts should be run"""
-
-    for protocol, protocol_steps in nsc.AUTOMATED_PROTOCOL_STEPS:
-        for ps in proto.steps:
-            process_type = ps.name
-    
-            
-    
-
-
-    
-
-
 
 if __name__ == "__main__":
     if nsc.TAG == "dev":
