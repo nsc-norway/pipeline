@@ -142,7 +142,7 @@ def upload_file(process, name, path = None, data = None):
 
 
 def running(process, current_job, status = None):
-    process.get(force=True)
+    process.get()
     if status:
         process.udf[nsc.JOB_STATUS_UDF] = "Running ({0})".format(status)
     else:

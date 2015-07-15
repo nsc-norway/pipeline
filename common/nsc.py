@@ -119,7 +119,8 @@ PDFLATEX="/usr/bin/pdflatex"
 #glsai   ALL=(seq-user)  NOPASSWD:/usr/bin/sbatch
 #Defaults:glsai          !requiretty
 SCANCEL_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/scancel"]
-SRUN_ARGLIST=["--account=nsc", "--qos=high", "--partition=main", "--nodes=1"]
+SRUN_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/srun", 
+            "--account=nsc", "--qos=high", "--partition=main", "--nodes=1"]
 
 if TAG == "prod":
     WRAPPER_SCRIPT="/data/nsc.loki/automation/pipeline/slurm/ous-job.sh"
