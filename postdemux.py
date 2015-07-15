@@ -1,14 +1,3 @@
-# Demultiplexing common routines
-
-import os
-import re
-import glob
-from xml.etree import ElementTree
-from decimal import *
-from genologics.lims import *
-import nsc
-import utilities
-import parse
 
 
 udf_list = [
@@ -17,7 +6,6 @@ udf_list = [
         '% Perfect Index Read', 'One Mismatch Reads (Index)',
         '% Bases >=Q30', 'Ave Q Score'
         ]
-
 
 def populate_results(process, ids_resultfile_map, demultiplex_stats):
     """Set UDFs on inputs (analytes representing the lanes) and output
@@ -70,28 +58,6 @@ def populate_results(process, ids_resultfile_map, demultiplex_stats):
 
 
 
-def download_sample_sheet(process, save_dir, append_limsid=True):
-    """Downloads the demultiplexing process's sample sheet, which contains only
-    samples for the requested project (added to the LIMS by setup-*-demultiplexing.py)."""
-
-    sample_sheet = None
-    for o in process.all_outputs(unique=True):
-        if o.output_type == "ResultFile" and o.name == "SampleSheet csv":
-            if len(o.files) == 1:
-                sample_sheet = o.files[0].download()
-
-    if sample_sheet:
-        if append_limsid:
-            name = "SampleSheet-" + process.id + ".csv"
-        else:
-            name = "SampleSheet.csv"
-        path = os.path.join(save_dir, name)
-        file(path, 'w').write(sample_sheet)
-        return path, sample_sheet
-    else:
-        return None, None
-
-
 def create_projdir_ne_mi(runid, basecalls_dir, sample_sheet, lane, reads):
     """Creates project directory and moves fastq files into it."""
 
@@ -113,6 +79,7 @@ def create_projdir_ne_mi(runid, basecalls_dir, sample_sheet, lane, reads):
             old_path = basecalls_dir + "/" + basename
             new_path = proj_path + "/" + basename
             os.rename(old_path, new_path)
+
 
 
 
