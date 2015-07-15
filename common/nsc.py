@@ -50,6 +50,11 @@ BCL2FASTQ_LOG = "bcl2fastq log"
 HISEQ_FASTQ_OUTPUT = "{0} R{1} fastq"
 NEXTSEQ_FASTQ_OUTPUT = "{0}"
 
+
+# Values of the CURRENT_JOB_UDF
+CJU_COPY_RUN = "Copy run"
+
+
 # Sequencing processes
 SEQ_PROCESSES=[
         ('hiseq', 'Illumina Sequencing (Illumina SBS) 5.0'),
@@ -110,14 +115,11 @@ PDFLATEX="/usr/bin/pdflatex"
 # thus gaining access to the NSC storage volumes. I haven't found a good way to allow
 # the script to set
 # the resources etc., but restrict the command.
+# TODO: modify sudo 
 #glsai   ALL=(seq-user)  NOPASSWD:/usr/bin/sbatch
-#glsai   ALL=(seq-user)  NOPASSWD:/usr/bin/scontrol -o show job *
-#glsai   ALL=(seq-user)  NOPASSWD:/usr/bin/scancel *
 #Defaults:glsai          !requiretty
-INVOKE_SBATCH_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/sbatch",
-        "-D", "/data/nsc.loki/automation/dev/run"]
-SCONTROL_STATUS_ARGLIST=["/usr/bin/scontrol", "-o", "show", "job"]
 SCANCEL_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/scancel"]
+SRUN_ARGLIST=["--account=nsc", "--qos=high", "--partition=main", "--nodes=1"]
 
 if TAG == "prod":
     WRAPPER_SCRIPT="/data/nsc.loki/automation/pipeline/slurm/ous-job.sh"
@@ -147,10 +149,6 @@ LOG_DIR = BASE_DIR + "/logs"       # for slurm jobs
 SCRATCH_DIR = BASE_DIR + "/run"    # not used
 DO_COPY_METADATA_FILES=True
 
-
-# Group of files written (TODO: not currently used)
-SET_GROUP='nsc-seq'
-
 if TAG == "dev":
     from genologics.config import *
     lims = Lims(BASEURI,USERNAME,PASSWORD)
@@ -170,14 +168,5 @@ elif TAG == "prod":
                 "apiuser",
                 open(pw_file).read().strip()
                 )
-
-
-config = SafeConfigParser({
-    "slurm_script": "nsc-slurm.sh"
-     })
-config.read(['/etc/nsc.conf'])
-
-
-# Todo: move into config file, or just use this as the config.
 
 

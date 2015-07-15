@@ -5,6 +5,8 @@
 # the actual data in BCL files, as only the fastq files are stored on secondary 
 # storage.
 
+# For the MiSeq, this also copies the demultiplexed data.
+
 import os.path, sys
 import argparse
 import subprocess

@@ -141,23 +141,14 @@ def upload_file(process, name, path = None, data = None):
     f.upload(data)
 
 
-def running(process, status = None):
-    for i in xrange(100): # Prevent race condition with epp-submit-slurm.py
-                          # and always refresh process to get the QC flags
-        process.get(force=True)
-        try:
-            job_id = process.udf[nsc.JOB_ID_UDF]
-            if job_id:
-                break
-        except KeyError:
-            pass
-        time.sleep(2)
-
+def running(process, current_job, status = None):
+    process.get(force=True)
     if status:
         process.udf[nsc.JOB_STATUS_UDF] = "Running ({0})".format(status)
     else:
         process.udf[nsc.JOB_STATUS_UDF] = "Running"
     process.udf[nsc.JOB_STATE_CODE_UDF] = 'RUNNING'
+    process.udf[nsc.CURRENT_JOB_UDF] = current_job
     process.put()
 
 
