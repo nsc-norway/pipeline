@@ -17,6 +17,7 @@ AUTO_FLAG_UDF = "NSC Automatic processing"
 AUTO_FLOWCELL_UDF = "Automation lane groups"
 
 JOB_ID_UDF = "Job ID"
+CURRENT_JOB_UDF = "Current job"
 JOB_STATUS_UDF = "Job status"
 JOB_STATE_CODE_UDF = "Job state code" #SUBMITTED,RUNNING,FAILED,COMPLETED,CANCELLED
 ERROR_DETAILS_UDF = "Error details"
