@@ -12,9 +12,8 @@ import argparse
 import subprocess
 import datetime
 
-
 from genologics.lims import *
-from common import nsc, utilities
+from common import nsc, utilities, slurm
 
 
 hiseq_exclude_paths = [
@@ -35,7 +34,7 @@ miseq_exclude_paths = [
         ]
 
 
-def rsync(source_path, destination_path, exclude):
+def rsync_arglist(source_path, destination_path, exclude):
     """Runs the rsync command. Note that trailing slashes
     on paths are significant."""
 
@@ -53,25 +52,53 @@ def rsync(source_path, destination_path, exclude):
     # sudo restorecon /usr/bin/rsync
     # Confirm: ls -lZ /usr/bin/rsync | grep bin_t
     # Note: first command requires absolute path.
-    code = subprocess.call(args)
-    return code == 0
+    return args
 
 
-def copy_files(runid, instrument):
-    destination = nsc.SECONDARY_STORAGE
-    source = os.path.join(nsc.PRIMARY_STORAGE, runid) # No trailing slash
+
+def main(process_id):
+    """To be run from LIMS on the NSC data processing step"""
+    process = Process(nsc.lims, id=process_id)
+    utilities.running(process, nsc.CJU_COPY_RUN)
+    seq_process = utilities.sequencing_process(process)
+    runid = seq_process.udf['Run ID']
+    instrument = utilities.get_instrument(seq_process)
+
+    # Specify source with trailing slash to copy content
+    try:
+        source = process.udf[SOURCE_RUN_DIR_UDF]
+    except KeyError:
+        source = os.path.join(nsc.PRIMARY_STORAGE, runid) + "/"
+        process.udf[SOURCE_RUN_DIR_UDF] = source
+        process.put()
+    try:
+        destination = process.udf[WORK_RUN_DIR_UDF]
+    except KeyError: 
+        destination = os.path.join(nsc.SECONDARY_STORAGE, runid)
+        process.udf[WORK_RUN_DIR_UDF] = source
+        process.put()
+
     if instrument == "hiseq":
         exclude = hiseq_exclude_paths
     elif instrument == "nextseq":
         exclude = nextseq_exclude_paths
     elif instrument == "miseq":
         exclude = miseq_exclude_paths
-    return rsync(source, destination, ["/" + runid + e for e in exclude])
 
+    args = rsync_arglist(source, destination, exclude)
+    srun_args = ["--nodelist=loki"] # obviously OUS specific, but the whole script may be
 
-def main(process_id):
-    """To be run from LIMS on the NSC data processing step"""
-    utilities.running()
+    logfile = os.path.join(nsc.LOG_DIR, process_id + "-rsync.log")
+
+    rc = slurm.srun_command(
+            args, process_id + "." + nsc.CJU_COPY_RUN,
+            logfile=logfile, srun_args=srun_args
+            )
+    
+    if rc == 0:
+        utilities.success_finish(process)
+    else:
+        utilities.fail(process, "rsync failed", open(logfile).read())
 
 
 main(sys.argv[1])

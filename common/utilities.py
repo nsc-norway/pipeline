@@ -5,53 +5,14 @@
 # Various utility functions for managing workflow progress,
 # navigating between processes, and status tracking.
 
-import logging
 import subprocess
 import sys
-import time
 import datetime
 import traceback
 import requests
 import locale # Not needed in 2.7, see display_int
-from operator import attrgetter
 from genologics.lims import *
 import nsc
-
-logger = logging.getLogger()
-
-
-def finish_step(lims, process_id):
-    """Sets next step for all analytes and finishes the specified step.
-    This function can handle steps which have a single configured next
-    step, and steps which are the last step of a protocol.
-    All samples are advanced to the next step."""
-
-    step = Step(lims, id=process_id)
-
-    if step.current_state.lower() != 'completed':
-
-        next_elements = step.configuration.transitions
-        finish_protocol = len(next_elements) == 0
-        if len(next_elements) == 1:
-            next_step = next_elements[0].step
-        elif len(next_elements) > 1:
-            raise Exception("There are multiple options for next step, don't know what to do.")
-    
-        # Set next action for each sample
-        for a in step.actions.next_actions:
-            if finish_protocol:
-                a.action = "complete"
-            else:
-                a.action = "nextstep"
-                a.next_step = next_step
-        step.actions.put()
-    
-        while step.current_state in ['Record Details', 'Assign Next Steps']:
-            step.advance()
-    
-        if step.current_state.lower() != 'completed':
-            raise Exception("Failed to finish the step. It is in state " + step.current_state)
-
 
 
 def get_sequencing_process(process):
@@ -76,23 +37,9 @@ def get_instrument(seq_process):
     return next(p[0] for p in nsc.SEQ_PROCESSES if seq_process.type.name == p[1])
 
 
-def get_demux_process(process):
-    """Gets the demultiplexing process corresponding to a given analyte (lane
-    on a flow cell). Analogous to the above method."""
+def logfile(process, step, command):
+    d = os.path.join(process.udf[WORK_RUN_DIR_UDF], )
 
-    # Find the demultiplexing process: First process which has output file
-    # per reagent label
-    input = process.all_inputs()[0]
-    sib_procs = nsc.lims.get_processes(inputartifactlimsid=input.id)
-    sib_procs.sort(key=attrgetter('id'))
-    for s in sib_procs:
-        io = s.input_output_maps
-        for x in io:
-            output = x[1]
-            if output and output['output-type'] == "ResultFile" and\
-                    output['output-generation-type'] == "PerReagentLabel":
-                return s
-    
 
 def get_index_sequence(artifact):
     for label in artifact.reagent_labels:
@@ -224,8 +171,6 @@ def display_int(val):
     """Adds thousands separators. To be replaced with "{:,}".format(val) when 
     upgrading to Python 2.7"""
     return locale.format("%d", round(val), grouping=True)
-
-
 
 
 # The check_output function is only available in Python >=2.7, but we also support 2.6,
