@@ -54,6 +54,7 @@ NEXTSEQ_FASTQ_OUTPUT = "{0}"
 
 # Values of the CURRENT_JOB_UDF
 CJU_COPY_RUN = "Copy run"
+CJU_DEMULTIPLEXING = "Demultiplexing"
 
 
 # Sequencing processes

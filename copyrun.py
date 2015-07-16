@@ -64,19 +64,17 @@ def main(process_id):
     runid = seq_process.udf['Run ID']
     instrument = utilities.get_instrument(seq_process)
 
+    source = utilities.get_udf(
+            process, nsc.SOURCE_RUN_DIR_UDF,
+            os.path.join(nsc.PRIMARY_STORAGE, run_id)
+            )
+    destination = utilities.get_udf(
+            process, nsc.WORK_RUN_DIR_UDF,
+            os.path.join(nsc.SECONDARY_STORAGE, run_id)
+            )
+    
     # Specify source with trailing slash to copy content
-    try:
-        source = process.udf[SOURCE_RUN_DIR_UDF]
-    except KeyError:
-        source = os.path.join(nsc.PRIMARY_STORAGE, runid) + "/"
-        process.udf[SOURCE_RUN_DIR_UDF] = source
-        process.put()
-    try:
-        destination = process.udf[WORK_RUN_DIR_UDF]
-    except KeyError: 
-        destination = os.path.join(nsc.SECONDARY_STORAGE, runid)
-        process.udf[WORK_RUN_DIR_UDF] = source
-        process.put()
+    source = source + "/"
 
     if instrument == "hiseq":
         exclude = hiseq_exclude_paths

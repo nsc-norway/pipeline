@@ -37,8 +37,24 @@ def get_instrument(seq_process):
     return next(p[0] for p in nsc.SEQ_PROCESSES if seq_process.type.name == p[1])
 
 
-def logfile(process, step, command):
-    d = os.path.join(process.udf[WORK_RUN_DIR_UDF], )
+def logfile(process, step, command, extension="txt"):
+    """Create the DemultiplexLogs dir if it doesn't exist. Returns the
+    path to the log file for the step and command. One dir is created
+    for each process ID.
+    step: Name of the step, becomes part of the log name.
+    command: Name of the command executed, also becomes part of the log name."""
+    d1 = os.path.join(process.udf[WORK_RUN_DIR_UDF], "DemultiplexLogs")
+    d2 = os.path.join(process.udf[WORK_RUN_DIR_UDF], "DemultiplexLogs", process.id)
+    for d in [d1, d2]:
+        try:
+            os.mkdir(d)
+        except OSError:
+            pass
+    return "{0}/{1}.{2}.{3}".format(
+            d2, step.lower().replace(" ","_"),
+            command.split("/")[-1],
+            extension
+            )
 
 
 def get_index_sequence(artifact):
@@ -113,23 +129,24 @@ def fail(process, message, extra_info = None):
         except (KeyError,requests.exceptions.HTTPError):
             pass
 
-def success_finish(process, do_finish_step=True):
+
+def success_finish(process):
     """Called by background jobs (slurm) to declare that the task has been 
     completed successfully."""
 
-    process.get(force=True)
+    process.get()
     process.udf[nsc.JOB_STATUS_UDF] = 'Completed successfully ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     process.udf[nsc.JOB_STATE_CODE_UDF] = 'COMPLETED'
     process.put()
 
-    if do_finish_step:
-        try:
-            automation = process.all_inputs()[0].location[0].udf[nsc.AUTO_FLOWCELL_UDF]
-        except KeyError:
-            automation = False
 
-        if automation:
-            finish_step(process.lims, process.id)
+def get_udf(process, udf, default):
+    try:
+        return process.udf[udf]
+    except KeyError:
+        process.udf[udf] = default
+        process.put()
+        return default
 
 
 class error_reporter():
