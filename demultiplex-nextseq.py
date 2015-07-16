@@ -17,20 +17,6 @@ from common import nsc, utilities, demultiplex, parse, copyfiles
 
 
 
-def get_thread_args(n_threads, num_samples):
-    # Computing number of threads: use a little more than we have, per illumina recommendation
-    # Total is limited by slurm cpu binding anyway
-    base = n_threads * 1.5
-    loading = int(max(1, base * 0.1))
-    # No more write threads than 1 per sample
-    writing = int(max(1, min(num_samples, base * 0.1)))
-    remaining = base - loading - writing
-    processing = int(max(1, remaining * 0.7))
-    demultiplexing = int(max(1, remaining - processing))
-    return ['-r', str(loading), '-d', str(demultiplexing),
-            '-p', str(processing), '-w', str(writing)]
-
-
 def run_demultiplexing(process, num_samples, bases_mask, n_threads, 
         run_dir, input_dir, output_dir, other_options, log_dir):
     """Run bcl2fastq2."""
@@ -58,125 +44,10 @@ def run_demultiplexing(process, num_samples, bases_mask, n_threads,
         return False
 
 
-def make_id_resultfile_map(process, sample_sheet_data, reads):
-    """Produces map from lane, sample-ID and read to output 
-    analyte. Lane is always 1 for NS, but keeping it in for consistency."""
-    themap = {}
-    for entry in sample_sheet_data:
-        name = entry['samplename']
-        input_limsid = entry['sampleid']
-        try:
-            input_sample = Artifact(nsc.lims, id=input_limsid).samples[0]
-        except requests.exceptions.HTTPError as e:
-            # If the sample is not pooled, we'll get the Sample LIMSID in the 
-            # sample sheet, not the Analyte LIMSID. So we request the sample 
-            # with this ID.
-            # Would only do this for 404, but there is no e.response.status_code
-            # (that is, e.response is None)
-            input_sample = Sample(nsc.lims, id=input_limsid)
-            input_sample.get()
-
-        for output in process.all_outputs(unique=True):
-            #for read in reads:
-            #    for lane in xrange(1, 5):
-            if output.name == nsc.NEXTSEQ_FASTQ_OUTPUT.format(
-                    input_sample.name
-                    ):
-                themap[("X",input_limsid,1)] = output
-    return themap
-
-
-def move_files(runid, output_dir, project_name, sample_sheet_data, reads):
-    proj_dir = parse.get_project_dir(runid, project_name)
-    project_path = output_dir + "/" + proj_dir
-    
-    params = []
-    for i, row in enumerate(sample_sheet_data):
-        for r in reads:
-            par = dict(row)
-            par['samplename'] = par['samplename']
-
-            par['read'] = r
-            par['base'] = output_dir
-            par['index'] = i+1
-            par['project'] = project_name
-            par['project_path'] = project_path
-            params.append(par)
-
-    with_id_subdir = not all(p['sampleid'] == p['samplename'] for p in params)
-    for p in params:
-        f = "{samplename}_S{index}_R{read}_001.fastq.gz".format( **p)
-
-        if with_id_subdir:
-            input_path = "{base}/{project}/{sampleid}/{filename}".format(filename=f, **p)
-        else:
-            input_path = "{base}/{project}/{filename}".format(filename=f, **p)
-
-        output_path = os.path.join(project_path, f)
-        print "in", input_path, "out", output_path
-        os.rename(input_path, output_path)
-
-    for dpath in set("{base}/{project}/{sampleid}".format(**p) for p in params):
-        os.rmdir(dpath)
-    for dpath in set("{base}/{project}".format(**p) for p in params):
-        os.rmdir(dpath)
 
 
 
-
-
-def main(process_id):
-    os.umask(007)
-    process = Process(nsc.lims, id=process_id)
-
-    utilities.running(process)
-    
-    seq_proc = utilities.get_sequencing_process(process)
-    runid = seq_proc.udf['Run ID']
-
-    print "Demultiplexing process for LIMS process", process_id, ", NextSeq run", runid
-    destination = os.path.join(nsc.SECONDARY_STORAGE, runid)
-    log_dir = os.path.join(destination, "DemultiplexLogs")
-
-    if nsc.DO_COPY_METADATA_FILES:
-        already_existed = True
-        try:
-            os.mkdir(destination)
-            already_existed = False
-            os.mkdir(log_dir)
-        except OSError:
-            pass
-
-        if not already_existed:
-            utilities.running(process, "Copying run directory")
-            if not copyfiles.copy_files(runid, 'hiseq'):
-                utilities.fail(process, 'Unable to copy files')
-                return False
-
-    success = False
-
-    cfg = get_config(process)
-    if cfg:
-        # Download sample sheet or get it from the root of the run directory
-        # For the NS, the setup-nextseq-demultiplexing script will copy the
-        # LIMS generated sample sheet to the demultiplexing process.
-        ssheet_file, sample_sheet_content = get_sample_sheet(process, destination)
-
-        if sample_sheet_content:
             sample_sheet = parse.parse_ne_mi_seq_sample_sheet(sample_sheet_content)
-            num_samples = len(sample_sheet['data'])
-        else:
-            sample_sheet = None
-            num_samples = 1
-
-        utilities.running(process, "Demultiplexing")
-        input_dir = os.path.join(cfg.run_dir, "Data", "Intensities", "BaseCalls")
-        process_ok = run_demultiplexing(process, num_samples,
-                cfg.bases_mask, cfg.n_threads, destination, input_dir, cfg.output_dir,
-                cfg.other_options, log_dir)
-        #process_ok = True
-        
-        if process_ok:
             reads = [1]
             try:
                 if seq_proc.udf['Read 2 Cycles']:
@@ -214,23 +85,6 @@ def main(process_id):
         utilities.fail(process, "Missing configuration information, can't demultiplex")
         
     
-    if success:
-        utilities.success_finish(process)
-        return True
-    # If failing, should have already notified of failure, just quit
-    else:
-        if not process.udf[nsc.JOB_STATUS_UDF].startswith('Fail'):
-            utilities.fail(process, "Unknown failure")
-        return False
 
-
-if __name__ == "__main__":
-    if len(sys.argv) >= 2:
-        with utilities.error_reporter():
-            ok = main(sys.argv[1])
-            sys.exit(0 if ok else 1)
-    else:
-        print "use: demultiplex-nextseq.py <process-id>"
-        sys.exit(1)
 
 

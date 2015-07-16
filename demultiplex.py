@@ -4,6 +4,54 @@ from math import ceil
 from genologics.lims import *
 from common import nsc, utilities, slurm
 
+def main(process_id):
+    os.umask(007)
+    process = Process(nsc.lims, id=process_id)
+    utilities.running(process, nsc.CJU_DEMULTIPLEXING)
+
+    seq_process = utilities.get_sequencing_process(process)
+    run_id = seq_process.udf['Run ID']
+
+    print "Demultiplexing process for LIMS process", process_id, ", NextSeq run", run_id
+
+    source_run_dir = utilities.get_udf(
+            process, nsc.SOURCE_RUN_DIR_UDF,
+            os.path.join(nsc.PRIMARY_STORAGE, run_id)
+            )
+    dest_run_dir = utilities.get_udf(
+            process, nsc.WORK_RUN_DIR_UDF,
+            os.path.join(nsc.SECONDARY_STORAGE, run_id)
+            )
+    print "Reading from", source_run_dir, "writing to", dest_run_dir
+
+    sample_sheet_data = download_sample_sheet(process)
+    if sample_sheet_data:
+        with open(os.path.join(dest_run_dir, "SampleSheet.csv")) as f:
+            f.write(sample_sheet_data)
+        sample_sheet_path = utilities.logfile(nsc.CJU_DEMULTIPLEXING, "SampleSheet", "csv")
+        with open(sample_sheet_path) as f:
+            f.write(sample_sheet_data)
+
+    utilities.running(process, nsc.CJU_DEMULTIPLEXING, "Demultiplexing")
+
+    threads = utilities.get_udf(process, nsc.THREADS_UDF, 1)
+    default_no_lane_splitting = utilities.get_instrument(seq_process) == "nextseq"
+    no_lane_splitting = utilities.get_udf(
+            process, nsc.NO_LANE_SPLITTING_UDF, default_no_lane_splitting
+            )
+    other_options = utilities.get_udf(process, nsc.OTHER_OPTIONS_UDF, None)
+
+    if run_dmx(
+            process, n_threads, input_dir, output_dir, no_lane_splitting,
+            other_options
+            ):
+        utilities.success_finish(process)
+        return True
+    else:
+        utilities.fail(process, "bcl2fastq failure (see log)") 
+        return False
+
+
 def get_thread_args(n_threads):
     # Computing number of threads: use the standard allocation 
     # logic for bcl2fastq2, but limit ourselves to n_threads
@@ -56,49 +104,13 @@ def get_sample_sheet(process):
         return None
 
 
-
-
-def main(process_id):
-    process = Process(nsc.lims, id=process_id)
-    utilities.running(process, nsc.CJU_DEMULTIPLEXING)
-    seq_process = utilities.get_sequencing_process(process)
-    run_id = seq_process.udf['Run ID']
-    source_run_dir = utilities.get_udf(
-            process, nsc.SOURCE_RUN_DIR_UDF,
-            os.path.join(nsc.PRIMARY_STORAGE, run_id)
-            )
-    dest_run_dir = utilities.get_udf(
-            process, nsc.WORK_RUN_DIR_UDF,
-            os.path.join(nsc.SECONDARY_STORAGE, run_id)
-            )
-
-
-    sample_sheet_data = download_sample_sheet(process)
-    if sample_sheet_data:
-        with open(os.path.join(dest_run_dir, "SampleSheet.csv")) as f:
-            f.write(sample_sheet_data)
-        sample_sheet_path = utilities.logfile(nsc.CJU_DEMULTIPLEXING, "SampleSheet", "csv")
-        with open(sample_sheet_path) as f:
-            f.write(sample_sheet_data)
-
-    utilities.running(process, nsc.CJU_DEMULTIPLEXING, "Demultiplexing")
-
-    threads = utilities.get_udf(process, nsc.THREADS_UDF, 1)
-    default_no_lane_splitting = utilities.get_instrument(seq_process) == "nextseq"
-    no_lane_splitting = utilities.get_udf(
-            process, nsc.NO_LANE_SPLITTING_UDF, default_no_lane_splitting
-            )
-    other_options = utilities.get_udf(process, nsc.OTHER_OPTIONS_UDF, None)
-
-    if run_dmx(
-            process, n_threads, input_dir, output_dir, no_lane_splitting,
-            other_options
-            ):
-        utilities.success_finish(process)
+if __name__ == "__main__":
+    if len(sys.argv) >= 2:
+        with utilities.error_reporter():
+            ok = main(sys.argv[1])
+            sys.exit(0 if ok else 1)
     else:
-        utilities.fail(process, "bcl2fastq failure (see log)") 
+        print "use: demultiplex.py <process-id>"
         sys.exit(1)
 
-
-main(sys.argv[1])
 

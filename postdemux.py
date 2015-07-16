@@ -1,3 +1,10 @@
+import sys, os
+
+from genologics.lims import *
+from common import nsc
+
+
+
 
 udf_list = [
         '# Reads', 'Yield PF (Gb)', '% of Raw Clusters Per Lane',
@@ -5,6 +12,23 @@ udf_list = [
         '% Perfect Index Read', 'One Mismatch Reads (Index)',
         '% Bases >=Q30', 'Ave Q Score'
         ]
+
+
+
+def main_lims(process_id):
+    """LIMS mode main function.
+    
+    Post-demultiplexing process:
+    1) rename files and directories to NSC standard
+    2) generate reports (Delivery folder)
+    3) post stats to LIMS
+    """
+    pass
+
+
+def main(todo):
+    pass
+
 
 def populate_results(process, ids_resultfile_map, demultiplex_stats):
     """Set UDFs on inputs (analytes representing the lanes) and output
@@ -56,6 +80,72 @@ def populate_results(process, ids_resultfile_map, demultiplex_stats):
     return True
 
 
+def make_id_resultfile_map(process, sample_sheet_data, reads):
+    """Produces map from lane, sample-ID and read to output 
+    analyte. Lane is always 1 for NS, but keeping it in for consistency."""
+    themap = {}
+    for entry in sample_sheet_data:
+        name = entry['samplename']
+        input_limsid = entry['sampleid']
+        try:
+            input_sample = Artifact(nsc.lims, id=input_limsid).samples[0]
+        except requests.exceptions.HTTPError as e:
+            # If the sample is not pooled, we'll get the Sample LIMSID in the 
+            # sample sheet, not the Analyte LIMSID. So we request the sample 
+            # with this ID.
+            # Would only do this for 404, but there is no e.response.status_code
+            # (that is, e.response is None)
+            input_sample = Sample(nsc.lims, id=input_limsid)
+            input_sample.get()
+
+        for output in process.all_outputs(unique=True):
+            #for read in reads:
+            #    for lane in xrange(1, 5):
+            if output.name == nsc.NEXTSEQ_FASTQ_OUTPUT.format(
+                    input_sample.name
+                    ):
+                themap[("X",input_limsid,1)] = output
+    return themap
+
+
+def move_files(runid, output_dir, project_name, sample_sheet_data, reads):
+    proj_dir = parse.get_project_dir(runid, project_name)
+    project_path = output_dir + "/" + proj_dir
+    
+    params = []
+    for i, row in enumerate(sample_sheet_data):
+        for r in reads:
+            par = dict(row)
+            par['samplename'] = par['samplename']
+
+            par['read'] = r
+            par['base'] = output_dir
+            par['index'] = i+1
+            par['project'] = project_name
+            par['project_path'] = project_path
+            params.append(par)
+
+    with_id_subdir = not all(p['sampleid'] == p['samplename'] for p in params)
+    for p in params:
+        f = "{samplename}_S{index}_R{read}_001.fastq.gz".format( **p)
+
+        if with_id_subdir:
+            input_path = "{base}/{project}/{sampleid}/{filename}".format(filename=f, **p)
+        else:
+            input_path = "{base}/{project}/{filename}".format(filename=f, **p)
+
+        output_path = os.path.join(project_path, f)
+        print "in", input_path, "out", output_path
+        os.rename(input_path, output_path)
+
+    for dpath in set("{base}/{project}/{sampleid}".format(**p) for p in params):
+        os.rmdir(dpath)
+    for dpath in set("{base}/{project}".format(**p) for p in params):
+        os.rmdir(dpath)
+
+
+
+
 
 def create_projdir_ne_mi(runid, basecalls_dir, sample_sheet, lane, reads):
     """Creates project directory and moves fastq files into it."""
@@ -78,6 +168,34 @@ def create_projdir_ne_mi(runid, basecalls_dir, sample_sheet, lane, reads):
             old_path = basecalls_dir + "/" + basename
             new_path = proj_path + "/" + basename
             os.rename(old_path, new_path)
+
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--sbatch', default=False, action='store_true', help="Running under sbatch (not working well)")
+    parser.add_argument('--threads', type=int, default=1, help='Number of threads (cores)')
+    parser.add_argument('--pid', default=None, help="Process-ID if running within LIMS")
+    parser.add_argument('--no-sample-sheet', action='store_true', help="Run without sample sheet, look for files")
+    parser.add_argument('--no-process-undetermined', action='store_true', help="Do not process undetermined indexes")
+    parser.add_argument('DIR', default=None, nargs='?', help="Run directory")
+    args = parser.parse_args()
+    threads = args.threads
+    try:
+        threads = int(os.environ['SLURM_CPUS_ON_NODE'])
+        print "Threads from slurm: ", threads
+    except KeyError:
+        pass
+
+    if args.pid and not args.DIR:
+        with utilities.error_reporter(args.pid):
+            main_lims(threads, args.pid)
+
+    elif args.DIR and not args.pid:
+        main(threads, args.DIR, args.no_sample_sheet, not args.no_process_undetermined)
+    else:
+        print "Must specify either LIMS-ID of QC process or bcl2fastq2 output directory"
+        sys.exit(1)
 
 
 
