@@ -88,6 +88,7 @@ def main(process_id):
     no_lane_splitting = utilities.get_udf(
             process, nsc.NO_LANE_SPLITTING_UDF, default_no_lane_splitting
             )
+    other_options = utilities.get_udf(process, nsc.OTHER_OPTIONS_UDF, None)
 
     if run_dmx(
             process, n_threads, input_dir, output_dir, no_lane_splitting,

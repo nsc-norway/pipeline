@@ -30,8 +30,7 @@ SOURCE_RUN_DIR_UDF = "Source run directory"
 WORK_RUN_DIR_UDF = "Working run directory"
 DEST_FASTQ_DIR_UDF = "Fastq output directory"
 COPY_MISEQ_DEST_UDF = "Copy run to"
-OTHER_OPTIONS_UDF = "Other options for configureBclToFastq"
-NS_OTHER_OPTIONS_UDF = "Other options for bcl2fastq"
+OTHER_OPTIONS_UDF = "Other options for bcl2fastq"
 PROCESS_UNDETERMINED_UDF = "Process undetermined indexes"
 
 # Other UDFs 

@@ -15,34 +15,6 @@ import shutil
 import requests
 from common import nsc, utilities, demultiplex, parse, copyfiles
 
-class Config:
-    pass
-
-def get_config(process):
-    """Configuration is stored in UDFs on the demultiplexing process. This
-    function loads them into a generic object.
-    
-    The options are set by """
-
-    try:
-        cfg = Config()
-        cfg.n_threads = process.udf[nsc.THREADS_UDF]
-        cfg.run_dir = process.udf[nsc.SOURCE_RUN_DIR_UDF]
-        cfg.output_dir = process.udf[nsc.DEST_FASTQ_DIR_UDF]
-    except KeyError:
-        return None
-    # Optional
-    try:
-        cfg.other_options = process.udf[nsc.NS_OTHER_OPTIONS_UDF]
-    except KeyError:
-        cfg.other_options = None
-
-    try:
-        cfg.bases_mask = process.udf[nsc.BASES_MASK_UDF]
-    except KeyError:
-        cfg.bases_mask = None
-
-    return cfg
 
 
 def get_thread_args(n_threads, num_samples):
@@ -150,19 +122,6 @@ def move_files(runid, output_dir, project_name, sample_sheet_data, reads):
         os.rmdir(dpath)
 
 
-
-def get_sample_sheet(process, output_run_dir):
-    """Get sample sheet from LIMS or run directory."""
-
-    ssheet_file, sample_sheet = demultiplex.download_sample_sheet(process, output_run_dir, False)
-    if ssheet_file:
-        return ssheet_file, sample_sheet
-    elif os.path.exists(os.path.join(output_run_dir, "SampleSheet.csv")):
-        path = os.path.join(output_run_dir, "SampleSheet.csv")
-        data = open(path).read()
-        return path, data 
-    else:
-        return None, None
 
 
 

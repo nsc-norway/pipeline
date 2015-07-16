@@ -1,5 +1,4 @@
 
-
 udf_list = [
         '# Reads', 'Yield PF (Gb)', '% of Raw Clusters Per Lane',
         '% of PF Clusters Per Lane',

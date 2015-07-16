@@ -144,8 +144,9 @@ def get_udf(process, udf, default):
     try:
         return process.udf[udf]
     except KeyError:
-        process.udf[udf] = default
-        process.put()
+        if not default is None:
+            process.udf[udf] = default
+            process.put()
         return default
 
 
