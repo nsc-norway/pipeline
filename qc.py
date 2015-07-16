@@ -4,6 +4,12 @@ from genologics.lims import *
 from common import nsc
 
 
+#    Post-demultiplexing process:
+#    1) rename files and directories to NSC standard
+#    2) generate reports (Delivery folder)
+#    3) post stats to LIMS
+#    4) run fastqc
+#    5) generate PDFs and the HTML page
 
 
 udf_list = [
@@ -17,11 +23,6 @@ udf_list = [
 
 def main_lims(process_id):
     """LIMS mode main function.
-    
-    Post-demultiplexing process:
-    1) rename files and directories to NSC standard
-    2) generate reports (Delivery folder)
-    3) post stats to LIMS
     """
     pass
 
@@ -30,6 +31,9 @@ def main(todo):
     pass
 
 
+
+
+##### UPDATE LIMS STATS #####
 def populate_results(process, ids_resultfile_map, demultiplex_stats):
     """Set UDFs on inputs (analytes representing the lanes) and output
     files (each fastq file).
