@@ -112,8 +112,14 @@ def make_id_resultfile_map(process, sample_sheet_data, reads):
     return themap
 
 
-def move_files(runid, output_dir, project_name, sample_sheet_data, reads):
-    proj_dir = parse.get_project_dir(runid, project_name)
+#### RENAME PROJECT, FILES ####
+def move_files(instrument, runid, output_dir, project_name, sample_sheet_data, reads):
+    if instrument == 'hiseq':
+        proj_dir = samplesheet.get_project_dir(runid, project_name)
+    else:
+        proj_dir = samplesheet.get_project_dir(runid, project_name)
+
+
     project_path = output_dir + "/" + proj_dir
     
     params = []
