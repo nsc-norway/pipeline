@@ -24,7 +24,7 @@ def main(process_id):
             )
     print "Reading from", source_run_dir, "writing to", dest_run_dir
 
-    sample_sheet_data = download_sample_sheet(process)
+    sample_sheet_data = get_sample_sheet(process)
     if sample_sheet_data:
         with open(os.path.join(dest_run_dir, "SampleSheet.csv")) as f:
             f.write(sample_sheet_data)
