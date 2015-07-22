@@ -185,7 +185,7 @@ def get_projects(process):
 def eta(process, done_cycles, total_cycles):
     if total_cycles > 0 and done_cycles < total_cycles:
         now = datetime.datetime.now()
-        time_per_cycle = 3121
+        time_per_cycle = 2160
         time_left = seconds=(total_cycles - done_cycles) * time_per_cycle
         est_arrival = now + datetime.timedelta(seconds=time_left)
         return " (ETA: " + est_arrival.strftime("%d/%m %H:%M") + ")"
