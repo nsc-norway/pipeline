@@ -182,6 +182,18 @@ def get_projects(process):
     return [read_project(p) for p in lims_projects]
 
 
+def eta(process, done_cycles, total_cycles):
+    if total_cycles > 0 and done_cycles < total_cycles:
+        now = datetime.datetime.now()
+        time_per_cycle = 3121
+        time_left = seconds=(total_cycles - done_cycles) * time_per_cycle
+        est_arrival = now + datetime.timedelta(seconds=time_left)
+        return " (ETA: " + est_arrival.strftime("%d/%m %H:%M") + ")"
+    else:
+        return ""
+
+
+
 def read_sequencing(process_name, process):
     url = proc_url(process.id)
     flowcell_id = process.all_inputs()[0].location[0].name
@@ -203,6 +215,9 @@ def read_sequencing(process_name, process):
         runid = ""
     try:
         status = process.udf['Status']
+        cycles_re = re.match(r"Cycle (\d+) of (\d+)", status)
+        if cycles_re:
+            status += eta(process, int(cycles_re.group(1)), int(cycles_re.group(2)))
     except KeyError:
         status = "Pending/running"
     try:
