@@ -146,7 +146,7 @@ def get_hiseq_stats(demux_summary_file_path, aggregate_reads=False):
 
 ###################### NEXTSEQ METRICS #######################
 
-def parse_ns_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_reads):
+def parse_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_reads):
     """Get "conversion stats" from the NextSeq stats.
 
     Loops over the comprehensive tree structure of the ConversionStats.xml
