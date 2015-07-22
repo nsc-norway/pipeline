@@ -1,4 +1,4 @@
-# Parsing of bcl2fastq2 output and Illumina Analysis Software output for the MiSeq
+# Parsing of bcl2fastq2 output, and Illumina Analysis Software output for the MiSeq
 
 import re
 import os
@@ -193,7 +193,7 @@ def parse_demultiplexing_stats(conversion_stats_path, aggregate_lanes):
     return samples
 
 
-def get_nextseq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_reads=False):
+def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_reads=False):
     """Function for the NextSeq, to compute the usual demultiplexing stats.
 
     Params: stats_xml_file_path: path to the directory containing the XML files
