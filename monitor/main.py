@@ -188,7 +188,7 @@ def eta(process, done_cycles, total_cycles):
         time_per_cycle = 2160
         time_left = seconds=(total_cycles - done_cycles) * time_per_cycle
         est_arrival = now + datetime.timedelta(seconds=time_left)
-        return " (ETA: " + est_arrival.strftime("%d/%m %H:%M") + ")"
+        return " (ETA: " + est_arrival.strftime("%a %d/%m %H:%M") + ")"
     else:
         return ""
 
