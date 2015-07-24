@@ -109,5 +109,30 @@ def populate_results(process, ids_resultfile_map, demultiplex_stats):
 
     return True
 
+
+def post_stats(demultiplex_stats, input_output_maps):
+
+    for coordinates, stats in demultiplex_stats.items():
+        limsid = coordinates[1]
+        try:
+            input_sample = Artifact(nsc.lims, id=input_limsid).samples[0]
+        except requests.exceptions.HTTPError as e:
+            # If the sample is not pooled, we'll get the Sample LIMSID in the 
+            # sample sheet, not the Analyte LIMSID. So we request the sample 
+            # with this ID.
+            # Would only do this for 404, but there is no e.response.status_code
+            # (that is, e.response is None)
+            input_sample = Sample(nsc.lims, id=input_limsid)
+            input_sample.get()
+
+        for i, o in input_output_maps:
+            if i['uri'].name == "TODO":
+                pass
+
+
+
+
+
+
 if __name__ == "__main__":
     main(sys.argv[1])
