@@ -208,7 +208,7 @@ def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_rea
 
     It returns a dict indexed by lane, sample ID, and read, with the values
     being a dict indexed by the stats name:
-    { (lane (=1), sample name, read) => {stat => value} }
+    { (lane, sample name, read) => {stat => value} }
     """
 
     if aggregate_lanes:

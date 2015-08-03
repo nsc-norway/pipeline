@@ -20,98 +20,10 @@ def main(process_id):
             aggregate_reads = True
             )
 
-    update_lims(process, run_stats)
-
-    
+    post_stats(process, run_stats)
 
 
-
-def update_lims(process, stats):
-    for key, value in stats.items(}:
-        lane, sample_id, read = coordinates
-
-
-
-def make_id_resultfile_map(process, sample_sheet_data, reads):
-    """Produces map from lane, sample-ID and read to output 
-    analyte. Lane is always 1 for NS, but keeping it in for consistency."""
-    themap = {}
-    for entry in sample_sheet_data:
-        name = entry['samplename']
-        input_limsid = entry['sampleid']
-        try:
-            input_sample = Artifact(nsc.lims, id=input_limsid).samples[0]
-        except requests.exceptions.HTTPError as e:
-            # If the sample is not pooled, we'll get the Sample LIMSID in the 
-            # sample sheet, not the Analyte LIMSID. So we request the sample 
-            # with this ID.
-            # Would only do this for 404, but there is no e.response.status_code
-            # (that is, e.response is None)
-            input_sample = Sample(nsc.lims, id=input_limsid)
-            input_sample.get()
-
-        for output in process.all_outputs(unique=True):
-            #for read in reads:
-            #    for lane in xrange(1, 5):
-            if output.name == nsc.NEXTSEQ_FASTQ_OUTPUT.format(
-                    input_sample.name
-                    ):
-                themap[("X",input_limsid,1)] = output
-    return themap
-
-
-def populate_results(process, ids_resultfile_map, demultiplex_stats):
-    """Set UDFs on inputs (analytes representing the lanes) and output
-    files (each fastq file).
-    """
-    inputs = dict((i.location[1], i) for i in process.all_inputs(unique=True))
-    if len(set(i.location[0] for i in inputs.values())) != 1:
-        print "error: Wrong number of flowcells detected"
-        return False
-
-    for coordinates, stats in demultiplex_stats.items():
-        if len(coordinates) > 1:
-            lane = coordinates[0]
-            sample_name = coordinates[1]
-        else:
-            lane = "X"
-            sample_name = coordinates[0]
-
-        lims_fastqfile = None
-        try:
-            lims_fastqfile = ids_resultfile_map[coordinates]
-            undetermined = False
-        except KeyError:
-            if sample_name:
-                undetermined = re.match(r"lane\d$", sample_name)
-            else:
-                undetermined = True
-
-        if lims_fastqfile:
-            for statname in udf_list:
-                try:
-                    lims_fastqfile.udf[statname] = stats[statname]
-                except KeyError:
-                    pass
-            lims_fastqfile.put()
-    
-        elif undetermined:
-            try:
-                analyte = inputs['{0}:1'.format(lane)]
-            except KeyError:
-                if len(inputs) == 1:
-                    # NextSeq: flow cell has position A:1
-                    analyte = inputs['A:1']
-                else:
-                    raise
-            analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
-            analyte.put()
-
-    return True
-
-
-def post_stats(demultiplex_stats, input_output_maps):
-
+def post_stats(process, demultiplex_stats):
     for coordinates, stats in demultiplex_stats.items():
         lane, limsid = coordinates[0:2]
 
@@ -119,25 +31,81 @@ def post_stats(demultiplex_stats, input_output_maps):
         # derived sample that went into a pool that was sequenced, or one that went 
         # directly on the sequencer.
 
-        input_sample = Artifact(nsc.lims, id=input_limsid).samples[0]
-        
-        for i, o in input_output_maps:
-            input = i['uri']
-            if i.location[1] in ['%d:1' % lane, 'A:1']: # Use A:1 for NextSeq, MiSeq
-                if limsid: # Sample
-                    if o['output-type'] == "ResultFile" and o['output-generation-type'] == "PerReagentLabel":
-                        output = o['uri']
-                        # The LIMSID 
-                        if output.id == limsid:
                             
-                            pass
+        if limsid:
+            resultfile = get_resultfile(process, lane, limsid, 1)
+            for statname in udf_list:
+                try:
+                    lims_fastqfile.udf[statname] = stats[statname]
+                except KeyError:
+                    pass
+            lims_fastqfile.put()
+            
 
-                else: # Undetermined: limsid = None in demultiplex_stats
-                        input = i['uri']
-                        if input.location[1] == lane:
+        else: # Undetermined: limsid = None in demultiplex_stats
+            lane_analyte = get_lane(lane)
+            if lane_analyte:
+                lane_analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
+                lane_analyte.put()
 
 
+def get_resultfile(process, lane, input_limsid, read):
+    """Find a result file artifact which is an output of process and
+    which corresponds to input_limsid.
 
+    input_limsid is any derived sample which is not a pool, or a submitted sample.
+    
+    The correct output is identified by two criteria: 
+     - The output must come from an input which matches the lane number. The input
+       must be in the correct position in the flowcell in the LIMS.
+     - The name of the output must match a pattern, potentially including the 
+       following:
+        * The name of the submitted sample in the LIMS
+        * The read number (1 or 2 for paired end read)
+       The name of the submitted sample for comparison is retrieved by querying the
+       LIMS for the input_limsid, and using the sample which is associated with this
+       LIMS ID.
+
+    Returns the associated result file, If the file can't be found, in general an 
+    error is thrown (relying on underlying functions to throw, like HTTPError).
+    """
+
+    lane, input_limsid, read = coordinates
+    try:
+        input_sample = Artifact(nsc.lims, id=input_limsid).samples[0]
+    except requests.exceptions.HTTPError as e:
+        # If the sample is not pooled, we may get the Sample LIMSID in the 
+        # sample sheet, not the Analyte LIMSID. So we request the sample 
+        # with this ID.
+        # Would only do this for 404, but there is no e.response.status_code
+        # (that is, e.response is None)
+        input_sample = Sample(nsc.lims, id=input_limsid)
+        input_sample.get()
+
+    # Find the result file corresponding to this artifact
+    for i, o in process.input_output_maps:
+        input = i['uri']
+        if input.location[1] in ['%d:1' % lane, 'A:1']: # Use A:1 for NextSeq, MiSeq
+            if o['output-type'] == "ResultFile" and o['output-generation-type'] == "PerReagentLabel":
+                output = o['uri']
+                # The LIMSID 
+                if output.name == nsc.FASTQ_OUTPUT.format(
+                        lane=lane,
+                        sample_name=input_sample.name,
+                        read=read
+                        ):
+                    return output
+
+
+def get_lane(process, lane):
+    """Get the input corresponding to a given lane ID. 
+    
+    Returns None if no such lane."""
+    for input in process.all_inputs():
+        if lane == 1 and input.location[1] == 'A:1': # Use A:1 for NextSeq, MiSeq
+            return input
+        if i.location[1] == '%d:1' % lane:
+            return input
 
 
 
