@@ -9,8 +9,7 @@ def main(process_id):
     process = Process(nsc.lims, id=process_id)
     utilities.running(process, nsc.CJU_DEMULTIPLEXING)
 
-    seq_process = utilities.get_sequencing_process(process)
-    run_id = seq_process.udf['Run ID']
+    run_id = process.udf[nsc.RUN_ID_UDF]
 
     print "Demultiplexing process for LIMS process", process_id, ", NextSeq run", run_id
 
@@ -35,7 +34,7 @@ def main(process_id):
     utilities.running(process, nsc.CJU_DEMULTIPLEXING, "Demultiplexing")
 
     threads = utilities.get_udf(process, nsc.THREADS_UDF, 1)
-    default_no_lane_splitting = utilities.get_instrument(seq_process) == "nextseq"
+    default_no_lane_splitting = utilities.get_instrument_from_runid(run_id) == "nextseq"
     no_lane_splitting = utilities.get_udf(
             process, nsc.NO_LANE_SPLITTING_UDF, default_no_lane_splitting
             )

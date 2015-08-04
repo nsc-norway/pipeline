@@ -60,9 +60,8 @@ def main(process_id):
     """To be run from LIMS on the NSC data processing step"""
     process = Process(nsc.lims, id=process_id)
     utilities.running(process, nsc.CJU_COPY_RUN)
-    seq_process = utilities.sequencing_process(process)
-    runid = seq_process.udf['Run ID']
-    instrument = utilities.get_instrument(seq_process)
+    runid = process.udf[nsc.RUN_ID]
+    instrument = utilities.get_instrument_from_runid(runid)
 
     source = utilities.get_udf(
             process, nsc.SOURCE_RUN_DIR_UDF,

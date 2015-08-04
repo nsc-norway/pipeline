@@ -6,9 +6,7 @@ def main(process_id):
     process = Process(nsc.lims, id=process_id)
     utilities.running(process, nsc.CJU_SAVING_STATS)
 
-    seq_process = utilities.get_sequencing_process(process)
-    
-    run_id = seq_process.udf['Run ID']
+    run_id = process.udf[nsc.RUN_ID_UDF]
     demultiplex_dir = utilities.get_udf(
             process, nsc.WORK_RUN_DIR_UDF,
             os.path.join(nsc.SECONDARY_STORAGE, run_id)

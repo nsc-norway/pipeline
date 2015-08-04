@@ -23,7 +23,7 @@ JOB_STATE_CODE_UDF = "Job state code" #SUBMITTED,RUNNING,FAILED,COMPLETED,CANCEL
 ERROR_DETAILS_UDF = "Error details"
 
 # UDFs for configuration and job steering (On process types)
-RUN_ID = "Run ID"
+RUN_ID_UDF = "Run ID"
 THREADS_UDF = "Number of threads"
 MISMATCHES_UDF = "Number of mismatches"
 SOURCE_RUN_DIR_UDF = "Source run directory"
@@ -44,7 +44,6 @@ PROCESSED_DATE_UDF = "Processing completed date"
 # Output files
 BCL2FASTQ_LOG = "bcl2fastq log"
 FASTQ_OUTPUT = "{sample_name}"
-
 
 # Values of the CURRENT_JOB_UDF
 CJU_COPY_RUN = "Copy run"

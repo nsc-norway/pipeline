@@ -37,6 +37,15 @@ def get_instrument(seq_process):
     return next(p[0] for p in nsc.SEQ_PROCESSES if seq_process.type.name == p[1])
 
 
+def get_instrument_by_runid(run_id):
+    if re.match("\d{6}_M"):
+        return 'miseq'
+    elif re.match("\d{6}_NS"):
+        return 'nextseq'
+    else:
+        return 'hiseq'
+
+
 def logfile(process, step, command, extension="txt"):
     """Create the DemultiplexLogs dir if it doesn't exist. Returns the
     path to the log file for the step and command. One dir is created
