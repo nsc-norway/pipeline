@@ -46,7 +46,6 @@ def parse_ne_mi_seq_sample_sheet(sample_sheet):
     return result
 
 
-
 ################# FILE STRUCTURE #################
 def get_sample_name():
     pass

@@ -1,27 +1,58 @@
 import sys, os
 
 from genologics.lims import *
-from common import nsc, stats, utilities
+from common import nsc, stats, utilities, lane_info
 
 # Generate reports for email based on demultiplexing stats
 
-def make_reports(work_dir):
-    run_stats = stats.get_bcl2fastq_stats(
-            os.path.join(work_dir, "Stats"),
-            aggregate_lanes = True,
-            aggregate_reads = False
-            )
+def make_reports(work_dir, run_id, run_stats, lane_stats):
+    qc_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls", "QualityControl")
+    delivery_dir = os.path.join(qc_dir, "Delivery")
+    for d in [qc_dir, delivery_dir]:
+        try:
+            os.mkdir(d)
+        except OSError:
+            pass # Assume it exists
+
+
+
+    for project in projects:
+        if project.name != "Undetermined_indices":
+            fname = delivery_dir + "/Email_for_" + project.name + ".xls"
+            write_sample_info_table(fname, run_id, project)
+
+    fname = delivery_dir + "/Table_for_GA_runs_" + run_id + ".xls"
+    write_internal_sample_table(fname, run_id, projects)
+
+    fname = delivery_dir + "/Summary_email_for_NSC_" + run_id + ".xls"
+    write_summary_email(fname, run_id, projects, instrument_type=='hiseq')
 
 
 def main_lims(process_id):
     process = Process(nsc.lims, id=process_id)
     run_id = process.udf[nsc.RUN_ID_UDF]
+    instument = utilities.get_instrument_from_runid(run_id)
     work_dir = utilities.get_udf(
             process, nsc.WORK_RUN_DIR_UDF,
             os.path.join(nsc.SECONDARY_STORAGE, run_id)
             )
     
-    make_reports(work_dir)
+    if instrument == "nextseq":
+        run_stats = stats.get_bcl2fastq_stats(
+                os.path.join(work_dir, "Stats"),
+                aggregate_lanes = True,
+                aggregate_reads = False
+                )
+    else:
+        run_stats = stats.get_bcl2fastq_stats(
+                os.path.join(work_dir, "Stats"),
+                aggregate_lanes = False,
+                aggregate_reads = False
+                )
+
+    lane_stats = lane_info.get_from_lims(process, instrument)
+
+    make_reports(work_dir, run_id, run_stats, lane_stats)
 
 
 def write_sample_info_table(output_path, runid, project):
