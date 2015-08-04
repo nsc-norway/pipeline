@@ -23,13 +23,11 @@ JOB_STATE_CODE_UDF = "Job state code" #SUBMITTED,RUNNING,FAILED,COMPLETED,CANCEL
 ERROR_DETAILS_UDF = "Error details"
 
 # UDFs for configuration and job steering (On process types)
-BASES_MASK_UDF = "Bases Mask"
+RUN_ID = "Run ID"
 THREADS_UDF = "Number of threads"
 MISMATCHES_UDF = "Number of mismatches"
 SOURCE_RUN_DIR_UDF = "Source run directory"
 WORK_RUN_DIR_UDF = "Working run directory"
-DEST_FASTQ_DIR_UDF = "Fastq output directory"
-COPY_MISEQ_DEST_UDF = "Copy run to"
 OTHER_OPTIONS_UDF = "Other options for bcl2fastq"
 PROCESS_UNDETERMINED_UDF = "Process undetermined indexes"
 
@@ -44,8 +42,6 @@ RECENTLY_COMPLETED_UDF = "Recently completed"
 PROCESSED_DATE_UDF = "Processing completed date"
 
 # Output files
-CONFIGURE_LOG = "configureBclToFastq log"
-MAKE_LOG = "make log"
 BCL2FASTQ_LOG = "bcl2fastq log"
 FASTQ_OUTPUT = "{sample_name}"
 
@@ -61,48 +57,6 @@ SEQ_PROCESSES=[
         ('hiseq', 'Illumina Sequencing (Illumina SBS) 5.0'),
         ('nextseq', 'NextSeq Run (NextSeq) 1.0'),
         ('miseq', 'MiSeq Run (MiSeq) 5.0')
-        ]
-
-# Auxiliary class to represent configuration
-class StepSetup:
-    def __init__(self, name, grouping, script = None):
-        """name is the name of the process type
-
-        grouping can be: project, flowcell. Determines which
-        lanes can be processed together. flowcell requires all
-        lanes together, project only includes lanes from the same
-        project in any given job. TODO: do we need "lane", maybe
-        for CEES/Abel, to make more slurm jobs?
-        """
-        self.name = name
-        self.grouping = grouping
-        self.script = script
-
-# Analysis after sequencing. List of protocols and per-protocol info.
-# The top-level items are tuples of protocol name and lists of StepSetup 
-# objects. The StepSetup objects represent a step in a protocol (see above).
-AUTOMATED_PROTOCOL_STEPS = [
-            ("NSC Data processing for HiSeq",
-            [
-                StepSetup("NSC Demultiplexing (HiSeq)", "project", "Submit demultiplexing job"),
-                StepSetup("NSC Data Quality Reporting (HiSeq)", "project", "Submit QC job"),
-                StepSetup("NSC Delivery", "project", "Submit delivery job"),
-                StepSetup("NSC Finalize run", "flowcell", "Submit")
-            ]),
-            ("NSC Data processing for NextSeq",
-            [
-                StepSetup("NSC Demultiplexing (NextSeq)", "flowcell", "Submit demultiplexing job"),
-                StepSetup("NSC Data Quality Reporting (Mi/NextSeq)", "project", "Submit QC job"),
-                StepSetup("NSC Delivery", "project", "Submit delivery job"),
-                StepSetup("NSC Finalize run", "flowcell", "Submit")
-            ]),
-            ("NSC Data processing for MiSeq",
-            [
-                StepSetup("NSC Copy MiSeq Run", "flowcell", "Copy MiSeq Run"),
-                StepSetup("NSC Data Quality Reporting (Mi/NextSeq)", "flowcell", "Submit QC job"),
-                StepSetup("NSC Delivery", "project", "Submit delivery job"),
-                StepSetup("NSC Finalize run", "flowcell", "Submit")
-            ]),
         ]
 
 # System programs
