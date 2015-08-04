@@ -7,7 +7,7 @@ from common import nsc
 #    Post-demultiplexing process:
 #    1) rename files and directories to NSC standard
 #    2) generate reports (Delivery folder)
-#    3) post stats to LIMS
+#    3) post stats to LIMS - OK
 #    4) run fastqc
 #    5) generate PDFs and the HTML page
 
