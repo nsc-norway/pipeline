@@ -1,11 +1,11 @@
 import sys, os
 
 from genologics.lims import *
-from common import nsc, stats, utilities, lane_info
+from common import nsc, stats, utilities, lane_info, sample
 
 # Generate reports for email based on demultiplexing stats
 
-def make_reports(work_dir, run_id, run_stats, lane_stats):
+def make_reports(work_dir, run_id, project_stats, lane_stats):
     qc_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls", "QualityControl")
     delivery_dir = os.path.join(qc_dir, "Delivery")
     for d in [qc_dir, delivery_dir]:
@@ -14,7 +14,7 @@ def make_reports(work_dir, run_id, run_stats, lane_stats):
         except OSError:
             pass # Assume it exists
 
-
+    projects = sample.get_projects(run_id
 
     for project in projects:
         if project.name != "Undetermined_indices":
@@ -49,10 +49,12 @@ def main_lims(process_id):
                 aggregate_lanes = False,
                 aggregate_reads = False
                 )
+    
+    projects = sample.get_projects(sample_sheet)
 
     lane_stats = lane_info.get_from_lims(process, instrument)
 
-    make_reports(work_dir, run_id, run_stats, lane_stats)
+    make_reports(work_dir, run_id, project_stats, lane_stats)
 
 
 def write_sample_info_table(output_path, runid, project):
