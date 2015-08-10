@@ -28,8 +28,7 @@ def post_stats(process, demultiplex_stats):
         # The LIMS ID in the sample sheet (and then in the stats) will be the ID of the 
         # derived sample that went into a pool that was sequenced, or one that went 
         # directly on the sequencer.
-
-                            
+ 
         if limsid:
             resultfile = get_resultfile(process, lane, limsid, 1)
             for statname in udf_list:
