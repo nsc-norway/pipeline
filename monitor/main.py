@@ -285,20 +285,24 @@ def get_recently_completed_runs():
             type=FLOWCELL_INSTRUMENTS.keys()
             )
 
-
     cutoff_date = datetime.date.today() - datetime.timedelta(days=30)
     results = [[],[],[]]
     for fc in reversed(flowcells):
         try:
             date = fc.udf[nsc.PROCESSED_DATE_UDF]
         except KeyError:
-            date = cutoff_date
+            fc.get(force=True)
+            try:
+                date = fc.udf[nsc.PROCESSED_DATE_UDF]
+            except KeyError:
+                date = cutoff_date
 
         if date <= cutoff_date:
             try:
                 del recent_run_cache[fc.id]
             except KeyError:
                 pass
+            fc.get(force=True)
             fc.udf[nsc.RECENTLY_COMPLETED_UDF] = False
             fc.put()
         else:
