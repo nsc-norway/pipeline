@@ -182,10 +182,13 @@ def get_projects(process):
     return [read_project(p) for p in lims_projects]
 
 
-def eta(process, done_cycles, total_cycles):
+def estimated_time_completion(process, rapid, done_cycles, total_cycles):
     if total_cycles > 0 and done_cycles < total_cycles:
         now = datetime.datetime.now()
-        time_per_cycle = 2160
+        if rapid:
+            time_per_cycle = 430
+        else:
+            time_per_cycle = 2160
         time_left = seconds=(total_cycles - done_cycles) * time_per_cycle
         est_arrival = now + datetime.timedelta(seconds=time_left)
         return " (ETA: " + est_arrival.strftime("%a %d/%m %H:%M") + ")"
@@ -196,7 +199,8 @@ def eta(process, done_cycles, total_cycles):
 
 def read_sequencing(process_name, process):
     url = proc_url(process.id)
-    flowcell_id = process.all_inputs()[0].location[0].name
+    flowcell = process.all_inputs()[0].location[0]
+    flowcell_id = flowcell.name
     if "NextSeq" in process_name:
         step = Step(nsc.lims, id=process.id)
         for lot in step.reagent_lots:
@@ -217,7 +221,13 @@ def read_sequencing(process_name, process):
         status = process.udf['Status']
         cycles_re = re.match(r"Cycle (\d+) of (\d+)", status)
         if cycles_re:
-            status += eta(process, int(cycles_re.group(1)), int(cycles_re.group(2)))
+            if 
+            status += estimated_time_completion(
+                    process, 
+                    "Rapid" in flowcell.type.name,
+                    int(cycles_re.group(1)), int(cycles_re.group(2))
+                    )
+
     except KeyError:
         status = "Pending/running"
     try:
