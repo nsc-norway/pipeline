@@ -444,6 +444,7 @@ def go_eval():
     processes = nsc.lims.get_processes(projectname=project_name, type=PROJECT_EVALUATION)
     if len(processes) > 0:
         process = processes[-1]
+        step = Step(nsc.lims, id=process.id)
         state = step.current_state.upper()
         if state == 'COMPLETED':
             return redirect(complete_url(process.id))
