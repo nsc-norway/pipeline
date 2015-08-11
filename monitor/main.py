@@ -221,7 +221,6 @@ def read_sequencing(process_name, process):
         status = process.udf['Status']
         cycles_re = re.match(r"Cycle (\d+) of (\d+)", status)
         if cycles_re:
-            if 
             status += estimated_time_completion(
                     process, 
                     "Rapid" in flowcell.type.name,
