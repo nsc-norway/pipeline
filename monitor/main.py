@@ -158,10 +158,10 @@ def is_sequencing_completed(proc, step):
         return False
 
 
-def proc_url(process_id):
+def proc_url(process_id, page='work-details'):
     global ui_server
     second_part_limsid = re.match(r"[\d]+-([\d]+)$", process_id).group(1)
-    return "{0}clarity/work-details/{1}".format(ui_server, second_part_limsid)
+    return "{0}clarity/{1}/{2}".format(ui_server, page, second_part_limsid)
 
 def complete_url(process_id):
     global ui_server
@@ -444,10 +444,15 @@ def go_eval():
     processes = nsc.lims.get_processes(projectname=project_name, type=PROJECT_EVALUATION)
     if len(processes) > 0:
         process = processes[-1]
-        if is_step_completed(Step(nsc.lims, id=process.id)):
+        state = step.current_state.upper()
+        if state == 'COMPLETED':
             return redirect(complete_url(process.id))
-        else:
+        elif state == 'RECORD DETAILS':
             return redirect(proc_url(process.id))
+        elif state == 'STEP SETUP':
+            return redirect(proc_url(process.id, "step-setup"))
+        else:
+            return Response("Project evaluation for " + project_name + " is in an unknown state", mimetype="text/plain")
     else:
         return Response("Sorry, project evaluation not found for " + project_name, mimetype="text/plain")
 
