@@ -451,7 +451,7 @@ def go_eval():
         elif state == 'RECORD DETAILS':
             return redirect(proc_url(process.id))
         elif state == 'STEP SETUP':
-            return redirect(proc_url(process.id, "step-setup"))
+            return redirect(proc_url(process.id, "work-setup"))
         else:
             return Response("Project evaluation for " + project_name + " is in an unknown state", mimetype="text/plain")
     else:
