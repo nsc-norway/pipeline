@@ -443,8 +443,11 @@ def go_eval():
     project_name = request.args.get('project_name')
     processes = nsc.lims.get_processes(projectname=project_name, type=PROJECT_EVALUATION)
     if len(processes) > 0:
-        url = complete_url(processes[-1].id)
-        return redirect(url)
+        process = processes[-1]
+        if is_step_completed(Step(nsc.lims, id=process.id)):
+            return redirect(complete_url(process.id))
+        else:
+            return redirect(proc_url(process.id))
     else:
         return Response("Sorry, project evaluation not found for " + project_name, mimetype="text/plain")
 
