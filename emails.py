@@ -1,7 +1,7 @@
 import sys, os
 
 from genologics.lims import *
-from common import nsc, stats, utilities, lane_info, sample
+from common import nsc, stats, utilities, lane_info, samples
 
 # Generate reports for emails based on demultiplexing stats
 
@@ -53,8 +53,8 @@ def main_lims(process_id):
     
     
     run_stats = get_run_stats(instrument, work_dir)
-    projects = sample.get_projects_by_process(process)
-    sample.add_stats(projects, run_stats)
+    projects = samples.get_projects_by_process(process)
+    samples.add_stats(projects, run_stats)
 
     lane_stats = lane_info.get_from_lims(process, instrument)
 
@@ -70,8 +70,8 @@ def main(work_dir):
     data_reads, index_reads = utilities.get_num_reads(work_dir)
 
     run_stats = get_run_stats(instrument, work_dir)
-    projects = sample.get_projects_by_process(process)
-    sample.add_stats(projects, run_stats)
+    projects = samples.get_projects_by_process(process)
+    samples.add_stats(projects, run_stats)
 
     make_reports(work_dir, run_id, projects, lane_stats)
 
