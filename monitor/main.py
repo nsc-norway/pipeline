@@ -142,20 +142,13 @@ def background_clear_monitor(completed):
         proc.put()
 
 
-def is_step_completed(proc, step):
+def is_step_completed(step):
     """Check if the state of this Step is completed.
 
     Does not refresh the step, this should be done by a batch request
     prior to calling is_step_completed.
     """
     return step.current_state.upper() == "COMPLETED"
-
-
-def is_sequencing_completed(proc, step):
-    try:
-        return proc.udf['Finish Date'] != None and is_step_completed(proc, step)
-    except KeyError:
-        return False
 
 
 def proc_url(process_id, page='work-details'):
@@ -382,13 +375,13 @@ def get_main():
     completed = []
     for p, step in zip(processes_with_data, steps):
         if p.type.name in seq_procs:
-            if is_sequencing_completed(p, step):
+            if is_step_completed(step):
                 completed.append(p)
             else:
                 seq_processes[p.type.name].append(p)
 
         else:
-            if is_step_completed(p, step):
+            if is_step_completed(step):
                 completed.append(p)
             else:
                 post_processes[p.type.name].append(p)
