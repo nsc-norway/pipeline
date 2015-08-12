@@ -61,7 +61,7 @@ def main(process_id):
     process = Process(nsc.lims, id=process_id)
     utilities.running(process, nsc.CJU_COPY_RUN)
     runid = process.udf[nsc.RUN_ID]
-    instrument = utilities.get_instrument_from_runid(runid)
+    instrument = utilities.get_instrument_by_runid(runid)
 
     source = utilities.get_udf(
             process, nsc.SOURCE_RUN_DIR_UDF,

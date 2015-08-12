@@ -17,31 +17,29 @@ def main(process_id):
             process, nsc.SOURCE_RUN_DIR_UDF,
             os.path.join(nsc.PRIMARY_STORAGE, run_id)
             )
+    input_dir = os.path.join(source_run_dir, "Data", "Intensities", "BaseCalls")
     dest_run_dir = utilities.get_udf(
             process, nsc.WORK_RUN_DIR_UDF,
             os.path.join(nsc.SECONDARY_STORAGE, run_id)
             )
     print "Reading from", source_run_dir, "writing to", dest_run_dir
 
-    sample_sheet_data = get_sample_sheet(process)
-    if sample_sheet_data:
-        with open(os.path.join(dest_run_dir, "SampleSheet.csv")) as f:
-            f.write(sample_sheet_data)
-        sample_sheet_path = utilities.logfile(nsc.CJU_DEMULTIPLEXING, "SampleSheet", "csv")
-        with open(sample_sheet_path) as f:
-            f.write(sample_sheet_data)
+    sample_sheet_content = utilities.get_sample_sheet(process)
+    if sample_sheet_content:
+        with open(os.path.join(dest_run_dir, "DemultiplexingSampleSheet.csv")) as f:
+            f.write(sample_sheet_content)
 
     utilities.running(process, nsc.CJU_DEMULTIPLEXING, "Demultiplexing")
 
     threads = utilities.get_udf(process, nsc.THREADS_UDF, 1)
-    default_no_lane_splitting = utilities.get_instrument_from_runid(run_id) == "nextseq"
+    default_no_lane_splitting = utilities.merged_lanes(run_id)
     no_lane_splitting = utilities.get_udf(
             process, nsc.NO_LANE_SPLITTING_UDF, default_no_lane_splitting
             )
     other_options = utilities.get_udf(process, nsc.OTHER_OPTIONS_UDF, None)
 
     if run_dmx(
-            process, n_threads, input_dir, output_dir, no_lane_splitting,
+            process, n_threads, dest_run_dir, input_dir, no_lane_splitting,
             other_options
             ):
         utilities.success_finish(process)
@@ -65,15 +63,19 @@ def get_thread_args(n_threads):
             '-p', str(processing), '-w', str(writing)]
 
 
-def run_dmx(process, n_threads, run_dir, input_dir, output_dir,
+def run_dmx(process, n_threads, run_dir, input_dir,
         no_lane_splitting, other_options):
-    """Run bcl2fastq2 via srun."""
+    """Run bcl2fastq2 via srun.
+    
+    Speciy run_dir as the destination directory and input_dir as the source
+    directory containing BCLs, <source_run>/Data/Intensities/BaseCalls."""
 
     args = ['--runfolder-dir', run_dir]
+    sample_sheet_path = os.path.join(run_dir, 'DemultiplexingSampleSheet.csv')
+    args += ['--sample-sheet', sample_sheet_path]
     if no_lane_splitting:
         args += ['--no-lane-splitting']
     args += ['--input-dir', input_dir]
-    args += ['--output-dir', output_dir]
     args += get_thread_args(n_threads)
     if other_options:
         args += re.split(" +", other_options)
@@ -89,18 +91,6 @@ def run_dmx(process, n_threads, run_dir, input_dir, output_dir,
 
     return rcode == 0
 
-
-def get_sample_sheet(process):
-    """Downloads the demultiplexing process's sample sheet and returns
-    the data."""
-
-    sample_sheet = None
-    for o in process.all_outputs(unique=True):
-        if o.output_type == "ResultFile" and o.name == "SampleSheet csv":
-            if len(o.files) == 1:
-                return o.files[0].download()
-    else:
-        return None
 
 
 if __name__ == "__main__":

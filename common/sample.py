@@ -40,7 +40,7 @@ class FastqFile(object):
     
     lane is a Lane object containing lane-specific stats.
 
-    read_num is the read index, 1 or 2 (second read is only available for paired
+    i_read is the read ordinal, 1 or 2 (second read is only available for paired
     end). Index reads are not considered.
 
     Path is the path to the fastq file relative to the "Unaligned"
@@ -53,7 +53,7 @@ class FastqFile(object):
 
     def __init__(self, lane, read_num, path, stats):
         self.lane = lane
-        self.read_num = read_num
+        self.i_read = i_read
         self.path = path
         self.stats = stats
         self.empty = False
@@ -74,6 +74,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes):
     to represent the undetermined index data. TODO : do that? """ 
 
     projects = {}
+    lanes = set()
     for sample_index, entry in enumerate(sample_sheet_data):
         project_name = entry['project']
         project = projects.get(project_name)
@@ -90,7 +91,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes):
                 break
 
         if not sample:
-            sample = Sample(entry['name'], [])
+            sample = Sample(entry['sampleid'], entry['samplename'], [])
             project.samples.append(sample)
 
         if merged_lanes:
@@ -101,7 +102,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes):
             except KeyError:
                 lane_id = 1
 
-        files = sample.files
+        lanes.add(lane_id)
 
         for i_read in xrange(1, num_reads+1):
             if merged_lanes:
@@ -115,10 +116,64 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes):
                         str(sample_index + 1), str(lane_id).zfill(3),
                         i_read)
 
-            files.append(qc.FastqFile(lane_id, i_read, path, None))
+            sample.files.append(FastqFile(lane_id, i_read, path, None))
 
-        return projects
-        
+        # Create an undetermined file for each lane, read seen
+        undetermined_project = Project("Undetermined", None, [], True)
+        undetermined_sample = Sample(None, "Undetermined")
+        undetermined_project.samples.append(undetermined_sample)
+        for lane in lanes:
+            for i_read in xrange(1, num_reads+1):
+                if merged_lanes:
+                    path = "Undetermined_S0_R{0}_001.fastq.gz".format(i_read)
+                else:
+                    path = "Undetermined_S0_L{0}_R{1}_001.fastq.gz".format(
+                            str(lane_id).zfill(3), i_read
+                            )
+                undetermined_sample.files.append(FastqFile(lane, i_read, path, None))
+
+        return [undetermined_project] + projects.values()
+
+
+def get_projects_by_process(process):
+    """Convenience function to get the proejects info (above) given only a LIMS
+    process."""
+
+    sample_sheet_content = utilities.get_sample_sheet(process)
+    run_id = process.udf[nsc.RUN_ID_UDF]
+    
+    merged_lanes = utilities.get_udf(process, nsc.NO_LANE_SPLITTING_UDF, False)
+    sample_sheet = parse_sample_sheet(sample_sheet_data)
+
+    reads = sample_sheet.get('reads')
+    if reads:
+        num_reads = len(reads)
+    else:
+        num_reads = 1
+        seq_proc = utilities.get_sequencing_process(process)
+        try:
+            if seq_proc.udf['Read 2 Cycles']:
+                num_reads = 2
+        except KeyError:
+            pass
+
+    return get_projects(run_id, sample_sheet['data'], num_reads, merged_lanes)
+
+
+
+def add_stats(projects, run_stats):
+    """Adds the stats from the stats module to the appropriate
+    FastqFile objects in the tree structure produced by the above 
+    function.
+    """
+
+    for project in projects:
+        for sample in project.samples:
+            for f in sample.files:
+                stats = run_stats.get(f.lane, sample.sample_id, f.read)
+                if stats:
+                    f.stats = stats
+
 
 
 ################# SAMPLE SHEET ##################

@@ -3,21 +3,18 @@ import sys, os
 from genologics.lims import *
 from common import nsc, stats, utilities, lane_info, sample
 
-# Generate reports for email based on demultiplexing stats
+# Generate reports for emails based on demultiplexing stats
 
-def make_reports(work_dir, run_id, project_stats, lane_stats):
-    qc_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls", "QualityControl")
-    delivery_dir = os.path.join(qc_dir, "Delivery")
-    for d in [qc_dir, delivery_dir]:
-        try:
-            os.mkdir(d)
-        except OSError:
-            pass # Assume it exists
-
-    projects = sample.get_projects(run_id
+def make_reports(work_dir, run_id, projects, lane_stats):
+    basecalls_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls")
+    delivery_dir = os.path.join(basecalls_dir, "Delivery")
+    try:
+        os.mkdir(delivery_dir)
+    except OSError:
+        pass # Assume it exists
 
     for project in projects:
-        if project.name != "Undetermined_indices":
+        if not project.is_undetermined:
             fname = delivery_dir + "/Email_for_" + project.name + ".xls"
             write_sample_info_table(fname, run_id, project)
 
@@ -25,18 +22,11 @@ def make_reports(work_dir, run_id, project_stats, lane_stats):
     write_internal_sample_table(fname, run_id, projects)
 
     fname = delivery_dir + "/Summary_email_for_NSC_" + run_id + ".xls"
+    instrument_type = utilities.get_instrument_by_runid(run_id)
     write_summary_email(fname, run_id, projects, instrument_type=='hiseq')
 
 
-def main_lims(process_id):
-    process = Process(nsc.lims, id=process_id)
-    run_id = process.udf[nsc.RUN_ID_UDF]
-    instument = utilities.get_instrument_from_runid(run_id)
-    work_dir = utilities.get_udf(
-            process, nsc.WORK_RUN_DIR_UDF,
-            os.path.join(nsc.SECONDARY_STORAGE, run_id)
-            )
-    
+def get_run_stats(instrument, work_dir):
     if instrument == "nextseq":
         run_stats = stats.get_bcl2fastq_stats(
                 os.path.join(work_dir, "Stats"),
@@ -49,12 +39,38 @@ def main_lims(process_id):
                 aggregate_lanes = False,
                 aggregate_reads = False
                 )
+    return run_stats
+
+
+def main_lims(process_id):
+    process = Process(nsc.lims, id=process_id)
+    run_id = process.udf[nsc.RUN_ID_UDF]
+    instument = utilities.get_instrument_from_runid(run_id)
+    work_dir = utilities.get_udf(
+            process, nsc.WORK_RUN_DIR_UDF,
+            os.path.join(nsc.SECONDARY_STORAGE, run_id)
+            )
     
-    projects = sample.get_projects(sample_sheet)
+    
+    run_stats = get_run_stats(instrument, work_dir)
+    projects = sample.get_projects_by_process(process)
+    sample.add_stats(projects, run_stats)
 
     lane_stats = lane_info.get_from_lims(process, instrument)
 
-    make_reports(work_dir, run_id, project_stats, lane_stats)
+    make_reports(work_dir, run_id, projects, lane_stats)
+
+
+def main(work_dir):
+    run_id = os.path.basename(os.path.realpath(run_dir))
+    instrument = get_instrument_by_runid(run_id)
+    
+    run_stats = get_run_stats(instrument, work_dir)
+    projects = sample.get_projects_by_process(process)
+    sample.add_stats(projects, run_stats)
+
+
+
 
 
 def write_sample_info_table(output_path, runid, project):
@@ -71,10 +87,7 @@ def write_sample_info_table(output_path, runid, project):
                 )
         for s,f in files:
             out.write(os.path.basename(f.path) + "\t")
-            if f.empty:
-                out.write("0\t")
-            else:
-                out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
+            out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
             out.write("fragments\n")
 
 
@@ -90,7 +103,7 @@ def write_internal_sample_table(output_path, runid, projects):
                 (s
                 for proj in projects
                 for s in proj.samples
-                if proj.name != "Undetermined_indices"),
+                if not proj.is_undetermined),
                 key=operator.attrgetter('name')
                 )
         for s in samples:

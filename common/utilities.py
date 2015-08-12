@@ -9,6 +9,7 @@ import subprocess
 import sys
 import datetime
 import traceback
+import re
 import requests
 import locale # Not needed in 2.7, see display_int
 from genologics.lims import *
@@ -44,6 +45,10 @@ def get_instrument_by_runid(run_id):
         return 'nextseq'
     else:
         return 'hiseq'
+
+
+def merged_lanes(run_id):
+    return get_instrument_by_runid(run_id) == "nextseq"
 
 
 def logfile(process, step, command, extension="txt"):
@@ -86,6 +91,19 @@ def get_index_sequence(artifact):
                         if attribute_tag.attrib['name'] == "Sequence":
                             return attribute_tag.attrib['value']
 
+        return None
+
+
+def get_sample_sheet(process):
+    """Downloads the demultiplexing process's sample sheet and returns
+    the data."""
+
+    sample_sheet = None
+    for o in process.all_outputs(unique=True):
+        if o.output_type == "ResultFile" and o.name == "SampleSheet csv":
+            if len(o.files) == 1:
+                return o.files[0].download()
+    else:
         return None
 
 
@@ -191,6 +209,25 @@ def get_sample_sheet_proj_name(seq_process, project):
     Will become really complex if we allow other than [A-Za-z0-9\-] in 
     sample sheet."""
     return project.name
+
+
+def get_num_reads(run_dir):
+    """Get the number of read passes. 1=single read, 2=paired end.
+    Also returns the number of index reads.
+
+    Returns a tuple: (number of data reads, number of index reads)
+    """
+    with open(os.path.join(run_dir, "RunInfo.xml")) as run_info:
+        lines = run_info.readlines()
+        data_reads = sum(1 for x in lines 
+                if re.match(r'\s<Read Number="1" NumCycles="(\d+)" IsIndexedRead="N" />\s$', l)
+                )
+        index_reads = sum(1 for x in lines 
+                if re.match(r'\s<Read Number="1" NumCycles="(\d+)" IsIndexedRead="Y" />\s$', l)
+                )
+        return data_reads, index_reads
+
+
 
 
 locale.setlocale(locale.LC_ALL, 'en_US')
