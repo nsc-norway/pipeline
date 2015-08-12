@@ -69,12 +69,12 @@ def main(work_dir):
 
     data_reads, index_reads = utilities.get_num_reads(work_dir)
 
+    sample_sheet_path = os.path.join(work_dir, "DemultiplexingSampleSheet.csv")
     run_stats = get_run_stats(instrument, work_dir)
-    projects = samples.get_projects_by_process(process)
+    projects = samples.get_projects_by_files(work_dir, sample_sheet_path)
     samples.add_stats(projects, run_stats)
 
     make_reports(work_dir, run_id, projects, lane_stats)
-
 
 
 def write_sample_info_table(output_path, runid, project):
