@@ -19,11 +19,11 @@ def make_reports(work_dir, run_id, projects, lane_stats):
             write_sample_info_table(fname, run_id, project)
 
     fname = delivery_dir + "/Table_for_GA_runs_" + run_id + ".xls"
-    write_internal_sample_table(fname, run_id, projects)
+    write_internal_sample_table(fname, run_id, projects, lane_stats)
 
     fname = delivery_dir + "/Summary_email_for_NSC_" + run_id + ".xls"
     instrument_type = utilities.get_instrument_by_runid(run_id)
-    write_summary_email(fname, run_id, projects, instrument_type=='hiseq')
+    write_summary_email(fname, run_id, projects, instrument_type=='hiseq', lane_stats)
 
 
 def get_run_stats(instrument, work_dir):
@@ -65,11 +65,15 @@ def main(work_dir):
     run_id = os.path.basename(os.path.realpath(run_dir))
     instrument = get_instrument_by_runid(run_id)
     
+    lane_stats = lane_info.get_from_files(work_dir, instrument)
+
+    data_reads, index_reads = utilities.get_num_reads(work_dir)
+
     run_stats = get_run_stats(instrument, work_dir)
     projects = sample.get_projects_by_process(process)
     sample.add_stats(projects, run_stats)
 
-
+    make_reports(work_dir, run_id, projects, lane_stats)
 
 
 
@@ -83,7 +87,7 @@ def write_sample_info_table(output_path, runid, project):
 
         files = sorted(
                 ((s,fi) for s in project.samples for fi in s.files),
-                key=lambda (s,f): (f.lane.id, s.name, f.read_num)
+                key=lambda (s,f): (f.lane, s.name, f.read_num)
                 )
         for s,f in files:
             out.write(os.path.basename(f.path) + "\t")
@@ -92,7 +96,7 @@ def write_sample_info_table(output_path, runid, project):
 
 
 
-def write_internal_sample_table(output_path, runid, projects):
+def write_internal_sample_table(output_path, runid, projects, lane_stats):
     with open(output_path, 'w') as out:
         out.write("--------------------------------\n")
         out.write("Table for GA_runs.xlsx\n")
@@ -110,8 +114,9 @@ def write_internal_sample_table(output_path, runid, projects):
             for f in s.files:
                 if f.read_num == 1:
                     out.write(s.name + "\t")
-                    out.write(utilities.display_int(f.lane.raw_cluster_density) + "\t")
-                    out.write(utilities.display_int(f.lane.pf_cluster_density) + "\t")
+                    lane = lane_stats[f.lane]
+                    out.write(utilities.display_int(lane[0]) + "\t")
+                    out.write(utilities.display_int(lane[1]) + "\t")
                     if f.empty:
                         out.write("%4.2f" % (0,) + "%\t")
                         out.write("0\t")
@@ -125,7 +130,7 @@ def write_internal_sample_table(output_path, runid, projects):
 
 
 
-def write_summary_email(output_path, runid, projects, print_lane_number):
+def write_summary_email(output_path, runid, projects, print_lane_number, lane_stats):
     with open(output_path, 'w') as out:
         summary_email_head = """\
 --------------------------------							
@@ -151,14 +156,14 @@ Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2
         out.write(summary_email_head)
         # assumes 1 project per lane, and undetermined
         # Dict: lane ID => (lane object, project object)
-        lane_proj = dict((f.lane.id, (f.lane, proj)) for proj in projects
-                for s in proj.samples for f in s.files if proj.name != "Undetermined_indices")
+        lane_proj = dict((f.lane, proj) for proj in projects
+                for s in proj.samples for f in s.files if not proj.is_undetermined)
         # lane ID => file object (will be the last one)
-        lane_undetermined = dict((f.lane.id, f) for proj in projects
-                for s in proj.samples for f in s.files if proj.name == "Undetermined_indices")
+        lane_undetermined = dict((f.lane, f) for proj in projects
+                for s in proj.samples for f in s.files if not proj.is_undetermined)
 
         for l in sorted(lane_proj.keys()):
-            lane, proj = lane_proj[l]
+            proj = lane_proj[l]
             try:
                 undetermined_file = lane_undetermined[l]
             except KeyError:
@@ -171,11 +176,12 @@ Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2
                     for proj in projects
                     for s in proj.samples
                     for f in s.files
-                    if f.lane.id == l and f.read_num == 1 and not f.empty)
+                    if f.lane == l and f.read_num == 1 and not f.empty)
             out.write(utilities.display_int(cluster_no) + '\t')
-            out.write("%4.2f" % (lane.pf_ratio) + "\t")
-            out.write(utilities.display_int(lane.raw_cluster_density) + '\t')
-            out.write(utilities.display_int(lane.pf_cluster_density) + '\t')
+            lane = lane_stats[l]
+            out.write("%4.2f" % (lane[2]) + "\t")
+            out.write(utilities.display_int(lane[0]) + '\t')
+            out.write(utilities.display_int(lane[1]) + '\t')
             if undetermined_file and not undetermined_file.empty:
                 if undetermined_file.stats.has_key('% of Raw Clusters Per Lane'):
                     out.write("%4.2f" % (undetermined_file.stats['% of Raw Clusters Per Lane'],) + "%\t")

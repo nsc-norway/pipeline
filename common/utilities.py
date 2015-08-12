@@ -12,6 +12,8 @@ import traceback
 import re
 import requests
 import locale # Not needed in 2.7, see display_int
+from xml.etree import ElementTree
+
 from genologics.lims import *
 import nsc
 
@@ -212,20 +214,24 @@ def get_sample_sheet_proj_name(seq_process, project):
 
 
 def get_num_reads(run_dir):
-    """Get the number of read passes. 1=single read, 2=paired end.
+    """Get the number of read passes from the RunInfo.xml file.     
+
+    1=single read, 2=paired end.
     Also returns the number of index reads.
 
     Returns a tuple: (number of data reads, number of index reads)
     """
-    with open(os.path.join(run_dir, "RunInfo.xml")) as run_info:
-        lines = run_info.readlines()
-        data_reads = sum(1 for x in lines 
-                if re.match(r'\s<Read Number="1" NumCycles="(\d+)" IsIndexedRead="N" />\s$', l)
-                )
-        index_reads = sum(1 for x in lines 
-                if re.match(r'\s<Read Number="1" NumCycles="(\d+)" IsIndexedRead="Y" />\s$', l)
-                )
-        return data_reads, index_reads
+
+    run_info = ElementTree.parse(os.path.join(run_dir, "RunInfo.xml")).getroot()
+    reads = run_info.find("Run").find("Reads")
+    n_data, n_index = 0, 0
+    for read in reads.findall("Read"):
+        if read.attrib['IsIndexedRead'] == 'Y':
+            n_index += 1
+        else:
+            n_data += 1
+
+    return n_data, n_index
 
 
 

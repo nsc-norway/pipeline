@@ -145,17 +145,11 @@ def get_projects_by_process(process):
     merged_lanes = utilities.get_udf(process, nsc.NO_LANE_SPLITTING_UDF, False)
     sample_sheet = parse_sample_sheet(sample_sheet_data)
 
-    reads = sample_sheet.get('reads')
-    if reads:
-        num_reads = len(reads)
-    else:
-        num_reads = 1
-        seq_proc = utilities.get_sequencing_process(process)
-        try:
-            if seq_proc.udf['Read 2 Cycles']:
-                num_reads = 2
-        except KeyError:
-            pass
+    run_dir = utilities.get_udf(
+            process, nsc.WORK_RUN_DIR_UDF,
+            os.path.join(nsc.SECONDARY_STORAGE, run_id)
+            )
+    num_reads, index_reads = utilities.get_num_reads(run_dir)
 
     return get_projects(run_id, sample_sheet['data'], num_reads, merged_lanes)
 
