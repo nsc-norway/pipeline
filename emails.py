@@ -59,6 +59,7 @@ def main_lims(process_id):
     run_stats = get_run_stats(instrument, work_dir)
     projects = samples.get_projects_by_process(process)
     samples.add_stats(projects, run_stats)
+    samples.flag_empty_files(projects, work_dir)
 
     lane_stats = lane_info.get_from_lims(process, instrument)
 
@@ -77,6 +78,7 @@ def main(work_dir):
     run_stats = get_run_stats(instrument, work_dir)
     projects = samples.get_projects_by_files(work_dir, sample_sheet_path)
     samples.add_stats(projects, run_stats)
+    samples.flag_empty_files(projects, work_dir)
 
     make_reports(work_dir, run_id, projects, lane_stats)
 

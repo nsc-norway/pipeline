@@ -193,6 +193,14 @@ def add_stats(projects, run_stats):
                 if stats:
                     f.stats = stats
 
+def flag_empty_files(projects, run_dir):
+    basecalls_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
+    for p in projects:
+        for s in p.samples:
+            for f in s.files:
+                full_path = os.path.join(basecalls_dir, f.path)
+                f.empty = not os.path.exists(full_path)
+
 
 
 ################# SAMPLE SHEET ##################

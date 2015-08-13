@@ -32,6 +32,8 @@ OTHER_OPTIONS_UDF = "Other options for bcl2fastq"
 PROCESS_UNDETERMINED_UDF = "Process undetermined indexes"
 
 # Other UDFs 
+# On process types
+BCL2FASTQ_VERSION_UDF = "bcl2fastq version"
 # On Analyte
 LANE_UNDETERMINED_UDF = "NSC % Undetermined Indices (PF)"
 # On Project

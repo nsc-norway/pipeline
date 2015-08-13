@@ -3,13 +3,17 @@ import sys, os
 from genologics.lims import *
 from common import nsc, stats, utilities, lane_info, samples
 
+
+template_dir = os.path.dirname(os.path.dirname(__file__)) + "/template"
+
+
 # Generate reports after FastQC has completed
 
 
 def main_lims(process_id):
     process = Process(nsc.lims, id=process_id)
     run_id = process.udf[nsc.RUN_ID_UDF]
-    instument = utilities.get_instrument_from_runid(run_id)
+    instument = utilities.get_instrument_by_runid(run_id)
     work_dir = utilities.get_udf(
             process, nsc.WORK_RUN_DIR_UDF,
             os.path.join(nsc.SECONDARY_STORAGE, run_id)
@@ -19,23 +23,22 @@ def main_lims(process_id):
     projects = samples.get_projects_by_process(process)
     samples.add_stats(projects, run_stats)
 
-    lane_stats = lane_info.get_from_lims(process, instrument)
+    bcl2fastq_version = utilities.get_udf(process, nsc.BCL2FASTQ_VERSION_UDF, None)
 
-    make_reports(work_dir, run_id, projects, lane_stats)
+    make_reports(work_dir, run_id, projects, lane_stats, bcl2fastq_version)
 
 
 def main(work_dir):
     run_id = os.path.basename(os.path.realpath(run_dir))
     instrument = get_instrument_by_runid(run_id)
     
-    lane_stats = lane_info.get_from_files(work_dir, instrument)
-
     data_reads, index_reads = utilities.get_num_reads(work_dir)
 
     sample_sheet_path = os.path.join(work_dir, "DemultiplexingSampleSheet.csv")
     run_stats = get_run_stats(instrument, work_dir)
     projects = samples.get_projects_by_files(work_dir, sample_sheet_path)
     samples.add_stats(projects, run_stats)
+    samples.flag_empty_files(projects, work_dir)
 
     make_reports(work_dir, run_id, projects, lane_stats)
 
@@ -56,23 +59,43 @@ def get_run_stats(instrument, work_dir):
     return run_stats
 
 
-def make_reports(work_dir, run_id, projects, lane_stats):
+def make_reports(work_dir, run_id, projects, lane_stats, bcl2fastq_version=None):
     basecalls_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls")
-    qc_dir = os.path.join(basecalls_dir, "QualityControl")
+    quality_control_dir = os.path.join(basecalls_dir, "QualityControl")
     os.umask(007)
 
-    for project in projects:
-        if not project.is_undetermined:
-            fname = delivery_dir + "/Email_for_" + project.name + ".xls"
-            write_sample_info_table(fname, run_id, project)
+    software_versions = [("RTA", get_rta_version(work_dir))]
+    if bcl2fastq_version:
+        software_versions += [("bcl2fastq", bcl2fastq_version)]
 
-    fname = delivery_dir + "/Table_for_GA_runs_" + run_id + ".xls"
-    write_internal_sample_table(fname, run_id, projects, lane_stats)
+    # Generate PDF reports in parallel
+    # template_dir defined at top of file
+    template = open(template_dir + "/reportTemplate_indLane_v4.tex").read()
+    arg_pack = [basecalls_dir, quality_control_dir, run_id, software_versions, template]
+    pool = Pool(int(threads))
+    # Run one task for each fastq file, giving a sample reference and FastqFile as argument 
+    # as well as the ones given above. Debug note: change pool.map to map for better errors.
+    pool.map(
+            generate_report_for_customer,
+            [tuple(arg_pack + [p,s,f]) 
+                for p in projects for s in p.samples for f in s.files
+                if not f.empty
+                ]
+            )
+    
 
-    fname = delivery_dir + "/Summary_email_for_NSC_" + run_id + ".xls"
-    instrument_type = utilities.get_instrument_by_runid(run_id)
-    write_summary_email(fname, run_id, projects, instrument_type=='hiseq', lane_stats)
+def get_rta_version(run_dir):
+    try:
+        xmltree = ElementTree.parse(os.path.join(run_dir, 'RunParameters.xml'))
+    except IOError:
+        xmltree = ElementTree.parse(os.path.join(run_dir, 'runParameters.xml'))
 
+    run_parameters = xmltree.getroot()
+    rta_ver = run_parameters.find("RTAVersion").text
+    return rta_ver
+
+
+# PDF GENERATION CODE
 
 def replace_multiple(replacedict, text):
     """Replace each key in replacedict found in string with the
@@ -92,10 +115,10 @@ def tex_escape(s):
 
 def qc_pdf_name(run_id, fastq):
     report_root_name = re.sub(".fastq.gz$", ".qc", os.path.basename(fastq.path))
-    if fastq.lane.is_merged:
+    if fastq.lane == "X":
         return "{0}.{1}.pdf".format(run_id, report_root_name)
     else:
-        return "{0}.{1}.{2}.pdf".format(run_id, fastq.lane.id, report_root_name)
+        return "{0}.{1}.{2}.pdf".format(run_id, fastq.lane, report_root_name)
 
 
 def generate_report_for_customer(args):
@@ -137,6 +160,8 @@ def generate_report_for_customer(args):
     os.rename(pdf_dir + "/" + orig_pdfname, quality_control_dir + "/" + pdfname)
 
 
+
+# HTML GENERATION
 def extract_format_overrepresented(fqc_report, fastqfile, index):
     """Processes the fastqc_report.html file for a single fastq file and extracts the
     overrepresented sequences.

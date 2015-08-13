@@ -42,6 +42,7 @@ def main(process_id):
             process, n_threads, dest_run_dir, input_dir, no_lane_splitting,
             other_options
             ):
+
         utilities.success_finish(process)
         return True
     else:
@@ -87,6 +88,13 @@ def run_dmx(process, n_threads, run_dir, input_dir,
             cpus_per_task=n_threads, mem="8G"
             )
     utilities.upload_file(process, nsc.BCL2FASTQ_LOG, log_path)
+    # Get the bcl2fastq version
+    log = open(log_path)
+    for i in xrange(3):
+        l = next(log)
+        if l.startswith("bcl2fastq v"):
+            process.udf[nsc.BCL2FASTQ_VERSION_UDF] = l.split(" ")[1].strip("\n")
+            # No put(), will put later when calling success_finish() or fail()
 
     return rcode == 0
 
