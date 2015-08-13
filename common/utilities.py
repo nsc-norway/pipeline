@@ -235,7 +235,6 @@ def get_num_reads(run_dir):
 
 
 
-
 locale.setlocale(locale.LC_ALL, 'en_US')
 def display_int(val):
     """Adds thousands separators. To be replaced with "{:,}".format(val) when 

@@ -5,9 +5,13 @@ from common import nsc, stats, utilities, lane_info, samples
 
 # Generate reports for emails based on demultiplexing stats
 
+
+# This has a dependency on LIMS because it preferentially gets the 
+
 def make_reports(work_dir, run_id, projects, lane_stats):
     basecalls_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls")
     delivery_dir = os.path.join(basecalls_dir, "Delivery")
+    os.umask(007)
     try:
         os.mkdir(delivery_dir)
     except OSError:

@@ -43,12 +43,14 @@ PROCESSED_DATE_UDF = "Processing completed date"
 
 # Output files
 BCL2FASTQ_LOG = "bcl2fastq log"
+FASTQC_LOG = "fastqc log"
 FASTQ_OUTPUT = "{sample_name}"
 
 # Values of the CURRENT_JOB_UDF
 CJU_COPY_RUN = "Copy run"
 CJU_DEMULTIPLEXING = "Demultiplexing"
 CJU_SAVING_STATS = "Saving stats"
+CJU_FASTQC = "FastQC"
 
 
 # Sequencing processes

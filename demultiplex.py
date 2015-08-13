@@ -32,7 +32,7 @@ def main(process_id):
     utilities.running(process, nsc.CJU_DEMULTIPLEXING, "Demultiplexing")
 
     threads = utilities.get_udf(process, nsc.THREADS_UDF, 1)
-    default_no_lane_splitting = utilities.merged_lanes(run_id)
+    default_no_lane_splitting = utilities.get_instrument_by_runid(run_id) == "nextseq"
     no_lane_splitting = utilities.get_udf(
             process, nsc.NO_LANE_SPLITTING_UDF, default_no_lane_splitting
             )
@@ -81,12 +81,11 @@ def run_dmx(process, n_threads, run_dir, input_dir,
         args += re.split(" +", other_options)
 
     log_path = utilities.logfile(process, nsc.CJU_DEMULTIPLEXING, "bcl2fastq2")
-    with open(log_path, "w") as log:
-        jobname = process.id + ".bcl2fastq2"
-        rcode = slurm.srun_command(
-                args, jobname, time="1-0", logfile=log_path,
-                cpus_per_task=n_threads, mem="8G"
-                )
+    jobname = process.id + ".bcl2fastq2"
+    rcode = slurm.srun_command(
+            args, jobname, time="1-0", logfile=log_path,
+            cpus_per_task=n_threads, mem="8G"
+            )
     utilities.upload_file(process, nsc.BCL2FASTQ_LOG, log_path)
 
     return rcode == 0

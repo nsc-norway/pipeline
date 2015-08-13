@@ -1,5 +1,6 @@
 import os
 import glob
+import re
 
 from genologics.lims import *
 
@@ -247,7 +248,7 @@ def get_project_dir(run_id, project_name):
     if utilities.get_instrument_by_runid(run_id) == 'hiseq':
         return get_hiseq_project_dir(run_id, project_name)
     else:
-        return get_project_dir(run_id, project_name)
+        return get_ne_mi_project_dir(run_id, project_name)
 
 def get_hiseq_project_dir(run_id, project_name):
     """Gets project directory name, prefixed by date and flowcell index"""
@@ -256,10 +257,16 @@ def get_hiseq_project_dir(run_id, project_name):
     return project_prefix + "Project_" + project_name
 
 
-def get_project_dir(run_id, project_name):
+def get_ne_mi_project_dir(run_id, project_name):
     """Gets project directory name for mi and nextseq."""
     date_machine = re.match(r"([\d]+_[^_]+)_", run_id)
     project_dir = date_machine.group(1) + ".Project_" + project_name
     return project_dir
 
+def get_fastqc_dir(qc_dir, project, sample, fastqfile):
+    """Get the directory created by fastqc."""
+    
+    fq_name = os.path.basename(fastqfile.path)
+    fqc_name = re.sub(r".fastq.gz$", "_fastqc", fq_name)
+    return os.path.join(qc_dir, project.name, sample.name, fqc_name)
 
