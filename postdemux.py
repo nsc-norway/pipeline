@@ -35,48 +35,6 @@ def main(todo):
 
 
 
-#### RENAME PROJECT, FILES ####
-def move_files(instrument, runid, output_dir, project_name, sample_sheet_data, reads):
-    if instrument == 'hiseq':
-        proj_dir = samplesheet.get_project_dir(runid, project_name)
-    else:
-        proj_dir = samplesheet.get_project_dir(runid, project_name)
-
-
-    project_path = output_dir + "/" + proj_dir
-    
-    params = []
-    for i, row in enumerate(sample_sheet_data):
-        for r in reads:
-            par = dict(row)
-            par['samplename'] = par['samplename']
-
-            par['read'] = r
-            par['base'] = output_dir
-            par['index'] = i+1
-            par['project'] = project_name
-            par['project_path'] = project_path
-            params.append(par)
-
-    with_id_subdir = not all(p['sampleid'] == p['samplename'] for p in params)
-    for p in params:
-        f = "{samplename}_S{index}_R{read}_001.fastq.gz".format( **p)
-
-        if with_id_subdir:
-            input_path = "{base}/{project}/{sampleid}/{filename}".format(filename=f, **p)
-        else:
-            input_path = "{base}/{project}/{filename}".format(filename=f, **p)
-
-        output_path = os.path.join(project_path, f)
-        print "in", input_path, "out", output_path
-        os.rename(input_path, output_path)
-
-    for dpath in set("{base}/{project}/{sampleid}".format(**p) for p in params):
-        os.rmdir(dpath)
-    for dpath in set("{base}/{project}".format(**p) for p in params):
-        os.rmdir(dpath)
-
-
 
 
 

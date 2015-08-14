@@ -271,6 +271,7 @@ def get_ne_mi_project_dir(run_id, project_name):
     project_dir = date_machine.group(1) + ".Project_" + project_name
     return project_dir
 
+
 def get_fastqc_dir(project, sample, fastqfile):
     """Get the directory in which the fastqc results are stored
     (after moving it)."""
