@@ -1,4 +1,7 @@
-import sys, os
+
+import sys
+import os
+import shutil
 
 from genologics.lims import *
 from common import nsc, stats, utilities, lane_info, samples
@@ -9,6 +12,9 @@ template_dir = os.path.dirname(os.path.dirname(__file__)) + "/template"
 
 # Generate reports after FastQC has completed
 
+# This task requires an intermediate amount of CPU resources. Will be 
+# executed on the LIMS server, where we can make sure to have the necessary
+# software installed.
 
 def main_lims(process_id):
     process = Process(nsc.lims, id=process_id)
@@ -73,6 +79,14 @@ def make_reports(work_dir, run_id, projects, lane_stats, bcl2fastq_version=None)
     template = open(template_dir + "/reportTemplate_indLane_v4.tex").read()
     arg_pack = [basecalls_dir, quality_control_dir, run_id, software_versions, template]
     pool = Pool(int(threads))
+
+    # PDF directory (all PDF files generated here)
+    pdf_dir = os.path.join(quality_control_dir, "pdf")
+    try:
+        os.mkdir(pdf_dir)
+    except OSError:
+        pass
+
     # Run one task for each fastq file, giving a sample reference and FastqFile as argument 
     # as well as the ones given above. Debug note: change pool.map to map for better errors.
     pool.map(
@@ -82,6 +96,8 @@ def make_reports(work_dir, run_id, projects, lane_stats, bcl2fastq_version=None)
                 if not f.empty
                 ]
             )
+
+    shutil.rmtree(pdf_dir)
     
 
 def get_rta_version(run_dir):
@@ -115,7 +131,7 @@ def tex_escape(s):
 
 def qc_pdf_name(run_id, fastq):
     report_root_name = re.sub(".fastq.gz$", ".qc", os.path.basename(fastq.path))
-    if fastq.lane == "X":
+    if fastq.lane == "X": # Merged lanes
         return "{0}.{1}.pdf".format(run_id, report_root_name)
     else:
         return "{0}.{1}.{2}.pdf".format(run_id, fastq.lane, report_root_name)
@@ -127,13 +143,9 @@ def generate_report_for_customer(args):
     The last argument, sample_fastq, is a tuple containing a 
     Sample object and a FastqFile object"""
     fastq_dir, quality_control_dir, run_id, software_versions, template,\
-            sample, fastq = args
-    sample_dir = os.path.join(quality_control_dir, "Sample_" + sample.name)
-    pdf_dir = os.path.join(sample_dir, "pdf")
-    try:
-        os.mkdir(pdf_dir)
-    except OSError:
-        pass
+            project, sample, fastq = args
+
+    pdf_dir = os.path.join(quality_control_dir, "pdf")
 
     replacements = {
         '__RunName__': tex_escape(run_id),
@@ -142,7 +154,7 @@ def generate_report_for_customer(args):
         '__SampleName__': tex_escape(sample.name),
         '__ReadNum__': str(fastq.read_num),
         '__TotalN__': utilities.display_int(fastq.stats['# Reads PF']),
-        '__Folder__': '../' + fastqc_dir(fastq.path),
+        '__Folder__': '../' + samples.get_fastqc_dir(project, sample, fastq),
         '__TemplateDir__': template_dir
             }
 
@@ -156,8 +168,7 @@ def generate_report_for_customer(args):
 
     orig_pdfname = rootname + ".pdf"
     pdfname = qc_pdf_name(run_id, fastq)
-    shutil.copyfile(pdf_dir + "/" + orig_pdfname, os.path.join(fastq_dir, os.path.dirname(fastq.path), pdfname))
-    os.rename(pdf_dir + "/" + orig_pdfname, quality_control_dir + "/" + pdfname)
+    os.rename(pdf_dir + "/" + orig_pdfname, os.path.join(fastq_dir, os.path.dirname(fastq.path), pdfname))
 
 
 
@@ -195,7 +206,7 @@ def extract_format_overrepresented(fqc_report, fastqfile, index):
 
 
 
-def generate_internal_html_report(quality_control_dir, samples):
+def generate_internal_html_report(quality_control_dir, projects):
     # Generate the NSC QC report HTML file
     top_file = open(template_dir + "/QC_NSC_report_template.html")
     overrepresented_seq_buffer = ""
@@ -207,13 +218,12 @@ def generate_internal_html_report(quality_control_dir, samples):
     
         i = 0
         samples_files = sorted(
-                ((s,fi) for s in samples for fi in s.files),
-                key=lambda (s,f): (f.lane.id, s.name, f.read_num)
+                ((p, s,fi) for p in projects for s in p.samples for fi in s.files),
+                key=lambda (s,f): (f.lane, s.name, f.read_num)
                 )
-        for s, fq in samples_files:
-            subdir = "Sample_" + s.name
+        for p, s, fq in samples_files:
             fq_name = os.path.basename(fq.path)
-            fqc_dir = fastqc_dir(fq.path)
+            fqc_dir = samples.get_fastqc_dir(p, s, fq)
 
             cell1 = "<tr><td align=\"left\"><b>{fileName}<br/><br/>SampleName: {sampleName}<br/>Read Num: {nReads}</b></td>\n"
             if fq.empty:
@@ -230,14 +240,14 @@ def generate_internal_html_report(quality_control_dir, samples):
                 if fq.empty:
                     out_file.write("<td></td>\n")
                 else:
-                    cell = "<td><a href=\"{subDir}/{fastqcDir}/Images/{image}\"><img src=\"{subDir}/{fastqcDir}/Images/{image}\" class=\"graph\" align=\"center\"/></a></td>\n"
-                    out_file.write(cell.format(subDir=subdir, fastqcDir=fqc_dir, image=img))
+                    cell = "<td><a href=\"{fastqcDir}/Images/{image}\"><img src=\"{fastqcDir}/Images/{image}\" class=\"graph\" align=\"center\"/></a></td>\n"
+                    out_file.write(cell.format(fastqcDir=fqc_dir, image=img))
 
             
-            report_path = os.path.join(quality_control_dir, subdir, fqc_dir, "fastqc_report.html")
+            report_path = os.path.join(quality_control_dir, fqc_dir, "fastqc_report.html")
             if not fq.empty:
                 celln = "<td align=\"center\"><b><a href=\"#M{index}\">Overrepresented sequences</a></b></td>\n</tr>\n";
-                out_file.write(celln.format(subDir=subdir, fileName=fq_name, index=i))
+                out_file.write(celln.format(index=i))
                 overrepresented_seq_buffer += extract_format_overrepresented(report_path, fq_name, "M" + str(i))
             else:
                 out_file.write("<td></td>\n</tr>\n")

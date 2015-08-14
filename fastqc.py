@@ -70,7 +70,8 @@ def fastqc_dir(basecalls_dir, fastq_path):
 
 
 def move_fastqc_results(qc_dir, basecalls_dir, projects):
-    """Organises the fastqc results into a more manageable structure. Deletes zip files."""
+    """Organises the fastqc results into a more manageable structure. Deletes zip files.
+    Gets the desired name of the fastqc dir from the "samples" module."""
 
     for project in projects:
         # Create the project dir
@@ -91,7 +92,7 @@ def move_fastqc_results(qc_dir, basecalls_dir, projects):
                 if os.path.exists(basecalls_dir, f.path):
                     original_fqc_dir = fastqc_dir(basecalls_dir, f.path)
                     os.remove(original_fqc_dir + ".zip")
-                    fqc_dir = samples.get_fastq_dir(qc_dir, project, sample, f)
+                    fqc_dir = os.path.join(qc_dir, samples.get_fastqc_dir(project, sample, f))
                     if os.path.exists(fqc_dir):
                         shutil.rmtree(fqc_dir)
                     os.rename(original_fqc_dir, fqc_dir)

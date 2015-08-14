@@ -271,10 +271,11 @@ def get_ne_mi_project_dir(run_id, project_name):
     project_dir = date_machine.group(1) + ".Project_" + project_name
     return project_dir
 
-def get_fastqc_dir(qc_dir, project, sample, fastqfile):
-    """Get the directory created by fastqc."""
-    
+def get_fastqc_dir(project, sample, fastqfile):
+    """Get the directory in which the fastqc results are stored
+    (after moving it)."""
+
     fq_name = os.path.basename(fastqfile.path)
     fqc_name = re.sub(r".fastq.gz$", "_fastqc", fq_name)
-    return os.path.join(qc_dir, project.name, sample.name, fqc_name)
+    return os.path.join(project.name, sample.name, fqc_name)
 
