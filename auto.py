@@ -20,13 +20,10 @@
 import sys
 import time
 import logging
-from argparse import ArgumentParser
 from collections import defaultdict
 
 # scilife genologics library
 from genologics.lims import *
-
-#from genologics.epp import EppLogger
 
 # Local
 from common import nsc, utilities
