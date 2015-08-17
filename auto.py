@@ -6,10 +6,16 @@
 # This script monitors the LIMS via the REST API and starts processing 
 # steps. Its main purpose is to start other jobs. It only updates a small 
 # number of user defined fields (UDFs) in the API to manage the processing 
-# status. 
+# status. This system doesn't have any storage system of its own -- all
+# runtime data are kept in the LIMS.
 
-# This system doesn't have any storage system of its own -- all runtime
-# data are kept in the LIMS.
+# The new version performs these primary tasks:
+# * Checks the queue of the demultiplexing/QC step, and starts a task
+#   for each full flowcell which is present, which also has the automation
+#   flag on the sequencing process, and the sequencing is finsihed.
+# * For each demultiplexing/QC step with the automation flag set, checks 
+#   whether the 
+
 
 import sys
 import time
@@ -26,52 +32,6 @@ from genologics.lims import *
 from common import nsc, utilities
 
 nsc.lims.check_version()
-
-
-def mark_flowcell_projects(fc):
-    """Sets a UDF for automatic processing on the flow cell Container.
-        The "Automation lane groups" UDF on the container is set to a 
-        comma separated list of the LIMSIDs of all pools in a single 
-        project"""
-
-    logging.debug("Processing flowcell " + fc.id)
-
-    project_lanes = defaultdict(list)
-    for lane,pool in fc.placements.items():
-        project = None
-
-        # Check that all samples in the pool (lane) are from the same
-        # project
-        for sample in pool.samples:
-            if not project:
-                project = sample.project
-            else:
-                if project.id != sample.project.id:
-                    logging.error("Pool has samples from multiple projects. Skipping pool.")
-                    project = None
-                    break
-            
-        if project:
-            project_lanes[project.id].append(lane)
-
-    logging.debug("Marking %d groups of lanes as projects." % len(project_lanes))
-    group_strings = []
-    for project, lanes in project_lanes.items():
-        lane_group = ",".join(sorted(lanes))
-        group_strings.append(lane_group)
-
-    lane_group_list = "|".join(group_strings)
-    fc.udf[nsc.AUTO_FLOWCELL_UDF] = lane_group_list
-    fc.put()
-    
-
-
-def set_qc_flags(process):
-    for ana in process.all_inputs(unique=True):
-        ana.get()
-        ana.qc_flag = "PASSED"
-        ana.put()
-
 
 
 def init_automation(lims, instrument, process):
@@ -126,54 +86,11 @@ def check_new_processes(lims):
 
 
 
-def get_input_groups(queue):
-    """Get groups of inputs for automated jobs.
-
-    Flow cells which are set up for automation include a UDF with information 
-    about which lanes should be processed together. The basic data items are 
-    the positions of the lanes on the flow cell as given in the LIMS. The positions
-    in a group are separated by commas. The groups are separated by pipe characters.
-
-    Example: 1:1,2:1,3:1|4:1,5:1|6:1,7:1,8:1
-
-    The groups correspond to proects.
-    """
-
-    # flowcell_info value tuples (flowcell, [analytes])
-    flowcell_info = {}
-
-    for ana in queue:
-        fc = ana.location[0]
-        if not flowcell_info.has_key(fc.id):
-            flowcell_info[fc.id] = (fc, [], [])
-        flowcell_info[fc.id][1].append(ana)
-
-    groups = []
-
-    for fcid,info in flowcell_info.items():
-        fc = info[0]
-        try:
-            lanes_auto = fc.udf[nsc.AUTO_FLOWCELL_UDF]
-        except KeyError:
-            continue
-
-        for group in lanes_auto.split("|"):
-            have_lanes = [a.location[1] for a in info[1]]
-            have_all = all(lane in have_lanes for lane in group.split(","))
-            if have_all:
-                groups.append([a for a in info[1] if a.location[1] in group])
-
-    return groups
-
 
 def get_input_flowcell(queue):
     """ Get a list of inputs from the queue of a step, 
-    corresponding to all the pools on a  flow cell. If not all inputs are 
+    corresponding to all the analytes on a flow cell. If not all inputs are 
     present in the queue, the flow cell is ignored for now.
-    
-    If there are pools on the flow
-    cell which do not have the automation flag set, these inputs are 
-    ignored, and the flow cell may still be returned.
     """
 
     flowcell_inputs = defaultdict(list)
@@ -188,20 +105,25 @@ def get_input_flowcell(queue):
     flowcell_groups = []
     for fcid,inputs in flowcell_inputs.items():
         logging.debug("Checking flowcell " + fcid)
-        fc = inputs[0].location[0]
 
-        try:
-            auto_udf = fc.udf[nsc.AUTO_FLOWCELL_UDF]
-        except KeyError:
-            logging.debug("Flowcell was not marked for automation")
-            continue
+        automation = False
+        seq_processes = process.lims.get_processes(inputartifactlimsid=inputs[0].id)
+        for proc in processes:
+            if proc.type.name in [p[1] for p in nsc.SEQ_PROCESSES]:
+                try:
+                    automation = proc.udf[nsc.AUTO_FLAG_UDF]
+                    break
+                except KeyError:
+                    automation = False
+        else: # if not break
+            automation = False
 
-        lanes = auto_udf.replace("|", ",").split(",")
-        have_input_ids = [i.id for i in inputs]
-        
-        valid = all(fc.placements[i].id in have_input_ids for i in lanes)
+        do_process = False
+        if automation:
+            if frozenset(inputs) == frozenset(proc.all_inputs()):
+                do_process = True
 
-        if valid:
+        if do_process:
             flowcell_groups.append(inputs)
             logging.debug("All expected inputs are present, returning this flow cell")
         else: 
@@ -209,7 +131,6 @@ def get_input_flowcell(queue):
 
     return flowcell_groups
 
-        
 
 def start_steps(lims, protocol_step, protocol_step_setup):
     """Starts zero or more instances of a specific protocol step.
@@ -237,19 +158,21 @@ def start_steps(lims, protocol_step, protocol_step_setup):
 
 
 
-        
-
 def start_automated_protocols(lims):
-    """Checks for samples in the automated protocols and starts steps if 
-    possible, then executes a script on the "record details" screen if 
-    configured."""
+    """Checks for samples in the queue for the demultiplexing script, and
+    starts them if everything is set up correctly."""
     
-    # Loop over protocols in NSC configuration file
-    for protocol, protocol_steps in nsc.AUTOMATED_PROTOCOL_STEPS:
-        proto = lims.get_protocols(name=protocol)[0]
-        
-        # Check all protocol steps known for this protocol
-        for ps in proto.steps:
+    proto = lims.get_protocols(name=nsc.DEMULTIPLEXING_QC_PROTOCOL)[0]
+    
+    step = next(step for step in proto.steps if 
+    # Check all protocol steps known for this protocol
+    for ps in proto.steps:
+            
+
+
+
+
+#### Old code...
             
             # Check if this protocol step should be processed 
             found = False
