@@ -158,7 +158,7 @@ class Task(object):
         print "STATUS [" + self.task_name + "] " + status
 
 
-    def fail(process, message, extra_info = None):
+    def fail(message, extra_info = None):
         """Report failure.
         
         NOTE: Calls sys.exit(1) to terminate program.
@@ -182,7 +182,7 @@ class Task(object):
         sys.exit(1)
 
 
-    def success_finish(process):
+    def success_finish(self):
         """Notify LIMS or command line that the job is completed.
         
         NOTE: Calls sys.exit(0) to terminate program."""

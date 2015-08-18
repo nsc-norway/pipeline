@@ -2,26 +2,24 @@ import os
 from math import ceil
 
 from genologics.lims import *
-from common import nsc, utilities, slurm, samples
+from common import nsc, utilities, slurm, samples, taskmgr
 
-def main(process_id):
+TASK_NAME = "Demultiplexing"
+TASK_DESCRIPTION = "Demultiplexing (calls bcl2fastq2)"
+TASK_ARGS = ['src_dir', 'work_dir', 'threads']
+
+
+def main(task):
     os.umask(007)
-    process = Process(nsc.lims, id=process_id)
-    utilities.running(process, nsc.CJU_DEMULTIPLEXING)
 
-    run_id = process.udf[nsc.RUN_ID_UDF]
+    task.running()
+    run_id = task.run_id
 
     print "Demultiplexing process for LIMS process", process_id, ", NextSeq run", run_id
 
-    source_run_dir = utilities.get_udf(
-            process, nsc.SOURCE_RUN_DIR_UDF,
-            os.path.join(nsc.PRIMARY_STORAGE, run_id)
-            )
+    source_run_dir = task.src_dir
     input_dir = os.path.join(source_run_dir, "Data", "Intensities", "BaseCalls")
-    dest_run_dir = utilities.get_udf(
-            process, nsc.WORK_RUN_DIR_UDF,
-            os.path.join(nsc.SECONDARY_STORAGE, run_id)
-            )
+    dest_run_dir = task.work_dir
     print "Reading from", source_run_dir, "writing to", dest_run_dir
 
     sample_sheet_content = utilities.get_sample_sheet(process)
@@ -106,47 +104,9 @@ def run_dmx(process, n_threads, run_dir, input_dir,
     return rcode == 0
 
 
-def move_files(instrument, runid, output_dir, project_name, sample_sheet_data, reads):
-    """Rename result files after demultiplexing"""
-
-    proj_dir = samplesheet.get_project_dir(runid, project_name)
-    project_path = output_dir + "/" + proj_dir
-    
-    params = []
-    for i, row in enumerate(sample_sheet_data):
-        for r in reads:
-            par = dict(row)
-            par['samplename'] = par['samplename']
-
-            par['read'] = r
-            par['base'] = output_dir
-            par['index'] = i+1
-            par['project'] = project_name
-            par['project_path'] = project_path
-            params.append(par)
-
-    for p in params:
-        f = "{samplename}_S{index}_R{read}_001.fastq.gz".format( **p)
-        input_path = "{base}/{project}/{sampleid}/{filename}".format(filename=f, **p)
-        output_path = os.path.join(project_path, f)
-        print "in", input_path, "out", output_path
-        os.rename(input_path, output_path)
-
-    for dpath in set("{base}/{project}/{sampleid}".format(**p) for p in params):
-        os.rmdir(dpath)
-    for dpath in set("{base}/{project}".format(**p) for p in params):
-        os.rmdir(dpath)
-
-
-
 
 if __name__ == "__main__":
-    if len(sys.argv) >= 2:
-        with utilities.error_reporter():
-            ok = main(sys.argv[1])
-            sys.exit(0 if ok else 1)
-    else:
-        print "use: demultiplex.py <process-id>"
-        sys.exit(1)
+    with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
+        main(task)
 
 

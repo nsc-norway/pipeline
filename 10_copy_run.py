@@ -17,6 +17,7 @@ from common import nsc, utilities, slurm, taskmgr
 
 TASK_NAME = "Copy run"
 TASK_DESCRIPTION = "Copy run metadata"
+TASK_ARGS = ['src_dir', 'work_dir']
 
 hiseq_exclude_paths = [
         "/Thumbnail_Images",
@@ -62,23 +63,19 @@ def rsync_arglist(source_path, destination_path, exclude):
 def main(task):
     """To be run from LIMS on the NSC data processing step"""
 
+    os.umask(007)
+
     task.running()
     process = Process(nsc.lims, id=process_id)
-    runid = process.udf[nsc.RUN_ID]
-    instrument = utilities.get_instrument_by_runid(runid)
+    runid = task.run_id
 
-    source = utilities.get_udf(
-            process, nsc.SOURCE_RUN_DIR_UDF,
-            os.path.join(nsc.PRIMARY_STORAGE, run_id)
-            )
-    destination = utilities.get_udf(
-            process, nsc.WORK_RUN_DIR_UDF,
-            os.path.join(nsc.SECONDARY_STORAGE, run_id)
-            )
-    
+    source = task.src_dir
+    destination = task.work_dir    
+
     # Specify source with trailing slash to copy content
-    source = source + "/"
+    source = source.rstrip('/') + "/"
 
+    instrument = utilities.get_instrument_by_runid(runid)
     if instrument == "hiseq":
         exclude = hiseq_exclude_paths
     elif instrument == "nextseq":
@@ -88,21 +85,30 @@ def main(task):
 
     args = rsync_arglist(source, destination, exclude)
     srun_args = ["--nodelist=loki"] # obviously OUS specific, but the whole script may be
-
-    logfile = os.path.join(nsc.LOG_DIR, process_id + "-rsync.log")
+    
+    if task.process:
+        # Can't use a per-run log dir, as it's not created yet, it's 
+        # created by the rsync command
+        logfile = os.path.join(nsc.LOG_DIR, process_id + "-rsync.txt")
+        job_name = process.id + "." TASK_NAME
+    else:
+        logfile = None
+        job_name = TASK_NAME
 
     rc = slurm.srun_command(
-            args, process_id + "." + nsc.CJU_COPY_RUN,
-            logfile=logfile, srun_args=srun_args
+            args, job_name, logfile=logfile, srun_args=srun_args
             )
     
     if rc == 0:
-        utilities.success_finish(process)
+        task.success_finish()
     else:
-        utilities.fail(process, "rsync failed", open(logfile).read())
+        detail = None
+        if task.process: #LIMS
+            detail = open(logfile).read()
+        utilities.fail("rsync failed", detail)
 
 
 
-with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION) as task:
+with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
     main(task)
 
