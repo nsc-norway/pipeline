@@ -68,6 +68,15 @@ class Task(object):
     def threads(self):
         return self.get_arg('threads')
 
+    def add_argument(self, *args, **kwargs):
+        """Add an extra argument for command line. Used for args which
+        are only applicable for a single task, and not part of the 
+        general ones defined above.
+        
+        Essentially, we bypass this class and interact directly with the
+        ArgumentParser."""
+        self.parser.add_argument(*args, **kwargs)
+
 
     # Context manager protocol: __enter__ and __exit__
     def __enter__(self):

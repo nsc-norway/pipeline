@@ -17,11 +17,13 @@
 #
 #  * Command line mode *
 #  - This script reads the sample sheet from SampleSheet.csv and writes it to
-#    DemutliplexingSampleSheet.csv
+#    DemutliplexingSampleSheet.csv. The input sample sheet file may be overridden
+#    with the --input-sample-sheet option. TODO
 #  - Other tasks read the sample sheet from DemultiplexingSampleSheet.csv or 
 #    another file provided on the command line.
 
-
+# Since this script must deal with two sample sheets, input and output, it can't
+# use the "taskmgr.Task" interface, and has to manually I/O the sample sheets.
 
 import os.path, sys
 import argparse
@@ -37,12 +39,24 @@ TASK_ARGS = ['work_dir']
 
 
 def main(task):
-    """To be run from LIMS on the NSC data processing step"""
+    """Sample sheet processing."""
 
+    task.add_argument(
+            '--input-sample-sheet',
+            default=None,
+            help="Path to source sample sheet to transform"
+            )
+    task.add_argument(
+            '--output-sample-sheet',
+            default=None,
+            help="Path to destination sample sheet to write"
+            )
     os.umask(007)
     task.running()
 
-    
+    if task.process:
+        
+
     
     if rc == 0:
         task.success_finish()

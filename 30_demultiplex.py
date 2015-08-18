@@ -6,7 +6,7 @@ from common import nsc, utilities, slurm, samples, taskmgr
 
 TASK_NAME = "Demultiplexing"
 TASK_DESCRIPTION = "Demultiplexing (calls bcl2fastq2)"
-TASK_ARGS = ['src_dir', 'work_dir', 'threads']
+TASK_ARGS = ['src_dir', 'work_dir', 'threads', 'sample_sheet']
 
 
 def main(task):
@@ -15,7 +15,7 @@ def main(task):
     task.running()
     run_id = task.run_id
 
-    print "Demultiplexing process for LIMS process", process_id, ", NextSeq run", run_id
+    print "Demultiplexing process for LIMS process", process_id, ", run", run_id
 
     source_run_dir = task.src_dir
     input_dir = os.path.join(source_run_dir, "Data", "Intensities", "BaseCalls")
