@@ -133,51 +133,6 @@ def upload_file(process, name, path = None, data = None):
     f.upload(data)
 
 
-def running(process, current_job, status = None):
-    process.get()
-    if status:
-        process.udf[nsc.JOB_STATUS_UDF] = "Running ({0})".format(status)
-    else:
-        process.udf[nsc.JOB_STATUS_UDF] = "Running"
-    process.udf[nsc.JOB_STATE_CODE_UDF] = 'RUNNING'
-    process.udf[nsc.CURRENT_JOB_UDF] = current_job
-    process.put()
-
-
-def fail(process, message, extra_info = None):
-    """Report failure from background job"""
-
-    process.get(force=True)
-    process.udf[nsc.JOB_STATUS_UDF] = "Failed: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ": " + message
-    process.udf[nsc.JOB_STATE_CODE_UDF] = 'FAILED'
-    process.put()
-    if extra_info:
-        try:
-            process.udf[nsc.ERROR_DETAILS_UDF] = extra_info
-            process.put()
-        except (KeyError,requests.exceptions.HTTPError):
-            pass
-
-
-def success_finish(process):
-    """Called by background jobs (slurm) to declare that the task has been 
-    completed successfully."""
-
-    process.get()
-    process.udf[nsc.JOB_STATUS_UDF] = 'Completed successfully ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-    process.udf[nsc.JOB_STATE_CODE_UDF] = 'COMPLETED'
-    process.put()
-
-
-def get_udf(process, udf, default):
-    try:
-        return process.udf[udf]
-    except KeyError:
-        if not default is None:
-            process.udf[udf] = default
-            process.put()
-        return default
-
 
 def get_sample_sheet_proj_name(seq_process, project):
     """Get the project name as it would appear in the sample sheet.
@@ -205,6 +160,18 @@ def get_num_reads(run_dir):
             n_data += 1
 
     return n_data, n_index
+
+
+
+
+def get_udf(process, udf, default):
+    try:
+        return process.udf[udf]
+    except KeyError:
+        if not default is None:
+            process.udf[udf] = default
+            process.put()
+        return default
 
 
 

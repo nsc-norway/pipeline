@@ -23,6 +23,7 @@ hiseq_exclude_paths = [
         ]
 
 nextseq_exclude_paths = [
+        "/Thumbnail_Images",
         "/Data/Intensities/L00*",
         "/Data/Intensities/BaseCalls/L00*",
         ]
