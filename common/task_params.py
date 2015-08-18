@@ -2,7 +2,12 @@ import argparse
 import utilities
 import nsc
 
+from genologics.lims import *
 # TODO: rename to task.py
+
+
+# Module to manage processing status for all the script, and to abstract the 
+# differences between command line invocation and invocation through LIMS.
 
 
 # Standard argument definitions
@@ -25,9 +30,8 @@ class Task(object):
     """
 
     def __init__(self, task_name, task_description):
-        self.work_dir = None
-        self.src_dir = None
-        self.threads = None
+        self.task_name = task_name
+        self.task_description = task_description
         self.args = []
         self.parser = argparse.ArgumentParser(description=task_description)
         self.parser.add_argument("--pid", default=None, help="Process ID if running within LIMS")
@@ -48,27 +52,6 @@ class Task(object):
                     )
 
 
-    def start(self):
-        """Start running the task. Will exit() if the args are
-        incorrect."""
-
-        self.parser.parse()
-        if self.parser.pid:
-            # LIMS operation
-            from genologics.lims import *
-            self.process = Process(nsc.lims, id=self.parser.pid)
-
-        else:
-            self.process = None
-
-        self.process = None
-        for arg in self.args:
-            pass
-
-
-    def finish(self):
-        self.finished = True
-    
 
     def get_arg(self, arg_name):
         argparse_name, udf_name, type, default, help = self.args[arg_name]
@@ -95,6 +78,11 @@ class Task(object):
         pass
 
     def __exit__(self, etype, value, tb):
+        """Catch unexpected exceptions and also throw an error if exiting without
+        success_finish. Called when exiting the with ... section.
+
+        Note: many exit points in this function.
+        """
         if etype is None:
             if self.finished:
                 return True
@@ -102,11 +90,7 @@ class Task(object):
                 print "Uexpected exit"
                 if self.process:
                     utilities.fail(self.process, "Unexpected exit", "Unexpected exit without exception")
-                return False
-
-        if not self.process_id:
-            if len(sys.argv) == 2:
-                self.process_id = sys.argv[1]
+                raise RuntimeError("Unexpected exit!")
 
         if self.process:
             process = Process(nsc.lims, id=self.process_id)
@@ -115,37 +99,70 @@ class Task(object):
 
         return False # re-raise exception
 
-    def running(process, current_job, status = None):
-        process.get()
-        if status:
-            process.udf[nsc.JOB_STATUS_UDF] = "Running ({0})".format(status)
+
+
+    # To be called to indicate the status
+    def running(self, info_str=None):
+        """Users should call this function once at the start of the task to 
+        indicate that the program has started.
+
+        parse_args() will exit() if the args are incorrect."""
+
+        self.parser.parse()
+        if self.parser.pid:
+            # LIMS operation
+            self.process = Process(nsc.lims, id=self.parser.pid)
+            self.process.udf[nsc.JOB_STATUS_UDF] = "Running"
+            self.process.udf[nsc.JOB_STATE_CODE_UDF] = 'RUNNING'
+            self.process.udf[nsc.CURRENT_JOB_UDF] = self.task_name
+            self.process.put()
         else:
-            process.udf[nsc.JOB_STATUS_UDF] = "Running"
-        process.udf[nsc.JOB_STATE_CODE_UDF] = 'RUNNING'
-        process.udf[nsc.CURRENT_JOB_UDF] = current_job
-        process.put()
+            self.process = None
+            print "START  [" + self.task_name + "]"
+
+        if info_str:
+            self.info(info_str)
+
+
+    def info(current_job, status):
+        if self.process:
+            self.process.get(force=True)
+            self.process.udf[nsc.JOB_STATUS_UDF] = "Running ({0})".format(status)
+            self.process.put()
+        print "STATUS [" + self.task_name + "] " + status
 
 
     def fail(process, message, extra_info = None):
-        """Report failure from background job"""
+        """Report failure."""
 
-        process.get(force=True)
-        process.udf[nsc.JOB_STATUS_UDF] = "Failed: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ": " + message
-        process.udf[nsc.JOB_STATE_CODE_UDF] = 'FAILED'
-        process.put()
+        self.finished = True
+        if self.process:
+            self.process.get(force=True)
+            self.process.udf[nsc.JOB_STATUS_UDF] = "Failed: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ": " + message
+            self.process.udf[nsc.JOB_STATE_CODE_UDF] = 'FAILED'
+            if extra_info:
+                self.process.udf[nsc.ERROR_DETAILS_UDF] = extra_info
+            self.process.put()
+        print "ERROR  [" + self.task_name + "]" + message
         if extra_info:
-            try:
-                process.udf[nsc.ERROR_DETAILS_UDF] = extra_info
-                process.put()
-            except (KeyError,requests.exceptions.HTTPError):
-                pass
+            print "----------"
+            print extra_info
+            print "----------"
 
 
     def success_finish(process):
-        """Called by background jobs (slurm) to declare that the task has been 
-        completed successfully."""
+        """Notify LIMS or command line that the job is completed."""
 
-        process.get()
-        process.udf[nsc.JOB_STATUS_UDF] = 'Completed successfully ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-        process.udf[nsc.JOB_STATE_CODE_UDF] = 'COMPLETED'
-        process.put()
+        self.finished = True
+        complete_str = 'Completed successfully ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        if self.process:
+            self.process.get(force=True)
+            self.process.udf[nsc.JOB_STATUS_UDF] = complete_str
+            self.process.udf[nsc.JOB_STATE_CODE_UDF] = 'COMPLETED'
+            self.process.put()
+            TODO : would have some processing status UDF
+
+        print "SUCCESS[" + self.task_name + "]" + complete_str
+
+
+
