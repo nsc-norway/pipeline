@@ -1,7 +1,7 @@
 # Slurm script
 
 def srun_command(
-        args, jobname, time, logfile="/dev/null",
+        args, jobname, time, logfile=None,
         cpus_per_task=1, mem=1024,
         srun_args=[]
         ):
@@ -11,6 +11,7 @@ def srun_command(
             '--time=' + time,
             '--mem=' + str(mem)
             ]
-    other_args += ['--output=' + logfile, '--error=' + logfile]
+    if logfile:
+        other_args += ['--output=' + logfile, '--error=' + logfile]
     return subprocess.call(nsc.SRUN_ARGLIST + args + other_args)
 
