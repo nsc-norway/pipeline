@@ -28,9 +28,12 @@ class Task(object):
     
     Implements a "proxy" for retrieving information which is done differently
     in LIMS and non-LIMS (lane stats).
+
+    (Maintenance note: this constructor should not do anything that could fail,
+    as it won't be reported to the LIMS)
     """
 
-    def __init__(self, task_name, task_description):
+    def __init__(self, task_name, task_description, args):
         self.task_name = task_name
         self.task_description = task_description
         self.args = []
@@ -38,20 +41,6 @@ class Task(object):
         self.parser.add_argument("--pid", default=None, help="Process ID if running within LIMS")
         self.process = None
         self.finished = False
-        
-
-    def set_args(self, arg_list=['work-dir']):
-        self.args = arg_list
-        for name in self.args:
-            argparse_name, udf_name, type, default, help = self.args[arg_name]
-            self.parser.add_argument(
-                    argparse_name,
-                    destination=name,
-                    type=type,
-                    default=default,
-                    help=help
-                    )
-
 
 
     def get_arg(self, arg_name):
@@ -59,8 +48,9 @@ class Task(object):
         if self.process:
             return utilities.get_udf(self.process, udf_name, default)
         else:
-            return self.parser.getattr(arg_name)
-
+            val = self.parser.getattr(arg_name)
+            if val is None: # Handle when default gets updated
+                return default
 
     @property
     def run_id(self):
@@ -78,13 +68,11 @@ class Task(object):
     def threads(self):
         return self.get_arg('threads')
 
-    @property
-    def run_id(self):
-        return 
 
     # Context manager protocol: __enter__ and __exit__
     def __enter__(self):
         pass
+
 
     def __exit__(self, etype, value, tb):
         """Catch unexpected exceptions and also throw an error if exiting without
@@ -117,6 +105,16 @@ class Task(object):
 
         parse_args() will exit() if the args are incorrect."""
 
+        for name in self.args:
+            argparse_name, udf_name, type, default, help = ARG_OPTIONS[name]
+            self.parser.add_argument(
+                    argparse_name,
+                    destination=name,
+                    type=type,
+                    default=default,
+                    help=help
+                    )
+
         self.parser.parse()
         if self.parser.pid:
             # LIMS operation
@@ -132,12 +130,19 @@ class Task(object):
             try:
                 run_id = self.process.udf[nsc.RUN_ID_UDF]
                 work_dir = os.path.join(nsc.PRIMARY_STORAGE, run_id)
-                ARG_OPTIONS['src_dir'][DEFAULT_VAL_UDF] = src_dir
-                ARG_OPTIONS['work_dir'][DEFAULT_VAL_UDF] = work_dir
+                # These defaults are set to None in the ARG_OPTIONS initialization,
+                # no need to check if they are None
+                ARG_OPTIONS['src_dir'][DEFAULT_VAL_INDEX] = src_dir
+                ARG_OPTIONS['work_dir'][DEFAULT_VAL_INDEX] = work_dir
             except KeyError:
                 pass
         else:
             self.process = None
+
+            # Set run ID based on working directory, for command-line operation
+            if not self.parser.run_id and self.parser.work_dir:
+                run_id = os.path.basename(os.path.realpath(run_dir))
+                ARG_OPTIONS['run_id'][DEFAULT_VAL_INDEX] = run_id
 
         print "START  [" + self.task_name + "]"
 
