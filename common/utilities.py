@@ -179,33 +179,6 @@ def get_udf(process, udf, default):
         return default
 
 
-class error_reporter():
-    """Context manager for reporting error status when exceptions occur"""
-
-    def __init__(self, process_id = None):
-        self.process_id = process_id
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self, etype, value, tb):
-        if etype is None:
-            return True
-        elif etype == SystemExit:
-            return False
-
-        if not self.process_id:
-            if len(sys.argv) == 2:
-                self.process_id = sys.argv[1]
-
-        if self.process_id:
-            process = Process(nsc.lims, id=self.process_id)
-            fail(process, etype.__name__ + " " + str(value),
-                    "\n".join(traceback.format_exception(etype, value, tb)))
-
-        return False # re-raise exception
-
-
 def get_sample_sheet_proj_name(seq_process, project):
     """Get the project name as it would appear in the sample sheet.
     Will become really complex if we allow other than [A-Za-z0-9\-] in 
