@@ -17,6 +17,7 @@ ARG_OPTIONS = {
         "work_dir": ("DIR", str, None, "Destination/working directory (run folder)"),
         "threads": ("--threads", int, 1, "Number of threads/cores to use"),
         }
+DEFAULT_VAL_INDEX = 2
 
 class Task(object): 
     """Class to manage the processing tasks (scripts) in a common way for LIMS
@@ -60,6 +61,11 @@ class Task(object):
         else:
             return self.parser.getattr(arg_name)
 
+
+    @property
+    def run_id(self):
+        return self.get_arg("run_id")
+
     @property
     def work_dir(self):
         return self.get_arg('work_dir')
@@ -72,6 +78,9 @@ class Task(object):
     def threads(self):
         return self.get_arg('threads')
 
+    @property
+    def run_id(self):
+        return 
 
     # Context manager protocol: __enter__ and __exit__
     def __enter__(self):
@@ -112,13 +121,25 @@ class Task(object):
         if self.parser.pid:
             # LIMS operation
             self.process = Process(nsc.lims, id=self.parser.pid)
+            self.process.get()
             self.process.udf[nsc.JOB_STATUS_UDF] = "Running"
             self.process.udf[nsc.JOB_STATE_CODE_UDF] = 'RUNNING'
             self.process.udf[nsc.CURRENT_JOB_UDF] = self.task_name
             self.process.put()
+
+            # Set defaults for source & working directories based on run ID
+            # (only available for LIMS)
+            try:
+                run_id = self.process.udf[nsc.RUN_ID_UDF]
+                work_dir = os.path.join(nsc.PRIMARY_STORAGE, run_id)
+                ARG_OPTIONS['src_dir'][DEFAULT_VAL_UDF] = src_dir
+                ARG_OPTIONS['work_dir'][DEFAULT_VAL_UDF] = work_dir
+            except KeyError:
+                pass
         else:
             self.process = None
-            print "START  [" + self.task_name + "]"
+
+        print "START  [" + self.task_name + "]"
 
         if info_str:
             self.info(info_str)
@@ -133,7 +154,12 @@ class Task(object):
 
 
     def fail(process, message, extra_info = None):
-        """Report failure."""
+        """Report failure.
+        
+        NOTE: Calls sys.exit(1) to terminate program.
+        
+        (this was considered a more convenient protocol at the time of 
+        writing this code)"""
 
         self.finished = True
         if self.process:
@@ -148,10 +174,13 @@ class Task(object):
             print "----------"
             print extra_info
             print "----------"
+        sys.exit(1)
 
 
     def success_finish(process):
-        """Notify LIMS or command line that the job is completed."""
+        """Notify LIMS or command line that the job is completed.
+        
+        NOTE: Calls sys.exit(0) to terminate program."""
 
         self.finished = True
         complete_str = 'Completed successfully ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -160,9 +189,10 @@ class Task(object):
             self.process.udf[nsc.JOB_STATUS_UDF] = complete_str
             self.process.udf[nsc.JOB_STATE_CODE_UDF] = 'COMPLETED'
             self.process.put()
-            TODO : would have some processing status UDF
+            #TODO : would have some processing status UDF
 
         print "SUCCESS[" + self.task_name + "]" + complete_str
+        sys.exit(0)
 
 
 

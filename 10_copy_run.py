@@ -13,8 +13,10 @@ import subprocess
 import datetime
 
 from genologics.lims import *
-from common import nsc, utilities, slurm
+from common import nsc, utilities, slurm, taskmgr
 
+TASK_NAME = "Copy run"
+TASK_DESCRIPTION = "Copy run metadata"
 
 hiseq_exclude_paths = [
         "/Thumbnail_Images",
@@ -57,10 +59,11 @@ def rsync_arglist(source_path, destination_path, exclude):
 
 
 
-def main(process_id):
+def main(task):
     """To be run from LIMS on the NSC data processing step"""
+
+    task.running()
     process = Process(nsc.lims, id=process_id)
-    utilities.running(process, nsc.CJU_COPY_RUN)
     runid = process.udf[nsc.RUN_ID]
     instrument = utilities.get_instrument_by_runid(runid)
 
@@ -99,5 +102,7 @@ def main(process_id):
         utilities.fail(process, "rsync failed", open(logfile).read())
 
 
-main(sys.argv[1])
+
+with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION) as task:
+    main(task)
 

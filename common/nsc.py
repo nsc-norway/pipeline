@@ -49,7 +49,6 @@ FASTQC_LOG = "fastqc log"
 FASTQ_OUTPUT = "{sample_name}"
 
 # Values of the CURRENT_JOB_UDF
-CJU_COPY_RUN = "Copy run"
 CJU_DEMULTIPLEXING = "Demultiplexing"
 CJU_SAVING_STATS = "Saving stats"
 CJU_FASTQC = "FastQC"
