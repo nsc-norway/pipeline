@@ -10,7 +10,7 @@ from genologics.lims import *
 
 
 # Standard argument definitions
-# (name, argparse_name, udf_name, type, default)
+# { name => (argparse_name, type, default, description) }
 ARG_OPTIONS = {
         "src_dir": ("SRC-DIR", str, None, "Source directory (run folder)"),
         "work_dir": ("DIR", str, None, "Destination/working directory (run folder)"),
