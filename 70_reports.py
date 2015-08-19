@@ -13,7 +13,7 @@ from common import nsc, stats, utilities, lane_info, samples, taskmgr
 
 template_dir = os.path.dirname(os.path.dirname(__file__)) + "/template"
 
-TASK_NAME = "Generate reports."
+TASK_NAME = "Reports"
 TASK_DESCRIPTION = """Generates HTML and PDF reports based on demultiplexing stats
                     and FastQC results."""
 

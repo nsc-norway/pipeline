@@ -1,4 +1,7 @@
 # Utilities to get lane-based stats
+
+# Currently only used by 50_emails.py
+
 import re
 import os
 from genologics.lims import *
