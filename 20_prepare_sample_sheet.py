@@ -36,8 +36,8 @@ import datetime
 from genologics.lims import *
 from common import nsc, utilities, slurm, taskmgr
 
-TASK_NAME = "Copy run"
-TASK_DESCRIPTION = "Copy run metadata"
+TASK_NAME = "Prepare SampleSheet"
+TASK_DESCRIPTION = "Prepare sample sheet for bcl2fastq2"
 TASK_ARGS = ['work_dir']
 
 
@@ -83,7 +83,7 @@ def main(task):
             sample_sheet_path = os.path.join(task.work_dir, "SampleSheet.csv")
 
     else:
-        sample_sheet_path = task.parser.input_sample_sheet
+        sample_sheet_path = task.args.input_sample_sheet
         if not sample_sheet_path:
             sample_sheet_path = os.path.join(task.work_dir, "SampleSheet.csv")
         
@@ -116,12 +116,12 @@ def main(task):
                 data = sample_sheet
                 )
     else:
-        if task.parser.output_sample_sheet:
-            path = os.path.join(task.work_dir, task.parser.output_sample_sheet)
+        if task.args.output_sample_sheet:
+            path = os.path.join(task.work_dir, task.args.output_sample_sheet)
         else:
             path = os.path.join(task.work_dir, "DemultiplexingSampleSheet.csv")
 
-        open(path, 'rb').write(sample_sheet)
+        open(path, 'wb').write(sample_sheet)
     
     task.success_finish()
 

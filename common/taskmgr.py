@@ -232,7 +232,12 @@ class Task(object):
                         help=help
                         )
 
-        self.args = self.parser.parse_args()
+        try:
+            self.args = self.parser.parse_args()
+        except SystemExit:
+            self.finished = True
+            raise
+
         if self.args.pid:
             # LIMS operation
             self.process = Process(nsc.lims, id=self.args.pid)
