@@ -282,3 +282,12 @@ def get_fastqc_dir(project, sample, fastqfile):
     fqc_name = re.sub(r".fastq.gz$", "_fastqc", fq_name)
     return os.path.join(project.name, sample.name, fqc_name)
 
+
+def qc_pdf_name(run_id, fastq):
+    """Get QC report name for a given FastqFile object"""
+    report_root_name = re.sub(".fastq.gz$", ".qc", os.path.basename(fastq.path))
+    if fastq.lane == "X": # Merged lanes
+        return "{0}.{1}.pdf".format(run_id, report_root_name)
+    else:
+        return "{0}.{1}.{2}.pdf".format(run_id, fastq.lane, report_root_name)
+
