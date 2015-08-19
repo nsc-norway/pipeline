@@ -109,14 +109,6 @@ def tex_escape(s):
     return re.sub(r"[^\d:a-zA-Z()+-. ]", lambda x: '\\' + x.group(0), s)
 
 
-def qc_pdf_name(run_id, fastq):
-    report_root_name = re.sub(".fastq.gz$", ".qc", os.path.basename(fastq.path))
-    if fastq.lane == "X": # Merged lanes
-        return "{0}.{1}.pdf".format(run_id, report_root_name)
-    else:
-        return "{0}.{1}.{2}.pdf".format(run_id, fastq.lane, report_root_name)
-
-
 def generate_report_for_customer(args):
     """Generate PDF report for a fastq file.
 
@@ -147,7 +139,7 @@ def generate_report_for_customer(args):
     subprocess.check_call([nsc.PDFLATEX, '-shell-escape', fname], stdout=DEVNULL, stdin=DEVNULL, cwd=pdf_dir)
 
     orig_pdfname = rootname + ".pdf"
-    pdfname = qc_pdf_name(run_id, fastq)
+    pdfname = samples.qc_pdf_name(run_id, fastq)
     os.rename(pdf_dir + "/" + orig_pdfname, os.path.join(fastq_dir, os.path.dirname(fastq.path), pdfname))
 
 
