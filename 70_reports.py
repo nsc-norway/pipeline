@@ -26,48 +26,26 @@ def main_lims(task):
     run_id = task.run_id
     instument = utilities.get_instrument_by_runid(run_id)
     work_dir = task.work_dir
-    
-    run_stats = get_run_stats(instrument, work_dir)
-    projects = samples.get_projects_by_process(process)
-    samples.add_stats(projects, run_stats)
-
-    bcl2fastq_version = utilities.get_udf(process, nsc.BCL2FASTQ_VERSION_UDF, None)
-
-    make_reports(work_dir, run_id, projects, lane_stats, bcl2fastq_version)
-
-
-def main(work_dir):
-    run_id = os.path.basename(os.path.realpath(run_dir))
-    instrument = get_instrument_by_runid(run_id)
-    
-    data_reads, index_reads = utilities.get_num_reads(work_dir)
-
-    sample_sheet_path = os.path.join(work_dir, "DemultiplexingSampleSheet.csv")
-    run_stats = get_run_stats(instrument, work_dir)
-    projects = samples.get_projects_by_files(work_dir, sample_sheet_path)
+    run_stats = stats.get_bcl2fastq_stats(
+                os.path.join(work_dir, "Stats"),
+                aggregate_lanes = task.no_lane_splitting,
+                aggregate_reads = False
+                )
+    projects = task.projects
     samples.add_stats(projects, run_stats)
     samples.flag_empty_files(projects, work_dir)
 
-    make_reports(work_dir, run_id, projects, lane_stats)
-
-
-def get_run_stats(instrument, work_dir):
-    if instrument == "nextseq":
-        run_stats = stats.get_bcl2fastq_stats(
-                os.path.join(work_dir, "Stats"),
-                aggregate_lanes = True,
-                aggregate_reads = False
-                )
+    if task.process:
+        bcl2fastq_version = utilities.get_udf(process, nsc.BCL2FASTQ_VERSION_UDF, None)
     else:
-        run_stats = stats.get_bcl2fastq_stats(
-                os.path.join(work_dir, "Stats"),
-                aggregate_lanes = False,
-                aggregate_reads = False
-                )
-    return run_stats
+        bcl2fastq_version = None
+
+    make_reports(work_dir, run_id, projects, bcl2fastq_version)
+
+    task.success_finish()
 
 
-def make_reports(work_dir, run_id, projects, lane_stats, bcl2fastq_version=None):
+def make_reports(work_dir, run_id, projects, bcl2fastq_version=None):
     basecalls_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls")
     quality_control_dir = os.path.join(basecalls_dir, "QualityControl")
     os.umask(007)
