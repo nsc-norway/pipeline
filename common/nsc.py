@@ -30,6 +30,7 @@ SOURCE_RUN_DIR_UDF = "Source run directory"
 WORK_RUN_DIR_UDF = "Working run directory"
 OTHER_OPTIONS_UDF = "Other options for bcl2fastq"
 PROCESS_UNDETERMINED_UDF = "Process undetermined indexes"
+NO_LANE_SPLITTING_UDF = "No lane splitting"
 
 # Other UDFs 
 # On process types
