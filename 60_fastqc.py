@@ -12,7 +12,6 @@ TASK_DESCRIPTION = """Run FastQC on the demultiplexed files."""
 TASK_ARGS = ['work_dir', 'sample_sheet', 'threads']
 
 def main(task):
-
     task.running()
     os.umask(007)
 
