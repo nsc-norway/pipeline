@@ -1,29 +1,31 @@
-
-import sys
-import os
-import shutil
-
-from genologics.lims import *
-from common import nsc, stats, utilities, lane_info, samples
-
-
-template_dir = os.path.dirname(os.path.dirname(__file__)) + "/template"
-
-
 # Generate reports after FastQC has completed
 
 # This task requires an intermediate amount of CPU resources. Will be 
 # executed on the LIMS server, where we can make sure to have the necessary
 # software installed.
 
-def main_lims(process_id):
-    process = Process(nsc.lims, id=process_id)
-    run_id = process.udf[nsc.RUN_ID_UDF]
+import sys
+import os
+import shutil
+
+from genologics.lims import *
+from common import nsc, stats, utilities, lane_info, samples, taskmgr
+
+template_dir = os.path.dirname(os.path.dirname(__file__)) + "/template"
+
+TASK_NAME = "Generate reports."
+TASK_DESCRIPTION = """Generates HTML and PDF reports based on demultiplexing stats
+                    and FastQC results."""
+
+TASK_ARGS = ['work_dir', 'sample_sheet', 'threads']
+
+
+def main_lims(task):
+    task.running()
+    os.umask(007)
+    run_id = task.run_id
     instument = utilities.get_instrument_by_runid(run_id)
-    work_dir = utilities.get_udf(
-            process, nsc.WORK_RUN_DIR_UDF,
-            os.path.join(nsc.SECONDARY_STORAGE, run_id)
-            )
+    work_dir = task.work_dir
     
     run_stats = get_run_stats(instrument, work_dir)
     projects = samples.get_projects_by_process(process)
@@ -259,7 +261,8 @@ def generate_internal_html_report(quality_control_dir, projects):
         out_file.write("</div>\n</body>\n</html>\n")
 
 
-
 if __name__ == "__main__":
-    main_lims(sys.argv[1])
+    with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
+        main(task)
+
 
