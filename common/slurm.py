@@ -2,7 +2,7 @@
 
 def srun_command(
         args, jobname, time, logfile=None,
-        cpus_per_task=1, mem=1024,
+        cpus_per_task=1, mem=1024, cwd=None,
         srun_args=[]
         ):
     other_args = [
@@ -13,5 +13,5 @@ def srun_command(
             ]
     if logfile:
         other_args += ['--output=' + logfile, '--error=' + logfile]
-    return subprocess.call(nsc.SRUN_ARGLIST + args + other_args)
+    return subprocess.call(nsc.SRUN_ARGLIST + args + other_args, cwd=cwd)
 
