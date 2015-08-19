@@ -7,10 +7,8 @@
 
 # For the MiSeq, this also copies the demultiplexed data.
 
-import os.path, sys
-import argparse
-import subprocess
-import datetime
+import os
+import sys
 
 from genologics.lims import *
 from common import nsc, utilities, slurm, taskmgr
@@ -106,7 +104,6 @@ def main(task):
         if task.process: #LIMS
             detail = open(logfile).read()
         utilities.fail("rsync failed", detail)
-
 
 
 with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
