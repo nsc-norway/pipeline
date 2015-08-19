@@ -11,7 +11,12 @@ import re
 import subprocess
 import crypt
 from genologics.lims import *
-from common import nsc, parse, utilities
+from common import nsc, parse, utilities, taskmgr
+
+TASK_NAME = "Delivery prep"
+TASK_DESCRIPTION = """Prepare for delivery."""
+TASK_ARGS = ['work_dir']
+
 if nsc.TAG == "prod":
     from common import secure
 else:
@@ -72,10 +77,11 @@ require user {username}
     
 
 
-def main(process_id):
+def main(task):
+    task.running()
     os.umask(007)
     process = Process(nsc.lims, id=process_id)
-    utilities.running(process)
+
     projects = set()
     for i in process.all_inputs(unique=True):
         projects.add(i.samples[0].project)
@@ -115,6 +121,7 @@ def main(process_id):
     utilities.success_finish(process, do_finish_step=False)
 
 
-with utilities.error_reporter():
-    main(sys.argv[1])
+if __name__ == "__main__":
+    with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
+        main(task)
 
