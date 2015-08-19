@@ -128,6 +128,16 @@ class Task(object):
                         )
                     )
 
+    @property
+    def projects(self):
+        """Get the list of project objects, defined in the samples module. """
+        if self.process:
+            projects = samples.get_projects_by_process(self.process)
+        else:
+            projects = samples.get_projects_by_files(self.work_dir, self.sample_sheet_path)
+        return projects
+
+
 
     # Arguments:
     def add_argument(self, *args, **kwargs):

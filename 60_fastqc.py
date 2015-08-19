@@ -9,22 +9,19 @@ from common import utilities, samples, nsc, taskmgr
 
 TASK_NAME = "Run FastQC"
 TASK_DESCRIPTION = """Run FastQC on the demultiplexed files."""
-TASK_ARGS = ['work_dir', 'sample_sheet']
+TASK_ARGS = ['work_dir', 'sample_sheet', 'threads']
 
-def main(process_id):
+def main(task):
+
+    task.running()
     os.umask(007)
 
-    process = Process(nsc.lims, id=process_id)
+    run_id = task.run_id
+    bc_dir = task.bc_dir
 
-    run_id = process.udf[nsc.RUN_ID_UDF]
-    work_dir = utilities.get_udf(
-            process, nsc.WORK_RUN_DIR_UDF,
-            os.path.join(nsc.SECONDARY_STORAGE, run_id)
-            )
+    projects = task.projects
 
-    projects = samples.get_projects_by_process(process)
 
-    bc_dir = os.paht.join(work_dir, "Data", "Intensities", "BaseCalls")
     # Empty fastq files (no sequences) will not be created by the new 
     # bcl2fastq, instead they will not exist, so we check that.
     # First get a list of FastqFile objects
@@ -39,20 +36,23 @@ def main(process_id):
             ]
 
 
-
-    threads = utilities.get_udf(process, nsc.THREADS_UDF, 1)
-    output_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls", "QualityControl")
+    output_dir = os.path.join(bc_dir, "QualityControl")
     try:
         os.mkdir(output_dir)
     except OSError:
         pass
 
+    threads = task.threads
+
     fastqc_args = ["--extract", "--threads=" + str(threads)]
     fastqc_args += ["--outdir=" + output_dir]
     fastqc_args += fastq_files
 
-    log_path = utilities.logfile(process, nsc.CJU_FASTQC, "fastqc")
-    jobname = process.id + ".fastqc"
+    log_path = task.logfile("fastqc")
+    if task.process:
+        jobname = task.process.id + ".fastqc"
+    else:
+        jobname = "fastqc"
     rcode = slurm.srun_command(
             [nsc.FASTQC] + fastqc_args, jobname, time="1-0", logfile=log_path,
             cpus_per_task=n_threads, mem=str(1024+256*threads)+"M"
@@ -60,9 +60,9 @@ def main(process_id):
 
     if rcode == 0:
         move_fastqc_results(output_dir, projects)
-        utilities.success_finish(process)
+        task.success_finish()
     else:
-        utilities.fail(process, "fastqc failure")
+        task.fail("fastqc failure")
 
     return rcode
 
