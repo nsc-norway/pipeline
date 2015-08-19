@@ -116,29 +116,29 @@ class Task(object):
         return path
 
     
-    @property
     def logfile(self, command, extension="txt"):
         """Get the path to a logfile in the standard log directory, for use with
         subprocesses, etc."""
-        logdir = os.path.join(process.udf[WORK_RUN_DIR_UDF], "DemultiplexLogs")
-        try:
-            os.mkdir(d)
-        except OSError:
-            pass
+
+        logdir = os.path.join(self.work_dir, "DemultiplexLogs")
+
+        if not os.path.exists(logdir):
+            os.mkdir(logdir)
+
         if self.process:
             return os.path.join(
-                    self.work_dir,
+                    logdir,
                     "{0}.{1}.{2}.{3}".format(
                         self.task_name.lower().replace(" ","_"),
-                        process.id,
+                        self.process.id,
                         command.split("/")[-1],
                         extension
                         )
                     )
         else:
             return os.path.join(
-                    self.work_dir,
-                    "{0}.{2}.{3}".format(
+                    logdir,
+                    "{0}.{1}.{2}".format(
                         self.task_name.lower().replace(" ","_"),
                         command.split("/")[-1],
                         extension

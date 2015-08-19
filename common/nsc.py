@@ -92,7 +92,8 @@ elif TAG == "dev":
 # Data processing programs
 CONFIGURE_BCL_TO_FASTQ="/data/common/tools/nscbin/configureBclToFastq.pl"
 MAKE="/usr/bin/make"
-BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
+#BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
+BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.17.1.14/nscinstallbin/bin/bcl2fastq"
 FASTQC="/data/common/tools/nscbin/fastqc"
 # Some programs don't have to be put here, because they are standard on all 
 # machines: tar.

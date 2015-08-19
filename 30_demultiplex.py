@@ -17,7 +17,8 @@ def main(task):
     task.running()
     run_id = task.run_id
 
-    print "Demultiplexing process for LIMS process", process_id, ", run", run_id
+    if task.process:
+        print "Demultiplexing process for LIMS process", task.process.id, ", run", run_id
 
     source_run_dir = task.src_dir
     input_dir = os.path.join(source_run_dir, "Data", "Intensities", "BaseCalls")
@@ -53,12 +54,12 @@ def main(task):
         demultiplex_sample_sheet_path = task.sample_sheet_path
 
     if run_dmx(
-            process, n_threads, dest_run_dir, input_dir, no_lane_splitting,
-            other_options
+            task, threads, dest_run_dir, input_dir, demultiplex_sample_sheet_path,
+            no_lane_splitting, other_options
             ):
         task.success_finish()
     else:
-        task.fail(process, "bcl2fastq failure (see log)") 
+        task.fail("bcl2fastq failure (see log)") 
 
 
 def get_thread_args(n_threads):
@@ -80,7 +81,7 @@ def run_dmx(task, n_threads, run_dir, input_dir, sample_sheet_path,
     Speciy run_dir as the destination directory and input_dir as the source
     directory containing BCLs, <source_run>/Data/Intensities/BaseCalls."""
 
-    args = ['--runfolder-dir', run_dir]
+    args = [nsc.BCL2FASTQ2, '--runfolder-dir', run_dir]
     args += ['--sample-sheet', sample_sheet_path]
     if no_lane_splitting:
         args += ['--no-lane-splitting']
@@ -93,14 +94,17 @@ def run_dmx(task, n_threads, run_dir, input_dir, sample_sheet_path,
     jobname = "bcl2fastq2"
     if task.process:
         jobname = task.process.id + "." + jobname
+
     rcode = slurm.srun_command(
             args, jobname, time="1-0", logfile=log_path,
             cpus_per_task=n_threads, mem="8G"
             )
-    utilities.upload_file(process, nsc.BCL2FASTQ_LOG, log_path)
 
-    # Get the bcl2fastq version
+    # LIMS only:
+    # - Upload log
+    # - Get the bcl2fastq version
     if task.process:
+        utilities.upload_file(task.process, nsc.BCL2FASTQ_LOG, log_path)
         log = open(log_path)
         for i in xrange(3):
             l = next(log)
