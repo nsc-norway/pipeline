@@ -15,7 +15,7 @@ import utilities
 class Project(object):
     """Project object.
     name: name with special characters replaced
-    path: base name of project directory relative to Data/Intensities/BaseCalls
+    proj_dir: base name of project directory relative to Data/Intensities/BaseCalls
     samples: list of samples
     """
     def __init__(self, name, proj_dir, samples, is_undetermined=False):
@@ -84,7 +84,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes):
         if not project:
             project_dir = get_project_dir(run_id, project) # fn defined in bottom of this file
             project = Project(project_name, project_dir, [])
-            projects[project_name] = project
+            projects[project_name] = project
 
         sample = None
         for s in project.samples:
@@ -159,12 +159,14 @@ def get_projects_by_process(process):
 
 def check_files_merged_lanes(run_dir):
     basecalls_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
-    if os.path.exists(basecalls_dir + "/Undetermined_S0_R1_001.fastq.gz"):
+    unmerged_exists = len(glob.glob(basecalls_dir + "/Undetermined_S0_L*_R1_001.fastq.gz")) > 0
+    merged_exists = os.path.exists(basecalls_dir + "/Undetermined_S0_R1_001.fastq.gz")
+    if merged_exists and not unmerged_exists:
         return True
-    elif len(glob.glob(basecalls_dir + "/Undetermined_S0_L*_R1_001.fastq.gz")) > 0:
+    elif unmerged_exists and not merged_exists:
         return False
     else:
-        raise RuntimeError("Unable to determine if lanes were merged")
+        raise RuntimeError("Unable to determine if lanes were merged (no-lane-splitting option)")
 
 
 def get_projects_by_files(run_dir, sample_sheet_path):
@@ -246,7 +248,7 @@ def parse_sample_sheet(sample_sheet):
                 if c.isdigit() and not int(c) == 0:
                     result['reads'].append(int(c))
         elif header == "[Data]":
-            result['data'] = parse_csv_sample_sheet(data)
+            result['data'] = parse_sample_sheet_data(data)
 
     return result
 

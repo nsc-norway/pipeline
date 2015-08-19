@@ -60,6 +60,11 @@ class Task(object):
     def work_dir(self):
         return self.get_arg('work_dir')
 
+
+    @property
+    def bc_dir(self):
+        return os.path.join(self.work_dir, "Data", "Intensities", "BaseCalls")
+
     @property
     def src_dir(self):
         return self.get_arg('src_dir')
