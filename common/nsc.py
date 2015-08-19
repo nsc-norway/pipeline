@@ -104,9 +104,12 @@ if TAG == "prod":
     DELIVERY_DIR="/data/nsc.loki/delivery"     # used by prepare-delivery after QC
     DIAGNOSTICS_DELIVERY = "/data/diag/nscDelivery"
 elif TAG == "dev":
-    SECONDARY_STORAGE="/data/nsc.loki/test"    # location of demultiplexed files
-    DELIVERY_DIR="/data/nsc.loki/test/delivery"# used by prepare-delivery after QC
-    DIAGNOSTICS_DELIVERY = "/data/nsc.loki/test/diag"
+    #SECONDARY_STORAGE="/data/nsc.loki/test"    # location of demultiplexed files
+    #DELIVERY_DIR="/data/nsc.loki/test/delivery"# used by prepare-delivery after QC
+    #DIAGNOSTICS_DELIVERY = "/data/nsc.loki/test/diag"
+    SECONDARY_STORAGE="/data/data/test"    # location of demultiplexed files
+    DELIVERY_DIR="/data/data/test/delivery"# used by prepare-delivery after QC
+    DIAGNOSTICS_DELIVERY = "/data/data/test/diag"
     
 LOG_DIR = BASE_DIR + "/logs"       # for slurm jobs
 SCRATCH_DIR = BASE_DIR + "/run"    # not used
