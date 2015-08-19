@@ -26,12 +26,11 @@ def main(task):
     else:
         lane_stats = lane_info.get_from_files(work_dir, instrument)
 
-    merged_lanes = task.no_lane_splitting
     projects = task.projects
 
     run_stats = stats.get_bcl2fastq_stats(
                 os.path.join(work_dir, "Stats"),
-                aggregate_lanes = merged_lanes,
+                aggregate_lanes = task.no_lane_splitting,
                 aggregate_reads = False
                 )
 
