@@ -1,7 +1,11 @@
 import os
 from common import taskmgr
 
-# TODO: remove instrument parameter?
+TASK_NAME = "Move results"
+TASK_DESCRIPTION = """Move fastq files from demultiplexing into the standard
+                    directory structure used by NSC."""
+TASK_ARGS = ['work_dir', 'sample_sheet']
+
 
 def move_files(bc_dir, projects):
     """Rename result files after demultiplexing. Work back from the desired
