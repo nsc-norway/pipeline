@@ -2,6 +2,9 @@ import os
 import sys
 import traceback
 import argparse
+import datetime
+
+# local
 import utilities
 import samples
 import nsc
@@ -305,7 +308,7 @@ class Task(object):
             self.process.put()
             #TODO : would have some processing status UDF
 
-        print "SUCCESS[" + self.task_name + "]" + complete_str
+        print "SUCCESS[" + self.task_name + "] " + complete_str
         sys.exit(0)
 
 

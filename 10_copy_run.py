@@ -93,7 +93,7 @@ def main(task):
         job_name = TASK_NAME
 
     rc = slurm.srun_command(
-            args, job_name, "02:00", logfile=logfile, srun_args=srun_args
+            args, job_name, "02:00:00", logfile=logfile, srun_args=srun_args
             )
     
     if rc == 0:
