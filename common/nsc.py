@@ -26,8 +26,8 @@ ERROR_DETAILS_UDF = "Error details"
 RUN_ID_UDF = "Run ID"
 THREADS_UDF = "Number of threads"
 MISMATCHES_UDF = "Number of mismatches"
-SOURCE_RUN_DIR_UDF = "Source run directory"
-WORK_RUN_DIR_UDF = "Working run directory"
+SOURCE_RUN_DIR_UDF = "Source run folder"
+WORK_RUN_DIR_UDF = "Working run folder"
 OTHER_OPTIONS_UDF = "Other options for bcl2fastq"
 PROCESS_UNDETERMINED_UDF = "Process undetermined indexes"
 NO_LANE_SPLITTING_UDF = "No lane splitting"
@@ -82,7 +82,7 @@ PDFLATEX="/usr/bin/pdflatex"
 #Defaults:glsai          !requiretty
 SCANCEL_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/scancel"]
 SRUN_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/srun", 
-            "--account=nsc", "--qos=high", "--partition=main", "--nodes=1"]
+            "--account=nsc", "--qos=high", "--partition=lucky", "--nodes=1"]
 
 if TAG == "prod":
     WRAPPER_SCRIPT="/data/nsc.loki/automation/pipeline/slurm/ous-job.sh"

@@ -41,9 +41,9 @@ def get_instrument(seq_process):
 
 
 def get_instrument_by_runid(run_id):
-    if re.match("\d{6}_M"):
+    if re.match(r"\d{6}_M", run_id):
         return 'miseq'
-    elif re.match("\d{6}_NS"):
+    elif re.match(r"\d{6}_NS", run_id):
         return 'nextseq'
     else:
         return 'hiseq'

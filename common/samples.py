@@ -134,7 +134,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes):
                             )
                 undetermined_sample.files.append(FastqFile(lane, i_read, path, None))
 
-        return [undetermined_project] + projects.values()
+        return [undetermined_project] + projects.values()
 
 
 def get_projects_by_process(process):

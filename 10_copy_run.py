@@ -64,7 +64,6 @@ def main(task):
     os.umask(007)
 
     task.running()
-    process = Process(nsc.lims, id=process_id)
     runid = task.run_id
 
     source = task.src_dir
@@ -87,14 +86,14 @@ def main(task):
     if task.process:
         # Can't use a per-run log dir, as it's not created yet, it's 
         # created by the rsync command
-        logfile = os.path.join(nsc.LOG_DIR, process_id + "-rsync.txt")
-        job_name = process.id + "." TASK_NAME
+        logfile = os.path.join(nsc.LOG_DIR, task.process.id + "-rsync.txt")
+        job_name = task.process.id + "." + TASK_NAME
     else:
         logfile = None
         job_name = TASK_NAME
 
     rc = slurm.srun_command(
-            args, job_name, logfile=logfile, srun_args=srun_args
+            args, job_name, "02:00", logfile=logfile, srun_args=srun_args
             )
     
     if rc == 0:
@@ -103,7 +102,7 @@ def main(task):
         detail = None
         if task.process: #LIMS
             detail = open(logfile).read()
-        utilities.fail("rsync failed", detail)
+        task.fail("rsync failed", detail)
 
 
 with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:

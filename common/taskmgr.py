@@ -1,4 +1,6 @@
 import os
+import sys
+import traceback
 import argparse
 import utilities
 import samples
@@ -11,12 +13,18 @@ from genologics.lims import *
 
 
 # Standard argument definitions
-# { name => (argparse_name, type, default, description) }
+# { name => (argparse_name, udf_name, type, default, description) }
+# sample_sheet doesn't have UDF, special case
+# Note: in the argument parser we attempt to set the name of the attribute on the result
+# object equal to the "name" of the option, i.e. the key of this dict. For positional 
+# arguments (without leading "--"), however, the attribute will be called by the argparse_name
+# instead. So keep name and argparse_name equal for those.
 ARG_OPTIONS = {
-        "src_dir": ("SRC-DIR", str, None, "Source directory (run folder)"),
-        "work_dir": ("DIR", str, None, "Destination/working directory (run folder)"),
-        "threads": ("--threads", int, 1, "Number of threads/cores to use"),
-        "sample_sheet": ("--sample-sheet", str, "<DIR>/DemultiplexingSampleSheet.csv", "Sample sheet"),
+        "src_dir": ("src_dir", nsc.SOURCE_RUN_DIR_UDF, str, None, "Source directory (run folder)"),
+        "work_dir": ("work_dir", nsc.WORK_RUN_DIR_UDF, str, None, "Destination/working directory (run folder)"),
+        "run_id": ("--run-id", nsc.RUN_ID_UDF, str, None, "Override run ID (mostly useless)"),
+        "threads": ("--threads", nsc.THREADS_UDF, int, 1, "Number of threads/cores to use"),
+        "sample_sheet": ("--sample-sheet", None, str, "<DIR>/DemultiplexingSampleSheet.csv", "Sample sheet"),
         }
 DEFAULT_VAL_INDEX = 2
 
@@ -34,33 +42,38 @@ class Task(object):
     as it won't be reported to the LIMS)
     """
 
-    def __init__(self, task_name, task_description, args):
+    def __init__(self, task_name, task_description, arg_names):
         self.task_name = task_name
         self.task_description = task_description
-        self.args = []
+        self.arg_names = arg_names
         self.parser = argparse.ArgumentParser(description=task_description)
-        self.parser.add_argument("--pid", default=None, help="Process ID if running within LIMS")
+        self.parser.add_argument("--pid", dest="pid", default=None, help="Process ID if running within LIMS")
+        self.args = None # To be set when argument parser is run
         self.process = None
         self.finished = False
 
 
     def get_arg(self, arg_name):
-        argparse_name, udf_name, type, default, help = self.args[arg_name]
+        argparse_name, udf_name, type, default, help = ARG_OPTIONS[arg_name]
         if self.process:
             return utilities.get_udf(self.process, udf_name, default)
         else:
-            val = self.parser.getattr(arg_name)
+            val = getattr(self.args, arg_name)
             if val is None: # Handle when default gets updated
                 return default
+            else:
+                return val
 
     @property
     def run_id(self):
-        return self.get_arg("run_id")
+        if self.process:
+            return self.get_arg("run_id")
+        else:
+            return os.path.basename(os.path.realpath(self.args.work_dir))
 
     @property
     def work_dir(self):
         return self.get_arg('work_dir')
-
 
     @property
     def bc_dir(self):
@@ -94,7 +107,7 @@ class Task(object):
     def sample_sheet_path(self):
         """Get the path to the sample sheet, for non-lims operation only"""
 
-        path = self.parser.sample_sheet
+        path = self.args.sample_sheet
         if path == "<DIR>/DemultiplexingSampleSheet.csv":
             path = os.path.join(self.work_dir, "DemultiplexingSampleSheet.csv")
         return path
@@ -111,7 +124,7 @@ class Task(object):
             pass
         if self.process:
             return os.path.join(
-                    self.work_dir 
+                    self.work_dir,
                     "{0}.{1}.{2}.{3}".format(
                         self.task_name.lower().replace(" ","_"),
                         process.id,
@@ -121,7 +134,7 @@ class Task(object):
                     )
         else:
             return os.path.join(
-                    self.work_dir 
+                    self.work_dir,
                     "{0}.{2}.{3}".format(
                         self.task_name.lower().replace(" ","_"),
                         command.split("/")[-1],
@@ -167,7 +180,7 @@ class Task(object):
 
     # Context manager protocol: __enter__ and __exit__
     def __enter__(self):
-        pass
+        return self
 
 
     def __exit__(self, etype, value, tb):
@@ -176,21 +189,18 @@ class Task(object):
 
         Note: many exit points in this function.
         """
+
+        if self.finished:
+            return True
+
         if etype is None:
-            if self.finished:
-                return True
-            else:
-                print "Uexpected exit"
-                if self.process:
-                    utilities.fail(self.process, "Unexpected exit", "Unexpected exit without exception")
-                raise RuntimeError("Unexpected exit!")
+            print "Uexpected exit"
+            if self.process:
+                utilities.fail(self.process, "Unexpected exit", "Unexpected exit without exception")
 
-        if self.process:
-            process = Process(nsc.lims, id=self.process_id)
-            utilities.fail(self.process, etype.__name__ + " " + str(value),
-                    "\n".join(traceback.format_exception(etype, value, tb)))
-
-        return False # re-raise exception
+        # Note: fail() function calls exit()
+        self.fail(etype.__name__ + " " + str(value),
+                "\n".join(traceback.format_exception(etype, value, tb)))
 
 
 
@@ -201,20 +211,28 @@ class Task(object):
 
         parse_args() will exit() if the args are incorrect."""
 
-        for name in self.args:
+        for name in self.arg_names:
             argparse_name, udf_name, type, default, help = ARG_OPTIONS[name]
-            self.parser.add_argument(
-                    argparse_name,
-                    destination=name,
-                    type=type,
-                    default=default,
-                    help=help
-                    )
+            if argparse_name.startswith("--"):
+                self.parser.add_argument(
+                        argparse_name,
+                        dest=name,
+                        type=type,
+                        default=default,
+                        help=help
+                        )
+            else: # we're not allowed to set dest for positional arguments
+                self.parser.add_argument(
+                        argparse_name,
+                        type=type,
+                        default=default,
+                        help=help
+                        )
 
-        self.parser.parse()
-        if self.parser.pid:
+        self.args = self.parser.parse_args()
+        if self.args.pid:
             # LIMS operation
-            self.process = Process(nsc.lims, id=self.parser.pid)
+            self.process = Process(nsc.lims, id=self.args.pid)
             self.process.get()
             self.process.udf[nsc.JOB_STATUS_UDF] = "Running"
             self.process.udf[nsc.JOB_STATE_CODE_UDF] = 'RUNNING'
@@ -235,18 +253,13 @@ class Task(object):
         else:
             self.process = None
 
-            # Set run ID based on working directory, for command-line operation
-            if not self.parser.run_id and self.parser.work_dir:
-                run_id = os.path.basename(os.path.realpath(run_dir))
-                ARG_OPTIONS['run_id'][DEFAULT_VAL_INDEX] = run_id
-
         print "START  [" + self.task_name + "]"
 
         if info_str:
             self.info(info_str)
 
 
-    def info(current_job, status):
+    def info(self, current_job, status):
         if self.process:
             self.process.get(force=True)
             self.process.udf[nsc.JOB_STATUS_UDF] = "Running ({0})".format(status)
@@ -254,7 +267,7 @@ class Task(object):
         print "STATUS [" + self.task_name + "] " + status
 
 
-    def fail(message, extra_info = None):
+    def fail(self, message, extra_info = None):
         """Report failure.
         
         NOTE: Calls sys.exit(1) to terminate program.
@@ -270,7 +283,7 @@ class Task(object):
             if extra_info:
                 self.process.udf[nsc.ERROR_DETAILS_UDF] = extra_info
             self.process.put()
-        print "ERROR  [" + self.task_name + "]" + message
+        print "ERROR  [" + self.task_name + "] " + message
         if extra_info:
             print "----------"
             print extra_info
