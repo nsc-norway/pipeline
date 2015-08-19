@@ -2,23 +2,28 @@
 from common import nsc, stats, utilities
 from genologics.lims import *
 
-def main(process_id):
-    process = Process(nsc.lims, id=process_id)
-    utilities.running(process, nsc.CJU_SAVING_STATS)
+TASK_NAME = "Update LIMS stats"
+TASK_DESCRIPTION = """Post demultiplexing stats to LIMS (doesn't make an effort
+                    to handle the non-LIMS case, obviously)."""
+TASK_ARGS = ['work_dir']
 
-    run_id = process.udf[nsc.RUN_ID_UDF]
-    demultiplex_dir = utilities.get_udf(
-            process, nsc.WORK_RUN_DIR_UDF,
-            os.path.join(nsc.SECONDARY_STORAGE, run_id)
-            )
+
+def main(task):
+    task.running()
+
+    if not task.process:
+        print "Can't use this script without LIMS (--pid), sorry."
+        sys.exit(1)
 
     run_stats = stats.get_bcl2fastq_stats(
-            os.path.join(demultiplex_dir, "Stats"),
+            os.path.join(task.bc_dir, "Stats"),
             aggregate_lanes = True,
             aggregate_reads = True
             )
 
-    post_stats(process, run_stats)
+    post_stats(task.process, run_stats)
+
+    task.success_finish()
 
 
 def post_stats(process, demultiplex_stats):
@@ -105,7 +110,7 @@ def get_lane(process, lane):
             return input
 
 
-
 if __name__ == "__main__":
-    main(sys.argv[1])
+    with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
+        main(task)
 
