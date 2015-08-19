@@ -7,7 +7,7 @@ import shutil
 from genologics.lims import *
 from common import utilities, samples, nsc, taskmgr
 
-TASK_NAME = "Run FastQC"
+TASK_NAME = "FastQC"
 TASK_DESCRIPTION = """Run FastQC on the demultiplexed files."""
 TASK_ARGS = ['work_dir', 'sample_sheet', 'threads']
 
