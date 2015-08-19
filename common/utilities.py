@@ -53,26 +53,6 @@ def merged_lanes(run_id):
     return get_instrument_by_runid(run_id) == "nextseq"
 
 
-def logfile(process, step, command, extension="txt"):
-    """Create the DemultiplexLogs dir if it doesn't exist. Returns the
-    path to the log file for the step and command. One dir is created
-    for each process ID.
-    step: Name of the step, becomes part of the log name.
-    command: Name of the command executed, also becomes part of the log name."""
-    d1 = os.path.join(process.udf[WORK_RUN_DIR_UDF], "DemultiplexLogs")
-    d2 = os.path.join(process.udf[WORK_RUN_DIR_UDF], "DemultiplexLogs", process.id)
-    for d in [d1, d2]:
-        try:
-            os.mkdir(d)
-        except OSError:
-            pass
-    return "{0}/{1}.{2}.{3}".format(
-            d2, step.lower().replace(" ","_"),
-            command.split("/")[-1],
-            extension
-            )
-
-
 def get_index_sequence(artifact):
     for label in artifact.reagent_labels:
         # The structure of the reagent label XML isn't consistent with other lims
@@ -93,19 +73,6 @@ def get_index_sequence(artifact):
                         if attribute_tag.attrib['name'] == "Sequence":
                             return attribute_tag.attrib['value']
 
-        return None
-
-
-def get_sample_sheet(process):
-    """Downloads the demultiplexing process's sample sheet and returns
-    the data."""
-
-    sample_sheet = None
-    for o in process.all_outputs(unique=True):
-        if o.output_type == "ResultFile" and o.name == "SampleSheet csv":
-            if len(o.files) == 1:
-                return o.files[0].download()
-    else:
         return None
 
 

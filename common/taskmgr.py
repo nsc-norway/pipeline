@@ -1,10 +1,9 @@
+import os
 import argparse
 import utilities
 import nsc
 
 from genologics.lims import *
-# TODO: rename to task.py
-
 
 # Module to manage processing status for all the script, and to abstract the 
 # differences between command line invocation and invocation through LIMS.
@@ -16,6 +15,7 @@ ARG_OPTIONS = {
         "src_dir": ("SRC-DIR", str, None, "Source directory (run folder)"),
         "work_dir": ("DIR", str, None, "Destination/working directory (run folder)"),
         "threads": ("--threads", int, 1, "Number of threads/cores to use"),
+        "sample_sheet": ("--sample-sheet", str, "<DIR>/DemultiplexingSampleSheet.csv", "Sample sheet"),
         }
 DEFAULT_VAL_INDEX = 2
 
@@ -68,6 +68,63 @@ class Task(object):
     def threads(self):
         return self.get_arg('threads')
 
+    @property
+    def sample_sheet_content(self):
+        """Get the content of the "demultiplexing" sample sheet"""
+        if self.process:
+            sample_sheet = None
+            for o in process.all_outputs(unique=True):
+                if o.output_type == "ResultFile" and o.name == nsc.SAMPLE_SHEET:
+                    if len(o.files) == 1:
+                        sample_sheet = o.files[0].download()
+                        break
+
+        else:
+            sample_sheet = open(self.sample_sheet_path, 'rb').read()
+
+        return sample_sheet
+
+    @property
+    def sample_sheet_path(self):
+        """Get the path to the sample sheet, for non-lims operation only"""
+
+        path = self.parser.sample_sheet
+        if path == "<DIR>/DemultiplexingSampleSheet.csv":
+            path = os.path.join(self.work_dir, "DemultiplexingSampleSheet.csv")
+        return path
+
+    
+    @property
+    def logfile(self, command, extension="txt"):
+        """Get the path to a logfile in the standard log directory, for use with
+        subprocesses, etc."""
+        logdir = os.path.join(process.udf[WORK_RUN_DIR_UDF], "DemultiplexLogs")
+        try:
+            os.mkdir(d)
+        except OSError:
+            pass
+        if self.process:
+            return os.path.join(
+                    self.work_dir 
+                    "{0}.{1}.{2}.{3}".format(
+                        self.task_name.lower().replace(" ","_"),
+                        process.id,
+                        command.split("/")[-1],
+                        extension
+                        )
+                    )
+        else:
+            return os.path.join(
+                    self.work_dir 
+                    "{0}.{2}.{3}".format(
+                        self.task_name.lower().replace(" ","_"),
+                        command.split("/")[-1],
+                        extension
+                        )
+                    )
+
+
+    # Arguments:
     def add_argument(self, *args, **kwargs):
         """Add an extra argument for command line. Used for args which
         are only applicable for a single task, and not part of the 
