@@ -5,8 +5,11 @@ import os
 import re
 import shutil
 from genologics.lims import *
-from common import utilities, samples, nsc
+from common import utilities, samples, nsc, taskmgr
 
+TASK_NAME = "Run FastQC"
+TASK_DESCRIPTION = """Run FastQC on the demultiplexed files."""
+TASK_ARGS = ['work_dir', 'sample_sheet']
 
 def main(process_id):
     os.umask(007)
@@ -96,4 +99,9 @@ def move_fastqc_results(qc_dir, basecalls_dir, projects):
                     if os.path.exists(fqc_dir):
                         shutil.rmtree(fqc_dir)
                     os.rename(original_fqc_dir, fqc_dir)
+
+
+if __name__ == "__main__":
+    with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
+        main(task)
 
