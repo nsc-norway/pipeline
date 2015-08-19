@@ -43,15 +43,16 @@ PROJECT_TYPE_UDF = "Project type"
 RECENTLY_COMPLETED_UDF = "Recently completed"
 PROCESSED_DATE_UDF = "Processing completed date"
 
+
+# Input files
+INPUT_SAMPLE_SHEET = "Input sample sheet"
+# Files 
+SAMPLE_SHEET = "Demultiplexing sample sheet"
 # Output files
 BCL2FASTQ_LOG = "bcl2fastq log"
 FASTQC_LOG = "fastqc log"
 FASTQ_OUTPUT = "{sample_name}"
 
-# Values of the CURRENT_JOB_UDF
-CJU_DEMULTIPLEXING = "Demultiplexing"
-CJU_SAVING_STATS = "Saving stats"
-CJU_FASTQC = "FastQC"
 
 
 # Sequencing processes

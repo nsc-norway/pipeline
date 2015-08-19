@@ -6,19 +6,22 @@
 
 # Sample sheet management:
 #  * LIMS mode *
-#  - This script takes the sample sheet from the sequencing process. If
-#    no sequencing process is found, it takes it from <run folder>/SampleSheet.csv
-#  - It adds the headers and copies it to the process in the LIMS. It also writes
-#    the sample sheet to DemultiplexingSampleSheet.csv in the run folder, for 
-#    consistency with the non-LIMS operation mode.
-#  - Other tasks always take the sample sheet from the LIMS process, but 
-#    the demultiplexing process also writes it to DemultiplexingSampleSheet.csv
-#    (overwrites it, to make sure it's using the correct sample sheet)
+#  - This script takes the sample sheet from the "Input sample sheet" ResultFile 
+#    object associated with the task's LIMS process. If there is no sample sheet, 
+#    it takes it from the cluster generation process. If
+#    no clustering process is found, it takes it from <run folder>/SampleSheet.csv
+#  - It stores the *input* sample sheet in the LIMS process if it was fetched from
+#    somewhere else, but this is not used further.
+#  - It adds the headers and copies it to the process in the LIMS, on the 
+#    "Demultiplexing sample sheet" ResultFile object. 
+#  - Other tasks always take the sample sheet from the LIMS process ("Demultiplexing
+#    sample sheet"), but the demultiplexing process also writes it to
+#    DemultiplexingSampleSheet.<process_id>.csv because bcl2fastq2 needs an on-disk copy.
 #
 #  * Command line mode *
 #  - This script reads the sample sheet from SampleSheet.csv and writes it to
 #    DemutliplexingSampleSheet.csv. The input sample sheet file may be overridden
-#    with the --input-sample-sheet option. TODO
+#    with the --input-sample-sheet option.
 #  - Other tasks read the sample sheet from DemultiplexingSampleSheet.csv or 
 #    another file provided on the command line.
 
@@ -43,7 +46,7 @@ def main(task):
 
     task.add_argument(
             '--input-sample-sheet',
-            default=None,
+            default=None, # would use work-dir/SampleSheet.csv but dont know work-dir
             help="Path to source sample sheet to transform"
             )
     task.add_argument(
@@ -54,17 +57,104 @@ def main(task):
     os.umask(007)
     task.running()
 
+    # Flag to track if the sample sheet was found right on the current LIMS process
+    # If the sample sheet was found on the current process, there is no need to 
+    # re-upload it.
+    found_on_process = False
+    sample_sheet = None
+    sample_sheet_lims_artifact = None # For use when uploading the input sample sheet
     if task.process:
+        # Try to get the input sample sheet:
+        
+        # On the current LIMS process
+        for o in task.process.all_outputs(unique=True):
+            if o.output_type == "ResultFile" and o.name == nsc.INPUT_SAMPLE_SHEET:
+                sample_sheet_lims_artifact = o
+                if len(o.files) == 1:
+                    sample_sheet = o.files[0].download()
+                    found_on_process = True
+
+        # From the clustering process
+        if not sample_sheet:
+            sample_sheet = get_ss_from_cluster_proc(task.process)
+
+        # From a file (fall through to non-LIMS case)
+        if not sample_sheet:
+            sample_sheet_path = os.path.join(task.work_dir, "SampleSheet.csv")
+
+    else:
+        sample_sheet_path = task.parser.input_sample_sheet
+        if not sample_sheet_path:
+            sample_sheet_path = os.path.join(task.work_dir, "SampleSheet.csv")
         
 
+    # If not using LIMS, or if LIMS sources failed, try to get a file
+    if not sample_sheet:
+        try:
+            sample_sheet = open(sample_sheet_path, 'rb').read()
+        except IOError:
+            task.fail("Couldn't find the sample sheet")
+
+    # Upload the input sample sheet as a record if -using LIMS, -it wasn't there already
+    if task.process and not found_on_process:
+        utilities.upload_file(
+                task.process,
+                name = nsc.INPUT_SAMPLE_SHEET,
+                path = "SampleSheet.csv",
+                data = sample_sheet
+                )
+
+    # Doctor the sample sheet
+    sample_sheet = "[Settings]\r\n[Data]\r\n" + sample_sheet
     
-    if rc == 0:
-        task.success_finish()
+    # Post the result, as appropriate...
+    if task.process:
+        utilities.upload_file(
+                task.process,
+                name = nsc.SAMPLE_SHEET,
+                path = "DemultiplexingSampleSheet.csv",
+                data = sample_sheet
+                )
     else:
-        detail = None
-        if task.process: #LIMS
-            detail = open(logfile).read()
-        utilities.fail("rsync failed", detail)
+        if task.parser.output_sample_sheet:
+            path = os.path.join(task.work_dir, task.parser.output_sample_sheet)
+        else:
+            path = os.path.join(task.work_dir, "DemultiplexingSampleSheet.csv")
+
+        open(path, 'rb').write(sample_sheet)
+    
+    task.success_finish()
+
+
+def get_ss_from_cluster_proc(process):
+    # On the associated cluster generation process
+    parent_processes = process.parent_processes()
+    parent_pids = set(p.id for p in parent_processes)
+
+    # Flow cell ID
+    fcid = process.all_inputs()[0].location[0].name
+
+    # This script can only handle the case when there is a single clustering process
+    if len(parent_pids) == 1:
+        cluster_proc = parent_processes[0]
+        outputs = cluster_proc.all_outputs(unique=True)
+        for io in cluster_proc.input_output_maps:
+            i = io[0]
+            o = io[1]
+            if o['output-type'] == 'ResultFile' and\
+                    o['output-generation-type'] == 'PerAllInputs':
+                if o['uri'].name == 'SampleSheet csv':
+                    if len(o['uri'].files) == 1:
+                        data = o['uri'].files[0].download()
+                        lines = data.splitlines()
+                        # Warning: this assumes the old style sample sheet
+                        # (bcl2fastq 1.84). Will probably be changing in 
+                        # mid 2016 or so
+                        if len(lines) >= 2 and lines[1].startswith(fcid+","):
+                            return data
+
+    return None
+
 
 
 
