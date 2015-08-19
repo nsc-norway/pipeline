@@ -23,11 +23,10 @@ def main(task):
     
     if task.process: # lims mode
         lane_stats = lane_info.get_from_lims(process, instrument)
-        merged_lanes = utilities.get_udf(task.process, nsc.NO_LANE_SPLITTING_UDF, False)
     else:
         lane_stats = lane_info.get_from_files(work_dir, instrument)
-        merged_lanes = samples.check_files_merged_lanes(work_dir)
 
+    merged_lanes = task.no_lane_splitting
     projects = task.projects
 
     run_stats = stats.get_bcl2fastq_stats(

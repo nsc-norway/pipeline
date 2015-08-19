@@ -1,6 +1,7 @@
 import os
 import argparse
 import utilities
+import samples
 import nsc
 
 from genologics.lims import *
@@ -136,6 +137,20 @@ class Task(object):
         else:
             projects = samples.get_projects_by_files(self.work_dir, self.sample_sheet_path)
         return projects
+
+
+    @property
+    def no_lane_splitting(self):
+        """Gets the no-lane-splitting AKA merged lanes option.
+        
+        This is used by tasks running after demultiplexing, to determine
+        whether data from multiple lanes are combined into single files. """
+        if self.process:
+            return utilities.get_udf(self.process, nsc.NO_LANE_SPLITTING_UDF, False)
+        else:
+            return samples.check_files_merged_lanes(work_dir)
+
+
 
 
 
