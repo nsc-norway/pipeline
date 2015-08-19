@@ -77,6 +77,6 @@ def main(task):
 
 
 if __name__ == "__main__":
-    with taskmgr.Task() as task:
+    with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
         main(task)
 
