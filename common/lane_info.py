@@ -4,7 +4,28 @@
 
 import re
 import os
+from collections import defaultdict
 from genologics.lims import *
+
+def get_lane_cluster_density(path):
+    """Get cluster density for lanes from report files in Data/reports.
+
+    Returns a dict indexed by the 1-based lane number."""
+
+    with open(path) as f:
+        # Discard up to and including Lane
+        while not next(f).startswith("Lane\t"):
+            pass
+
+        lane_sum = defaultdict(int)
+        lane_ntile = defaultdict(int)
+        for l in f:
+            cell = l.split("\t")
+            lane_sum[int(cell[0])] += float(cell[2])
+            lane_ntile[int(cell[0])] += 1
+
+        return dict((i+1, lane_sum[i] / lane_ntile[i]) for i in lane_sum.keys())
+
 
 def get_from_files(run_dir, instrument):
     """Returns a dict indexed by lane number with values of cluster density tuples. Each
@@ -21,9 +42,9 @@ def get_from_files(run_dir, instrument):
     if instrument == "miseq" or instrument == "hiseq":
         # MiSeq has the Data/reports info, like HiSeq, getting clu. density from files
         pf_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane PF.txt")
-        lane_pf = parse.get_lane_cluster_density(pf_path)
+        lane_pf = get_lane_cluster_density(pf_path)
         raw_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane.txt")
-        lane_raw = parse.get_lane_cluster_density(raw_path)
+        lane_raw = get_lane_cluster_density(raw_path)
         for l in sorted(lane_raw.keys()):
             lanes[l] = (lane_raw[l], lane_pf[l], lane_pf[l] / lane_raw[l])
 

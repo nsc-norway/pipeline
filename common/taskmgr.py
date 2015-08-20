@@ -71,8 +71,12 @@ class Task(object):
     def run_id(self):
         if self.process:
             return self.get_arg("run_id")
-        else:
+        elif "work_dir" in self.arg_names:
             return os.path.basename(os.path.realpath(self.args.work_dir))
+        elif "src_dir" in self.arg_names:
+            return os.path.basename(os.path.realpath(self.args.src_dir))
+        else:
+            raise RuntimeError("Can't get the run ID based on the run folder dir")
 
     @property
     def work_dir(self):
@@ -164,7 +168,7 @@ class Task(object):
         if self.process:
             return utilities.get_udf(self.process, nsc.NO_LANE_SPLITTING_UDF, False)
         else:
-            return samples.check_files_merged_lanes(work_dir)
+            return samples.check_files_merged_lanes(self.work_dir)
 
 
 

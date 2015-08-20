@@ -213,7 +213,7 @@ def add_stats(projects, run_stats):
     for project in projects:
         for sample in project.samples:
             for f in sample.files:
-                stats = run_stats.get(f.lane, sample.sample_id, f.read)
+                stats = run_stats.get((f.lane, sample.sample_id, f.i_read))
                 if stats:
                     f.stats = stats
 

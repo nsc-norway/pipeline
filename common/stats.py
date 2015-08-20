@@ -37,27 +37,30 @@ def parse_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_rea
         raise RuntimeError("Expected XML element Stats, found " + root.tag)
     fc = root.find("Flowcell")
 
-    project = None
+    projects = []
     for pro in fc.findall("Project"):
         if pro.attrib['name'] == "default":
             default_project = pro
         elif pro.attrib['name'] != "all":
-            project = pro
+            projects.append(pro)
 
-    if not project:
-        project = default_project
     
     # We compute the most specific coordinate first, and then take the 
     # aggregates (sum) later.
     samples = {}
-    for is_undetermined, project in [(False, project), (True, default_project)]:
+    for is_undetermined, project in [(True, default_project)] +\
+                                    [(False, project) for project in projects]:
         for sample in project.findall("Sample"):
             if is_undetermined:
                 sample_id = None
-                if not sample.attrib['name'] == "unknown":
+                if not (sample.attrib['name'] == "unknown" or
+                        sample.attrib['name'] == "Undetermined"):
                     continue
             else:
                 sample_id = sample.attrib['name']
+                if sample_id == "all":
+                    continue
+
             # stats_* are indexed by filter type (pf/raw) then by the read index (then will
             # be re-organised in the return value)
             barcode = next(bar for bar in sample.findall("Barcode") if bar.attrib['name'] == 'all')
@@ -142,40 +145,41 @@ def parse_demultiplexing_stats(conversion_stats_path, aggregate_lanes):
     if root.tag != "Stats":
         raise RuntimeError("Expected XML element Stats, found " + root.tag)
     fc = root.find("Flowcell")
-    # There are always two projects, "default" and "all". This code must be revised
-    # if NS starts allowing independent projects.
-    project = None
+
+    projects = []
     for pro in fc.findall("Project"):
         if pro.attrib['name'] == "default":
             default_project = pro
         elif pro.attrib['name'] != "all":
-            project = pro
-
-    if not project:
-        project = default_project
+            projects.append(pro)
 
     # Real samples
     samples = {}
-    for sample in project.findall("Sample"):
-        sample_id = sample.attrib['name']
-        # only look at barcode="all"
-        barcode = next(bar for bar in sample.findall("Barcode") if bar.attrib['name'] == 'all')
-        if aggregate_lanes:
-            stats = defaultdict(int)
-            key = ("X", sample_id)
-        for lane in barcode.findall("Lane"):
-            if not aggregate_lanes:
+    for project in projects:
+        for sample in project.findall("Sample"):
+            sample_id = sample.attrib['name']
+            if sample_id == "all":
+                continue # Don't need "all"
+            # only look at barcode="all"
+            barcode = next(bar for bar in sample.findall("Barcode") if bar.attrib['name'] == 'all')
+            if aggregate_lanes:
                 stats = defaultdict(int)
-                key = (int(lane.attrib['number']), sample_id)
+                key = ("X", sample_id)
+            for lane in barcode.findall("Lane"):
+                if not aggregate_lanes:
+                    stats = defaultdict(int)
+                    key = (int(lane.attrib['number']), sample_id)
 
-            for stat in lane:
-                stats[stat.tag] += int(stat.text)
+                for stat in lane:
+                    stats[stat.tag] += int(stat.text)
 
-            samples[key] = stats
+                samples[key] = stats
 
-        samples[sample_id] = stats
     # Undetermined
-    sample = next(sam for sam in default_project.findall("Sample") if sam.attrib['name'] == "unknown")
+    sample = next(
+            sam for sam in default_project.findall("Sample")
+            if sam.attrib['name'] == "unknown" or sam.attrib['name'] == "Undetermined"
+            )
     barcode = next(bar for bar in sample.findall("Barcode") if bar.attrib['name'] == 'all')
     stats = defaultdict(int)
     for lane in barcode.findall("Lane"):
@@ -208,13 +212,8 @@ def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_rea
 
     It returns a dict indexed by lane, sample ID, and read, with the values
     being a dict indexed by the stats name:
-    { (lane, sample name, read) => {stat => value} }
+    { (lane, sample_id, read) => {stat => value} }
     """
-
-    if aggregate_lanes:
-        lanes = ("X",)
-    else:
-        lanes = (1,2,3,4)
     
     demultiplexing_stats = parse_demultiplexing_stats(
             os.path.join(stats_xml_file_path, "DemultiplexingStats.xml"),
@@ -225,15 +224,29 @@ def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_rea
             aggregate_lanes, aggregate_reads
             )
 
-    # Totals
+
+    if aggregate_lanes:
+        lanes = ("X",)
+    else:
+        lanes = sorted(set(c[0] for c in conversion_stats.keys()))
+
+
+    # Totals: sum all sample clusters in each lane (read 1 only)
     all_raw_reads = dict(
-            (lane, conversion_stats[(lane, "all", 1)][0]['ClusterCount'] +
-                conversion_stats[(lane, None, 1)][0]['ClusterCount'])
+            (lane, 
+                sum(val[0]['ClusterCount'] 
+                    for coord, val in conversion_stats.items()
+                    if coord[0] == lane and coord[2] == 1)
+                )
             for lane in lanes
             )
+
     all_pf_reads = dict(
-            (lane, conversion_stats[(lane, "all", 1)][1]['ClusterCount'] +
-                conversion_stats[(lane, None, 1)][1]['ClusterCount'])
+            (lane, 
+                sum(val[1]['ClusterCount'] 
+                    for coord, val in conversion_stats.items()
+                    if coord[0] == lane and coord[2] == 1)
+                )
             for lane in lanes
             )
 

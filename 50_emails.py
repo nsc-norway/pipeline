@@ -1,4 +1,6 @@
-import sys, os
+import sys
+import os
+import operator
 
 from genologics.lims import *
 from common import nsc, stats, utilities, lane_info, samples, taskmgr
@@ -18,7 +20,7 @@ def main(task):
     
     run_id = task.run_id
     work_dir = task.work_dir
-    instrument = get_instrument_by_runid(run_id)
+    instrument = utilities.get_instrument_by_runid(run_id)
     
     if task.process: # lims mode
         lane_stats = lane_info.get_from_lims(process, instrument)
@@ -28,7 +30,7 @@ def main(task):
     projects = task.projects
 
     run_stats = stats.get_bcl2fastq_stats(
-                os.path.join(work_dir, "Stats"),
+                os.path.join(task.bc_dir, "Stats"),
                 aggregate_lanes = task.no_lane_splitting,
                 aggregate_reads = False
                 )
@@ -45,10 +47,9 @@ def main(task):
 def make_reports(work_dir, run_id, projects, lane_stats):
     basecalls_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls")
     delivery_dir = os.path.join(basecalls_dir, "Delivery")
-    try:
+
+    if not os.path.exists(delivery_dir):
         os.mkdir(delivery_dir)
-    except OSError:
-        pass # Assume it exists
 
     for project in projects:
         if not project.is_undetermined:
@@ -73,7 +74,7 @@ def write_sample_info_table(output_path, runid, project):
 
         files = sorted(
                 ((s,fi) for s in project.samples for fi in s.files),
-                key=lambda (s,f): (f.lane, s.name, f.read_num)
+                key=lambda (s,f): (f.lane, s.name, f.i_read)
                 )
         for s,f in files:
             out.write(os.path.basename(f.path) + "\t")
@@ -98,7 +99,7 @@ def write_internal_sample_table(output_path, runid, projects, lane_stats):
                 )
         for s in samples:
             for f in s.files:
-                if f.read_num == 1:
+                if f.i_read == 1:
                     out.write(s.name + "\t")
                     lane = lane_stats[f.lane]
                     out.write(utilities.display_int(lane[0]) + "\t")
@@ -146,7 +147,7 @@ Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2
                 for s in proj.samples for f in s.files if not proj.is_undetermined)
         # lane ID => file object (will be the last one)
         lane_undetermined = dict((f.lane, f) for proj in projects
-                for s in proj.samples for f in s.files if not proj.is_undetermined)
+                for s in proj.samples for f in s.files if proj.is_undetermined)
 
         for l in sorted(lane_proj.keys()):
             proj = lane_proj[l]
@@ -162,20 +163,14 @@ Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2
                     for proj in projects
                     for s in proj.samples
                     for f in s.files
-                    if f.lane == l and f.read_num == 1 and not f.empty)
+                    if f.lane == l and f.i_read == 1 and not f.empty)
             out.write(utilities.display_int(cluster_no) + '\t')
             lane = lane_stats[l]
             out.write("%4.2f" % (lane[2]) + "\t")
             out.write(utilities.display_int(lane[0]) + '\t')
             out.write(utilities.display_int(lane[1]) + '\t')
             if undetermined_file and not undetermined_file.empty:
-                if undetermined_file.stats.has_key('% of Raw Clusters Per Lane'):
-                    out.write("%4.2f" % (undetermined_file.stats['% of Raw Clusters Per Lane'],) + "%\t")
-                elif undetermined_file.stats.has_key('% of PF Clusters Per Lane'):
-                    print "Warning: No info about % raw clusters per lane, using PF clusters."
-                    out.write("%4.2f" % (undetermined_file.stats['% of PF Clusters Per Lane'],) + "%\t")
-                else:
-                    out.write("-\t")
+                out.write("%4.2f" % (undetermined_file.stats['% of PF Clusters Per Lane'],) + "%\t")
             else:
                 out.write("-\t")
             out.write("ok\n")

@@ -3,10 +3,9 @@
 
 import sys
 import os
-import subprocess
 from datetime import date
 from genologics.lims import *
-from common import nsc, parse, utilities, taskmgr
+from common import nsc, taskmgr
 
 TASK_NAME = "Processed"
 TASK_DESCRIPTION = """Do some bookkeeping and move original run folder into processed/ 
@@ -40,7 +39,7 @@ def main(task):
     print "Moving", task.src_dir, "to processed directory"
     os.rename(
             task.src_dir,
-            os.path.join(nsc.PRIMARY_STORAGE, "processed", task.runid)
+            os.path.join(nsc.PRIMARY_STORAGE, "processed", task.run_id)
             )
 
     task.success_finish()
