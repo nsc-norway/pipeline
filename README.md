@@ -9,5 +9,5 @@ See the [Wiki](https://github.com/nsc-norway/pipeline/wiki) for more information
 * [NSC's data processing manager](https://github.com/nsc-norway/pipeline/wiki/DataProcessing)
 
 
-See SETUP.md for setup instructions.
+See SETUP.md for setup instructions. (currently out of date)
 
