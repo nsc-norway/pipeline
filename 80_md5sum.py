@@ -36,8 +36,9 @@ def main(task):
     bc_dir = task.bc_dir
     run_id = task.run_id
     n_threads = task.threads
-
-    for project in task.projects:
+    projects = task.projects
+    samples.flag_empty_files(projects, work_dir)
+    for project in projects:
         if not project.is_undetermined:
 
             paths = paths_for_project(run_id, project)
