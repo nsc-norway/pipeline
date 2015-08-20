@@ -75,21 +75,19 @@ def move_fastqc_results(qc_dir, basecalls_dir, projects):
 
     for project in projects:
         # Create the project dir
-        try:
-            os.mkdir(os.path.join(qc_dir, project.name))
-        except OSError:
-            pass
+        project_dir = os.path.join(qc_dir, project.name)
+        if not os.path.exists(project_dir)
+            os.mkdir(project_dir)
 
         for sample in project.samples:
-            try:
-                os.mkdir(os.path.join(qc_dir, project.name, sample.name))
-            except OSError:
-                pass
+            sample_dir = os.path.join(project_dir, sample.name)
+            if not os.path.exists(sample_dir):
+                os.mkdir(sample_dir)
 
             for f in sample.files:
                 # Have to check again if the fastq file exists, to determine if 
                 # fastqc was run on it
-                if os.path.exists(basecalls_dir, f.path):
+                if not f.empty:
                     original_fqc_dir = fastqc_dir(basecalls_dir, f.path)
                     os.remove(original_fqc_dir + ".zip")
                     fqc_dir = os.path.join(qc_dir, samples.get_fastqc_dir(project, sample, f))
