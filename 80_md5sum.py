@@ -12,33 +12,28 @@ TASK_DESCRIPTION = """Compute md5 checksums for fastq files and pdfs."""
 TASK_ARGS = ['work_dir', 'sample_sheet', 'threads']
 
 
-def paths_for_project(project):
-
-    # Prefix of the sample names
-    prefix = project.proj_dir.rstrip("/") + "/"
-
+def paths_for_project(run_id, project):
     paths = []
-    for f in (f for s in project.samples for f in s.files):
-        if not f.path.startswith(prefix):
-            task.fail("Unexpected filename!", f.path)
-            # exits
+    for sample in project.samples:
+        for f in sample.files:
+            if not f.empty:
 
-        # Files with no reads will not be written, so we skip them
-        if os.path.exists(os.path.join(bc_dir, f.path)):
+                path = f.filename
+                pdfpath = samples.qc_pdf_name(run_id, f)
+                if sample.sample_dir:
+                    path = os.path.join(sample.sample_dir, path)
+                    pdfpath = os.path.join(sample.sample_dir, pdfpath)
 
-            relpath = f.path[len(prefix):]
-            paths.append(relpath)
+                paths.append(path)
+                paths.append(pdfpath)
 
-            pdfname = samples.qc_pdf_name(run_id, f)
-            relpath_dir = os.path.dirname(relpath)
-
-            paths.append(os.path.join(relpath_dir, pdfname))
     return paths
 
 
 
 def main(task):
     task.running()
+    os.umask(007)
     bc_dir = task.bc_dir
     run_id = task.run_id
     n_threads = task.threads
@@ -46,7 +41,7 @@ def main(task):
     for project in task.projects:
         if not project.is_undetermined:
 
-            paths = paths_for_project(project)
+            paths = paths_for_project(run_id, project)
 
             rcode = slurm.srun_command(
                     [nsc.MD5DEEP] + paths, jobname, time="1-0",
