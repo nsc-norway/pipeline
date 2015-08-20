@@ -1,5 +1,5 @@
 import os
-from common import taskmgr
+from common import taskmgr, samples
 
 TASK_NAME = "Move results"
 TASK_DESCRIPTION = """Move fastq files from demultiplexing into the standard
@@ -20,39 +20,62 @@ def move_files(bc_dir, projects):
             if not os.path.exists(projdir):
                 os.mkdir(projdir)
 
+    no_sample_id_dir = all(
+            sample.sample_id == sample.name 
+            for project in projects for sample in project.samples
+            if not project.is_undetermined
+            )
+
     for project in projects:
         if not project.is_undetermined:
             for sample in project.samples:
-                first_file = sample.files[0]
-                sample_dir = os.path.join(
-                        bc_dir,
-                        os.path.dirname(first_file.path)
-                        )
-
-                if not os.path.exists(sample_dir):
-                    os.mkdir(sample_dir)
+                if sample.sample_dir:
+                    sample_path = os.path.join(bc_dir, project.proj_dir, sample.sample_dir)
+                    if not os.path.exists(sample_path):
+                        os.mkdir(sample_path)
 
                 for f in sample.files:
-                    orig_path = os.path.join(
-                            bc_dir,
-                            project.name,
-                            sample.sample_id,
-                            os.path.basename(f.path)
+                    orig_fname = samples.bcl2fastq2_file_name(
+                            sample.name,
+                            sample.sample_index,
+                            f.lane, 
+                            f.i_read,
+                            f.lane == "X"
                             )
-                    os.rename(orig_path, f.path)
-            
-            # Remove sample dir (should now be empty)
-            os.rmdir("{base}/{project}/{sampleid}".format(
-                base=bc_dir,
-                project=project.name,
-                sampleid=sample.sample_id
-                )
+                    if no_sample_id_dir:
+                        orig_path = os.path.join(
+                                bc_dir,
+                                project.name,
+                                orig_fname
+                                )
+                    else:
+                        orig_path = os.path.join(
+                                bc_dir,
+                                project.name,
+                                sample.sample_id,
+                                orig_fname
+                                )
 
-        # Remove project dir
-        os.rmdir("{base}/{project}").format(
-            base=bc_dir,
-            project=project.name
-            )
+                    new_path = os.path.join(bc_dir, f.path)
+                    print "Moving", orig_path, "to", new_path
+                    try:
+                        os.rename(orig_path, new_path)
+                    except OSError:
+                        print "FAIL"
+            
+                # Remove sample dir (should now be empty)
+                if not no_sample_id_dir:
+                    os.rmdir("{base}/{project}/{sampleid}".format(
+                        base=bc_dir,
+                        project=project.name,
+                        sampleid=sample.sample_id
+                        ))
+
+            # Remove project dir
+            os.rmdir("{base}/{project}".format(
+                base=bc_dir,
+                project=project.name
+                ))
 
 
 def main(task):

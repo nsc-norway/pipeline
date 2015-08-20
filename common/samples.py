@@ -28,19 +28,26 @@ class Project(object):
 class Sample(object):
     """Contains information about a sample. Contains a list of FastqFile
     objects representing the reads. One instance for each sample on a 
-    flowcell, even if that sample is run on multiple lanes."""
+    flowcell, even if that sample is run on multiple lanes.
+    
+    sample_index is the 1-based index of the entry in the sample sheet,
+    counting only unique samples
+    
+    """
 
-    def __init__(self, sample_id, name, files):
+    def __init__(self, sample_index, sample_id, name, sample_dir, files):
+        self.sample_index = sample_index
         self.sample_id = sample_id
         self.name = name
+        self.sample_dir = sample_dir
         self.files = files
 
 
 class FastqFile(object):
     """Represents a single output file for a specific sample, lane and
     read. Currently assumed to be no more than one FastqFile per read.
-    
-    lane is a Lane object containing lane-specific stats.
+
+    lane is an integer representing the lane, or "X" for merged lanes
 
     i_read is the read ordinal, 1 or 2 (second read is only available for paired
     end). Index reads are not considered.
@@ -53,16 +60,17 @@ class FastqFile(object):
     
     empty is set by the QC function. You may set it, but it will be overwritten."""
 
-    def __init__(self, lane, read_num, path, stats):
+    def __init__(self, lane, i_read, filename, path, stats):
         self.lane = lane
         self.i_read = i_read
         self.path = path
+        self.filename = filename
         self.stats = stats
         self.empty = False
 
 
 
-################ SAMPLE OBJECTS #################
+################ Get object tree, with various info #################
 def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes):
     """Get the "sample object model" tree, one for each project.
     
@@ -73,27 +81,30 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes):
     can be provided by other functions later.
     
     In addition to the normal projects, an "Undetermined" project is also returned,
-    to represent the undetermined index data. TODO : do that? """ 
+    to represent the undetermined index data.""" 
 
     projects = {}
     lanes = set()
-    for sample_index, entry in enumerate(sample_sheet_data):
-        project_name = entry['project']
+    instrument = utilities.get_instrument_by_runid(run_id)
+    sample_index = 1
+    for entry in sample_sheet_data:
+        project_name = entry.get('sampleproject')
+        if not project_name:
+            project_name = entry['project']
         project = projects.get(project_name)
-
         if not project:
-            project_dir = get_project_dir(run_id, project) # fn defined in bottom of this file
+            project_dir = get_project_dir(run_id, project_name) # fn defined in bottom of this file
             project = Project(project_name, project_dir, [])
             projects[project_name] = project
 
-        sample = None
-        for s in project.samples:
-            if sample.sample_id == e['sampleid']:
-                sample = s
+        for sample in project.samples:
+            if sample.sample_id == entry['sampleid']:
                 break
-
-        if not sample:
-            sample = Sample(entry['sampleid'], entry['samplename'], [])
+        else: # if not break
+            sample_name = entry['samplename']
+            sample_dir = get_sample_dir(instrument, sample_name)
+            sample = Sample(sample_index, entry['sampleid'], sample_name, sample_dir, [])
+            sample_index += 1
             project.samples.append(sample)
 
         if merged_lanes:
@@ -106,35 +117,46 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes):
 
         lanes.add(lane_id)
 
+        path = ""
+        if project.proj_dir:
+            path = project.proj_dir + "/"
+        if sample.sample_dir:
+            path += sample.sample_dir + "/"
+
+        for i_read in xrange(1, num_reads+1):
+
+            fastq_name = get_fastq_name(
+                    instrument, 
+                    sample.name,
+                    sample.sample_index,
+                    entry.get('index'),
+                    entry.get('index2'),
+                    lane_id,
+                    i_read,
+                    merged_lanes
+                    )
+
+            # path contains trailing slash
+            fastq_path = path + fastq_name
+
+            sample.files.append(FastqFile(lane_id, i_read, fastq_name, fastq_path, None))
+            # Stats can be added in later
+
+    # Create an undetermined file for each lane, read seen
+    undetermined_project = Project("Undetermined", None, [], True)
+    undetermined_sample = Sample(0, None, "Undetermined", None, [])
+    undetermined_project.samples.append(undetermined_sample)
+    for lane in lanes:
         for i_read in xrange(1, num_reads+1):
             if merged_lanes:
-                path = "{0}/{1}_S{2}_R{3}_001.fastq.gz".format(
-                        project_dir, sample.name,
-                        str(sample_index + 1), i_read
-                        )
+                path = "Undetermined_S0_R{0}_001.fastq.gz".format(i_read)
             else:
-                path = "{0}/{1}_S{2}_L{3}_R{4}_001.fastq.gz".format(
-                        project_dir, sample_name,
-                        str(sample_index + 1), str(lane_id).zfill(3),
-                        i_read)
+                path = "Undetermined_S0_L{0}_R{1}_001.fastq.gz".format(
+                        str(lane_id).zfill(3), i_read
+                        )
+            undetermined_sample.files.append(FastqFile(lane, i_read, path, path, None))
 
-            sample.files.append(FastqFile(lane_id, i_read, path, None))
-
-        # Create an undetermined file for each lane, read seen
-        undetermined_project = Project("Undetermined", None, [], True)
-        undetermined_sample = Sample(None, "Undetermined")
-        undetermined_project.samples.append(undetermined_sample)
-        for lane in lanes:
-            for i_read in xrange(1, num_reads+1):
-                if merged_lanes:
-                    path = "Undetermined_S0_R{0}_001.fastq.gz".format(i_read)
-                else:
-                    path = "Undetermined_S0_L{0}_R{1}_001.fastq.gz".format(
-                            str(lane_id).zfill(3), i_read
-                            )
-                undetermined_sample.files.append(FastqFile(lane, i_read, path, None))
-
-        return [undetermined_project] + projects.values()
+    return [undetermined_project] + projects.values()
 
 
 def get_projects_by_process(process):
@@ -273,6 +295,49 @@ def get_ne_mi_project_dir(run_id, project_name):
     project_dir = date_machine.group(1) + ".Project_" + project_name
     return project_dir
 
+
+def get_sample_dir(instrument, sample_name):
+    if instrument == 'hiseq':
+        return "Sample_" + sample_name
+    else:
+        return None
+
+
+def get_fastq_name(instrument, sample_name, sample_index,
+        index1, index2, lane_id, i_read, merged_lanes):
+    """The file name we want depends on the instument type, for consistency with older
+    deliveries."""
+    
+    if instrument == "hiseq":
+        index_seq = index1
+        if index2:
+            index_seq += "-" + index2
+        name = "{0}_{1}_L{2}_R{3}_001.fastq.gz".format(
+                sample_name,
+                index_seq,
+                str(lane_id).zfill(3),
+                i_read)
+    
+    else:
+        return bcl2fastq2_file_name(sample_name, sample_index, lane_id, i_read, merged_lanes)
+
+    return name
+    
+
+def bcl2fastq2_file_name(sample_name, sample_index, lane_id, i_read, merged_lanes):
+    if merged_lanes:
+        name = "{0}_S{1}_R{2}_001.fastq.gz".format(
+                sample.name,
+                sample_index, i_read
+                )
+    else:
+        name = "{0}_S{1}_L{2}_R{3}_001.fastq.gz".format(
+                sample_name,
+                sample_index, str(lane_id).zfill(3),
+                i_read)
+    return name
+
+    
 
 def get_fastqc_dir(project, sample, fastqfile):
     """Get the directory in which the fastqc results are stored
