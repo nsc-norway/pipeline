@@ -54,8 +54,6 @@ BCL2FASTQ_LOG = "bcl2fastq log"
 FASTQC_LOG = "fastqc log"
 FASTQ_OUTPUT = "{sample_name}"
 
-
-
 # Sequencing processes
 SEQ_PROCESSES=[
         ('hiseq', 'Illumina Sequencing (Illumina SBS) 5.0'),
