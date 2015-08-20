@@ -84,11 +84,6 @@ SCANCEL_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/scancel"]
 SRUN_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/srun", 
             "--account=nsc", "--qos=high", "--partition=lucky", "--nodes=1"]
 
-if TAG == "prod":
-    WRAPPER_SCRIPT="/data/nsc.loki/automation/pipeline/slurm/ous-job.sh"
-elif TAG == "dev":
-    WRAPPER_SCRIPT="/data/nsc.loki/automation/dev/pipeline/slurm/ous-job.sh"
-
 # Data processing programs
 CONFIGURE_BCL_TO_FASTQ="/data/common/tools/nscbin/configureBclToFastq.pl"
 MAKE="/usr/bin/make"

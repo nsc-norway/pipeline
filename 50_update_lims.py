@@ -8,6 +8,13 @@ TASK_DESCRIPTION = """Post demultiplexing stats to LIMS (doesn't make an effort
 TASK_ARGS = ['work_dir']
 
 
+udf_list = [
+        '# Reads', 'Yield PF (Gb)', '% of Raw Clusters Per Lane',
+        '% of PF Clusters Per Lane',
+        '% Perfect Index Read', 'One Mismatch Reads (Index)',
+        '% Bases >=Q30', 'Ave Q Score'
+        ]
+
 def main(task):
     task.running()
 
