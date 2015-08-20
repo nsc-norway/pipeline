@@ -8,8 +8,7 @@ import sys
 import os
 import shutil
 
-from genologics.lims import *
-from common import nsc, stats, utilities, lane_info, samples, taskmgr
+from common import nsc, stats, utilities, taskmgr
 
 template_dir = os.path.dirname(os.path.dirname(__file__)) + "/template"
 

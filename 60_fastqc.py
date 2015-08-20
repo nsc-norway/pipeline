@@ -4,7 +4,7 @@
 import os
 import re
 import shutil
-from common import samples, nsc, taskmgr, slurm
+from common import samples, nsc, taskmgr, samples, slurm
 
 TASK_NAME = "FastQC"
 TASK_DESCRIPTION = """Run FastQC on the demultiplexed files."""
@@ -17,7 +17,7 @@ def main(task):
     bc_dir = task.bc_dir
 
     projects = task.projects
-
+    samples.flag_empty_files(projects, task.work_dir)
 
     # First get a list of FastqFile objects
     # Empty fastq files (no sequences) will not be created by the new 
