@@ -21,7 +21,6 @@ def main(task):
         print "Demultiplexing process for LIMS process", task.process.id, ", run", run_id
 
     source_run_dir = task.src_dir
-    input_dir = os.path.join(source_run_dir, "Data", "Intensities", "BaseCalls")
     dest_run_dir = task.work_dir
     print "Reading from", source_run_dir, "writing to", dest_run_dir
 
@@ -53,8 +52,9 @@ def main(task):
     else: # command line mode
         demultiplex_sample_sheet_path = task.sample_sheet_path
 
+    output_dir = os.path.join(dest_run_dir, "Data", "Intensities", "BaseCalls")
     if run_dmx(
-            task, threads, dest_run_dir, input_dir, demultiplex_sample_sheet_path,
+            task, threads, source_run_dir, output_dir, demultiplex_sample_sheet_path,
             no_lane_splitting, other_options
             ):
         task.success_finish()
@@ -74,7 +74,7 @@ def get_thread_args(n_threads):
             '-p', str(processing), '-w', str(writing)]
 
 
-def run_dmx(task, n_threads, run_dir, input_dir, sample_sheet_path,
+def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
         no_lane_splitting, other_options):
     """Run bcl2fastq2 via srun.
     
@@ -85,7 +85,7 @@ def run_dmx(task, n_threads, run_dir, input_dir, sample_sheet_path,
     args += ['--sample-sheet', sample_sheet_path]
     if no_lane_splitting:
         args += ['--no-lane-splitting']
-    args += ['--input-dir', input_dir]
+    args += ['--output-dir', output_dir]
     args += get_thread_args(n_threads)
     if other_options:
         args += re.split(" +", other_options)

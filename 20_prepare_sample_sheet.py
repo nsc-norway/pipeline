@@ -33,6 +33,8 @@ import argparse
 import subprocess
 import datetime
 
+from Bio.Seq import Seq
+
 from genologics.lims import *
 from common import nsc, utilities, slurm, taskmgr
 
@@ -104,8 +106,13 @@ def main(task):
                 data = sample_sheet
                 )
 
-    # Doctor the sample sheet
-    sample_sheet = "[Settings]\r\n[Data]\r\n" + sample_sheet
+    # Doctor the sample sheet, only if using HiSeq and it doesn't have [Data] header
+    instrument = utilities.get_instrument_by_runid(task.run_id)
+    if instrument == "hiseq" and sample_sheet.find("\r\n[Data]\r\n") == -1:
+        sample_sheet = convert_from_bcl2fastqv1(sample_sheet)
+
+    # Invert the read2 indexes
+    #sample_sheet = reverse_complement_index2(sample_sheet)
     
     # Post the result, as appropriate...
     if task.process:
@@ -156,6 +163,79 @@ def get_ss_from_cluster_proc(process):
     return None
 
 
+def reverse_complement_index2(original_data):
+    original_lines = [l.strip("\r\n") for l in original_data.splitlines()]
+    data_start = next(i for i, d in enumerate(original_lines) if d == "[Data]")
+    data = [l.split(",") for l in original_lines[data_start+1:] if l.strip() != ""]
+    try:
+        index2_col = next(i for i, c in enumerate(data[0]) if c.lower() == "index2")
+        for row in data[1:]:
+            row[index2_col] = str(Seq(row[index2_col]).reverse_complement())
+
+        return "\r\n".join(
+                original_lines[0:data_start+1] +\
+                [",".join(cells) for cells in data]
+                )
+    except StopIteration: # index2 column not found
+        return original_data
+
+
+def convert_from_bcl2fastqv1(original_data):
+    main_headers = "[Settings]\r\n[Data]\r\n"
+    data = [l.strip("\r\n").split(",") for l in original_data.splitlines()]
+
+    replacements = {
+            "sampleid": "Sample_Name",
+            "description": "Sample_ID",
+            "sampleproject": "Sample_Project"
+            }
+
+
+    # Index of Description column:
+    description_index = next(i for i, c in enumerate(data[0]) if c.lower() == "description")
+    any_empty_description = any(r[description_index] == "" for r in data[1:])
+    if any_empty_description:
+        del replacements["description"]
+        replacements["sampleid"] = "Sample_ID"
+
+    # Replace column names, get index (numeric offset) of the "Index" column
+    index_column_index = None
+    sample_id_index = None
+    for i, cell in enumerate(data[0]):
+        rep = replacements.get(cell.lower())
+        if rep:
+            data[0][i] = rep
+
+        if cell.lower() == "index":
+            index_column_index = i
+        if cell.lower() == "sampleid":
+            sample_id_index = i
+
+
+    # Add the Sample_Name column if "Description" can't be used as Sample_ID
+    # The we use SampleID as sample name and sample ID
+    data[0].append("Sample_Name")
+    for r in data[1:]:
+        r.append(r[sample_id_index])
+
+
+    # Split the index into first and second part
+    use_dual_index = any(row[index_column_index].find("-") != -1 for row in data[1:])
+    if use_dual_index:
+        data[0].insert(index_column_index+1, "index2")
+        for row in data[1:]:
+            indexes = row[index_column_index].split("-")
+            if len(indexes) == 1:
+                indexes.append("")
+                if indexes[0] == "NoIndex":
+                    indexes[0] = ""
+            row[index_column_index] = indexes[0]
+            row.insert(index_column_index+1, indexes[1])
+
+    return main_headers + "\r\n".join(
+            [",".join(cells) for cells in data]
+            )
+    
 
 
 with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
