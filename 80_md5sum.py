@@ -33,7 +33,6 @@ def paths_for_project(run_id, project):
 
 def main(task):
     task.running()
-    os.umask(007)
     bc_dir = task.bc_dir
     run_id = task.run_id
     n_threads = task.threads

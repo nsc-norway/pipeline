@@ -218,6 +218,10 @@ class Task(object):
 
         parse_args() will exit() if the args are incorrect."""
 
+        # Initialization code common to all tasks:
+        os.umask(007)
+
+        # Argument setup
         for name in self.arg_names:
             argparse_name, udf_name, type, default, help = ARG_OPTIONS[name]
             if argparse_name.startswith("--"):

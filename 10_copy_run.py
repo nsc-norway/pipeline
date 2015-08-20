@@ -61,8 +61,6 @@ def rsync_arglist(source_path, destination_path, exclude):
 def main(task):
     """To be run from LIMS on the NSC data processing step"""
 
-    os.umask(007)
-
     task.running()
     runid = task.run_id
 

@@ -79,7 +79,6 @@ require user {username}
 
 def main(task):
     task.running()
-    os.umask(007)
     process = Process(nsc.lims, id=process_id)
 
     projects = set()

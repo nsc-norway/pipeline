@@ -12,7 +12,6 @@ TASK_ARGS = ['work_dir', 'sample_sheet', 'threads']
 
 def main(task):
     task.running()
-    os.umask(007)
 
     run_id = task.run_id
     bc_dir = task.bc_dir

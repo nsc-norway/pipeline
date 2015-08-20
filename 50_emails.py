@@ -14,9 +14,7 @@ TASK_ARGS = ['work_dir', 'sample_sheet']
 
 
 def main(task):
-
     task.running()
-    os.umask(007)
     
     run_id = task.run_id
     work_dir = task.work_dir

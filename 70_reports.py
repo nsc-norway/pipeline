@@ -48,7 +48,6 @@ def main_lims(task):
 def make_reports(work_dir, run_id, projects, bcl2fastq_version=None):
     basecalls_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls")
     quality_control_dir = os.path.join(basecalls_dir, "QualityControl")
-    os.umask(007)
 
     software_versions = [("RTA", get_rta_version(work_dir))]
     if bcl2fastq_version:

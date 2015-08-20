@@ -12,8 +12,6 @@ TASK_ARGS = ['src_dir', 'work_dir', 'threads', 'sample_sheet']
 
 
 def main(task):
-    os.umask(007)
-
     task.running()
     run_id = task.run_id
 

@@ -56,7 +56,6 @@ def main(task):
             default=None,
             help="Path to destination sample sheet to write"
             )
-    os.umask(007)
     task.running()
 
     # Flag to track if the sample sheet was found right on the current LIMS process
