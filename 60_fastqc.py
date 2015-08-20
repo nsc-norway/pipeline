@@ -4,8 +4,7 @@
 import os
 import re
 import shutil
-from genologics.lims import *
-from common import utilities, samples, nsc, taskmgr
+from common import samples, nsc, taskmgr, slurm
 
 TASK_NAME = "FastQC"
 TASK_DESCRIPTION = """Run FastQC on the demultiplexed files."""
@@ -21,13 +20,13 @@ def main(task):
     projects = task.projects
 
 
-    # Empty fastq files (no sequences) will not be created by the new 
-    # bcl2fastq, instead they will not exist, so we check that.
     # First get a list of FastqFile objects
+    # Empty fastq files (no sequences) will not be created by the new 
+    # bcl2fastq so skip those
     fastq_files = [
             f
             for p in projects for s in p.samples for f in s.files
-            if os.path.exists(os.path.join(bc_dir, f))
+            if not f.empty
             ]
     # then get the paths
     fastq_paths = [
@@ -45,7 +44,7 @@ def main(task):
 
     fastqc_args = ["--extract", "--threads=" + str(threads)]
     fastqc_args += ["--outdir=" + output_dir]
-    fastqc_args += fastq_files
+    fastqc_args += fastq_paths
 
     log_path = task.logfile("fastqc")
     if task.process:
@@ -54,7 +53,7 @@ def main(task):
         jobname = "fastqc"
     rcode = slurm.srun_command(
             [nsc.FASTQC] + fastqc_args, jobname, time="1-0", logfile=log_path,
-            cpus_per_task=n_threads, mem=str(1024+256*threads)+"M"
+            cpus_per_task=threads, mem=str(1024+256*threads)+"M"
             )
 
     if rcode == 0:
