@@ -38,7 +38,9 @@ def main(task):
     samples.add_stats(projects, run_stats)
     samples.flag_empty_files(projects, work_dir)
 
-    if task.process:
+    if task.args.bcl2fastq_version:
+        bcl2fastq_version = task.args.bcl2fastq_version
+    elif task.process:
         bcl2fastq_version = utilities.get_udf(process, nsc.BCL2FASTQ_VERSION_UDF, None)
     else:
         bcl2fastq_version = get_bcl2fastq2_version(work_dir)
@@ -69,6 +71,16 @@ def get_bcl2fastq2_version(work_dir):
     else:
         return None
     
+
+def get_rta_version(run_dir):
+    try:
+        xmltree = ElementTree.parse(os.path.join(run_dir, 'RunParameters.xml'))
+    except IOError:
+        xmltree = ElementTree.parse(os.path.join(run_dir, 'runParameters.xml'))
+
+    run_parameters = xmltree.getroot()
+    rta_ver = run_parameters.find("RTAVersion").text
+    return rta_ver
 
 
 def make_reports(work_dir, run_id, projects, bcl2fastq_version=None):
@@ -103,17 +115,6 @@ def make_reports(work_dir, run_id, projects, bcl2fastq_version=None):
             )
 
     shutil.rmtree(pdf_dir)
-    
-
-def get_rta_version(run_dir):
-    try:
-        xmltree = ElementTree.parse(os.path.join(run_dir, 'RunParameters.xml'))
-    except IOError:
-        xmltree = ElementTree.parse(os.path.join(run_dir, 'runParameters.xml'))
-
-    run_parameters = xmltree.getroot()
-    rta_ver = run_parameters.find("RTAVersion").text
-    return rta_ver
 
 
 # PDF GENERATION CODE
