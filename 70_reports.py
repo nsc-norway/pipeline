@@ -6,18 +6,21 @@
 
 import sys
 import os
+import re
 import shutil
+import multiprocessing
+import subprocess
 from xml.etree import ElementTree
 
-from common import nsc, stats, utilities, taskmgr
+from common import nsc, stats, samples, utilities, taskmgr
 
-template_dir = os.path.dirname(os.path.dirname(__file__)) + "/template"
+template_dir = os.path.dirname(__file__) + "/template"
 
 TASK_NAME = "Reports"
 TASK_DESCRIPTION = """Generates HTML and PDF reports based on demultiplexing stats
                     and FastQC results."""
 
-TASK_ARGS = ['work_dir', 'sample_sheet', 'threads']
+TASK_ARGS = ['work_dir', 'sample_sheet']
 
 
 def main(task):
@@ -30,8 +33,9 @@ def main(task):
     run_id = task.run_id
     instument = utilities.get_instrument_by_runid(run_id)
     work_dir = task.work_dir
+    bc_dir = task.bc_dir
     run_stats = stats.get_bcl2fastq_stats(
-                os.path.join(work_dir, "Stats"),
+                os.path.join(bc_dir, "Stats"),
                 aggregate_lanes = task.no_lane_splitting,
                 aggregate_reads = False
                 )
@@ -96,7 +100,7 @@ def make_reports(work_dir, run_id, projects, bcl2fastq_version=None):
     # template_dir defined at top of file
     template = open(template_dir + "/reportTemplate_indLane_v4.tex").read()
     arg_pack = [basecalls_dir, quality_control_dir, run_id, software_versions, template]
-    pool = Pool(int(threads))
+    pool = multiprocessing.Pool()
 
     # PDF directory (all PDF files generated here)
     pdf_dir = os.path.join(quality_control_dir, "pdf")
@@ -107,7 +111,7 @@ def make_reports(work_dir, run_id, projects, bcl2fastq_version=None):
 
     # Run one task for each fastq file, giving a sample reference and FastqFile as argument 
     # as well as the ones given above. Debug note: change pool.map to map for better errors.
-    pool.map(
+    map(
             generate_report_for_customer,
             [tuple(arg_pack + [p,s,f]) 
                 for p in projects for s in p.samples for f in s.files
@@ -116,6 +120,9 @@ def make_reports(work_dir, run_id, projects, bcl2fastq_version=None):
             )
 
     shutil.rmtree(pdf_dir)
+
+    generate_internal_html_report(quality_control_dir, projects)
+
 
 
 # PDF GENERATION CODE
@@ -146,12 +153,17 @@ def generate_report_for_customer(args):
 
     pdf_dir = os.path.join(quality_control_dir, "pdf")
 
+    if sample.name:
+        sample_name = sample.name
+    else:
+        sample_name = "Undetermined"
+
     replacements = {
         '__RunName__': tex_escape(run_id),
         '__Programs__': tex_escape(" & ".join(v[0] for v in software_versions)),
         '__VersionString__': tex_escape(" & ".join(v[1] for v in software_versions)),
-        '__SampleName__': tex_escape(sample.name),
-        '__ReadNum__': str(fastq.read_num),
+        '__SampleName__': tex_escape(sample_name),
+        '__ReadNum__': str(fastq.i_read),
         '__TotalN__': utilities.display_int(fastq.stats['# Reads PF']),
         '__Folder__': '../' + samples.get_fastqc_dir(project, sample, fastq),
         '__TemplateDir__': template_dir
@@ -217,8 +229,8 @@ def generate_internal_html_report(quality_control_dir, projects):
     
         i = 0
         samples_files = sorted(
-                ((p, s,fi) for p in projects for s in p.samples for fi in s.files),
-                key=lambda (s,f): (f.lane, s.name, f.read_num)
+                ((p, s, fi) for p in projects for s in p.samples for fi in s.files),
+                key=lambda (p, s,f): (f.lane, s.name, f.i_read)
                 )
         for p, s, fq in samples_files:
             fq_name = os.path.basename(fq.path)

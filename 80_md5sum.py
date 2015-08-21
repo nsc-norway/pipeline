@@ -4,7 +4,7 @@
 
 
 import os
-from common import taskmgr, samples, slurm
+from common import nsc, taskmgr, samples, slurm
 
 TASK_NAME = "Checksums"
 TASK_DESCRIPTION = """Compute md5 checksums for fastq files and pdfs."""
@@ -37,16 +37,20 @@ def main(task):
     run_id = task.run_id
     n_threads = task.threads
     projects = task.projects
-    samples.flag_empty_files(projects, work_dir)
+    samples.flag_empty_files(projects, task.work_dir)
     for project in projects:
         if not project.is_undetermined:
 
             paths = paths_for_project(run_id, project)
-
+            stdout = os.path.join(bc_dir, project.proj_dir, "md5sum.txt")
+            jobname = "md5deep"
+            if task.process:
+                jobname = task.process.id + "." + jobname
             rcode = slurm.srun_command(
-                    [nsc.MD5DEEP] + paths, jobname, time="02:00:00",
+                    [nsc.MD5DEEP, '-rl'] + paths, jobname, time="02:00:00",
                     cpus_per_task=n_threads, mem="1024M",
-                    cwd=os.path.join(bc_dir, project.project_dir)
+                    cwd=os.path.join(bc_dir, project.proj_dir),
+                    stdout = stdout
                     )
 
             if rcode != 0:
