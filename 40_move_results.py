@@ -57,7 +57,6 @@ def move_files(bc_dir, projects):
                                 )
 
                     new_path = os.path.join(bc_dir, f.path)
-                    print "Moving", orig_path, "to", new_path
                     try:
                         os.rename(orig_path, new_path)
                     except OSError:
