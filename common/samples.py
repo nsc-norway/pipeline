@@ -213,7 +213,7 @@ def add_stats(projects, run_stats):
     for project in projects:
         for sample in project.samples:
             for f in sample.files:
-                stats = run_stats.get((f.lane, sample.sample_id, f.i_read))
+                stats = run_stats.get((f.lane, sample.name, f.i_read))
                 if stats:
                     f.stats = stats
 
@@ -328,7 +328,7 @@ def get_fastq_name(instrument, sample_name, sample_index,
 def bcl2fastq2_file_name(sample_name, sample_index, lane_id, i_read, merged_lanes):
     if merged_lanes:
         name = "{0}_S{1}_R{2}_001.fastq.gz".format(
-                sample.name,
+                sample_name,
                 sample_index, i_read
                 )
     else:

@@ -60,12 +60,13 @@ def post_stats(process, demultiplex_stats):
 
 def get_resultfile(process, lane, input_limsid, read):
     """Find a result file artifact which is an output of process and
-    which corresponds to input_limsid.
+    which corresponds to input_limsid. This is used to find the output of
+    the demultiplexing process.
 
-    input_limsid is any derived sample which is not a pool, or a submitted sample.
+    input_limsid is any derived sample or a submitted sample.
     
-    The correct output is identified by two criteria: 
-     - The output must come from an input which matches the lane number. The input
+    The correct output artifact is identified by two criteria: 
+     - The output must come from an input which matches the lane number. I.e. the input
        must be in the correct position in the flowcell in the LIMS.
      - The name of the output must match a pattern, potentially including the 
        following:
@@ -97,7 +98,11 @@ def get_resultfile(process, lane, input_limsid, read):
         if input.location[1] in ['%d:1' % lane, 'A:1']: # Use A:1 for NextSeq, MiSeq
             if o['output-type'] == "ResultFile" and o['output-generation-type'] == "PerReagentLabel":
                 output = o['uri']
-                # The LIMSID 
+                # The constant FASTQ_OUTPUT corresponds to the name configured in
+                # the LIMS process type for the ResultFiles representing the "measurements", 
+                # i.e. the demultiplexing stats. It will be something like
+                # "{SubmittedSampleName}" to indicate that each sample will be named 
+                # after the corresponding submitted sample.
                 if output.name == nsc.FASTQ_OUTPUT.format(
                         lane=lane,
                         sample_name=input_sample.name,

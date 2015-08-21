@@ -7,6 +7,7 @@
 import sys
 import os
 import shutil
+from xml.etree import ElementTree
 
 from common import nsc, stats, utilities, taskmgr
 

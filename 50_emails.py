@@ -33,6 +33,8 @@ def main(task):
                 aggregate_reads = False
                 )
 
+    print run_stats
+
     samples.add_stats(projects, run_stats)
     samples.flag_empty_files(projects, work_dir)
 

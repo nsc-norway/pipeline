@@ -25,11 +25,9 @@ ERROR_DETAILS_UDF = "Error details"
 # UDFs for configuration and job steering (On process types)
 RUN_ID_UDF = "Run ID"
 THREADS_UDF = "Number of threads"
-MISMATCHES_UDF = "Number of mismatches"
 SOURCE_RUN_DIR_UDF = "Source run folder"
 WORK_RUN_DIR_UDF = "Working run folder"
 OTHER_OPTIONS_UDF = "Other options for bcl2fastq"
-PROCESS_UNDETERMINED_UDF = "Process undetermined indexes"
 NO_LANE_SPLITTING_UDF = "No lane splitting"
 
 # Other UDFs 
@@ -45,6 +43,7 @@ RECENTLY_COMPLETED_UDF = "Recently completed"
 PROCESSED_DATE_UDF = "Processing completed date"
 
 
+# -Names of inputs/outputs on processes -
 # Input files
 INPUT_SAMPLE_SHEET = "Input sample sheet"
 # Files 
@@ -98,12 +97,9 @@ if TAG == "prod":
     DELIVERY_DIR="/data/nsc.loki/delivery"     # used by prepare-delivery after QC
     DIAGNOSTICS_DELIVERY = "/data/diag/nscDelivery"
 elif TAG == "dev":
-    #SECONDARY_STORAGE="/data/nsc.loki/test"    # location of demultiplexed files
-    #DELIVERY_DIR="/data/nsc.loki/test/delivery"# used by prepare-delivery after QC
-    #DIAGNOSTICS_DELIVERY = "/data/nsc.loki/test/diag"
-    SECONDARY_STORAGE="/data/data/test"    # location of demultiplexed files
-    DELIVERY_DIR="/data/data/test/delivery"# used by prepare-delivery after QC
-    DIAGNOSTICS_DELIVERY = "/data/data/test/diag"
+    SECONDARY_STORAGE="/data/nsc.loki/test"    # location of demultiplexed files
+    DELIVERY_DIR="/data/nsc.loki/test/delivery"# used by prepare-delivery after QC
+    DIAGNOSTICS_DELIVERY = "/data/nsc.loki/test/diag"
     
 LOG_DIR = BASE_DIR + "/logs"       # for slurm jobs
 SCRATCH_DIR = BASE_DIR + "/run"    # not used

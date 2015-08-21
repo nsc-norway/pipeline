@@ -5,6 +5,7 @@
 import re
 import os
 from collections import defaultdict
+from xml.etree import ElementTree
 from genologics.lims import *
 
 def get_lane_cluster_density(path):
