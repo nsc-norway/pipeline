@@ -46,7 +46,7 @@ def make_reports(work_dir, run_id, projects, lane_stats):
     basecalls_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls")
     qc_dir = os.path.join(basecalls_dir, "QualityControl")
     if not os.path.exists(qc_dir):
-        os.mkdir(delivery_dir)
+        os.mkdir(qc_dir)
     delivery_dir = os.path.join(qc_dir, "Delivery")
     if not os.path.exists(delivery_dir):
         os.mkdir(delivery_dir)
