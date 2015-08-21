@@ -64,36 +64,37 @@ def main(task):
     return rcode
 
 
-def fastqc_dir(basecalls_dir, fastq_path):
-    """Get path to directory written by fastqc"""
+def fastqc_dir(fastq_path):
+    """Get name of directory written by fastqc"""
     return re.sub(r".fastq.gz$", "_fastqc", os.path.basename(fastq_path))
 
 
-def move_fastqc_results(qc_dir, basecalls_dir, projects):
+def move_fastqc_results(qc_dir, projects):
     """Organises the fastqc results into a more manageable structure. Deletes zip files.
     Gets the desired name of the fastqc dir from the "samples" module."""
 
     for project in projects:
         # Create the project dir
         project_dir = os.path.join(qc_dir, project.name)
-        if not os.path.exists(project_dir)
+        if not os.path.exists(project_dir):
             os.mkdir(project_dir)
 
         for sample in project.samples:
-            sample_dir = os.path.join(project_dir, sample.name)
-            if not os.path.exists(sample_dir):
-                os.mkdir(sample_dir)
-
             for f in sample.files:
                 # Have to check again if the fastq file exists, to determine if 
                 # fastqc was run on it
                 if not f.empty:
-                    original_fqc_dir = fastqc_dir(basecalls_dir, f.path)
-                    os.remove(original_fqc_dir + ".zip")
+                    original_fqc_dir = os.path.join(qc_dir, fastqc_dir(f.path))
+                    try:
+                        os.remove(original_fqc_dir + ".zip")
+                    except OSError:
+                        pass
                     fqc_dir = os.path.join(qc_dir, samples.get_fastqc_dir(project, sample, f))
                     if os.path.exists(fqc_dir):
                         shutil.rmtree(fqc_dir)
+
                     os.rename(original_fqc_dir, fqc_dir)
+                    os.rename(original_fqc_dir + ".html", fqc_dir + ".html")
 
 
 if __name__ == "__main__":

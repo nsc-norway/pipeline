@@ -152,7 +152,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes):
                 path = "Undetermined_S0_R{0}_001.fastq.gz".format(i_read)
             else:
                 path = "Undetermined_S0_L{0}_R{1}_001.fastq.gz".format(
-                        str(lane_id).zfill(3), i_read
+                        str(lane).zfill(3), i_read
                         )
             undetermined_sample.files.append(FastqFile(lane, i_read, path, path, None))
 
@@ -345,7 +345,7 @@ def get_fastqc_dir(project, sample, fastqfile):
 
     fq_name = os.path.basename(fastqfile.path)
     fqc_name = re.sub(r".fastq.gz$", "_fastqc", fq_name)
-    return os.path.join(project.name, sample.name, fqc_name)
+    return os.path.join(project.name, fqc_name)
 
 
 def qc_pdf_name(run_id, fastq):
