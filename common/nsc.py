@@ -16,10 +16,9 @@ elif TAG == "dev":
 AUTO_FLAG_UDF = "NSC Automatic processing"
 AUTO_FLOWCELL_UDF = "Automation lane groups"
 
-JOB_ID_UDF = "Job ID"
 CURRENT_JOB_UDF = "Current job"
 JOB_STATUS_UDF = "Job status"
-JOB_STATE_CODE_UDF = "Job state code" #SUBMITTED,RUNNING,FAILED,COMPLETED,CANCELLED
+JOB_STATE_CODE_UDF = "Job state code" #RUNNING,FAILED,COMPLETED
 ERROR_DETAILS_UDF = "Error details"
 
 # UDFs for configuration and job steering (On process types)
@@ -81,14 +80,12 @@ SCANCEL_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/scancel"]
 SRUN_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/srun", 
             "--account=nsc", "--qos=high", "--partition=lucky", "--nodes=1"]
 
-# Data processing programs
-CONFIGURE_BCL_TO_FASTQ="/data/common/tools/nscbin/configureBclToFastq.pl"
-MAKE="/usr/bin/make"
+# Data processing/analysis programs
 #BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
 BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.17.1.14/nscinstallbin/bin/bcl2fastq"
 FASTQC="/data/common/tools/nscbin/fastqc"
 # Some programs don't have to be put here, because they are standard on all 
-# machines: tar.
+# machines: tar. (see also "system programs" above)
 
 # Paths
 PRIMARY_STORAGE = "/data/runScratch.boston"     # source data
@@ -102,12 +99,11 @@ elif TAG == "dev":
     DIAGNOSTICS_DELIVERY = "/data/nsc.loki/test/diag"
     
 LOG_DIR = BASE_DIR + "/logs"       # for slurm jobs
-SCRATCH_DIR = BASE_DIR + "/run"    # not used
-DO_COPY_METADATA_FILES=True
 
 # Log dir in each run folder
 RUN_LOG_DIR="DemultiplexLogs"
 
+# Configure LIMS access (should be cleaned up)
 if TAG == "dev":
     from genologics.config import *
     lims = Lims(BASEURI,USERNAME,PASSWORD)
