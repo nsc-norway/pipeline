@@ -44,7 +44,7 @@ def main(task):
             paths = paths_for_project(run_id, project)
 
             rcode = slurm.srun_command(
-                    [nsc.MD5DEEP] + paths, jobname, time="1-0",
+                    [nsc.MD5DEEP] + paths, jobname, time="02:00:00",
                     cpus_per_task=n_threads, mem="1024M",
                     cwd=os.path.join(bc_dir, project.project_dir)
                     )
