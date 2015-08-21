@@ -11,7 +11,7 @@ import re
 import subprocess
 import crypt
 from genologics.lims import *
-from common import nsc, parse, utilities, taskmgr
+from common import nsc, utilities, taskmgr
 
 TASK_NAME = "Delivery prep"
 TASK_DESCRIPTION = """Prepare for delivery."""
@@ -79,45 +79,41 @@ require user {username}
 
 def main(task):
     task.running()
-    process = Process(nsc.lims, id=process_id)
 
-    projects = set()
-    for i in process.all_inputs(unique=True):
-        projects.add(i.samples[0].project)
+    if not task.process:
+        task.fail("Sorry, delivery prep is only available through LIMS")
 
-    if len(projects) != 1:
-        print "Can only process one project at a time"
-        sys.exit(1)
+    lims_projects = {}
+    for i in task.process.all_inputs(unique=True):
+        pro = i.samples[0].project
+        lims_projects[pro.name].add(pro)
 
-    project = next(iter(projects))
-    seq_process = utilities.get_sequencing_process(process)
-    runid = seq_process.udf['Run ID']
-    instrument = utilities.get_instrument(seq_process)
-    project_name = utilities.get_sample_sheet_proj_name(seq_process, project)
-    if instrument == "hiseq":
-        demux_path = utilities.get_demux_process(process).udf[nsc.DEST_FASTQ_DIR_UDF]
-        proj_dir = parse.get_hiseq_project_dir(runid, project_name)
-        project_path = os.path.join(demux_path, proj_dir)
-    elif instrument == "nextseq":
-        output_rundir = utilities.get_demux_process(process).udf[nsc.DEST_FASTQ_DIR_UDF]
-        proj_dir = parse.get_project_dir(runid, project_name)
-        project_path = os.path.join(output_rundir, proj_dir)
-    elif instrument == "miseq":
-        proj_dir = parse.get_project_dir(runid, project_name)
-        output_rundir = os.path.join(nsc.SECONDARY_STORAGE, runid) # not the best way...
-        project_path = os.path.join(output_rundir, "Data", "Intensities", "BaseCalls", proj_dir)
+    runid = task.run_id
+    instrument = utilities.get_instrument_by_runid(runid)
 
-    delivery_type = project.udf[nsc.DELIVERY_METHOD_UDF]
-    project_type = project.udf[nsc.PROJECT_TYPE_UDF]
+    projects = task.projects
 
-    if project_type == "Diagnostics":
-        delivery_diag(project_name, project_path)
-    elif delivery_type == "User HDD" or delivery_type == "New HDD":
-        delivery_harddrive(project, project_path)
-    elif delivery_type == "Norstore":
-        delivery_norstore(process, project_name, project_path)
+    for project in projects:
+        lims_project = lims_projects[project.name]
 
-    utilities.success_finish(process, do_finish_step=False)
+        project_path = os.path.join(task.bc_dir, project.proj_dir)
+
+        delivery_type = lims_project.udf[nsc.DELIVERY_METHOD_UDF]
+        project_type = lims_project.udf[nsc.PROJECT_TYPE_UDF]
+
+        if project_type == "Diagnostics":
+            task.info("Delivering to diagnostics...")
+            delivery_diag(project.name, project_path)
+        elif delivery_type == "User HDD" or delivery_type == "New HDD":
+            task.info("Copying to delivery area...")
+            delivery_harddrive(project.name, project_path)
+        elif delivery_type == "Norstore":
+            task.info("Tar'ing and copying to delivery area, for Norstore...")
+            delivery_norstore(task.process, project.name, project_path)
+        else:
+            print "No delivery prep done for project", project_name
+
+    task.success_finish()
 
 
 if __name__ == "__main__":

@@ -104,7 +104,7 @@ def upload_file(process, name, path = None, data = None):
 
 
 
-def get_sample_sheet_proj_name(seq_process, project):
+def get_sample_sheet_proj_name(project):
     """Get the project name as it would appear in the sample sheet.
     Will become really complex if we allow other than [A-Za-z0-9\-] in 
     sample sheet."""
