@@ -109,6 +109,9 @@ LOG_DIR = BASE_DIR + "/logs"       # for slurm jobs
 SCRATCH_DIR = BASE_DIR + "/run"    # not used
 DO_COPY_METADATA_FILES=True
 
+# Log dir in each run folder
+RUN_LOG_DIR="DemultiplexLogs"
+
 if TAG == "dev":
     from genologics.config import *
     lims = Lims(BASEURI,USERNAME,PASSWORD)

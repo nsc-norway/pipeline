@@ -19,9 +19,13 @@ TASK_DESCRIPTION = """Generates HTML and PDF reports based on demultiplexing sta
 TASK_ARGS = ['work_dir', 'sample_sheet', 'threads']
 
 
-def main_lims(task):
+def main(task):
+    task.add_argument(
+            '--bcl2fastq-version',
+            default=None,
+            help="bcl2fastq version to put in the reports"
+            )
     task.running()
-    os.umask(007)
     run_id = task.run_id
     instument = utilities.get_instrument_by_runid(run_id)
     work_dir = task.work_dir
@@ -37,11 +41,34 @@ def main_lims(task):
     if task.process:
         bcl2fastq_version = utilities.get_udf(process, nsc.BCL2FASTQ_VERSION_UDF, None)
     else:
-        bcl2fastq_version = None
+        bcl2fastq_version = get_bcl2fastq2_version(work_dir)
+        if not bcl2fastq_version:
+            task.fail("bcl2fastq version cannot be detected, use the --bcl2fastq-version option to specify!")
 
     make_reports(work_dir, run_id, projects, bcl2fastq_version)
 
     task.success_finish()
+
+
+def get_bcl2fastq2_version(work_dir):
+    """Check version in log file in standard location (for non-LIMS).
+    
+    Less than bullet proof way to get bcl2fastq2 version."""
+
+    log_path = os.path.join(
+            work_dir,
+            nsc.RUN_LOG_DIR,
+            "demultiplexing.bcl2fastq2.txt"
+            )
+    log = open(log_path)
+    for i in xrange(3):
+        l = next(log)
+        if l.startswith("bcl2fastq v"):
+            return l.split(" ")[1].strip("\n")
+
+    else:
+        return None
+    
 
 
 def make_reports(work_dir, run_id, projects, bcl2fastq_version=None):

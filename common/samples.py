@@ -217,6 +217,7 @@ def add_stats(projects, run_stats):
                 if stats:
                     f.stats = stats
 
+
 def flag_empty_files(projects, run_dir):
     basecalls_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
     for p in projects:
