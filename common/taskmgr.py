@@ -270,7 +270,7 @@ class Task(object):
         else:
             self.process = None
 
-        print "START  [" + self.task_name + "]"
+        print "START  [" + self.task_name + "] " + os.path.basename(sys.argv[0])
 
         if info_str:
             self.info(info_str)
