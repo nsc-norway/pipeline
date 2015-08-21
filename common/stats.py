@@ -56,10 +56,14 @@ def parse_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_rea
                 if not (sample.attrib['name'] == "unknown" or
                         sample.attrib['name'] == "Undetermined"):
                     continue
+                else:
+                    project_name = None
             else:
                 sample_id = sample.attrib['name']
                 if sample_id == "all":
                     continue
+                project_name = project.attrib['name']
+
 
             # stats_* are indexed by filter type (pf/raw) then by the read index (then will
             # be re-organised in the return value)
@@ -96,7 +100,7 @@ def parse_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_rea
                     # Include the read-independent stats into per-read stats
                     read_stats_pf[iread].update(stats_pf)
                     read_stats_raw[iread].update(stats_raw)
-                    samples[(lane_id, sample_id, iread)] = (read_stats_raw[iread], read_stats_pf[iread])
+                    samples[(lane_id, project_name, sample_id, iread)] = (read_stats_raw[iread], read_stats_pf[iread])
 
     # sorry
     if aggregate_lanes:
@@ -164,11 +168,11 @@ def parse_demultiplexing_stats(conversion_stats_path, aggregate_lanes):
             barcode = next(bar for bar in sample.findall("Barcode") if bar.attrib['name'] == 'all')
             if aggregate_lanes:
                 stats = defaultdict(int)
-                key = ("X", sample_id)
+                key = ("X", project.attrib['name'], sample_id)
             for lane in barcode.findall("Lane"):
                 if not aggregate_lanes:
                     stats = defaultdict(int)
-                    key = (int(lane.attrib['number']), sample_id)
+                    key = (int(lane.attrib['number']), project.attrib['name'], sample_id)
 
                 for stat in lane:
                     stats[stat.tag] += int(stat.text)
@@ -184,9 +188,9 @@ def parse_demultiplexing_stats(conversion_stats_path, aggregate_lanes):
     stats = defaultdict(int)
     for lane in barcode.findall("Lane"):
         if aggregate_lanes:
-            key = ("X", None)
+            key = ("X", None, None)
         else:
-            key = (int(lane.attrib['number']), None)
+            key = (int(lane.attrib['number']), None, None)
             stats = defaultdict(int)
 
         for stat in lane:
@@ -236,7 +240,7 @@ def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_rea
             (lane, 
                 sum(val[0]['ClusterCount'] 
                     for coord, val in conversion_stats.items()
-                    if coord[0] == lane and coord[2] == 1)
+                    if coord[0] == lane and coord[-1] == 1)
                 )
             for lane in lanes
             )
@@ -245,15 +249,15 @@ def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_rea
             (lane, 
                 sum(val[1]['ClusterCount'] 
                     for coord, val in conversion_stats.items()
-                    if coord[0] == lane and coord[2] == 1)
+                    if coord[0] == lane and coord[-1] == 1)
                 )
             for lane in lanes
             )
 
     result = {}
     for coordinates in conversion_stats.keys():
-        lane, sample, read = coordinates
-        de_s = demultiplexing_stats[(lane, sample)]
+        lane, project, sample, read = coordinates
+        de_s = demultiplexing_stats[(lane, project, sample)]
         con_s_raw, con_s_pf = conversion_stats[coordinates]
 
         stats = {}

@@ -143,8 +143,8 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes):
             # Stats can be added in later
 
     # Create an undetermined file for each lane, read seen
-    undetermined_project = Project("Undetermined", None, [], True)
-    undetermined_sample = Sample(0, None, "Undetermined", None, [])
+    undetermined_project = Project(None, None, [], True)
+    undetermined_sample = Sample(0, None, None, None, [])
     undetermined_project.samples.append(undetermined_sample)
     for lane in lanes:
         for i_read in xrange(1, num_reads+1):
@@ -213,7 +213,7 @@ def add_stats(projects, run_stats):
     for project in projects:
         for sample in project.samples:
             for f in sample.files:
-                stats = run_stats.get((f.lane, sample.name, f.i_read))
+                stats = run_stats.get((f.lane, project.name, sample.name, f.i_read))
                 if stats:
                     f.stats = stats
 
