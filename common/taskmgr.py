@@ -253,6 +253,7 @@ class Task(object):
             self.process.udf[nsc.JOB_STATUS_UDF] = "Running"
             self.process.udf[nsc.JOB_STATE_CODE_UDF] = 'RUNNING'
             self.process.udf[nsc.CURRENT_JOB_UDF] = self.task_name
+            self.process.udf[nsc.ERROR_DETAILS_UDF] = ""
             self.process.put()
 
             # Set defaults for source & working directories based on run ID
