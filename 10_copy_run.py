@@ -64,8 +64,18 @@ def main(task):
     task.running()
     runid = task.run_id
 
+
     source = task.src_dir
     destination = task.work_dir    
+    # Check destination
+    instr_from_dest = utilities.get_instrument_by_runid(
+            os.path.basename(os.path.realpath(destination))
+            )
+    if not instr_from_dest:
+        task.fail("Destination does not look like an Illumina run folder", 
+                """Remember to include the name of the destination directory in the 
+work_dir argument.""")
+
 
     # Specify source with trailing slash to copy content
     source = source.rstrip('/') + "/"
