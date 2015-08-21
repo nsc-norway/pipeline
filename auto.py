@@ -14,8 +14,10 @@
 #   for each full flowcell which is present, which also has the automation
 #   flag on the sequencing process, and the sequencing is finsihed.
 # * For each demultiplexing/QC step with the automation flag set, checks 
-#   whether the 
+#   whether a program is running, and starts a new one if appropriate (TBD).
 
+
+# This script is a TODO, sort of the last piece of the puzzle
 
 import sys
 import time

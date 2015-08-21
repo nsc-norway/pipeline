@@ -73,13 +73,14 @@ def main(process_id, sample_sheet_file):
     # This script can only handle the case when there is a single clustering process
     # (or for Mi/NextSeq, ...Load samples process)
     if len(parent_pids) == 1:
+        # look for clustering (HiSeq) or "load samples" proceess (Ne/MiSeq)
+        # This is where the sample sheet is generated
         parent_proc = parent_processes[0]
         sample_sheet_data = get_sample_sheet_data(parent_proc, fcid)
         if sample_sheet_data:
             open(sample_sheet_file, "w").write(sample_sheet_data)
     else:
         logging.info("Cannot auto-detect sample sheet when there are more than one clustering processes")
-        return 0
 
     if seq_proc:
         paths = get_paths(process, seq_proc)
