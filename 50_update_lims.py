@@ -22,26 +22,47 @@ def main(task):
         print "Can't use this script without LIMS (--pid), sorry."
         sys.exit(1)
 
+    # Aggregate lanes must match the setting used for demultiplexing
+    # Aggregate reads must match the setup in the LIMS -- it should be 
+    # true if there is one resultfile for both reads, false if separate
+    # resultfiles.
     run_stats = stats.get_bcl2fastq_stats(
             os.path.join(task.bc_dir, "Stats"),
-            aggregate_lanes = True,
+            aggregate_lanes = task.no_lane_splitting,
             aggregate_reads = True
             )
 
-    post_stats(task.process, run_stats)
+    # We need the projects list to match the sample name and project name
+    # to the corresponding LIMS-ID in the sample sheet. The sample name
+    # and project combo is unique, but may be difficult to look up in the 
+    # LIMS if the name contains any funny characters.
+    projects = task.projects
+
+    post_stats(task.process, projects, run_stats)
 
     task.success_finish()
 
 
-def post_stats(process, demultiplex_stats):
-    for coordinates, stats in demultiplex_stats.items():
-        lane, limsid = coordinates[0:2]
+def post_stats(process, projects, demultiplex_stats):
+    """Find the resultfiles in the LIMS and post the demultiplexing
+    stats.
+    """ 
+    projects_map = {}
+    for project in projects:
+        samples_map = {}
+        for sample in project.samples:
+            samples_map[sample.name] = sample
 
-        # The LIMS ID in the sample sheet (and then in the stats) will be the ID of the 
-        # derived sample that went into a pool that was sequenced, or one that went 
-        # directly on the sequencer.
- 
-        if limsid:
+        projects_map[project.name] = samples_map
+
+
+    for coordinates, stats in demultiplex_stats.items():
+        # Note: while it may seem that this works for both aggregate_reads and
+        # separate reads, it does not, the code must be changed for separate reads
+        lane, project, sample_name = coordinates[0:3]
+        
+        if sample_name: # Not undetermined
+            limsid = projects_map[project][sample_name].sample_id
             resultfile = get_resultfile(process, lane, limsid, 1)
             for statname in udf_list:
                 try:
@@ -51,7 +72,7 @@ def post_stats(process, demultiplex_stats):
             lims_fastqfile.put()
             
 
-        else: # Undetermined: limsid = None in demultiplex_stats
+        else: # Undetermined: sample_name = None in demultiplex_stats
             lane_analyte = get_lane(lane)
             if lane_analyte:
                 lane_analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
