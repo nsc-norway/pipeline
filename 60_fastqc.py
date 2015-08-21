@@ -79,7 +79,11 @@ def move_fastqc_results(qc_dir, projects):
 
     for project in projects:
         # Create the project dir
-        project_dir = os.path.join(qc_dir, project.name)
+        if project.name:
+            project_dir = os.path.join(qc_dir, project.name)
+        else:
+            project_dir = os.path.join(qc_dir, "Undetermined")
+
         if not os.path.exists(project_dir):
             os.mkdir(project_dir)
 
