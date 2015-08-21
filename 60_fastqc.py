@@ -31,7 +31,7 @@ def main(task):
     # Put large files first in the list, so that the fastqc process won't be
     # stuck processing one or two large files long after all others have finished
     fastq_paths = sorted(
-            os.path.join(bc_dir, f.path) for f in fastq_files,
+            (os.path.join(bc_dir, f.path) for f in fastq_files),
             key=os.path.getsize,
             reverse=True
             )
