@@ -28,9 +28,13 @@ def main(task):
             if not f.empty
             ]
     # then get the paths
-    fastq_paths = [
-            os.path.join(bc_dir, f.path) for f in fastq_files
-            ]
+    # Put large files first in the list, so that the fastqc process won't be
+    # stuck processing one or two large files long after all others have finished
+    fastq_paths = sorted(
+            os.path.join(bc_dir, f.path) for f in fastq_files,
+            key=os.path.getsize,
+            reverse=True
+            )
 
 
     output_dir = os.path.join(bc_dir, "QualityControl")
