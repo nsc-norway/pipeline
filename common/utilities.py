@@ -46,8 +46,10 @@ def get_instrument_by_runid(run_id):
         return 'miseq'
     elif re.match(r"\d{6}_NS", run_id):
         return 'nextseq'
-    else:
+    elif re.match(r"\d{6}_[A-Z0-9]", run_id):
         return 'hiseq'
+    else:
+        return None
 
 
 def merged_lanes(run_id):
