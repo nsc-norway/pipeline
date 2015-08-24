@@ -101,7 +101,19 @@ class Project(object):
         self.name = name
 
 
-class ProcessInfo(object):
+class SequencingInfo(object):
+    def __init__(self, name, url, flowcell_id, projects, status, runid, finished=None):
+        self.name = name
+        self.url = url
+        self.flowcell_id = flowcell_id
+        self.projects = projects
+        self.status = status
+        self.runid = runid
+        self.finished = finished
+        self.is_queue = False
+
+
+class DataAnalysisInfo(object):
     def __init__(self, name, url, flowcell_id, projects, status, seq_url, runid, finished=None):
         self.name = name
         self.url = url
@@ -227,8 +239,8 @@ def read_sequencing(process_name, process):
     except KeyError:
         finished = ""
 
-    return ProcessInfo(
-            process_name, url, flowcell_id, projects, status, url, runid, finished
+    return SequencingInfo(
+            process_name, url, flowcell_id, projects, status, runid, finished
             )
 
 
@@ -249,7 +261,7 @@ def read_post_sequencing_process(process_name, process, sequencing_process):
         status = "Open"
 
 
-    return ProcessInfo(
+    return DataAnalysisInfo(
             process_name, url, None, projects, status, seq_url, runid
             )
 
