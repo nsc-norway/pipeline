@@ -159,26 +159,6 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes):
     return [undetermined_project] + projects.values()
 
 
-def get_projects_by_process(process):
-    """Convenience function to get the projects info (above) given only a LIMS
-    process."""
-
-    run_id = process.udf[nsc.RUN_ID_UDF]
-    
-    merged_lanes = utilities.get_udf(process, nsc.NO_LANE_SPLITTING_UDF, False)
-
-    sample_sheet_content = utilities.get_sample_sheet(process)
-    sample_sheet = parse_sample_sheet(sample_sheet_content)
-
-    run_dir = utilities.get_udf(
-            process, nsc.WORK_RUN_DIR_UDF,
-            os.path.join(nsc.SECONDARY_STORAGE, run_id)
-            )
-    num_reads, index_reads = utilities.get_num_reads(run_dir)
-
-    return get_projects(run_id, sample_sheet['data'], num_reads, merged_lanes)
-
-
 def check_files_merged_lanes(run_dir):
     basecalls_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
     unmerged_exists = len(glob.glob(basecalls_dir + "/Undetermined_S0_L*_R1_001.fastq.gz")) > 0
@@ -189,19 +169,6 @@ def check_files_merged_lanes(run_dir):
         return False
     else:
         raise RuntimeError("Unable to determine if lanes were merged (no-lane-splitting option)")
-
-
-def get_projects_by_files(run_dir, sample_sheet_path):
-    run_id = os.path.basename(os.path.realpath(run_dir))
-
-    sample_sheet_content = open(sample_sheet_path).read()
-    sample_sheet = parse_sample_sheet(sample_sheet_content)
-
-    num_reads, index_reads = utilities.get_num_reads(run_dir)
-
-    merged_lanes = check_files_merged_lanes(run_dir)
-
-    return get_projects(run_id, sample_sheet['data'], num_reads, merged_lanes)
 
 
 def add_stats(projects, run_stats):

@@ -29,7 +29,7 @@ ARG_OPTIONS = {
         "threads": ["--threads", nsc.THREADS_UDF, int, 1, "Number of threads/cores to use"],
         "sample_sheet": ["--sample-sheet", None, str, "<DIR>/DemultiplexingSampleSheet.csv", "Sample sheet"],
         }
-DEFAULT_VAL_INDEX = 2
+DEFAULT_VAL_INDEX = 3
 
 class Task(object): 
     """Class to manage the processing tasks (scripts) in a common way for LIMS
@@ -153,12 +153,16 @@ class Task(object):
     @property
     def projects(self):
         """Get the list of project objects, defined in the samples module. """
-        if self.process:
-            projects = samples.get_projects_by_process(self.process)
-        else:
-            projects = samples.get_projects_by_files(self.work_dir, self.sample_sheet_path)
-        return projects
 
+        num_reads, index_reads = utilities.get_num_reads(self.work_dir)
+        sample_sheet_data = samples.parse_sample_sheet(self.sample_sheet_content)['data']
+
+        return samples.get_projects(
+                self.run_id,
+                sample_sheet_data,
+                num_reads,
+                self.no_lane_splitting
+                )
 
     @property
     def no_lane_splitting(self):
@@ -170,8 +174,6 @@ class Task(object):
             return utilities.get_udf(self.process, nsc.NO_LANE_SPLITTING_UDF, False)
         else:
             return samples.check_files_merged_lanes(self.work_dir)
-
-
 
 
 

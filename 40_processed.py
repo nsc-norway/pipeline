@@ -19,7 +19,7 @@ def main(task):
     runid = task.run_id
 
     if task.process:
-        inputs = process.all_inputs(unique=True)
+        inputs = task.process.all_inputs(unique=True)
         flowcells = set(i.location[0] for i in inputs)
         if len(flowcells) == 1:
             fc = next(iter(flowcells))
