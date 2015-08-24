@@ -21,7 +21,7 @@ def main(task):
     instrument = utilities.get_instrument_by_runid(run_id)
     
     if task.process: # lims mode
-        lane_stats = lane_info.get_from_lims(process, instrument)
+        lane_stats = lane_info.get_from_lims(task.process, instrument)
     else:
         lane_stats = lane_info.get_from_files(work_dir, instrument)
 
