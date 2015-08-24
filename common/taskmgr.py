@@ -260,12 +260,6 @@ class Task(object):
             self.process.udf[nsc.ERROR_DETAILS_UDF] = ""
             self.process.put()
 
-            step = Step(nsc.lims, id=self.process.id)
-            for ps in step.program_status:
-                if ps.status == "RUNNING": # It's this program
-                    ps.message = self.task_name + " running..."
-                    ps.put()
-
             # Set defaults for source & working directories based on run ID
             # (only available for LIMS)
             try:
@@ -312,11 +306,11 @@ class Task(object):
             if extra_info:
                 self.process.udf[nsc.ERROR_DETAILS_UDF] = extra_info
             self.process.put()
-        print "ERROR  [" + self.task_name + "] " + message
         if extra_info:
-            print "----------"
+            print "-- ERROR --"
             print extra_info
-            print "----------"
+            print "-----------"
+        print "ERROR  [" + self.task_name + "] " + message
         sys.exit(1)
 
 
