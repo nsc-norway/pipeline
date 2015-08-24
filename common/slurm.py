@@ -24,5 +24,8 @@ def srun_command(
         stdoutpath = os.path.realpath(stdout)
         srun_other_args += ['--output=' + stdoutpath]
 
+    if not cwd:
+        cwd = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+
     return subprocess.call(nsc.SRUN_ARGLIST + srun_other_args + args , cwd=cwd)
 

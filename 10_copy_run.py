@@ -44,7 +44,12 @@ def rsync_arglist(source_path, destination_path, exclude):
     # symlink source run, and it will still make a real copy.
     # We don't expect any symlinks in the run directories, as it's written
     # by a Windows machine.
-    args = [nsc.RSYNC, '-rLt', '--chmod=ug+rwX,o-rwx'] # or chmod 660
+
+    # No "copy source permissions" setting. Using default umask for
+    # seq-user which is set via sudoers. Then use chmod to make sure that
+    # all non-masked permissions are available. (this is the only way to 
+    # make it work)
+    args = [nsc.RSYNC, '-rLt', '--chmod=ug+rwX']
     args += ["--exclude=" + path for path in exclude]
     args += [source_path, destination_path]
     # Running rsync client in slurm jobs: It is necessary to remove SELinux protections
@@ -68,9 +73,8 @@ def main(task):
     source = task.src_dir
     destination = task.work_dir    
     # Check destination
-    instr_from_dest = utilities.get_instrument_by_runid(
-            os.path.basename(os.path.realpath(destination))
-            )
+    print runid
+    instr_from_dest = utilities.get_instrument_by_runid(runid)
     if not instr_from_dest:
         task.fail("Destination does not look like an Illumina run folder", 
                 """Remember to include the name of the destination directory in the 
@@ -109,7 +113,10 @@ work_dir argument.""")
     else:
         detail = None
         if task.process: #LIMS
-            detail = open(logfile).read()
+            try:
+                detail = open(logfile).read()
+            except IOError:
+                detail = None
         task.fail("rsync failed", detail)
 
 
