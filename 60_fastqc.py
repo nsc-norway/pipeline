@@ -4,7 +4,7 @@
 import os
 import re
 import shutil
-from common import samples, nsc, taskmgr, samples, slurm
+from common import samples, nsc, taskmgr, samples, slurm, utilities
 
 TASK_NAME = "FastQC"
 TASK_DESCRIPTION = """Run FastQC on the demultiplexed files."""
@@ -36,7 +36,6 @@ def main(task):
             reverse=True
             )
 
-
     output_dir = os.path.join(bc_dir, "QualityControl")
     try:
         os.mkdir(output_dir)
@@ -47,17 +46,29 @@ def main(task):
 
     fastqc_args = ["--extract", "--threads=" + str(threads)]
     fastqc_args += ["--outdir=" + output_dir]
-    fastqc_args += fastq_paths
 
     log_path = task.logfile("fastqc")
     if task.process:
         jobname = task.process.id + ".fastqc"
     else:
         jobname = "fastqc"
-    rcode = slurm.srun_command(
-            [nsc.FASTQC] + fastqc_args, jobname, time="1-0", logfile=log_path,
-            cpus_per_task=threads, mem=str(1024+256*threads)+"M"
-            )
+
+    # Process the files in groups of 500 files to prevent the 
+    # "argument list too long" error. The groups are processed 
+    # sequentially. The +499 is a "trick" to round up with int
+    # division.
+    n_groups = (len(fastq_paths) + 499) // 500
+    for i_group in xrange(n_groups):
+        # process e.g. #1, #3, #5, ... then #2, #4, #6... for 2k files
+        grp_fastqc_args = fastqc_args + fastq_paths[i_group::n_groups]
+        rcode = slurm.srun_command(
+                [nsc.FASTQC] + grp_fastqc_args, jobname, time="1-0", 
+                logfile=log_path, cpus_per_task=threads,
+                mem=str(1024+256*threads)+"M"
+                )
+    
+    if task.process:
+        utilities.upload_file(task.process, nsc.FASTQC_LOG, log_path)
 
     if rcode == 0:
         move_fastqc_results(output_dir, projects)
