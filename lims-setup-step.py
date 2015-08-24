@@ -36,7 +36,7 @@ def get_sample_sheet_data(cluster_proc, fcid):
             if o['uri'].name == 'SampleSheet csv':
                 if len(o['uri'].files) == 1:
                     f = o['uri'].files[0]
-                    if f.original_location == "{0}.csv".format(fcid)
+                    if f.original_location == "{0}.csv".format(fcid):
                         return f.download()
     return None
 
@@ -87,7 +87,7 @@ def main(process_id, sample_sheet_file):
         if paths:
             logging.debug('Found source and destination paths')
             process.udf[nsc.SOURCE_RUN_DIR_UDF] = paths[0]
-            process.udf[nsc.DEST_FASTQ_DIR_UDF] = paths[1]
+            process.udf[nsc.WORK_RUN_DIR_UDF] = paths[1]
         else:
             logging.debug('Unable to determine source and destination paths')
 

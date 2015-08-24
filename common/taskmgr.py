@@ -54,6 +54,7 @@ class Task(object):
         self.args = None # To be set when argument parser is run
         self.process = None
         self.finished = False
+        self.success = False
 
 
     def get_arg(self, arg_name):
@@ -198,7 +199,7 @@ class Task(object):
         """
 
         if self.finished:
-            return True
+            return self.success
 
         if etype is None:
             print "Uexpected exit"
@@ -293,6 +294,7 @@ class Task(object):
         writing this code)"""
 
         self.finished = True
+        self.success = True
         if self.process:
             self.process.get(force=True)
             self.process.udf[nsc.JOB_STATUS_UDF] = "Failed: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ": " + message
@@ -314,6 +316,7 @@ class Task(object):
         NOTE: Calls sys.exit(0) to terminate program."""
 
         self.finished = True
+        self.success = True
         complete_str = 'Completed successfully ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         if self.process:
             self.process.get(force=True)

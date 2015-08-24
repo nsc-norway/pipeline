@@ -33,7 +33,7 @@ import argparse
 import subprocess
 import datetime
 
-from Bio.Seq import Seq
+#from Bio.Seq import Seq
 
 from genologics.lims import *
 from common import nsc, utilities, slurm, taskmgr
@@ -163,6 +163,11 @@ def get_ss_from_cluster_proc(process):
     return None
 
 
+def rev_comp(sequence):
+    COMPLEMENTARY = {'A':'T', 'T':'A', 'G':'C', 'C':'G'}
+    return [COMPLEMENTARY[b] for b in reversed(sequence)]
+
+
 def reverse_complement_index2(original_data):
     original_lines = [l.strip("\r\n") for l in original_data.splitlines()]
     data_start = next(i for i, d in enumerate(original_lines) if d == "[Data]")
@@ -170,7 +175,8 @@ def reverse_complement_index2(original_data):
     try:
         index2_col = next(i for i, c in enumerate(data[0]) if c.lower() == "index2")
         for row in data[1:]:
-            row[index2_col] = str(Seq(row[index2_col]).reverse_complement())
+            #row[index2_col] = str(Seq(row[index2_col]).reverse_complement())
+            row[index2_col] = rev_comp(row[index2_col])
 
         return "\r\n".join(
                 original_lines[0:data_start+1] +\
