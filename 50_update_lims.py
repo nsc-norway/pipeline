@@ -13,7 +13,7 @@ udf_list = [
         '# Reads', 'Yield PF (Gb)', '% of Raw Clusters Per Lane',
         '% of PF Clusters Per Lane',
         '% Perfect Index Read', 'One Mismatch Reads (Index)',
-        '% Bases >=Q30', 'Ave Q Score'
+        '% Bases >=Q30', 'Ave Q Score', '%PF'
         ]
 
 def main(task):
@@ -139,7 +139,7 @@ def get_lane(process, lane):
     for input in process.all_inputs():
         if lane == 1 and input.location[1] == 'A:1': # Use A:1 for NextSeq, MiSeq
             return input
-        if i.location[1] == '%d:1' % lane:
+        if input.location[1] == '%d:1' % lane:
             return input
 
 
