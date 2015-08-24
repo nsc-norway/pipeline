@@ -26,6 +26,7 @@ if nsc.TAG == "dev":
     app.debug=True
 
 INSTRUMENTS = ["HiSeq", "NextSeq", "MiSeq"]
+
 # With indexes into INSTRUMENTS array
 FLOWCELL_INSTRUMENTS = {
 	"Illumina Flow Cell": 0,
@@ -40,26 +41,11 @@ SEQUENCING = [
         ("Illumina SBS (MiSeq) NSC 1.0", "MiSeq Run (MiSeq) 5.0")
         ]
 
-# [ (Protocol, (Step, Step, Step)) ]
+# [ (Protocol,  Step) ]
 DATA_PROCESSING = [
-        ("NSC Data processing for HiSeq", (
-            "NSC Demultiplexing (HiSeq)",
-            "NSC Data Quality Reporting (HiSeq)",
-            "NSC Delivery",
-            "NSC Finalize run"
-            )),
-        ("NSC Data processing for NextSeq", (
-            "NSC Demultiplexing (NextSeq)",
-            "NSC Data Quality Reporting (Mi/NextSeq)",
-            "NSC Delivery",
-            "NSC Finalize run"
-            )),
-        ("NSC Data processing for MiSeq", (
-            "NSC Copy MiSeq Run",
-            "NSC Data Quality Reporting (Mi/NextSeq)",
-            "NSC Delivery",
-            "NSC Finalize run"
-            )),
+        ("HiSeq demultiplexing and QC 2.0", "Demultiplexing and QC NSC 2.0"),
+        ("NextSeq demultiplexing and QC 2.0", "Demultiplexing and QC NSC 2.0"),
+        ("MiSeq processing and QC 2.0", "Demultiplexing and QC NSC 2.0"),
         ]
 
 PROJECT_EVALUATION = "Project Evaluation Step"
@@ -71,12 +57,11 @@ sequencing_process_type = []
 def init_application():
     # We get queue instances as part of the initialisation, then keep them
     # in the queues dict. (looking up queues is time consuming)
-    for protocol, protocol_steps in DATA_PROCESSING:
+    for protocol, protocol_step in DATA_PROCESSING:
         proto = nsc.lims.get_protocols(name=protocol)[0]
-        for step_name in protocol_steps:
-            for ps in proto.steps:
-                if step_name == ps.name:
-                    queues[(protocol, step_name)] = ps.queue()
+        for ps in proto.steps:
+            if protocol_step == ps.name:
+                queues[(protocol, protocol_step)] = ps.queue()
     for protocol, protocol_step in SEQUENCING:
         proto = nsc.lims.get_protocols(name=protocol)[0]
         for ps in proto.steps:
