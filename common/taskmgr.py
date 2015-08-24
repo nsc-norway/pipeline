@@ -309,7 +309,8 @@ class Task(object):
                 self.process.udf[nsc.ERROR_DETAILS_UDF] = extra_info
             self.process.put()
         if extra_info:
-            print "-- ERROR --"
+            print "ERROR  [" + self.task_name + "] " + message
+            print "-----------"
             print extra_info
             print "-----------"
         print "ERROR  [" + self.task_name + "] " + message

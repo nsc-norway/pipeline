@@ -1,6 +1,7 @@
 # Write stats to LIMS
-from common import nsc, stats, utilities
+import os
 from genologics.lims import *
+from common import nsc, taskmgr, stats
 
 TASK_NAME = "LIMS stats"
 TASK_DESCRIPTION = """Post demultiplexing stats to LIMS (doesn't make an effort
@@ -66,14 +67,14 @@ def post_stats(process, projects, demultiplex_stats):
             resultfile = get_resultfile(process, lane, limsid, 1)
             for statname in udf_list:
                 try:
-                    lims_fastqfile.udf[statname] = stats[statname]
+                    resultfile.udf[statname] = stats[statname]
                 except KeyError:
                     pass
-            lims_fastqfile.put()
+            resultfile.put()
             
 
         else: # Undetermined: sample_name = None in demultiplex_stats
-            lane_analyte = get_lane(lane)
+            lane_analyte = get_lane(process, lane)
             if lane_analyte:
                 lane_analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
                 lane_analyte.put()
@@ -101,7 +102,6 @@ def get_resultfile(process, lane, input_limsid, read):
     error is thrown (relying on underlying functions to throw, like HTTPError).
     """
 
-    lane, input_limsid, read = coordinates
     try:
         input_sample = Artifact(nsc.lims, id=input_limsid).samples[0]
     except requests.exceptions.HTTPError as e:
