@@ -220,9 +220,10 @@ def convert_from_bcl2fastqv1(original_data):
 
     # Add the Sample_Name column if "Description" can't be used as Sample_ID
     # The we use SampleID as sample name and sample ID
-    data[0].append("Sample_Name")
-    for r in data[1:]:
-        r.append(r[sample_id_index])
+    if any_empty_description:
+        data[0].append("Sample_Name")
+        for r in data[1:]:
+            r.append(r[sample_id_index])
 
 
     # Split the index into first and second part
