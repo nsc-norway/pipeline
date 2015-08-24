@@ -29,9 +29,9 @@ def main(task):
     # bcl2fastq2 options
     if task.process:
         no_lane_splitting = utilities.get_udf(
-                process, nsc.NO_LANE_SPLITTING_UDF, default_no_lane_splitting
+                task.process, nsc.NO_LANE_SPLITTING_UDF, default_no_lane_splitting
                 )
-        other_options = utilities.get_udf(process, nsc.OTHER_OPTIONS_UDF, None)
+        other_options = utilities.get_udf(task.process, nsc.OTHER_OPTIONS_UDF, None)
     else:
         # for non-lims mode, we don't provide many options, just the defaults
         no_lane_splitting = default_no_lane_splitting
@@ -42,7 +42,7 @@ def main(task):
         sample_sheet_content = task.sample_sheet_content
         demultiplex_sample_sheet_path = os.path.join(
                 dest_run_dir,
-                "DemultiplexingSampleSheet-" + process.id + ".csv"
+                "DemultiplexingSampleSheet-" + task.process.id + ".csv"
                 )
         with open(demultiplex_sample_sheet_path, 'wb') as f:
             f.write(sample_sheet_content)
@@ -107,7 +107,7 @@ def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
         for i in xrange(3):
             l = next(log)
             if l.startswith("bcl2fastq v"):
-                process.udf[nsc.BCL2FASTQ_VERSION_UDF] = l.split(" ")[1].strip("\n")
+                task.process.udf[nsc.BCL2FASTQ_VERSION_UDF] = l.split(" ")[1].strip("\n")
                 # No put(), will put later when calling success_finish() or fail()
 
     return rcode == 0
