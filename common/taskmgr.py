@@ -23,11 +23,11 @@ from genologics.lims import *
 # arguments (without leading "--"), however, the attribute will be called by the argparse_name
 # instead. So keep name and argparse_name equal for those.
 ARG_OPTIONS = {
-        "src_dir": ("src_dir", nsc.SOURCE_RUN_DIR_UDF, str, None, "Source directory (run folder)"),
-        "work_dir": ("work_dir", nsc.WORK_RUN_DIR_UDF, str, None, "Destination/working directory (run folder)"),
-        "run_id": ("--run-id", nsc.RUN_ID_UDF, str, None, "Override run ID (mostly useless)"),
-        "threads": ("--threads", nsc.THREADS_UDF, int, 1, "Number of threads/cores to use"),
-        "sample_sheet": ("--sample-sheet", None, str, "<DIR>/DemultiplexingSampleSheet.csv", "Sample sheet"),
+        "src_dir": ["src_dir", nsc.SOURCE_RUN_DIR_UDF, str, None, "Source directory (run folder)"],
+        "work_dir": ["work_dir", nsc.WORK_RUN_DIR_UDF, str, None, "Destination/working directory (run folder)"],
+        "run_id": ["--run-id", nsc.RUN_ID_UDF, str, None, "Override run ID (mostly useless)"],
+        "threads": ["--threads", nsc.THREADS_UDF, int, 1, "Number of threads/cores to use"],
+        "sample_sheet": ["--sample-sheet", None, str, "<DIR>/DemultiplexingSampleSheet.csv", "Sample sheet"],
         }
 DEFAULT_VAL_INDEX = 2
 
@@ -100,7 +100,7 @@ class Task(object):
         """Get the content of the "demultiplexing" sample sheet"""
         if self.process:
             sample_sheet = None
-            for o in process.all_outputs(unique=True):
+            for o in self.process.all_outputs(unique=True):
                 if o.output_type == "ResultFile" and o.name == nsc.SAMPLE_SHEET:
                     if len(o.files) == 1:
                         sample_sheet = o.files[0].download()
@@ -210,6 +210,8 @@ class Task(object):
         self.fail(etype.__name__ + " " + str(value),
                 "\n".join(traceback.format_exception(etype, value, tb)))
 
+        return False
+
 
 
     # To be called to indicate the status
@@ -238,7 +240,8 @@ class Task(object):
                         argparse_name,
                         type=type,
                         default=default,
-                        help=help
+                        help=help,
+                        nargs="?"
                         )
 
         try:
@@ -257,11 +260,18 @@ class Task(object):
             self.process.udf[nsc.ERROR_DETAILS_UDF] = ""
             self.process.put()
 
+            step = Step(nsc.lims, id=self.process.id)
+            for ps in step.program_status:
+                if ps.status == "RUNNING": # It's this program
+                    ps.message = self.task_name + " running..."
+                    ps.put()
+
             # Set defaults for source & working directories based on run ID
             # (only available for LIMS)
             try:
                 run_id = self.process.udf[nsc.RUN_ID_UDF]
-                work_dir = os.path.join(nsc.PRIMARY_STORAGE, run_id)
+                src_dir = os.path.join(nsc.PRIMARY_STORAGE, run_id)
+                work_dir = os.path.join(nsc.SECONDARY_STORAGE, run_id)
                 # These defaults are set to None in the ARG_OPTIONS initialization,
                 # no need to check if they are None
                 ARG_OPTIONS['src_dir'][DEFAULT_VAL_INDEX] = src_dir
@@ -294,7 +304,7 @@ class Task(object):
         writing this code)"""
 
         self.finished = True
-        self.success = True
+        self.success = False
         if self.process:
             self.process.get(force=True)
             self.process.udf[nsc.JOB_STATUS_UDF] = "Failed: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ": " + message
