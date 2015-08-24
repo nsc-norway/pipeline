@@ -41,18 +41,6 @@ def get_sample_sheet_data(cluster_proc, fcid):
     return None
 
 
-def get_paths(process, seq_process):
-    try:
-        run_id = seq_process.udf['Run ID']
-    except:
-        return None
-
-    source_path = os.path.join(nsc.PRIMARY_STORAGE, run_id)
-    dest_path = os.path.join(nsc.SECONDARY_STORAGE, run_id)
-
-    return (source_path, dest_path)
-
-
 def main(process_id, sample_sheet_file):
     process = Process(nsc.lims, id=process_id)
 
@@ -83,11 +71,19 @@ def main(process_id, sample_sheet_file):
         logging.info("Cannot auto-detect sample sheet when there are more than one clustering processes")
 
     if seq_proc:
-        paths = get_paths(process, seq_proc)
-        if paths:
+        try:
+            run_id = seq_proc.udf['Run ID']
+        except KeyError:
+            run_id = None
+
+        if run_id:
+            process.udf[nsc.RUN_ID_UDF] = run_id
+
             logging.debug('Found source and destination paths')
-            process.udf[nsc.SOURCE_RUN_DIR_UDF] = paths[0]
-            process.udf[nsc.WORK_RUN_DIR_UDF] = paths[1]
+            source_path = os.path.join(nsc.PRIMARY_STORAGE, run_id)
+            dest_path = os.path.join(nsc.SECONDARY_STORAGE, run_id)
+            process.udf[nsc.SOURCE_RUN_DIR_UDF] = source_path
+            process.udf[nsc.WORK_RUN_DIR_UDF] = dest_path
         else:
             logging.debug('Unable to determine source and destination paths')
 
