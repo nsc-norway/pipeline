@@ -4,6 +4,7 @@
 
 
 import os
+import getpass
 from common import nsc, taskmgr, samples, slurm
 
 TASK_NAME = "80. Checksums"
@@ -50,7 +51,7 @@ def main(task):
                     [nsc.MD5DEEP, '-rl'] + paths, jobname, time="02:00:00",
                     cpus_per_task=n_threads, mem="1024M",
                     cwd=os.path.join(bc_dir, project.proj_dir),
-                    stdout = stdout
+                    stdout = stdout, change_user=getpass.getuser()=="glsai"
                     )
 
             if rcode != 0:
