@@ -49,6 +49,7 @@ class Task(object):
         self.task_name = task_name
         self.task_description = task_description
         self.arg_names = arg_names
+        self.script_name = os.path.basename(sys.argv[0])
         self.parser = argparse.ArgumentParser(description=task_description)
         self.parser.add_argument("--pid", dest="pid", default=None, help="Process ID if running within LIMS")
         self.args = None # To be set when argument parser is run
@@ -277,7 +278,7 @@ class Task(object):
         else:
             self.process = None
 
-        print "START  [" + self.task_name + "] " + os.path.basename(sys.argv[0])
+        print "START  [" + self.task_name + "] " + self.script_name
 
         if info_str:
             self.info(info_str)
