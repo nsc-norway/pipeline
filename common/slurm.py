@@ -25,9 +25,6 @@ def srun_command(
         stdoutpath = os.path.realpath(stdout)
         srun_other_args += ['--output=' + stdoutpath]
 
-    if not cwd:
-        cwd = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-
     if change_user:
         arglist = nsc.SRUN_GLSAI_ARGLIST
     else:
