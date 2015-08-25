@@ -182,6 +182,7 @@ def get_ne_mi_seq_from_ssheet(run_id, run_dir, instrument, lanes,
         sample_name = sam['samplename']
         if not sample_name:
             sample_name = sam['sampleid']
+        sample_name = sample_name.replace("_", "-")
         for lane in lanes:
             for ir in xrange(1, n_reads+1):
                 if lane.is_merged:
