@@ -9,6 +9,7 @@
 
 import os
 import sys
+import getpass
 
 from genologics.lims import *
 from common import nsc, utilities, slurm, taskmgr
@@ -106,7 +107,7 @@ work_dir argument.""")
 
     rc = slurm.srun_command(
             args, job_name, "02:00:00", logfile=logfile, srun_user_args=srun_args,
-            change_user=task.process != None
+            change_user=getpass.getuser() == "glsai"
             )
     
     if rc == 0:
