@@ -95,7 +95,8 @@ def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
 
     rcode = slurm.srun_command(
             args, jobname, time="1-0", logfile=log_path,
-            cpus_per_task=n_threads, mem="16G"
+            cpus_per_task=n_threads, mem="16G",
+            change_user=task.process != None
             )
 
     # LIMS only:

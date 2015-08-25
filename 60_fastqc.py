@@ -66,12 +66,15 @@ def main(task):
     n_groups = (len(fastq_paths) + 499) // 500
     for i_group in xrange(n_groups):
         # process e.g. #1, #3, #5, ... then #2, #4, #6... for 2k files
-        grp_fastqc_args = fastqc_args + fastq_paths[i_group::n_groups]
+        proc_paths = fastq_paths[i_group::n_groups]
+        grp_fastqc_args = fastqc_args + proc_paths
+        print "Fastqc-" + str(i_group), ": Processing", len(proc_paths), "of", len(fastq_paths), "files..."
         rcode = slurm.srun_command(
                 [nsc.FASTQC] + grp_fastqc_args, jobname, time="1-0", 
                 logfile=log_path, cpus_per_task=threads,
                 mem=str(1024+256*threads)+"M",
-                srun_user_args=['--open-mode=append']
+                srun_user_args=['--open-mode=append'],
+                change_user=task.process != None
                 )
 
         if rcode != 0:

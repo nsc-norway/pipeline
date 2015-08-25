@@ -105,7 +105,8 @@ work_dir argument.""")
         job_name = TASK_NAME
 
     rc = slurm.srun_command(
-            args, job_name, "02:00:00", logfile=logfile, srun_user_args=srun_args
+            args, job_name, "02:00:00", logfile=logfile, srun_user_args=srun_args,
+            change_user=task.process != None
             )
     
     if rc == 0:

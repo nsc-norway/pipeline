@@ -7,7 +7,8 @@ import os
 def srun_command(
         args, jobname, time, logfile=None,
         cpus_per_task=1, mem=1024, cwd=None,
-        stdout=None, srun_user_args=[]
+        stdout=None, srun_user_args=[],
+        change_user=True
         ):
     srun_other_args = [
             '--job-name=' + jobname,
@@ -27,5 +28,10 @@ def srun_command(
     if not cwd:
         cwd = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
-    return subprocess.call(nsc.SRUN_ARGLIST + srun_other_args + args , cwd=cwd)
+    if change_user:
+        arglist = nsc.SRUN_GLSAI_ARGLIST
+    else:
+        arglist = nsc.SRUN_OTHER_ARGLIST
+
+    return subprocess.call(arglist + srun_other_args + args , cwd=cwd)
 

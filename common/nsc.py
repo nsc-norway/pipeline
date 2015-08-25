@@ -77,8 +77,13 @@ PDFLATEX="/usr/bin/pdflatex"
 #glsai   ALL=(seq-user)  NOPASSWD:/usr/bin/sbatch
 #Defaults:glsai          !requiretty
 SCANCEL_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/scancel"]
-SRUN_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/srun", 
+SRUN_GLSAI_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/srun", 
             "--account=nsc", "--qos=high", "--partition=lucky", "--nodes=1"]
+
+# When running on the command line we will be using a central user account,
+# so there's no need to sudo
+SRUN_OTHER_ARGLIST=["/usr/bin/srun", "--account=nsc", "--qos=high",
+                                    "--partition=lucky", "--nodes=1"]
 
 # Data processing/analysis programs
 #BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
