@@ -47,11 +47,17 @@ def main(task):
     fastqc_args = ["--extract", "--threads=" + str(threads)]
     fastqc_args += ["--outdir=" + output_dir]
 
-    log_path = task.logfile("fastqc")
     if task.process:
         jobname = task.process.id + ".fastqc"
     else:
         jobname = "fastqc"
+
+    log_path = task.logfile("fastqc")
+    try:
+        with open(log_path, 'w') as f:
+            f.truncate()
+    except IOError:
+        pass
 
     # Process the files in groups of 500 files to prevent the 
     # "argument list too long" error. The groups are processed 
@@ -64,19 +70,21 @@ def main(task):
         rcode = slurm.srun_command(
                 [nsc.FASTQC] + grp_fastqc_args, jobname, time="1-0", 
                 logfile=log_path, cpus_per_task=threads,
-                mem=str(1024+256*threads)+"M"
+                mem=str(1024+256*threads)+"M",
+                srun_user_args=['--open-mode=append']
                 )
+
+        if rcode != 0:
+            # The following function will call exit(1)
+            task.fail("fastqc failure", "Group " + str(i_group))
+
     
     if task.process:
         utilities.upload_file(task.process, nsc.FASTQC_LOG, log_path)
 
-    if rcode == 0:
-        move_fastqc_results(output_dir, projects)
-        task.success_finish()
-    else:
-        task.fail("fastqc failure")
+    move_fastqc_results(output_dir, projects)
+    task.success_finish() # Calls exit(0)
 
-    return rcode
 
 
 def fastqc_dir(fastq_path):
