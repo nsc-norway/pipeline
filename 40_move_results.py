@@ -1,7 +1,7 @@
 import os
 from common import taskmgr, samples
 
-TASK_NAME = "Move results"
+TASK_NAME = "40. Move fastq files"
 TASK_DESCRIPTION = """Move fastq files from demultiplexing into the standard
                     directory structure used by NSC."""
 TASK_ARGS = ['work_dir', 'sample_sheet']

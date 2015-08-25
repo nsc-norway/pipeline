@@ -5,7 +5,7 @@ from math import ceil
 from genologics.lims import *
 from common import nsc, utilities, slurm, samples, taskmgr
 
-TASK_NAME = "Demultiplexing"
+TASK_NAME = "30. Demultiplexing"
 TASK_DESCRIPTION = """Demultiplexing (calls bcl2fastq2). 
                     For advanced command-line options when running outside the
                     lims, just use bcl2fastq2 directly."""

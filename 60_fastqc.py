@@ -7,7 +7,7 @@ import shutil
 import getpass
 from common import samples, nsc, taskmgr, samples, slurm, utilities
 
-TASK_NAME = "FastQC"
+TASK_NAME = "60. FastQC"
 TASK_DESCRIPTION = """Run FastQC on the demultiplexed files."""
 TASK_ARGS = ['work_dir', 'sample_sheet', 'threads']
 

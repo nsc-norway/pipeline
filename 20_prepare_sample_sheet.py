@@ -38,7 +38,7 @@ import datetime
 from genologics.lims import *
 from common import nsc, utilities, slurm, taskmgr
 
-TASK_NAME = "Prepare SampleSheet"
+TASK_NAME = "20. Prepare SampleSheet"
 TASK_DESCRIPTION = "Prepare sample sheet for bcl2fastq2"
 TASK_ARGS = ['work_dir']
 

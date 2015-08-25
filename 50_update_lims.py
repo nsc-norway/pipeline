@@ -3,7 +3,7 @@ import os
 from genologics.lims import *
 from common import nsc, taskmgr, stats
 
-TASK_NAME = "LIMS stats"
+TASK_NAME = "50. LIMS stats"
 TASK_DESCRIPTION = """Post demultiplexing stats to LIMS (doesn't make an effort
                     to handle the non-LIMS case, obviously)."""
 TASK_ARGS = ['work_dir']

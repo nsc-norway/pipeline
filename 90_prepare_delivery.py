@@ -13,7 +13,7 @@ import crypt
 from genologics.lims import *
 from common import nsc, utilities, taskmgr
 
-TASK_NAME = "Delivery prep"
+TASK_NAME = "90. Prepare delivery"
 TASK_DESCRIPTION = """Prepare for delivery."""
 TASK_ARGS = ['work_dir']
 

@@ -14,7 +14,7 @@ import getpass
 from genologics.lims import *
 from common import nsc, utilities, slurm, taskmgr
 
-TASK_NAME = "Copy run"
+TASK_NAME = "10. Copy run"
 TASK_DESCRIPTION = "Copy run metadata"
 TASK_ARGS = ['src_dir', 'work_dir']
 

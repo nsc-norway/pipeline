@@ -16,7 +16,7 @@ from common import nsc, stats, samples, utilities, taskmgr
 
 template_dir = os.path.dirname(__file__) + "/template"
 
-TASK_NAME = "Reports"
+TASK_NAME = "70. Reports"
 TASK_DESCRIPTION = """Generates HTML and PDF reports based on demultiplexing stats
                     and FastQC results."""
 
