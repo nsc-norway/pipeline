@@ -14,7 +14,7 @@ from xml.etree import ElementTree
 
 from common import nsc, stats, samples, utilities, taskmgr
 
-template_dir = os.path.dirname(__file__) + "/template"
+template_dir = os.path.dirname(os.path.realpath(__file__)) + "/template"
 
 TASK_NAME = "70. Reports"
 TASK_DESCRIPTION = """Generates HTML and PDF reports based on demultiplexing stats
@@ -46,7 +46,7 @@ def main(task):
     if task.args.bcl2fastq_version:
         bcl2fastq_version = task.args.bcl2fastq_version
     elif task.process:
-        bcl2fastq_version = utilities.get_udf(process, nsc.BCL2FASTQ_VERSION_UDF, None)
+        bcl2fastq_version = utilities.get_udf(task.process, nsc.BCL2FASTQ_VERSION_UDF, None)
     else:
         bcl2fastq_version = get_bcl2fastq2_version(work_dir)
         if not bcl2fastq_version:
@@ -84,8 +84,11 @@ def get_rta_version(run_dir):
         xmltree = ElementTree.parse(os.path.join(run_dir, 'runParameters.xml'))
 
     run_parameters = xmltree.getroot()
-    rta_ver = run_parameters.find("RTAVersion").text
-    return rta_ver
+    rta_ver_element = run_parameters.find("RTAVersion")
+    if not rta_ver_element:
+        rta_ver_element = run_parameters.find("Setup").find("RTAVersion")
+
+    return rta_ver_element.text
 
 
 def make_reports(work_dir, run_id, projects, bcl2fastq_version=None):
