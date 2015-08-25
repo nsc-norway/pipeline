@@ -59,7 +59,6 @@ SEQ_PROCESSES=[
         ('miseq', 'MiSeq Run (MiSeq) 5.0')
         ]
 
-DEMULTIPLEXING_QC_PROTOCOL = "Demultiplexing and QC"
 DEMULTIPLEXING_QC_PROCESS = "Demultiplexing and QC NSC 1.0"
 
 # System programs
