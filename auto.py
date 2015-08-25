@@ -17,7 +17,7 @@ from common import nsc, utilities
 
 
 def start_programs():
-    processes = nsc.lims.get_processes(name=nsc.DEMULTIPLEXING_QC_PROCESS)
+    processes = nsc.lims.get_processes(type=nsc.DEMULTIPLEXING_QC_PROCESS)
     if not processes:
         return
 
