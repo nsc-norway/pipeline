@@ -70,17 +70,18 @@ def start_programs():
             continue
 
 
+        # Check if sequencing is complete, if no program has been run
+        if previous_program == None:
+            logging.debug("Checking if sequencing is finished...")
+            if not is_sequencing_finished(process):
+                logging.debug("Wasn't.")
+                continue
+            logging.debug("Sequencing is finished, checking if we can start some jobs")
+
+
         # Checks related to program status
         step = Step(nsc.lims, id=process.id)
         if step.program_status == None or step.program_status.status == "OK":
-
-            # Check if sequencing is complete
-            if step.program_status == None:
-                logging.debug("Checking if sequencing is finished...")
-                if not is_sequencing_finished(process):
-                    logging.debug("Wasn't.")
-                    continue
-                logging.debug("Sequencing is finished, checking if we can start some jobs")
 
             # Now ready to start the program (push the button)
             try:
