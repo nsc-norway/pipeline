@@ -46,6 +46,7 @@ def start_programs():
             process.get()
             process.udf['Monitor'] = False
             process.put()
+            logging.debug("Step " + process.id + " is completed, cleared Monitor flag")
             continue
 
 
