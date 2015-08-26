@@ -116,7 +116,7 @@ def get_resultfile(process, lane, input_limsid, read):
     # Find the result file corresponding to this artifact
     for i, o in process.input_output_maps:
         input = i['uri']
-        if input.location[1] in ['%d:1' % lane, 'A:1']: # Use A:1 for NextSeq, MiSeq
+        if input.location[1] in ['{0}:1'.format(lane), 'A:1']: # Use A:1 for NextSeq, MiSeq
             if o['output-type'] == "ResultFile" and o['output-generation-type'] == "PerReagentLabel":
                 output = o['uri']
                 # The constant FASTQ_OUTPUT corresponds to the name configured in
@@ -137,9 +137,9 @@ def get_lane(process, lane):
     
     Returns None if no such lane."""
     for input in process.all_inputs():
-        if lane == 1 and input.location[1] == 'A:1': # Use A:1 for NextSeq, MiSeq
+        if lane == 1 or lane == "X" and input.location[1] == 'A:1': # Use A:1 for NextSeq, MiSeq
             return input
-        if input.location[1] == '%d:1' % lane:
+        elif input.location[1] == '%d:1' % lane:
             return input
 
 
