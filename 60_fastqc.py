@@ -72,7 +72,7 @@ def main(task):
         print "Fastqc-" + str(i_group), ": Processing", len(proc_paths), "of", len(fastq_paths), "files..."
         rcode = remote.run_command(
                 [nsc.FASTQC] + grp_fastqc_args, jobname, time="1-0", 
-                logfile=log_path, cpus_per_task=threads,
+                logfile=log_path, cpus=threads,
                 mem=str(1024+256*threads)+"M",
                 srun_user_args=['--open-mode=append']
                 )
