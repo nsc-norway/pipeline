@@ -9,6 +9,7 @@ import sys
 import os
 import re
 import crypt
+import subprocess
 from genologics.lims import *
 from common import nsc, utilities, taskmgr, remote
 
@@ -35,6 +36,8 @@ def delivery_diag(project_name, source_path):
 
 
 def delivery_harddrive(project_name, source_path):
+    # There's no need to consider remote execution, creating hard-links is
+    # done within an instant
     subprocess.check_call(["/bin/cp", "-rl", source_path, nsc.DELIVERY_DIR])
 
 
