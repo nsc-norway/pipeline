@@ -71,7 +71,8 @@ def start_programs():
 
             except StopIteration:
                 logging.debug("Couldn't find the next checkbox after " + str(previous_program)
-                        + ", is everything finished?")
+                        + ", no more automation requested")
+                continue
 
             try:
                 button = next(
