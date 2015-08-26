@@ -57,7 +57,7 @@ def main(task):
             ):
         task.success_finish()
     else:
-        task.fail("bcl2fastq failure (see log)") 
+        task.fail("bcl2fastq exited with an error status") 
 
 
 def get_thread_args(n_threads):
