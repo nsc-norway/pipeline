@@ -85,7 +85,7 @@ def get_rta_version(run_dir):
 
     run_parameters = xmltree.getroot()
     rta_ver_element = run_parameters.find("RTAVersion")
-    if not rta_ver_element:
+    if rta_ver_element == None:
         rta_ver_element = run_parameters.find("Setup").find("RTAVersion")
 
     return rta_ver_element.text
