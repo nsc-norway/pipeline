@@ -92,7 +92,7 @@ def main(process_id, sample_sheet_file):
 
     else:
         logging.warning("Couldn't find the sequencing process")
-        return 1
+        return 0
 
     logging.info("Program completed")
 
