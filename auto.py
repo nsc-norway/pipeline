@@ -28,7 +28,7 @@ def is_sequencing_finished(process):
 
 
 def start_programs():
-    processes = nsc.lims.get_processes(type=nsc.DEMULTIPLEXING_QC_PROCESS)
+    processes = nsc.lims.get_processes(type=nsc.DEMULTIPLEXING_QC_PROCESS, udf={'Monitor': True})
 
     if not processes:
         logging.debug("No processes found")
