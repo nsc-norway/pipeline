@@ -12,14 +12,12 @@ from collections import defaultdict
 # ---------------------------------
 
 # Method for generating the progress overview:
-# 1. Queues:   Queue resources are queried via the API to fetch 
-#              samples which are queued for a step
+# 1. Queues:   No longer supported
 # 2. Processes:Process types which should be monitored have a boolean 
 #              UDF called "Monitor", with a default of true. This program
 #              queries the API for any process of a given type, with the 
-#              Monitor flag set. The Monitor flag is only used by this 
-#              program. It is cleared if the process should no longer be
-#              monitored.
+#              Monitor flag set. The Monitor flag is cleared if the protocol
+#              step is closed in the LIMS.
 
 app = Flask(__name__)
 if nsc.TAG == "dev":
@@ -34,49 +32,24 @@ FLOWCELL_INSTRUMENTS = {
 	"NextSeq Reagent Cartridge": 1, 
 	"MiSeq Reagent Cartridge": 2
 	}
-# [ (Protocol, Step) ]
+# List of process types
 SEQUENCING = [
-        ("Illumina SBS (HiSeq) NSC 1.0", "Illumina Sequencing (Illumina SBS) 5.0"),
-        ("Illumina SBS (NextSeq) NSC 1.0", "NextSeq Run (NextSeq) 1.0"),
-        ("Illumina SBS (MiSeq) NSC 1.0", "MiSeq Run (MiSeq) 5.0")
+        ("Illumina Sequencing (Illumina SBS) 5.0"),
+        ("NextSeq Run (NextSeq) 1.0"),
+        ("MiSeq Run (MiSeq) 5.0")
         ]
 
-# [ (Protocol,  Step) ]
+# List of process types
 DATA_PROCESSING = [
-        ("HiSeq demultiplexing and QC 2.0", "Demultiplexing and QC NSC 2.0"),
-        ("NextSeq demultiplexing and QC 2.0", "Demultiplexing and QC NSC 2.0"),
-        ("MiSeq processing and QC 2.0", "Demultiplexing and QC NSC 2.0"),
+        ("Demultiplexing and QC NSC 2.0"),
+        ("Demultiplexing and QC NSC 2.0"),
+        ("Demultiplexing and QC NSC 2.0"),
         ]
 
 PROJECT_EVALUATION = "Project Evaluation Step"
 
-queues = {}
 recent_run_cache = {}
 sequencing_process_type = []
-
-def init_application():
-    # We get queue instances as part of the initialisation, then keep them
-    # in the queues dict. (looking up queues is time consuming)
-    for protocol, protocol_step in DATA_PROCESSING:
-        proto = nsc.lims.get_protocols(name=protocol)[0]
-        for ps in proto.steps:
-            if protocol_step == ps.name:
-                queues[(protocol, protocol_step)] = ps.queue()
-    for protocol, protocol_step in SEQUENCING:
-        proto = nsc.lims.get_protocols(name=protocol)[0]
-        for ps in proto.steps:
-            if protocol_step == ps.name:
-                queues[(protocol, protocol_step)] = ps.queue()
-                sequencing_process_type.append(ps.process_type)
-
-
-class QueueState(object):
-    def __init__(self, url, protocol, step, num):
-        self.url = url
-        self.protocol = protocol
-        self.step = step
-        self.num = num
-        self.is_queue = True
 
 
 class Project(object):
@@ -95,20 +68,19 @@ class SequencingInfo(object):
         self.status = status
         self.runid = runid
         self.finished = finished
-        self.is_queue = False
 
 
 class DataAnalysisInfo(object):
-    def __init__(self, name, url, flowcell_id, projects, status, seq_url, runid, finished=None):
+    def __init__(self, name, url, projects, current_job,
+            status, seq_url, runid, finished=None):
         self.name = name
         self.url = url
-        self.flowcell_id = flowcell_id
         self.projects = projects
         self.status = status
+        self.current_job = current_job
         self.seq_url = seq_url
         self.runid = runid
         self.finished = finished
-        self.is_queue = False
 
 
 class CompletedRunInfo(object):
@@ -117,20 +89,6 @@ class CompletedRunInfo(object):
         self.runid = runid
         self.projects = projects
         self.date = date
-
-
-def get_queue(protocol, step):
-    """Get a single QueueState object if there are some samples in the queue,
-    else returns None.
-
-    Assumes that refresh is already done (done by batch request)"""
-
-    q = queues[(protocol, step)]
-    if len(q.artifacts) > 0:
-        url = "{0}clarity/queue/{1}".format(ui_server, q.id)
-        return QueueState(url, protocol, step, len(q.artifacts))
-    else:
-        return None
 
 
 def background_clear_monitor(completed):
@@ -241,13 +199,18 @@ def read_post_sequencing_process(process_name, process, sequencing_process):
     projects = get_projects(process)
 
     try:
-        status = process.udf['Job status']
+        status = process.udf[nsc.JOB_STATUS_UDF]
     except KeyError:
         status = "Open"
 
+    try:
+        current_job = process.udf[nsc.CURRENT_JOB_UDF]
+    except KeyError:
+        current_job = ""
+
 
     return DataAnalysisInfo(
-            process_name, url, None, projects, status, seq_url, runid
+            process_name, url, projects, current_job, status, seq_url, runid
             )
 
 
@@ -260,7 +223,7 @@ def get_recent_run(fc, instrument_index):
     Caching should be done by the caller."""
 
     sequencing_process = next(iter(nsc.lims.get_processes(
-            type=SEQUENCING[instrument_index][1],
+            type=SEQUENCING[instrument_index],
             inputartifactlimsid=fc.placements.values()[0].id
             )))
 
@@ -329,8 +292,6 @@ def get_batch(instances):
     return instances
 
 
-
-
 @app.route('/')
 def get_main():
     global ui_server
@@ -339,16 +300,9 @@ def get_main():
             "http://dev-lims.ous.nsc.local:8080/": "https://dev-lims.ous.nsc.local/",
             "http://ous-lims.ous.nsc.local:8080/": "https://ous-lims.ous.nsc.local/"
             }
-    ui_server = ui_servers.get(nsc.lims.baseuri], nsc.lims.baseuri)
+    ui_server = ui_servers.get(nsc.lims.baseuri, nsc.lims.baseuri)
 
-    # Refresh all queues
-    get_batch(q for q in queues.values())
-
-    seq_queues = [get_queue(*proc) for proc in SEQUENCING]
-
-    seq_procs = [i[1] for i in SEQUENCING]
-    all_process_types = seq_procs +\
-                [procname for wfname, proclist in DATA_PROCESSING for procname in proclist]
+    all_process_types = SEQUENCING + DATA_PROCESSING
 
     # Get a list of all processes 
     # Of course it can't be this efficient :( Multiple process types not supported
@@ -368,7 +322,7 @@ def get_main():
     post_processes = defaultdict(list)
     completed = []
     for p, step in zip(processes_with_data, steps):
-        if p.type.name in seq_procs:
+        if p.type.name in SEQUENCING:
             if is_step_completed(step):
                 completed.append(p)
             else:
@@ -388,8 +342,8 @@ def get_main():
     # List of three elements -- Hi,Next,MiSeq, each contains a list of 
     # sequencing processes
     sequencing = [
-        [read_sequencing(sp[1], proc) 
-            for proc in seq_processes[sp[1]]]
+        [read_sequencing(sp, proc) 
+            for proc in seq_processes[sp]]
             for sp in SEQUENCING
         ]
 
@@ -397,18 +351,14 @@ def get_main():
     # List of three sequencer types (containing lists within them)
     post_sequencing = []
     # One workflow for each sequencer type
-    for index, (wf, step_names) in enumerate(DATA_PROCESSING):
-        machine_items = [] # all processes, queues, for a type of sequencing machine
-        for step_name in step_names:
-            q = get_queue(wf, step_name)
-            if q:
-                machine_items.append(q)
-            for process in post_processes[step_name]:
-                sequencing_process = utilities.get_sequencing_process(process)
-                if sequencing_process.type == sequencing_process_type[index]:
-                    machine_items.append(read_post_sequencing_process(
-                        step_name, process, sequencing_process
-                        ))
+    for index, step_name in enumerate(DATA_PROCESSING):
+        machine_items = [] # all processes for a type of sequencing machine
+        for process in post_processes[step_name]:
+            sequencing_process = utilities.get_sequencing_process(process)
+            if sequencing_process.type.name == SEQUENCING[index]:
+                machine_items.append(read_post_sequencing_process(
+                    step_name, process, sequencing_process
+                    ))
         post_sequencing.append(machine_items)
         
 
@@ -417,7 +367,7 @@ def get_main():
     body = render_template(
             'processes.xhtml',
             server=nsc.lims.baseuri,
-            sequencing=zip(seq_queues, sequencing),
+            sequencing=sequencing,
             post_sequencing=post_sequencing,
             recently_completed=recently_completed,
             instruments=INSTRUMENTS
@@ -445,7 +395,6 @@ def go_eval():
         return Response("Sorry, project evaluation not found for " + project_name, mimetype="text/plain")
 
 
-init_application()
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5001)
 

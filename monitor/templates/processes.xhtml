@@ -31,15 +31,8 @@
 <tr>
 {% for data in sequencing %}
 <td class="main">
-{% if data[0] %}
-<div class="box">
-<h4 class="box-header"><a href="{{ data[0].url }}">Queue: {{ data[0].step }}</a></h4>
-<p>Queued: {{ data[0].num }}</p>
-</div>
-{% endif %}
 
-
-{% for proc in data[1] %}
+{% for proc in data %}
 	<div class="box">
 	<h4 class="box-header">
 		<a href="{{ proc.url }}">{{ proc.flowcell_id }}</a>
@@ -89,14 +82,6 @@
 
 {% for item in boxes %}
 
-{% if item.is_queue %}
-<div class="box">
-<h4 class="box-header"><a href="{{ item.url }}">Queue: {{ item.step }}</a></h4>
-<p>Queued: {{ item.num }}</p>
-</div>
-
-{% else %}
-
 <div class="box">
 <h4 class="box-header">
 	<a href="{{ item.url }}">{{ item.name }}</a>
@@ -123,12 +108,14 @@
 	</tr>
 	{% endfor %}
 	<tr>
+		<td>Job:</td><td>{{ item.current_job }}</td>
+	</tr>
+	<tr>
 		<td>Status:</td><td>{{ item.status }}</td>
 	</tr>
 </table>
 </div>
 
-{% endif %}
 {% endfor %}
 </td>
 {% endfor %}
