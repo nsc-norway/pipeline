@@ -71,7 +71,7 @@ class FastqFile(object):
 
 
 ################ Get object tree, with various info #################
-def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes):
+def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lanes=[1]):
     """Get the "sample object model" tree, one for each project.
     
     The FastqFile objects contain the file names after the post-demultiplexing
@@ -81,7 +81,16 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes):
     can be provided by other functions later.
     
     In addition to the normal projects, an "Undetermined" project is also returned,
-    to represent the undetermined index data.""" 
+    to represent the undetermined index data.
+    
+    Arguments:
+    run_id
+    sample_sheet_data   - [Data] section of sample sheet as a list of dicts
+    num_reads           - number of read passes 1=single read, 2=paired end
+    merged_lanes        - combine all lanes into one lane with ID "X"
+    expand_lanes        - when merged_lanes=False and sample sheet doesn't contain
+                          a lane number, copy all samples on these lanes (list)
+    """ 
 
     projects = {}
     lanes = set()
@@ -108,36 +117,40 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes):
             project.samples.append(sample)
 
         if merged_lanes:
-            lane_id = "X"
+            file_lanes = ["X"]
         else:
-            lane_id = int(entry.get('lane', 1))
+            try:
+                file_lanes = int(entry['lane'])
+            except KeyError:
+                file_lanes = expand_lanes
 
-        lanes.add(lane_id)
+        for lane_id in file_lanes:
+            lanes.add(lane_id)
 
-        path = ""
-        if project.proj_dir:
-            path = project.proj_dir + "/"
-        if sample.sample_dir:
-            path += sample.sample_dir + "/"
+            path = ""
+            if project.proj_dir:
+                path = project.proj_dir + "/"
+            if sample.sample_dir:
+                path += sample.sample_dir + "/"
 
-        for i_read in xrange(1, num_reads+1):
+            for i_read in xrange(1, num_reads+1):
 
-            fastq_name = get_fastq_name(
-                    instrument, 
-                    sample.name,
-                    sample.sample_index,
-                    entry.get('index'),
-                    entry.get('index2'),
-                    lane_id,
-                    i_read,
-                    merged_lanes
-                    )
+                fastq_name = get_fastq_name(
+                        instrument, 
+                        sample.name,
+                        sample.sample_index,
+                        entry.get('index'),
+                        entry.get('index2'),
+                        lane_id,
+                        i_read,
+                        merged_lanes
+                        )
 
-            # path contains trailing slash
-            fastq_path = path + fastq_name
+                # path contains trailing slash
+                fastq_path = path + fastq_name
 
-            sample.files.append(FastqFile(lane_id, i_read, fastq_name, fastq_path, None))
-            # Stats can be added in later
+                sample.files.append(FastqFile(lane_id, i_read, fastq_name, fastq_path, None))
+                # Stats can be added in later
 
     # Create an undetermined file for each lane, read seen
     undetermined_project = Project(None, None, [], True)

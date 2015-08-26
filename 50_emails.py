@@ -20,10 +20,11 @@ def main(task):
     work_dir = task.work_dir
     instrument = utilities.get_instrument_by_runid(run_id)
     
+    expand_lanes = instrument == "nextseq" and not task.no_lane_splitting
     if task.process: # lims mode
-        lane_stats = lane_info.get_from_lims(task.process, instrument)
+        lane_stats = lane_info.get_from_lims(task.process, instrument, expand_lanes)
     else:
-        lane_stats = lane_info.get_from_files(work_dir, instrument)
+        lane_stats = lane_info.get_from_files(work_dir, instrument, expand_lanes)
 
     projects = task.projects
 

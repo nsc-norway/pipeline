@@ -158,11 +158,21 @@ class Task(object):
         num_reads, index_reads = utilities.get_num_reads(self.work_dir)
         sample_sheet_data = samples.parse_sample_sheet(self.sample_sheet_content)['data']
 
+        if not self.no_lane_splitting:
+            instr = utilities.get_instrument_by_runid(self.run_id)
+            if instr == "nextseq":
+                expand_lanes = [1,2,3,4]
+            elif instr == "miseq":
+                expand_lanes = [1]
+            else:
+                raise RuntimeError("Unknown sequencing instrument " + str(instr))
+
         return samples.get_projects(
                 self.run_id,
                 sample_sheet_data,
                 num_reads,
-                self.no_lane_splitting
+                self.no_lane_splitting,
+                expand_lanes
                 )
 
     @property
