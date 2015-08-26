@@ -102,13 +102,13 @@ def main(task):
         project_type = lims_project.udf[nsc.PROJECT_TYPE_UDF]
 
         if project_type == "Diagnostics":
-            task.info("Delivering to diagnostics...")
+            task.info("Delivering " + project.name + " to diagnostics...")
             delivery_diag(project.name, project_path)
         elif delivery_type == "User HDD" or delivery_type == "New HDD":
-            task.info("Copying to delivery area...")
+            task.info("Copying " + project.name + " to delivery area...")
             delivery_harddrive(project.name, project_path)
         elif delivery_type == "Norstore":
-            task.info("Tar'ing and copying to delivery area, for Norstore...")
+            task.info("Tar'ing and copying " + project.name + " to delivery area, for Norstore...")
             delivery_norstore(task.process, project.name, project_path)
         else:
             print "No delivery prep done for project", project_name
