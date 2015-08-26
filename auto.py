@@ -37,7 +37,19 @@ def start_programs():
     for process in processes:
         logging.debug("Checking process " + process.id + "...")
 
-        # Checks related to the program status
+        # Have to always check the Step, to see if it is closed, and if so
+        # remove the Monitor flag. This is also done by the overview page 
+        # (monitor/main.py), but we can't rely on that, since that may not be
+        # used.
+        step = Step(nsc.lims, id=process.id)
+        if step.current_state.upper() == "COMPLETED":
+            process.get()
+            process.udf['Monitor'] = False
+            process.put()
+            continue
+
+
+        # Checks related to the UDF-based status tracking
         try:
             state = process.udf[nsc.JOB_STATE_CODE_UDF]
         except KeyError:
@@ -78,9 +90,7 @@ def start_programs():
                 continue
             logging.debug("Sequencing is finished, checking if we can start some jobs")
 
-
-        # Checks related to program status
-        step = Step(nsc.lims, id=process.id)
+        # Check the native Clarity program status
         if step.program_status == None or step.program_status.status == "OK":
 
             # Now ready to start the program (push the button)
