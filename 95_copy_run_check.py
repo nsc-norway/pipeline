@@ -6,7 +6,6 @@
 
 import os
 import sys
-import getpass
 import time
 
 from genologics.lims import *
@@ -77,7 +76,7 @@ work_dir argument.""")
 
     rc = remote.run_command(
             args, job_name, "00:05:00", logfile=logfile, 
-            change_user=getpass.getuser() == "glsai", storage_job=True
+            storage_job=True
             )
     
     if rc == 0:

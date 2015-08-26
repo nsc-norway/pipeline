@@ -4,7 +4,6 @@
 import os
 import re
 import shutil
-import getpass
 from common import samples, nsc, taskmgr, samples, remote, utilities
 
 TASK_NAME = "60. FastQC"
@@ -75,8 +74,7 @@ def main(task):
                 [nsc.FASTQC] + grp_fastqc_args, jobname, time="1-0", 
                 logfile=log_path, cpus_per_task=threads,
                 mem=str(1024+256*threads)+"M",
-                srun_user_args=['--open-mode=append'],
-                change_user=getpass.getuser() == "glsai"
+                srun_user_args=['--open-mode=append']
                 )
 
         if rcode != 0:

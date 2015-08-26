@@ -9,7 +9,6 @@
 
 import os
 import sys
-import getpass
 
 from genologics.lims import *
 from common import nsc, utilities, remote, taskmgr
@@ -106,7 +105,7 @@ work_dir argument.""")
 
     rc = remote.run_command(
             args, job_name, "02:00:00", logfile=logfile, 
-            change_user=getpass.getuser() == "glsai", storage_job=True
+            storage_job=True
             )
     
     if rc == 0:

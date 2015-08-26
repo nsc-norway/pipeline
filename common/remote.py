@@ -3,6 +3,7 @@
 import subprocess
 import nsc
 import os
+import getpass
 
 def srun_command(
         args, jobname, time, logfile=None,
@@ -47,6 +48,7 @@ def run_command(
         stdout=None, srun_user_args=[],
         change_user=True, storage_job=False
         ):
+    change_user = getpass.getuser() == "glsai" 
     return srun_command(
         args, jobname, time, logfile, cpus_per_task, mem, cwd,
         stdout, srun_user_args, change_user, storage_job
