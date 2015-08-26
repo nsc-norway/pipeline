@@ -150,10 +150,7 @@ Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2
 
         for l in sorted(lane_proj.keys()):
             proj = lane_proj[l]
-            try:
-                undetermined_file = lane_undetermined[l]
-            except KeyError:
-                undetermined_file = None
+            undetermined_file = lane_undetermined.get(l)
 
             if print_lane_number:
                 out.write(str(l) + "\t")

@@ -110,10 +110,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes):
         if merged_lanes:
             lane_id = "X"
         else:
-            try:
-                lane_id = int(entry['lane'])
-            except KeyError:
-                lane_id = 1
+            lane_id = int(entry.get('lane', 1))
 
         lanes.add(lane_id)
 

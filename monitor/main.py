@@ -339,10 +339,7 @@ def get_main():
             "http://dev-lims.ous.nsc.local:8080/": "https://dev-lims.ous.nsc.local/",
             "http://ous-lims.ous.nsc.local:8080/": "https://ous-lims.ous.nsc.local/"
             }
-    try:
-        ui_server = ui_servers[nsc.lims.baseuri]
-    except KeyError:
-        ui_server = nsc.lims.baseuri
+    ui_server = ui_servers.get(nsc.lims.baseuri], nsc.lims.baseuri)
 
     # Refresh all queues
     get_batch(q for q in queues.values())
