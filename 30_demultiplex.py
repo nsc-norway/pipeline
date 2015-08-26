@@ -3,7 +3,7 @@ import getpass
 from math import ceil
 
 from genologics.lims import *
-from common import nsc, utilities, slurm, samples, taskmgr
+from common import nsc, utilities, remote, samples, taskmgr
 
 TASK_NAME = "30. Demultiplexing"
 TASK_DESCRIPTION = """Demultiplexing (calls bcl2fastq2). 
@@ -94,7 +94,7 @@ def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
     if task.process:
         jobname = task.process.id + "." + jobname
 
-    rcode = slurm.srun_command(
+    rcode = remote.run_command(
             args, jobname, time="1-0", logfile=log_path,
             cpus_per_task=n_threads, mem="16G",
             change_user=getpass.getuser() == "glsai"

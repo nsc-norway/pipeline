@@ -5,7 +5,7 @@
 
 import os
 import getpass
-from common import nsc, taskmgr, samples, slurm
+from common import nsc, taskmgr, samples, remote
 
 TASK_NAME = "80. Checksums"
 TASK_DESCRIPTION = """Compute md5 checksums for fastq files and pdfs."""
@@ -47,7 +47,7 @@ def main(task):
             jobname = "md5deep"
             if task.process:
                 jobname = task.process.id + "." + jobname
-            rcode = slurm.srun_command(
+            rcode = remote.run_command(
                     [nsc.MD5DEEP, '-rl'] + paths, jobname, time="02:00:00",
                     cpus_per_task=n_threads, mem="1024M",
                     cwd=os.path.join(bc_dir, project.proj_dir),

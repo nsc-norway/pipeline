@@ -5,7 +5,7 @@ import os
 import re
 import shutil
 import getpass
-from common import samples, nsc, taskmgr, samples, slurm, utilities
+from common import samples, nsc, taskmgr, samples, remote, utilities
 
 TASK_NAME = "60. FastQC"
 TASK_DESCRIPTION = """Run FastQC on the demultiplexed files."""
@@ -71,7 +71,7 @@ def main(task):
         proc_paths = fastq_paths[i_group::n_groups]
         grp_fastqc_args = fastqc_args + proc_paths
         print "Fastqc-" + str(i_group), ": Processing", len(proc_paths), "of", len(fastq_paths), "files..."
-        rcode = slurm.srun_command(
+        rcode = remote.run_command(
                 [nsc.FASTQC] + grp_fastqc_args, jobname, time="1-0", 
                 logfile=log_path, cpus_per_task=threads,
                 mem=str(1024+256*threads)+"M",

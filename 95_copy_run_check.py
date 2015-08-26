@@ -10,7 +10,7 @@ import getpass
 import time
 
 from genologics.lims import *
-from common import nsc, utilities, slurm, taskmgr
+from common import nsc, utilities, remote, taskmgr
 
 TASK_NAME = "95. Copy run again (NextSeq)"
 TASK_DESCRIPTION = "Check for completion and copy run metadata again"
@@ -76,7 +76,7 @@ work_dir argument.""")
     else:
         job_name = TASK_NAME
 
-    rc = slurm.srun_command(
+    rc = remote.run_command(
             args, job_name, "02:00:00", logfile=logfile, srun_user_args=srun_args,
             change_user=getpass.getuser() == "glsai"
             )

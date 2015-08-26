@@ -32,3 +32,15 @@ def srun_command(
 
     return subprocess.call(arglist + srun_other_args + args , cwd=cwd)
 
+
+def run_command(
+        args, jobname, time, logfile=None,
+        cpus_per_task=1, mem=1024, cwd=None,
+        stdout=None, srun_user_args=[],
+        change_user=True
+        ):
+    return srun_command(
+        args, jobname, time, logfile, cpus_per_task, mem, cwd,
+        stdout, srun_user_args, change_user
+        )
+

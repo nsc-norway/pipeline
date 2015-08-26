@@ -12,7 +12,7 @@ import sys
 import getpass
 
 from genologics.lims import *
-from common import nsc, utilities, slurm, taskmgr
+from common import nsc, utilities, remote, taskmgr
 
 TASK_NAME = "10. Copy run"
 TASK_DESCRIPTION = "Copy run metadata"
@@ -105,7 +105,7 @@ work_dir argument.""")
         logfile = None
         job_name = TASK_NAME
 
-    rc = slurm.srun_command(
+    rc = remote.run_command(
             args, job_name, "02:00:00", logfile=logfile, srun_user_args=srun_args,
             change_user=getpass.getuser() == "glsai"
             )
