@@ -120,7 +120,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
             file_lanes = ["X"]
         else:
             try:
-                file_lanes = int(entry['lane'])
+                file_lanes = [int(entry['lane'])]
             except KeyError:
                 file_lanes = expand_lanes
 
