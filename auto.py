@@ -18,6 +18,9 @@ from common import nsc, utilities
 
 def is_sequencing_finished(process):
     seq_process = utilities.get_sequencing_process(process)
+    if not seq_process:
+        logging.warning("Cannot detect the sequencing process, returning as if it's completed")
+        return True
     try:
         return seq_process.udf['Finish Date']
     except KeyError:
@@ -32,20 +35,13 @@ def start_programs():
         return
 
     for process in processes:
-
         logging.debug("Checking process " + process.id + "...")
 
-        logging.debug("Checking if sequencing is finished...")
-        if not is_sequencing_finished(process):
-            logging.debug("Wasn't.")
-            continue
-
-        logging.debug("Sequencing is finished, checking if we can start some jobs")
+        # Checks related to the program status
         try:
             state = process.udf[nsc.JOB_STATE_CODE_UDF]
         except KeyError:
             state = None
-
         if state == "COMPLETED":
             previous_program = process.udf[nsc.CURRENT_JOB_UDF]
         elif state == None:
@@ -54,26 +50,39 @@ def start_programs():
             logging.debug("Have to wait because program is in state " + str(state))
             continue # skip to next if state is not "COMPLETED" or None
 
+
+        # Get the next program, based on UDF checkboxes
+        auto_udf_match = [
+                re.match(r"Auto ([\d-]+\..*)", udfname)
+                for udfname, udfvalue in process.udf.items()
+                if udfvalue
+                ]
+        auto_udf_name = sorted(m.group(1) for m in auto_udf_match if m)
+        try:
+            next_program = next(
+                    button_name for button_name in auto_udf_name
+                    if button_name > previous_program
+                    )
+
+        except StopIteration:
+            logging.debug("Couldn't find the next checkbox after " + str(previous_program)
+                    + ", no more automation requested")
+            continue
+
+
+        # Checks related to program status
         step = Step(nsc.lims, id=process.id)
         if step.program_status == None or step.program_status.status == "OK":
-            auto_udf_match = [
-                    re.match(r"Auto ([\d-]+\..*)", udfname)
-                    for udfname, udfvalue in process.udf.items()
-                    if udfvalue
-                    ]
-            auto_udf_name = sorted(m.group(1) for m in auto_udf_match if m)
 
-            try:
-                next_program = next(
-                        button_name for button_name in auto_udf_name
-                        if button_name > previous_program
-                        )
+            # Check if sequencing is complete
+            if step.program_status == None:
+                logging.debug("Checking if sequencing is finished...")
+                if not is_sequencing_finished(process):
+                    logging.debug("Wasn't.")
+                    continue
+                logging.debug("Sequencing is finished, checking if we can start some jobs")
 
-            except StopIteration:
-                logging.debug("Couldn't find the next checkbox after " + str(previous_program)
-                        + ", no more automation requested")
-                continue
-
+            # Now ready to start the program (push the button)
             try:
                 button = next(
                         program 
