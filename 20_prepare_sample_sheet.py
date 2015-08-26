@@ -36,7 +36,7 @@ import datetime
 #from Bio.Seq import Seq
 
 from genologics.lims import *
-from common import nsc, utilities, slurm, taskmgr
+from common import nsc, utilities, taskmgr
 
 TASK_NAME = "20. Prepare SampleSheet"
 TASK_DESCRIPTION = "Prepare sample sheet for bcl2fastq2"
@@ -105,12 +105,15 @@ def main(task):
                 data = sample_sheet
                 )
 
+    # Always replace special characters with ?
+    sample_sheet = replace_special_chars(sample_sheet)
+
     # Doctor the sample sheet, only if using HiSeq and it doesn't have [Data] header
     instrument = utilities.get_instrument_by_runid(task.run_id)
     if instrument == "hiseq" and sample_sheet.find("\r\n[Data]\r\n") == -1:
         sample_sheet = convert_from_bcl2fastqv1(sample_sheet)
 
-    # Invert the read2 indexes
+    # Invert the read2 indexes if using nextseq
     if instrument == "nextseq":
         sample_sheet = reverse_complement_index2(sample_sheet)
     
@@ -161,6 +164,10 @@ def get_ss_from_cluster_proc(process):
                             return data
 
     return None
+
+
+def replace_special_chars(sample_sheet_data):
+    return "".join(c if ord(c) < 128 else '?' for c in sample_sheet_data)
 
 
 def rev_comp(sequence):
