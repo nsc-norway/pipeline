@@ -107,7 +107,7 @@ work_dir argument.""")
 
     rc = remote.run_command(
             args, job_name, "02:00:00", logfile=logfile, srun_user_args=srun_args,
-            change_user=getpass.getuser() == "glsai"
+            change_user=getpass.getuser() == "glsai", storage_job=True
             )
     
     if rc == 0:

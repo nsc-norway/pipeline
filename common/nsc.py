@@ -84,6 +84,9 @@ SRUN_GLSAI_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/srun",
 SRUN_OTHER_ARGLIST=["/usr/bin/srun", "--account=nsc", "--qos=high",
                                     "--partition=lucky", "--nodes=1"]
 
+# Args for jobs which mainly do I/O on the secondary storage, not processing
+SRUN_STORAGE_JOB_ARGS=["--nodelist=loki"]
+
 # Data processing/analysis programs
 #BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
 BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.17.1.14/nscinstallbin/bin/bcl2fastq"
