@@ -77,7 +77,7 @@ def get_from_lims(process, instrument):
         density_raw_1000 = lane.udf['Cluster Density (K/mm^2) R1']
         n_raw = lane.udf['Clusters Raw R1']
         n_pf = lane.udf['Clusters PF R1']
-        density_pf_1000 = density_raw_1000 * n_pf * 1.0 / n_raw
+        density_pf_1000 = int(density_raw_1000 * n_pf * 1.0 / n_raw)
         pf_ratio = lane.udf['%PF R1'] / 100.0
         lanes[lane_id] = (density_raw_1000 * 1000.0, density_pf_1000 * 1000.0, pf_ratio)
 
