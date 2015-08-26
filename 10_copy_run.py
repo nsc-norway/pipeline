@@ -94,7 +94,6 @@ work_dir argument.""")
         exclude = miseq_exclude_paths
 
     args = rsync_arglist(source, destination, exclude)
-    srun_args = ["--nodelist=loki"] # obviously OUS specific, but the whole script may be
     
     if task.process:
         # Can't use a per-run log dir, as it's not created yet, it's 
@@ -106,7 +105,7 @@ work_dir argument.""")
         job_name = TASK_NAME
 
     rc = remote.run_command(
-            args, job_name, "02:00:00", logfile=logfile, srun_user_args=srun_args,
+            args, job_name, "02:00:00", logfile=logfile, 
             change_user=getpass.getuser() == "glsai", storage_job=True
             )
     
