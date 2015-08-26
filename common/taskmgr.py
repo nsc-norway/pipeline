@@ -284,7 +284,7 @@ class Task(object):
             self.info(info_str)
 
 
-    def info(self, current_job, status):
+    def info(self, status):
         if self.process:
             self.process.get(force=True)
             self.process.udf[nsc.JOB_STATUS_UDF] = "Running ({0})".format(status)
