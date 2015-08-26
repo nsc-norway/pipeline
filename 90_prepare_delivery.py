@@ -86,12 +86,12 @@ def main(task):
     lims_projects = {}
     for i in task.process.all_inputs(unique=True):
         pro = i.samples[0].project
-        lims_projects[pro.name].add(pro)
+        lims_projects[pro.name] = pro
 
     runid = task.run_id
     instrument = utilities.get_instrument_by_runid(runid)
 
-    projects = task.projects
+    projects = (project for project in task.projects if not project.is_undetermined)
 
     for project in projects:
         lims_project = lims_projects[project.name]
