@@ -8,10 +8,9 @@
 import sys
 import os
 import re
-import subprocess
 import crypt
 from genologics.lims import *
-from common import nsc, utilities, taskmgr
+from common import nsc, utilities, taskmgr, remote
 
 TASK_NAME = "90. Prepare delivery"
 TASK_DESCRIPTION = """Prepare for delivery."""
@@ -28,11 +27,16 @@ def delivery_diag(project_name, source_path):
     args = [nsc.RSYNC, '-rltW', '--chmod=ug+rwX,o-rwx'] # chmod 660
     args += [source_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
     # (If there is trouble, see note in copyfiles.py about SELinux and rsync)
-    subprocess.check_call(args)
-    
+    # Adding a generous time limit in case there is other activity going
+    # on, 500 GB / 100MB/s = 1:25:00 . 
+    rcode = remote.run_command(args, "delivery_diag", "04:00:00", storage_job=True)
+    if rcode != 0:
+        raise RuntimeError("Copying files to diagnostics failed, rsync returned an error")
+
 
 def delivery_harddrive(project_name, source_path):
     subprocess.check_call(["/bin/cp", "-rl", source_path, nsc.DELIVERY_DIR])
+
 
 def delivery_norstore(process, project_name, source_path):
     """Create a tar file"""
@@ -45,12 +49,27 @@ def delivery_norstore(process, project_name, source_path):
         pass
     tarname = project_dir + ".tar"
     args = ["/bin/tar", "cf", save_path + "/" + tarname , project_dir]
-    subprocess.check_call(args, cwd=os.path.dirname(source_path)) # dirname = parent dir
-    #md5_path = os.path.join(nsc.DELIVERY_DIR, project_dir + "md5sum.txt")
+    rcode = remote.run_command(
+            args, "tar", "02:00:00",
+            cwd=os.path.dirname(source_path),
+            storage_job=True
+            ) # dirname = parent dir
+    if rcode != 0:
+        raise RuntimeError('Failed to run "tar" to prepare for Norstore delivery')
+
     md5_path = os.path.join(save_path + "/md5sum.txt")
     with open(md5_path, "w") as md5file:
         # would use normal md5sum, but we have md5deep as a dependency already
-        subprocess.check_call([nsc.MD5DEEP, "-l", tarname], cwd=save_path, stdout=md5file)
+        # rudimentary test indicates that md5deep only uses one thread when processing
+        # a single file, so just requesting one core, and a "storage job"
+        rcode = remote.run_command(
+                [nsc.MD5DEEP, "-l", "-j1" + str(threads), tarname],
+                "md5deep", "02:00:00", cwd=save_path, stdout=md5file,
+                storage_job=True
+                )
+        if rcode != 0:
+            raise RuntimeError("Failed to compute checksum for tar file for Norstore, "+
+                    "md5deep returned an error")
 
     # Generate username / password files
     match = re.match("^([^-]+)-(.*)-\d\d\d\d-\d\d-\d\d", project_name)
