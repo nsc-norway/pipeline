@@ -30,6 +30,11 @@ def srun_command(
 
     if change_user:
         arglist = nsc.SRUN_GLSAI_ARGLIST
+        if not cwd:
+            # sort of a heuristic, when in change_user mode it's typically 
+            # run by LIMS, and then it will start in a dir which only exists
+            # on the LIMS server
+            cwd = "/tmp"
     else:
         arglist = nsc.SRUN_OTHER_ARGLIST
 
