@@ -158,6 +158,8 @@ class Task(object):
         num_reads, index_reads = utilities.get_num_reads(self.work_dir)
         sample_sheet_data = samples.parse_sample_sheet(self.sample_sheet_content)['data']
 
+        # Supply a list of lanes if lane number isn't given in the sample sheet
+        expand_lanes = None
         if not self.no_lane_splitting:
             instr = utilities.get_instrument_by_runid(self.run_id)
             if instr == "nextseq":
@@ -165,7 +167,7 @@ class Task(object):
             elif instr == "miseq":
                 expand_lanes = [1]
             else:
-                raise RuntimeError("Unknown sequencing instrument " + str(instr))
+                expand_lanes = None
 
         return samples.get_projects(
                 self.run_id,
@@ -296,7 +298,7 @@ class Task(object):
 
     def info(self, status):
         if self.process:
-            self.process.get(force=True)
+            self.process.get()
             self.process.udf[nsc.JOB_STATUS_UDF] = "Running ({0})".format(status)
             self.process.put()
         print "STATUS [" + self.task_name + "] " + status
@@ -313,7 +315,6 @@ class Task(object):
         self.finished = True
         self.success = False
         if self.process:
-            self.process.get(force=True)
             self.process.udf[nsc.JOB_STATUS_UDF] = "Failed: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ": " + message
             self.process.udf[nsc.JOB_STATE_CODE_UDF] = 'FAILED'
             if extra_info:
@@ -337,7 +338,6 @@ class Task(object):
         self.success = True
         complete_str = 'Completed successfully ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         if self.process:
-            self.process.get(force=True)
             self.process.udf[nsc.JOB_STATUS_UDF] = complete_str
             self.process.udf[nsc.JOB_STATE_CODE_UDF] = 'COMPLETED'
             self.process.put()
