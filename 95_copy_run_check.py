@@ -9,7 +9,7 @@ import sys
 import time
 
 from genologics.lims import *
-from common import nsc, utilities, taskmgr
+from common import nsc, utilities, taskmgr, remote
 
 TASK_NAME = "95. Copy run again (NextSeq)"
 TASK_DESCRIPTION = "Check for completion and copy run metadata again"
