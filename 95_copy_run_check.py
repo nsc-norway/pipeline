@@ -10,7 +10,7 @@ import getpass
 import time
 
 from genologics.lims import *
-from common import nsc, utilities, remote, taskmgr
+from common import nsc, utilities, taskmgr
 
 TASK_NAME = "95. Copy run again (NextSeq)"
 TASK_DESCRIPTION = "Check for completion and copy run metadata again"
@@ -68,7 +68,6 @@ work_dir argument.""")
 
     task.info("Copying remaining files...")
     args = rsync_arglist(source, destination, exclude)
-    srun_args = ["--nodelist=loki"]
     
     logfile=task.logfile("rsync-2")
     if task.process:
@@ -77,8 +76,8 @@ work_dir argument.""")
         job_name = TASK_NAME
 
     rc = remote.run_command(
-            args, job_name, "02:00:00", logfile=logfile, srun_user_args=srun_args,
-            change_user=getpass.getuser() == "glsai"
+            args, job_name, "00:05:00", logfile=logfile, 
+            change_user=getpass.getuser() == "glsai", storage_job=True
             )
     
     if rc == 0:
