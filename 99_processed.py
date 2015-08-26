@@ -7,7 +7,7 @@ from datetime import date
 from genologics.lims import *
 from common import nsc, taskmgr
 
-TASK_NAME = '90. Move to "processed"'
+TASK_NAME = '99. Move to "processed"'
 TASK_DESCRIPTION = """Do some bookkeeping and move original run folder into processed/ 
                     directory on primary storage, since we are done with it."""
 TASK_ARGS = ['src_dir']
