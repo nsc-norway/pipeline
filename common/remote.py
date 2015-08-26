@@ -44,13 +44,13 @@ def srun_command(
 
 def run_command(
         args, jobname, time, logfile=None,
-        cpus_per_task=1, mem=1024, cwd=None,
+        cpus=1, mem=1024, cwd=None,
         stdout=None, srun_user_args=[],
         change_user=True, storage_job=False
         ):
     change_user = getpass.getuser() == "glsai" 
     return srun_command(
-        args, jobname, time, logfile, cpus_per_task, mem, cwd,
+        args, jobname, time, logfile, cpus, mem, cwd,
         stdout, srun_user_args, change_user, storage_job
         )
 
