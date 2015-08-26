@@ -87,6 +87,9 @@ def main(process_id, sample_sheet_file):
         else:
             logging.debug('Unable to determine source and destination paths')
 
+        if utilities.get_instrument(seq_proc) == "nextseq":
+            process.udf[nsc.NO_LANE_SPLITTING_UDF] = True
+
         process.put()
         logging.debug('Saved settings in the process')
 
