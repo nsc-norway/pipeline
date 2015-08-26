@@ -7,7 +7,7 @@ from datetime import date
 from genologics.lims import *
 from common import nsc, taskmgr
 
-TASK_NAME = '40. Move to "processed"'
+TASK_NAME = '90. Move to "processed"'
 TASK_DESCRIPTION = """Do some bookkeeping and move original run folder into processed/ 
                     directory on primary storage, since we are done with it."""
 TASK_ARGS = ['src_dir']
@@ -24,12 +24,6 @@ def main(task):
         if len(flowcells) == 1:
             fc = next(iter(flowcells))
             fc.get()
-            # TODO: determine how automation is tracked in v2
-            try:
-                del fc.udf[nsc.AUTO_FLOWCELL_UDF]
-            except KeyError:
-                pass
-            
             # Tracking UDF for "overview" page
             fc.udf[nsc.RECENTLY_COMPLETED_UDF] = True
             fc.udf[nsc.PROCESSED_DATE_UDF] = date.today()
