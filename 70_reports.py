@@ -233,7 +233,7 @@ def generate_internal_html_report(quality_control_dir, projects):
         i = 0
         samples_files = sorted(
                 ((p, s, fi) for p in projects for s in p.samples for fi in s.files),
-                key=lambda (p, s,f): (f.lane, s.name, f.i_read)
+                key=lambda (p, s,f): (f.lane, s.name == None, s.name, f.i_read)
                 )
         for p, s, fq in samples_files:
             fq_name = os.path.basename(fq.path)
