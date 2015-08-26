@@ -26,7 +26,7 @@ def srun_command(
         srun_other_args += ['--output=' + stdoutpath]
 
     if storage_job:
-        srun_other_args += [nsc.SRUN_STORAGE_JOB_ARGS]
+        srun_other_args += nsc.SRUN_STORAGE_JOB_ARGS
 
     if change_user:
         arglist = nsc.SRUN_GLSAI_ARGLIST
