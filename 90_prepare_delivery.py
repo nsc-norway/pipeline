@@ -61,18 +61,17 @@ def delivery_norstore(process, project_name, source_path):
         raise RuntimeError('Failed to run "tar" to prepare for Norstore delivery')
 
     md5_path = os.path.join(save_path + "/md5sum.txt")
-    with open(md5_path, "w") as md5file:
-        # would use normal md5sum, but we have md5deep as a dependency already
-        # rudimentary test indicates that md5deep only uses one thread when processing
-        # a single file, so just requesting one core, and a "storage job"
-        rcode = remote.run_command(
-                [nsc.MD5DEEP, "-l", "-j1", tarname],
-                "md5deep", "02:00:00", cwd=save_path, stdout=md5file,
-                storage_job=True
-                )
-        if rcode != 0:
-            raise RuntimeError("Failed to compute checksum for tar file for Norstore, "+
-                    "md5deep returned an error")
+    # would use normal md5sum, but we have md5deep as a dependency already
+    # rudimentary test indicates that md5deep only uses one thread when processing
+    # a single file, so just requesting one core, and a "storage job"
+    rcode = remote.run_command(
+            [nsc.MD5DEEP, "-l", "-j1", tarname],
+            "md5deep", "02:00:00", cwd=save_path, stdout=md5_path,
+            storage_job=True
+            )
+    if rcode != 0:
+        raise RuntimeError("Failed to compute checksum for tar file for Norstore, "+
+                "md5deep returned an error")
 
     # Generate username / password files
     match = re.match("^([^-]+)-(.*)-\d\d\d\d-\d\d-\d\d", project_name)
