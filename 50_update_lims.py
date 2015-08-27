@@ -1,7 +1,7 @@
 # Write stats to LIMS
 import os
 from genologics.lims import *
-from common import nsc, taskmgr, stats
+from common import nsc, taskmgr, stats, utilities
 
 TASK_NAME = "50. LIMS stats"
 TASK_DESCRIPTION = """Post demultiplexing stats to LIMS (doesn't make an effort
@@ -27,8 +27,9 @@ def main(task):
     # Aggregate reads must match the setup in the LIMS -- it should be 
     # true if there is one resultfile for both reads, false if separate
     # resultfiles.
-    run_stats = stats.get_bcl2fastq_stats(
-            os.path.join(task.bc_dir, "Stats"),
+    run_stats = stats.get_stats(
+            utilities.get_instrument_by_runid(task.run_id),
+            task.work_dir,
             aggregate_lanes = task.no_lane_splitting,
             aggregate_reads = True
             )

@@ -31,14 +31,15 @@ def main(task):
             )
     task.running()
     run_id = task.run_id
-    instument = utilities.get_instrument_by_runid(run_id)
+    instrument = utilities.get_instrument_by_runid(run_id)
     work_dir = task.work_dir
     bc_dir = task.bc_dir
-    run_stats = stats.get_bcl2fastq_stats(
-                os.path.join(bc_dir, "Stats"),
-                aggregate_lanes = task.no_lane_splitting,
-                aggregate_reads = False
-                )
+    run_stats = stats.get_stats(
+            instrument,
+            work_dir,
+            aggregate_lanes = task.no_lane_splitting,
+            aggregate_reads = False
+            )
     projects = task.projects
     samples.add_stats(projects, run_stats)
     samples.flag_empty_files(projects, work_dir)

@@ -440,6 +440,22 @@ def get_miseq_stats(generate_fastq_path, num_reads, aggregate_reads):
 
 
 
+###################### WRAPPER FNC #######################
+def get_stats(
+        instrument, 
+        run_dir,
+        aggregate_lanes=True,
+        aggregate_reads=False
+        ):
+
+    if instrument in ['nextseq', 'hiseq']:
+        stats_xml_file_path = os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats")
+        return get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes, aggregate_reads)
+    elif instrument == 'miseq':
+        generate_fastq_path = os.path.join(run_dir, "GenerateFASTQRunStatistics.xml")
+        return get_miseq_stats(generate_fastq_path, 1, aggregate_reads)
+    else:
+        raise ValueError("Stats requested for unknown instrument " + str(instrument))
 
 
 

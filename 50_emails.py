@@ -28,11 +28,12 @@ def main(task):
 
     projects = task.projects
 
-    run_stats = stats.get_bcl2fastq_stats(
-                os.path.join(task.bc_dir, "Stats"),
-                aggregate_lanes = task.no_lane_splitting,
-                aggregate_reads = False
-                )
+    run_stats = stats.get_stats(
+            instrument,
+            work_dir,
+            aggregate_lanes = task.no_lane_splitting,
+            aggregate_reads = False
+            )
 
     samples.add_stats(projects, run_stats)
     samples.flag_empty_files(projects, work_dir)
