@@ -66,7 +66,7 @@ def delivery_norstore(process, project_name, source_path):
         # rudimentary test indicates that md5deep only uses one thread when processing
         # a single file, so just requesting one core, and a "storage job"
         rcode = remote.run_command(
-                [nsc.MD5DEEP, "-l", "-j1" + str(threads), tarname],
+                [nsc.MD5DEEP, "-l", "-j1", tarname],
                 "md5deep", "02:00:00", cwd=save_path, stdout=md5file,
                 storage_job=True
                 )
