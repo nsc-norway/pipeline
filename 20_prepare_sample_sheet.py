@@ -75,9 +75,6 @@ def main(task):
                     sample_sheet = o.files[0].download()
                     found_on_process = True
 
-        # From the clustering process
-        if not sample_sheet:
-            sample_sheet = get_ss_from_cluster_proc(task.process)
 
         # From a file (fall through to non-LIMS case)
         if not sample_sheet:
@@ -134,36 +131,6 @@ def main(task):
         open(path, 'wb').write(sample_sheet)
     
     task.success_finish()
-
-
-def get_ss_from_cluster_proc(process):
-    # On the associated cluster generation process
-    parent_processes = process.parent_processes()
-    parent_pids = set(p.id for p in parent_processes)
-
-    # Flow cell ID
-    fcid = process.all_inputs()[0].location[0].name
-
-    # This script can only handle the case when there is a single clustering process
-    if len(parent_pids) == 1:
-        cluster_proc = parent_processes[0]
-        outputs = cluster_proc.all_outputs(unique=True)
-        for io in cluster_proc.input_output_maps:
-            i = io[0]
-            o = io[1]
-            if o['output-type'] == 'ResultFile' and\
-                    o['output-generation-type'] == 'PerAllInputs':
-                if o['uri'].name == 'SampleSheet csv':
-                    if len(o['uri'].files) == 1:
-                        data = o['uri'].files[0].download()
-                        lines = data.splitlines()
-                        # Warning: this assumes the old style sample sheet
-                        # (bcl2fastq 1.84). Will probably be changing in 
-                        # mid 2016 or so
-                        if len(lines) >= 2 and lines[1].startswith(fcid+","):
-                            return data
-
-    return None
 
 
 def replace_special_chars(sample_sheet_data):
