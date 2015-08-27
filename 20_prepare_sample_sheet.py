@@ -172,7 +172,7 @@ def replace_special_chars(sample_sheet_data):
 
 def rev_comp(sequence):
     COMPLEMENTARY = {'A':'T', 'T':'A', 'G':'C', 'C':'G'}
-    return [COMPLEMENTARY[b] for b in reversed(sequence)]
+    return "".join(COMPLEMENTARY[b] for b in reversed(sequence))
 
 
 def reverse_complement_index2(original_data):
