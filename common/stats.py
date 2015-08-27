@@ -22,14 +22,11 @@ def parse_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_rea
     }
 
     Depending on the aggregate_X parameters, the coordinates can be:
-     ("X", sample name, 1)
-     (lane, sample name, 1)
-     (lane, sample name, read)
+     ("X", project, sample name, 1)
+     (lane, project, sample name, 1)
+     (lane, project, sample name, read)
 
-    Note: aggregating over lane but not read number is supported, but other code will
-    expect that lane is the first parameter if len(coordinates) > 1.
-
-    Undetermined indexes are reported as sample name = None.
+    Undetermined indexes are reported as project name = None, sample name = None.
     """
     xmltree = ElementTree.parse(conversion_stats_path)
     root = xmltree.getroot()
@@ -131,17 +128,17 @@ def parse_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_rea
 
 
 def parse_demultiplexing_stats(conversion_stats_path, aggregate_lanes):
-    """Sum up "demultiplexing stats" from the NextSeq stats directory.
+    """Sum up "demultiplexing stats" from the bcl2fastq2 stats directory.
     
-    Contains information about barcode reads for the NextSeq. The returned 
-    dict is indexed by the sample name, and it also includes an entry for 
-    sample None, which corresponds to undetermined indexes.
+    Contains information about barcode reads for runs demultiplexed by bcl2fastq2.
+    The returned dict is indexed by the lane, project and sample name, and it also
+    includes an entry for sample None, which corresponds to undetermined indexes.
     
     Returns: {
-         (lane, sample name) => {stats}
+         (lane, project, sample name) => {stats}
     } 
     or {
-         ("X", sample name) => {stats}
+         ("X", project, sample name) => {stats}
     } 
     """
     xmltree = ElementTree.parse(conversion_stats_path)
@@ -214,9 +211,9 @@ def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_rea
     This function computes derived statistics based on the accumulated data 
     from the two above functions. 
 
-    It returns a dict indexed by lane, sample ID, and read, with the values
+    It returns a dict indexed by lane, project, sample name, and read, with the values
     being a dict indexed by the stats name:
-    { (lane, sample_id, read) => {stat => value} }
+    { (lane, project, sample_name, read) => {stat => value} }
     """
     
     demultiplexing_stats = parse_demultiplexing_stats(
