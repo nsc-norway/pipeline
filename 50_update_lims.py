@@ -1,5 +1,6 @@
 # Write stats to LIMS
 import os
+import sys
 from genologics.lims import *
 from common import nsc, taskmgr, stats, utilities
 
@@ -20,8 +21,13 @@ def main(task):
     task.running()
 
     if not task.process:
-        print "Can't use this script without LIMS (--pid), sorry."
-        sys.exit(1)
+        task.fail("Can't use this script without LIMS (--pid), sorry.")
+
+    # We need the projects list to match the sample name and project name
+    # to the corresponding LIMS-ID in the sample sheet. The sample name
+    # and project combo is unique, but may be difficult to look up in the 
+    # LIMS if the name contains any funny characters.
+    projects = task.projects
 
     # Aggregate lanes must match the setting used for demultiplexing
     # Aggregate reads must match the setup in the LIMS -- it should be 
@@ -31,14 +37,9 @@ def main(task):
             utilities.get_instrument_by_runid(task.run_id),
             task.work_dir,
             aggregate_lanes = task.no_lane_splitting,
-            aggregate_reads = True
+            aggregate_reads = True,
+            miseq_uniproject=next(p.name for p in projects if not p.is_undetermined)
             )
-
-    # We need the projects list to match the sample name and project name
-    # to the corresponding LIMS-ID in the sample sheet. The sample name
-    # and project combo is unique, but may be difficult to look up in the 
-    # LIMS if the name contains any funny characters.
-    projects = task.projects
 
     post_stats(task.process, projects, run_stats)
 

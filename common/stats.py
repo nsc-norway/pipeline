@@ -445,15 +445,24 @@ def get_stats(
         instrument, 
         run_dir,
         aggregate_lanes=True,
-        aggregate_reads=False
+        aggregate_reads=False,
+        miseq_uniproject=None
         ):
+    """Instrument-independent interfact to the stats module.
+
+    MiSeq handling is kind of hackish because the stats file doesn't contain info
+    on reads or project. I expect Illumina may start to use bcl2fastq2 for MiSeq too
+    sooner or later, and then everything will be uniform.
+    """
 
     if instrument in ['nextseq', 'hiseq']:
         stats_xml_file_path = os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats")
         return get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes, aggregate_reads)
     elif instrument == 'miseq':
         generate_fastq_path = os.path.join(run_dir, "GenerateFASTQRunStatistics.xml")
-        return get_miseq_stats(generate_fastq_path, 1, aggregate_reads)
+        num_reads = utilities.get_num_reads(run_dir)
+        miseq_stats = get_miseq_stats(generate_fastq_path, num_reads, aggregate_reads)
+        return [(m[0:1]) + (miseq_uniproject,) + m[1:] for m in miseq_stats]
     else:
         raise ValueError("Stats requested for unknown instrument " + str(instrument))
 
