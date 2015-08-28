@@ -98,7 +98,7 @@ def write_internal_sample_table(output_path, runid, projects, lane_stats):
                 for proj in projects
                 for s in proj.samples
                 if not proj.is_undetermined),
-                key=operator.attrgetter('name')
+                key=lambda s: (s.files[0].lane, s.sample_index)
                 )
         for s in samples:
             for f in s.files:
