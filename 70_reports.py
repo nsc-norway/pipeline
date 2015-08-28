@@ -34,6 +34,7 @@ def main(task):
     instrument = utilities.get_instrument_by_runid(run_id)
     work_dir = task.work_dir
     bc_dir = task.bc_dir
+    projects = task.projects
     run_stats = stats.get_stats(
             instrument,
             work_dir,
@@ -41,7 +42,6 @@ def main(task):
             aggregate_reads = False,
             miseq_uniproject=next(p.name for p in projects if not p.is_undetermined)
             )
-    projects = task.projects
     samples.add_stats(projects, run_stats)
     samples.flag_empty_files(projects, work_dir)
 
