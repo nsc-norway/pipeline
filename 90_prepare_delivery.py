@@ -8,14 +8,15 @@
 import sys
 import os
 import re
+import shutil
 import crypt
 import subprocess
 from genologics.lims import *
-from common import nsc, utilities, taskmgr, remote
+from common import nsc, utilities, taskmgr, remote, samples
 
 TASK_NAME = "90. Prepare delivery"
 TASK_DESCRIPTION = """Prepare for delivery."""
-TASK_ARGS = ['work_dir']
+TASK_ARGS = ['work_dir', 'sample_sheet']
 
 if nsc.TAG == "prod":
     from common import secure
@@ -24,15 +25,62 @@ else:
     from common import secure_dummy as secure
 
 
-def delivery_diag(project_name, source_path):
+
+
+def delivery_diag(project, basecalls_dir, project_path):
     args = [nsc.RSYNC, '-rltW', '--chmod=ug+rwX,o-rwx'] # chmod 660
-    args += [source_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
+    args += [project_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
     # (If there is trouble, see note in copyfiles.py about SELinux and rsync)
     # Adding a generous time limit in case there is other activity going
     # on, 500 GB / 100MB/s = 1:25:00 . 
     rcode = remote.run_command(args, "delivery_diag", "04:00:00", storage_job=True)
     if rcode != 0:
         raise RuntimeError("Copying files to diagnostics failed, rsync returned an error")
+
+    # Now copy quality control data
+
+    # Diagnostics wants the QC info in a particular format (file names, etc.). Do not
+    # change without consultiing with them. 
+
+    source_qc_dir = os.path.join(basecalls_dir, "QualityControl")
+
+    dest_dir = os.path.join(
+            nsc.DIAGNOSTICS_DELIVERY,
+            os.path.basename(project_path)
+            )
+    qc_dir = os.path.join(dest_dir, "QualityControl")
+
+    if not os.path.exists(qc_dir):
+        os.mkdir(qc_dir)
+
+    # When moving to bcl2fastq2 diag. have to decide how they extract the QC metrics.
+    # For now we give them the full Reports and Stats for the whole run. Later we
+    # should only give the relevant lanes.
+    for subdir in ["Stats", "Reports"]:
+        source = os.path.join(basecalls_dir, subdir)
+        subprocess.check_call([nsc.RSYNC, "-rlt", source, dest_dir])
+
+    # Copy the QualityControl files
+    # The locations of the fastqc directories are defined by the get_fastqc_dir() 
+    # function in the samples module. These directories will then be moved to a 
+    # fixed hierarchy by the following code, so the diag delivery structure is
+    # decoupled from how we store it in the run folder. 
+    
+    # This doesn't sanitise the fastqc directory names, which depend on the fastq 
+    # file names. The fastq file names and directories should be kept consistent
+    # not just for diagnostics but for other users, so this shouldn't be a problem.
+    for sample in project.samples:
+        sample_dir = os.path.join(qc_dir, "Sample_" + sample.name)
+        if not os.path.exists(sample_dir):
+            os.mkdir(sample_dir)
+
+        for f in sample.files:
+            source = os.path.join(source_qc_dir, samples.get_fastqc_dir(project, sample, f))
+            fqc_name = re.sub(r".fastq.gz$", "_fastqc", f.filename)
+            dest = os.path.join(sample_dir, fqc_name)
+            if os.path.exists(dest):
+                shutil.rmtree(dest)
+            shutil.copytree(source, dest)
 
 
 def delivery_harddrive(project_name, source_path):
@@ -114,6 +162,7 @@ def main(task):
 
     projects = (project for project in task.projects if not project.is_undetermined)
 
+    sensitive_fail = []
     for project in projects:
         lims_project = lims_projects[project.name]
 
@@ -124,16 +173,21 @@ def main(task):
 
         if project_type == "Diagnostics":
             task.info("Delivering " + project.name + " to diagnostics...")
-            delivery_diag(project.name, project_path)
+            delivery_diag(project, task.bc_dir, project_path)
         elif delivery_type == "User HDD" or delivery_type == "New HDD":
-            task.info("Copying " + project.name + " to delivery area...")
+            task.info("Hard-linking " + project.name + " to delivery area...")
             delivery_harddrive(project.name, project_path)
         elif delivery_type == "Norstore":
+            if project_type != "Non-sensitive":
+                sensitive_fail.append(project.name)
+                continue
             task.info("Tar'ing and copying " + project.name + " to delivery area, for Norstore...")
             delivery_norstore(task.process, project.name, project_path)
         else:
             print "No delivery prep done for project", project_name
 
+    if sensitive_fail:
+        task.fail("Selected Norstore delivery for sensitive data, nothing done for: " + ",".join(sensitive_fail))
     task.success_finish()
 
 

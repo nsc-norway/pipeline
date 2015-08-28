@@ -321,8 +321,7 @@ def get_fastqc_dir(project, sample, fastqfile):
     """Get the directory in which the fastqc results are stored
     (after moving it)."""
 
-    fq_name = os.path.basename(fastqfile.path)
-    fqc_name = re.sub(r".fastq.gz$", "_fastqc", fq_name)
+    fqc_name = re.sub(r".fastq.gz$", "_fastqc", fastqfile.filename)
     if project.name:
         project_name = project.name
     else:
