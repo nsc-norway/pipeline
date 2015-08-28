@@ -324,9 +324,11 @@ def get_fastqc_dir(project, sample, fastqfile):
     fqc_name = re.sub(r".fastq.gz$", "_fastqc", fastqfile.filename)
     if project.name:
         project_name = project.name
+        sample_name = sample.name
     else:
         project_name = "Undetermined"
-    return os.path.join(project_name, fqc_name)
+        sample_name = "Undetermined"
+    return os.path.join(project_name, "Sample_" + sample_name, fqc_name)
 
 
 def qc_pdf_name(run_id, fastq):

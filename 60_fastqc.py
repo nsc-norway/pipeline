@@ -100,19 +100,28 @@ def move_fastqc_results(qc_dir, projects):
     Gets the desired name of the fastqc dir from the "samples" module."""
 
     for project in projects:
-        # Create the project dir
-        if project.name:
-            project_dir = os.path.join(qc_dir, project.name)
-        else:
+        # Create the project dir (and sample dir below)
+        # while most of the code only depends on samples.get_fastqc_dir
+        # for locating the fastqc files, this function also hast to 
+        # create the directories in between 
+        if project.is_undetermined:
             project_dir = os.path.join(qc_dir, "Undetermined")
+        else:
+            project_dir = os.path.join(qc_dir, project.name)
 
         if not os.path.exists(project_dir):
             os.mkdir(project_dir)
 
         for sample in project.samples:
+            if project.is_undetermined:
+                sample_dir = os.path.join(project_dir, "Sample_Undetermined")
+            else:
+                sample_dir = os.path.join(project_dir, "Sample_" + sample.name)
+
+            if not os.path.exists(sample_dir):
+                os.mkdir(sample_dir)
+
             for f in sample.files:
-                # Have to check again if the fastq file exists, to determine if 
-                # fastqc was run on it
                 if not f.empty:
                     original_fqc_dir = os.path.join(qc_dir, fastqc_dir(f.path))
                     try:
