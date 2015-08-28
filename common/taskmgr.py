@@ -277,24 +277,26 @@ class Task(object):
 
             # Set defaults for source & working directories based on run ID
             # (only available for LIMS)
+            run_id = None
             try:
-                try:
-                    run_id = self.process.udf[nsc.RUN_ID_UDF]
-                except KeyError: # Run ID not set on process, try sequencing process
-                    sequencing_process = utilities.get_sequencing_process(self.process)
-                    if sequencing_process:
+                run_id = self.process.udf[nsc.RUN_ID_UDF]
+            except KeyError: # Run ID not set on process, try sequencing process
+                sequencing_process = utilities.get_sequencing_process(self.process)
+                if sequencing_process:
+                    try:
                         run_id = sequencing_process.udf['Run ID']
-                    else:
-                        self.fail("Run ID not found!")
+                    except KeyError:
+                        pass
 
+            if run_id:
                 src_dir = os.path.join(nsc.PRIMARY_STORAGE, run_id)
                 work_dir = os.path.join(nsc.SECONDARY_STORAGE, run_id)
                 # These defaults are set to None in the ARG_OPTIONS initialization,
                 # no need to check if they are None
                 ARG_OPTIONS['src_dir'][DEFAULT_VAL_INDEX] = src_dir
                 ARG_OPTIONS['work_dir'][DEFAULT_VAL_INDEX] = work_dir
-            except KeyError:
-                pass
+            else:
+                self.fail("Run ID not found!")
         else:
             self.process = None
 
