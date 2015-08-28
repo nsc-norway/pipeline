@@ -311,7 +311,7 @@ class Task(object):
             self.process.get()
             self.process.udf[nsc.JOB_STATUS_UDF] = "Running ({0})".format(status)
             self.process.put()
-        print "STATUS [" + self.task_name + "] " + status
+        print "INFO   [" + self.task_name + "] " + status
 
 
     def fail(self, message, extra_info = None):
