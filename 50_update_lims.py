@@ -67,12 +67,13 @@ def post_stats(process, projects, demultiplex_stats):
         if sample_name: # Not undetermined
             limsid = projects_map[project][sample_name].sample_id
             resultfile = get_resultfile(process, lane, limsid, 1)
-            for statname in udf_list:
-                try:
-                    resultfile.udf[statname] = stats[statname]
-                except KeyError:
-                    pass
-            resultfile.put()
+            if resultfile:
+                for statname in udf_list:
+                    try:
+                        resultfile.udf[statname] = stats[statname]
+                    except KeyError:
+                        pass
+                resultfile.put()
             
 
         else: # Undetermined: sample_name = None in demultiplex_stats
