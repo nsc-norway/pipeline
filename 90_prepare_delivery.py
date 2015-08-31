@@ -88,7 +88,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
 
     # Need to get the instrument and fcid
     instrument = utilities.get_instrument_by_runid(task.run_id)
-    fcid = task.process.all_inputs()[0].location[0].name
+    fcid = utilities.get_fcid_by_runid(task.run_id)
     bcl2fastq_version = utilities.get_udf(task.process, nsc.BCL2FASTQ_VERSION_UDF, None)
     undetermined_project = next(p for p in task.projects if p.is_undetermined)
     demultiplex_stats_content = demultiplex_stats.demultiplex_stats(

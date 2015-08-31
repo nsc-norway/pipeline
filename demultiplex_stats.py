@@ -177,10 +177,7 @@ def interactive(task):
     task.running()
     projects = task.projects
     instrument = utilities.get_instrument_by_runid(task.run_id)
-    if instrument in ['hiseq', 'nextseq']:
-        fcid = re.match(r"[\d]{6}_[\dA-Z]+_[\d]+_[AB]([A-Z\d]+)$", task.run_id).group(1)
-    else:
-        task.fail("Can't do this for the MiSeq at the moment")
+    fcid = utilities.get_fcid_by_runid(task.run_id)
 
     bcl2fastq_version = utilities.get_bcl2fastq2_version(task.work_dir)
 
