@@ -84,8 +84,9 @@ class DataAnalysisInfo(object):
 
 
 class CompletedRunInfo(object):
-    def __init__(self, url, runid, projects, date):
+    def __init__(self, url, demultiplexing_url, runid, projects, date):
         self.url = url
+        self.demultiplexing_url = demultiplexing_url
         self.runid = runid
         self.projects = projects
         self.date = date
@@ -228,11 +229,21 @@ def get_recent_run(fc, instrument_index):
             )))
 
     url = complete_url(sequencing_process.id)
+    try:
+        demux_process = next(iter(nsc.lims.get_processes(
+                type=DATA_PROCESSING[instrument_index],
+                inputartifactlimsid=fc.placements.values()[0].id
+                )))
+        demultiplexing_url = complete_url(demux_process.id)
+    except StopIteration:
+        demultiplexing_url = ""
+
     runid = sequencing_process.udf['Run ID']
     projects = get_projects(sequencing_process)
 
     return CompletedRunInfo(
             url,
+            demultiplexing_url,
             runid,
             list(projects),
             fc.udf[nsc.PROCESSED_DATE_UDF]

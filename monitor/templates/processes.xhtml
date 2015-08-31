@@ -137,9 +137,14 @@
 	<a href="{{ item.url }}">{{ item.runid }}</a>
 </h4>
 <table>  <tr>
+		<td class="label-col">Demultiplexing:</td>
+		<td><a href="{{ item.demultiplexing_url }}">link</a><td>
+	</tr>
+	<tr>
 		<td class="label-col">Processed date:</td>
 		<td>{{ item.date }}<td>
-	</tr><tr>
+	</tr>
+	<tr>
 		<td>Project:</td><td>
 			<a href="{{ item.projects[0].url }}">
 			{{ item.projects[0].name }}</a> 
