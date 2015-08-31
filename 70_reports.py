@@ -50,7 +50,7 @@ def main(task):
     elif task.process:
         bcl2fastq_version = utilities.get_udf(task.process, nsc.BCL2FASTQ_VERSION_UDF, None)
     else:
-        bcl2fastq_version = get_bcl2fastq2_version(work_dir)
+        bcl2fastq_version = utilities.get_bcl2fastq2_version(work_dir)
         if not bcl2fastq_version:
             task.fail("bcl2fastq version cannot be detected, use the --bcl2fastq-version option to specify!")
 
@@ -58,26 +58,6 @@ def main(task):
 
     task.success_finish()
 
-
-def get_bcl2fastq2_version(work_dir):
-    """Check version in log file in standard location (for non-LIMS).
-    
-    Less than bullet proof way to get bcl2fastq2 version."""
-
-    log_path = os.path.join(
-            work_dir,
-            nsc.RUN_LOG_DIR,
-            "demultiplexing.bcl2fastq2.txt"
-            )
-    log = open(log_path)
-    for i in xrange(3):
-        l = next(log)
-        if l.startswith("bcl2fastq v"):
-            return l.split(" ")[1].strip("\n")
-
-    else:
-        return None
-    
 
 def get_rta_version(run_dir):
     try:

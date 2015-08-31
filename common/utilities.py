@@ -12,6 +12,7 @@ import datetime
 import traceback
 import re
 import requests
+import glob
 import locale # Not needed in 2.7, see display_int
 from xml.etree import ElementTree
 
@@ -51,6 +52,27 @@ def get_instrument_by_runid(run_id):
     else:
         return None
 
+
+def get_bcl2fastq2_version(work_dir):
+    """Check version in log file in standard location (for non-LIMS).
+    
+    Less than bullet proof way to get bcl2fastq2 version."""
+
+    log_path_pattern = os.path.join(
+            work_dir,
+            nsc.RUN_LOG_DIR,
+            "30._demultiplexing.*bcl2fastq2.txt"
+            )
+    log_path = sorted(glob.glob(log_path_pattern))[-1]
+    log = open(log_path)
+    for i in xrange(3):
+        l = next(log)
+        if l.startswith("bcl2fastq v"):
+            return l.split(" ")[1].strip("\n")
+
+    else:
+        return None
+    
 
 def merged_lanes(run_id):
     return get_instrument_by_runid(run_id) == "nextseq"
