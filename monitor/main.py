@@ -107,15 +107,19 @@ def is_step_completed(step):
     return step.current_state.upper() == "COMPLETED"
 
 
-def proc_url(process_id, page='work-details'):
+def proc_url(process_id):
     global ui_server
+    step = Step(nsc.lims, id=process_id)
+    state = step.current_state.upper()
+    if state == 'COMPLETED':
+        page = "work-complete"
+    elif state == 'RECORD DETAILS':
+        page = "work-details"
+    elif state == 'STEP SETUP':
+        page = "work-setup"
     second_part_limsid = re.match(r"[\d]+-([\d]+)$", process_id).group(1)
     return "{0}clarity/{1}/{2}".format(ui_server, page, second_part_limsid)
 
-def complete_url(process_id):
-    global ui_server
-    second_part_limsid = re.match(r"[\d]+-([\d]+)$", process_id).group(1)
-    return "{0}clarity/work-complete/{1}".format(ui_server, second_part_limsid)
 
 def read_project(lims_project):
     url = "{0}clarity/search?scope=Project&query={1}".format(ui_server, lims_project.id)
@@ -190,7 +194,7 @@ def read_sequencing(process_name, process):
 
 def read_post_sequencing_process(process_name, process, sequencing_process):
     url = proc_url(process.id)
-    seq_url = complete_url(sequencing_process.id)
+    seq_url = proc_url(sequencing_process.id)
     #flowcell_id = process.all_inputs()[0].location[0].name
     try:
         runid = sequencing_process.udf['Run ID']
@@ -228,13 +232,13 @@ def get_recent_run(fc, instrument_index):
             inputartifactlimsid=fc.placements.values()[0].id
             )))
 
-    url = complete_url(sequencing_process.id)
+    url = proc_url(sequencing_process.id)
     try:
         demux_process = next(iter(nsc.lims.get_processes(
                 type=DATA_PROCESSING[instrument_index],
                 inputartifactlimsid=fc.placements.values()[0].id
                 )))
-        demultiplexing_url = complete_url(demux_process.id)
+        demultiplexing_url = proc_url(demux_process.id)
     except StopIteration:
         demultiplexing_url = ""
 
@@ -394,14 +398,7 @@ def go_eval():
         process = processes[-1]
         step = Step(nsc.lims, id=process.id)
         state = step.current_state.upper()
-        if state == 'COMPLETED':
-            return redirect(complete_url(process.id))
-        elif state == 'RECORD DETAILS':
-            return redirect(proc_url(process.id))
-        elif state == 'STEP SETUP':
-            return redirect(proc_url(process.id, "work-setup"))
-        else:
-            return Response("Project evaluation for " + project_name + " is in an unknown state", mimetype="text/plain")
+        return redirect(proc_url(process.id))
     else:
         return Response("Sorry, project evaluation not found for " + project_name, mimetype="text/plain")
 
