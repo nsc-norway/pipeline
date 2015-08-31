@@ -1,4 +1,5 @@
 import re
+import os
 import operator
 from common import taskmgr, utilities, samples, stats
 
@@ -83,16 +84,18 @@ MID = """</table></div>
 <col>
 """
 
-FOOTER=""" </table></div>
+BOTTOM=""" </table></div>
 <p>bcl2fastq2 {version} (via NSC compatibility module)</p>
 </body>
 </html>
 """
 
 
-def demultiplex_stats(project, basecalls_dir, instrument, fcid, bcl2fastq_version):
-    """Note: this function MODIFIES the project object tree, adding stats to the file objects,
-    with aggregate_lanes. """
+def demultiplex_stats(project, undetermined_project, basecalls_dir, instrument, fcid, bcl2fastq_version):
+    """Generate Demultiplexing_stats.htm file.
+    
+    Note: this function MODIFIES the project object tree, adding stats to the file objects,
+    with aggregate_lanes. Be extremely careful if stats are used in other code calling this."""
     run_stats = stats.get_stats(
             instrument,
             task.work_dir,
@@ -101,20 +104,36 @@ def demultiplex_stats(project, basecalls_dir, instrument, fcid, bcl2fastq_versio
             miseq_uniproject=project
             )
 
-    samples.add_stats([project], run_stats)
+    samples.add_stats([undetermined_project, project], run_stats)
     out = TOP.format(fcid=fcid)
+    project_lanes = set(f.lane for sample in project.samples for f in sample.files)
     file_sample_sorted = sorted(
-            ((f, sample) for sample in project.samples for f in sample.files if f.i_read==1),
-            key=lambda item: (item[0].lane, item[1].sample_index)
+            ((f, sample, p) 
+                for p in (project, undetermined_project) 
+                for sample in p.samples for f in sample.files
+                if f.i_read==1 and f.lane in project_lanes),
+            key=lambda item: (item[0].lane, item[1].sample_index == 0, item[1].sample_index)
             )
-    for f, sample in file_sample_sorted:
+    for f, sample, p in file_sample_sorted:
+        if p.is_undetermined:
+            sample_name = "lane{0}".format(f.lane)
+            sample_index_sequence = "Undetermined"
+            sample_project = "Undetermined_indices"
+            description = ""
+        else:
+            sample_name = sample.name
+            sample_index_sequence = f.index_sequence
+            sample_project = p.name
+            description = sample.sample_id
+        print f.path
         out += "<tr>\n"
         out += "<td>{0}</td>\n".format(f.lane)
-        out += "<td>{0}</td>\n".format(sample.name)
+        out += "<td>{0}</td>\n".format(sample_name)
         out += "<td></td>\n"
-        out += "<td>{0}</td>\n".format(sample.sample_id)
+        out += "<td>{0}</td>\n".format(sample_index_sequence)
+        out += "<td>{0}</td>\n".format(description)
         out += "<td>N</td>\n"
-        out += "<td>{0}</td>\n".format(project.name)
+        out += "<td>{0}</td>\n".format(sample_project)
         out += "<td>{0}</td>\n".format(utilities.display_int(f.stats['Yield PF (Gb)'] * 1000.0))
         out += "<td>{0:3.2f}</td>\n".format(f.stats['%PF'])
         out += "<td>{0}</td>\n".format(utilities.display_int(f.stats['# Reads PF']))
@@ -126,14 +145,19 @@ def demultiplex_stats(project, basecalls_dir, instrument, fcid, bcl2fastq_versio
         out += "</tr>\n"
 
     out += MID 
-    for sample in sorted(project.samples, key=operator.itemgetter('sample_index')):
+    for sample in sorted(project.samples, key=operator.attrgetter('sample_index')):
         out += "<tr>\n"
         out += "<td>{0}</td>".format(sample.name)
         out += "<td></td>"
         out += "<td>{0}</td>".format("Unknown")
         out += "<td>{0}</td>".format(os.path.join(basecalls_dir, project.proj_dir, sample.sample_dir))
-
-    out += END.format(version=bcl2fastq_version)
+    for lane in sorted(project_lanes):
+        out += "<tr>\n"
+        out += "<td>{0}</td>".format("lane{0}".format(lane))
+        out += "<td></td>"
+        out += "<td>{0}</td>".format("Unknown")
+        out += "<td>{0}</td>".format(os.path.join(basecalls_dir, "Undetermined_indices", "Sample_lane{0}".format(lane)))
+    out += BOTTOM.format(version=bcl2fastq_version)
 
     return out
 
@@ -151,9 +175,13 @@ def interactive(task):
     bcl2fastq_version = utilities.get_bcl2fastq2_version(task.work_dir)
 
     project = next(project for project in projects if not project.is_undetermined and project.name.startswith(task.args.PROJECT))
+    undetermined_project = next(
+            project 
+            for project in projects if project.is_undetermined
+            )
 
-    print demultiplex_stats(project, task.bc_dir, instrument, fcid, bcl2fastq_version)
-    task.finish_success()
+    print demultiplex_stats(project, undetermined_project, task.bc_dir, instrument, fcid, bcl2fastq_version)
+    task.success_finish()
 
 
 if __name__ == "__main__":

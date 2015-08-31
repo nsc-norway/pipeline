@@ -60,12 +60,13 @@ class FastqFile(object):
     
     empty is set by the QC function. You may set it, but it will be overwritten."""
 
-    def __init__(self, lane, i_read, filename, path, stats):
+    def __init__(self, lane, i_read, filename, path, index_sequence, stats):
         self.lane = lane
         self.i_read = i_read
         self.path = path
         self.filename = filename
         self.stats = stats
+        self.index_sequence = index_sequence
         self.empty = False
 
 
@@ -149,7 +150,11 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
                 # path contains trailing slash
                 fastq_path = path + fastq_name
 
-                sample.files.append(FastqFile(lane_id, i_read, fastq_name, fastq_path, None))
+                index_sequence = entry.get("index")
+                if entry.has_key("index2"):
+                    index_sequence += "-" + entry.get("index2")
+
+                sample.files.append(FastqFile(lane_id, i_read, fastq_name, fastq_path, index_sequence, None))
                 # Stats can be added in later
 
     # Create an undetermined file for each lane, read seen
@@ -164,7 +169,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
                 path = "Undetermined_S0_L{0}_R{1}_001.fastq.gz".format(
                         str(lane).zfill(3), i_read
                         )
-            undetermined_sample.files.append(FastqFile(lane, i_read, path, path, None))
+            undetermined_sample.files.append(FastqFile(lane, i_read, path, path, None, None))
 
     return [undetermined_project] + projects.values()
 

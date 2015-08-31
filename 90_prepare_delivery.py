@@ -90,8 +90,9 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     instrument = utilities.get_instrument_by_runid(task.run_id)
     fcid = task.process.all_inputs()[0].location[0].name
     bcl2fastq_version = utilities.get_udf(task.process, nsc.BCL2FASTQ_VERSION_UDF, None)
+    undetermined_project = next(project for project in task.projects if project.is_undetermined)
     demultiplex_stats_content = demultiplex_stats.demultiplex_stats(
-            project, basecalls_dir, instrument, fcid, bcl2fastq_version
+            project, undetermined_project, basecalls_dir, instrument, fcid, bcl2fastq_version
             )
     with open(os.path.join(dest_dir, "Demultiplex_Stats.htm")) as f:
         f.write(demultiplex_stats_content)
