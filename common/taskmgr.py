@@ -293,6 +293,7 @@ class Task(object):
                 work_dir = os.path.join(nsc.SECONDARY_STORAGE, run_id)
                 # These defaults are set to None in the ARG_OPTIONS initialization,
                 # no need to check if they are None
+                ARG_OPTIONS['run_id'][DEFAULT_VAL_INDEX] = run_id
                 ARG_OPTIONS['src_dir'][DEFAULT_VAL_INDEX] = src_dir
                 ARG_OPTIONS['work_dir'][DEFAULT_VAL_INDEX] = work_dir
             else:
