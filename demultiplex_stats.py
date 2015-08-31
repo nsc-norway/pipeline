@@ -91,15 +91,16 @@ BOTTOM=""" </table></div>
 """
 
 
-def demultiplex_stats(project, undetermined_project, basecalls_dir, instrument, fcid, bcl2fastq_version):
+def demultiplex_stats(project, undetermined_project, work_dir, basecalls_dir,
+        instrument, aggregate_lanes, fcid, bcl2fastq_version):
     """Generate Demultiplexing_stats.htm file.
     
     Note: this function MODIFIES the project object tree, adding stats to the file objects,
     with aggregate_lanes. Be extremely careful if stats are used in other code calling this."""
     run_stats = stats.get_stats(
             instrument,
-            task.work_dir,
-            aggregate_lanes = task.no_lane_splitting,
+            work_dir,
+            aggregate_lanes = aggregate_lanes,
             aggregate_reads = True,
             miseq_uniproject=project
             )
@@ -154,7 +155,10 @@ def demultiplex_stats(project, undetermined_project, basecalls_dir, instrument, 
         out += "<td>{0}</td>\n".format(sample.name)
         out += "<td></td>\n"
         out += "<td>{0}</td>\n".format("Unknown")
-        out += "<td>{0}</td>\n".format(os.path.join(basecalls_dir, project.proj_dir, sample.sample_dir))
+        if sample.sample_dir:
+            out += "<td>{0}</td>\n".format(os.path.join(basecalls_dir, project.proj_dir, sample.sample_dir))
+        else: # NextSeq, etc
+            out += "<td>{0}</td>\n".format(os.path.join(basecalls_dir, project.proj_dir))
         out += "</tr>\n"
     for lane in sorted(project_lanes):
         out += "<tr>\n"
@@ -186,7 +190,8 @@ def interactive(task):
             for project in projects if project.is_undetermined
             )
 
-    print demultiplex_stats(project, undetermined_project, task.bc_dir, instrument, fcid, bcl2fastq_version)
+    print demultiplex_stats(project, undetermined_project, task.work_dir, task.bc_dir, instrument, 
+            task.no_lane_splitting, fcid, bcl2fastq_version)
     task.success_finish()
 
 
