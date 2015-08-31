@@ -125,7 +125,6 @@ def demultiplex_stats(project, undetermined_project, basecalls_dir, instrument, 
             sample_index_sequence = f.index_sequence
             sample_project = p.name
             description = sample.sample_id
-        print f.path
         out += "<tr>\n"
         out += "<td>{0}</td>\n".format(f.lane)
         out += "<td>{0}</td>\n".format(sample_name)
@@ -135,11 +134,16 @@ def demultiplex_stats(project, undetermined_project, basecalls_dir, instrument, 
         out += "<td>N</td>\n"
         out += "<td>{0}</td>\n".format(sample_project)
         out += "<td>{0}</td>\n".format(utilities.display_int(f.stats['Yield PF (Gb)'] * 1000.0))
-        out += "<td>{0:3.2f}</td>\n".format(f.stats['%PF'])
+        # For compatibility we pretend that there is only PF data -- 100 % PF ratio and use "% of PF" below
+        out += "<td>{0:3.2f}</td>\n".format(100.0)
         out += "<td>{0}</td>\n".format(utilities.display_int(f.stats['# Reads PF']))
         out += "<td>{0:3.2f}</td>\n".format(f.stats['% of PF Clusters Per Lane'])
-        out += "<td>{0:3.2f}</td>\n".format(f.stats['% Perfect Index Read'])
-        out += "<td>{0:3.2f}</td>\n".format(f.stats['% One Mismatch Reads (Index)'])
+        if p.is_undetermined:
+            out += "<td>{0:3.2f}</td>\n".format(0.0)
+            out += "<td>{0:3.2f}</td>\n".format(0.0)
+        else:
+            out += "<td>{0:3.2f}</td>\n".format(f.stats['% Perfect Index Read'])
+            out += "<td>{0:3.2f}</td>\n".format(f.stats['% One Mismatch Reads (Index)'])
         out += "<td>{0:3.2f}</td>\n".format(f.stats['% Bases >=Q30'])
         out += "<td>{0:3.2f}</td>\n".format(f.stats['Ave Q Score'])
         out += "</tr>\n"
@@ -147,16 +151,18 @@ def demultiplex_stats(project, undetermined_project, basecalls_dir, instrument, 
     out += MID 
     for sample in sorted(project.samples, key=operator.attrgetter('sample_index')):
         out += "<tr>\n"
-        out += "<td>{0}</td>".format(sample.name)
-        out += "<td></td>"
-        out += "<td>{0}</td>".format("Unknown")
-        out += "<td>{0}</td>".format(os.path.join(basecalls_dir, project.proj_dir, sample.sample_dir))
+        out += "<td>{0}</td>\n".format(sample.name)
+        out += "<td></td>\n"
+        out += "<td>{0}</td>\n".format("Unknown")
+        out += "<td>{0}</td>\n".format(os.path.join(basecalls_dir, project.proj_dir, sample.sample_dir))
+        out += "</tr>\n"
     for lane in sorted(project_lanes):
         out += "<tr>\n"
-        out += "<td>{0}</td>".format("lane{0}".format(lane))
-        out += "<td></td>"
-        out += "<td>{0}</td>".format("Unknown")
-        out += "<td>{0}</td>".format(os.path.join(basecalls_dir, "Undetermined_indices", "Sample_lane{0}".format(lane)))
+        out += "<td>{0}</td>\n".format("lane{0}".format(lane))
+        out += "<td></td>\n"
+        out += "<td>{0}</td>\n".format("Unknown")
+        out += "<td>{0}</td>\n".format(os.path.join(basecalls_dir, "Undetermined_indices", "Sample_lane{0}".format(lane)))
+        out += "</tr>\n"
     out += BOTTOM.format(version=bcl2fastq_version)
 
     return out
