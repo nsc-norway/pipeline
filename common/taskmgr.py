@@ -1,3 +1,6 @@
+
+from __future__ import print_function
+
 import os
 import sys
 import traceback
@@ -10,6 +13,7 @@ import samples
 import nsc
 
 from genologics.lims import *
+
 
 # Module to manage processing status for all the script, and to abstract the 
 # differences between command line invocation and invocation through LIMS.
@@ -217,7 +221,7 @@ class Task(object):
             return self.success
 
         if etype is None:
-            print "Uexpected exit"
+            print("Uexpected exit", file=sys.stderr)
             if self.process:
                 utilities.fail(self.process, "Unexpected exit", "Unexpected exit without exception")
 
@@ -293,6 +297,7 @@ class Task(object):
                 work_dir = os.path.join(nsc.SECONDARY_STORAGE, run_id)
                 # These defaults are set to None in the ARG_OPTIONS initialization,
                 # no need to check if they are None
+                ARG_OPTIONS['run_id'][DEFAULT_VAL_INDEX] = run_id
                 ARG_OPTIONS['src_dir'][DEFAULT_VAL_INDEX] = src_dir
                 ARG_OPTIONS['work_dir'][DEFAULT_VAL_INDEX] = work_dir
             else:
@@ -300,7 +305,7 @@ class Task(object):
         else:
             self.process = None
 
-        print "START  [" + self.task_name + "] " + self.script_name
+        print("START  [" + self.task_name + "] " + self.script_name, file=sys.stderr)
 
         if info_str:
             self.info(info_str)
@@ -311,7 +316,7 @@ class Task(object):
             self.process.get()
             self.process.udf[nsc.JOB_STATUS_UDF] = "Running ({0})".format(status)
             self.process.put()
-        print "INFO   [" + self.task_name + "] " + status
+        print("INFO   [" + self.task_name + "] " + status, file=sys.stderr)
 
 
     def fail(self, message, extra_info = None):
@@ -331,11 +336,11 @@ class Task(object):
                 self.process.udf[nsc.ERROR_DETAILS_UDF] = extra_info
             self.process.put()
         if extra_info:
-            print "ERROR  [" + self.task_name + "] " + message
-            print "-----------"
-            print extra_info
-            print "-----------"
-        print "ERROR  [" + self.task_name + "] " + message
+            print("ERROR  [" + self.task_name + "] " + message, file=sys.stderr)
+            print("-----------", file=sys.stderr)
+            print(extra_info, file=sys.stderr)
+            print("-----------", file=sys.stderr)
+        print("ERROR  [" + self.task_name + "] " + message, file=sys.stderr)
         sys.exit(1)
 
 
@@ -353,7 +358,7 @@ class Task(object):
             self.process.put()
             #TODO : would have some processing status UDF
 
-        print "SUCCESS[" + self.task_name + "] " + complete_str
+        print("SUCCESS[" + self.task_name + "] " + complete_str, file=sys.stderr)
         sys.exit(0)
 
 

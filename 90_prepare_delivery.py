@@ -11,6 +11,7 @@ import re
 import shutil
 import crypt
 import subprocess
+import demultiplex_stats
 from genologics.lims import *
 from common import nsc, utilities, taskmgr, remote, samples
 
@@ -27,7 +28,7 @@ else:
 
 
 
-def delivery_diag(project, basecalls_dir, project_path):
+def delivery_diag(task, project, basecalls_dir, project_path):
     args = [nsc.RSYNC, '-rltW', '--chmod=ug+rwX,o-rwx'] # chmod 660
     args += [project_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
     # (If there is trouble, see note in copyfiles.py about SELinux and rsync)
@@ -81,6 +82,21 @@ def delivery_diag(project, basecalls_dir, project_path):
             if os.path.exists(dest):
                 shutil.rmtree(dest)
             shutil.copytree(source, dest)
+
+    # Get the demultiplex stats for diag. We generate a HTML file in the same 
+    # format as that used by the first version of bcl2fastq.
+
+    # Need to get the instrument and fcid
+    instrument = utilities.get_instrument_by_runid(task.run_id)
+    fcid = task.process.all_inputs()[0].location[0].name
+    bcl2fastq_version = utilities.get_udf(task.process, nsc.BCL2FASTQ_VERSION_UDF, None)
+    undetermined_project = next(p for p in task.projects if p.is_undetermined)
+    demultiplex_stats_content = demultiplex_stats.demultiplex_stats(
+            project, undetermined_project, task.work_dir, basecalls_dir, instrument,
+            task.no_lane_splitting, fcid, bcl2fastq_version
+            )
+    with open(os.path.join(dest_dir, "Demultiplex_Stats.htm"), 'w') as f:
+        f.write(demultiplex_stats_content)
 
 
 def delivery_harddrive(project_name, source_path):
@@ -158,8 +174,6 @@ def main(task):
         lims_projects[pro.name] = pro
 
     runid = task.run_id
-    instrument = utilities.get_instrument_by_runid(runid)
-
     projects = (project for project in task.projects if not project.is_undetermined)
 
     sensitive_fail = []
@@ -173,7 +187,7 @@ def main(task):
 
         if project_type == "Diagnostics":
             task.info("Delivering " + project.name + " to diagnostics...")
-            delivery_diag(project, task.bc_dir, project_path)
+            delivery_diag(task, project, task.bc_dir, project_path)
         elif delivery_type == "User HDD" or delivery_type == "New HDD":
             task.info("Hard-linking " + project.name + " to delivery area...")
             delivery_harddrive(project.name, project_path)
