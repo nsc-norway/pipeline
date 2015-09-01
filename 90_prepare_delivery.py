@@ -192,7 +192,7 @@ def main(task):
             task.info("Hard-linking " + project.name + " to delivery area...")
             delivery_harddrive(project.name, project_path)
         elif delivery_type == "Norstore":
-            if project_type != "Non-sensitive":
+            if project_type != "Non-Sensitive":
                 sensitive_fail.append(project.name)
                 continue
             task.info("Tar'ing and copying " + project.name + " to delivery area, for Norstore...")
