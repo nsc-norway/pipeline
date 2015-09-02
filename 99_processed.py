@@ -30,11 +30,16 @@ def main(task):
             fc.put()
 
 
-    print "Moving", task.src_dir, "to processed directory"
-    os.rename(
-            task.src_dir,
+    if os.path.exists(
             os.path.join(nsc.PRIMARY_STORAGE, "processed", task.run_id)
-            )
+            ):
+        task.info("Run " + task.run_id + " is already in processed directory")
+    else:
+        task.info("Moving " + task.src_dir + " to processed directory")
+        os.rename(
+                task.src_dir,
+                os.path.join(nsc.PRIMARY_STORAGE, "processed", task.run_id)
+                )
 
     task.success_finish()
 
