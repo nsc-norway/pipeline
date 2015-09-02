@@ -75,7 +75,7 @@ def get_bcl2fastq2_version(work_dir):
     
 
 def get_fcid_by_runid(run_id):
-    return re.match(r"[\d]{6}_[\dA-Z]+_[\d]+_[AB]([A-Z\d-]+)$", task.run_id).group(1)
+    return re.match(r"[\d]{6}_[\dA-Z]+_[\d]+_[AB]([A-Z\d-]+)$", run_id).group(1)
 
 def merged_lanes(run_id):
     return get_instrument_by_runid(run_id) == "nextseq"
