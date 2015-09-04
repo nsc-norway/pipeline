@@ -42,15 +42,22 @@ def srun_command(
     return subprocess.call(arglist + srun_other_args + args , cwd=cwd)
 
 
+def ssh_command(args, logfile=None, cwd=None, stdout=None):
+    pass
+
+
 def run_command(
         args, jobname, time, logfile=None,
         cpus=1, mem=1024, cwd=None,
         stdout=None, srun_user_args=[],
         change_user=True, storage_job=False
         ):
-    change_user = getpass.getuser() == "glsai" 
-    return srun_command(
-        args, jobname, time, logfile, cpus, mem, cwd,
-        stdout, srun_user_args, change_user, storage_job
-        )
+    if nsc.REMOTE_MODE == "srun":
+        change_user = getpass.getuser() == "glsai" 
+        return srun_command(
+            args, jobname, time, logfile, cpus, mem, cwd,
+            stdout, srun_user_args, change_user, storage_job
+            )
+    elif nsc.REMOTE_MODE == "ssh": 
+        return ssh_command(args, logfile, cwd, stdout)
 

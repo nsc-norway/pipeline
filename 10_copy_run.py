@@ -96,7 +96,8 @@ work_dir argument.""")
     
     if task.process:
         # Can't use a per-run log dir, as it's not created yet, it's 
-        # created by the rsync command
+        # created by the rsync command. Requires LOG_DIR, not defined for
+        # CEES site at the moment
         logfile = os.path.join(nsc.LOG_DIR, task.process.id + "-rsync.txt")
         job_name = task.process.id + "." + TASK_NAME
     else:

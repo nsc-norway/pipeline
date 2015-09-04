@@ -7,10 +7,11 @@ from ConfigParser import SafeConfigParser
 # Configure prod or dev
 TAG="dev"
 
-if TAG == "prod":
-    BASE_DIR = "/data/nsc.loki/automation"
-elif TAG == "dev":
-    BASE_DIR = "/data/nsc.loki/automation/dev"
+SITE="ous"
+
+### Configuration for all sites, for production and dev ###
+
+#### Names of objects in LIMS ####
 
 # UDFs used in the LIMS for tracking automatic processing
 AUTO_FLAG_UDF = "NSC Automatic processing"
@@ -61,54 +62,99 @@ SEQ_PROCESSES=[
 
 DEMULTIPLEXING_QC_PROCESS = "Demultiplexing and QC NSC 2.0"
 
+
+#### Misc config ####
+
+# Log dir in each run folder
+RUN_LOG_DIR="DemultiplexLogs"
+
+
+#### System config ####
+
 # System programs
 RSYNC="/usr/bin/rsync"
 MD5DEEP="/usr/bin/md5deep"
 PDFLATEX="/usr/bin/pdflatex"
 
-# Command line to run slurm
-# ** OUS net: need to add this to sudoers to allow glsai to run as seq-user **
-# The first example below essentially allows glsai to run any command as seq-user,
-# thus gaining access to the NSC storage volumes. I haven't found a good way to allow
-# the script to set
-# the resources etc., but restrict the command.
-# TODO: modify sudo 
-#glsai   ALL=(seq-user)  NOPASSWD:/usr/bin/sbatch
-#Defaults:glsai          !requiretty
-SCANCEL_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/scancel"]
-SRUN_GLSAI_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/srun", 
-            "--account=nsc", "--qos=high", "--partition=lucky", "--nodes=1"]
 
-# When running on the command line we will be using a central user account,
-# so there's no need to sudo
-SRUN_OTHER_ARGLIST=["/usr/bin/srun", "--account=nsc", "--qos=high",
-                                    "--partition=lucky", "--nodes=1"]
-
-# Args for jobs which mainly do I/O on the secondary storage, not processing
-SRUN_STORAGE_JOB_ARGS=["--nodelist=loki"]
-
-# Data processing/analysis programs
-#BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
-BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.17.1.14/nscinstallbin/bin/bcl2fastq"
-FASTQC="/data/common/tools/nscbin/fastqc"
 # Some programs don't have to be put here, because they are standard on all 
-# machines: tar. (see also "system programs" above)
+# machines: tar.
+
+
+
+### Site specific configuration ###
+
+if SITE == "cees":
+    # Data processing/analysis programs
+    BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.17.1.14/nscinstallbin/bin/bcl2fastq"
+    FASTQC="/data/common/tools/nscbin/fastqc"
+
+    REMOTE_MODE = "ssh"
+
+    SSH_ARGLIST = ["/usr/bin/ssh", "biolinux2.uio.no"]
+
+elif SITE == "ous":
+    # Data processing/analysis programs
+    #BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
+    BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.17.1.14/nscinstallbin/bin/bcl2fastq"
+    FASTQC="/data/common/tools/nscbin/fastqc"
+
+    PRIMARY_STORAGE = "/data/runScratch.boston"     # source data
+
+    REMOTE_MODE = "srun"
+
+    # Command line to run slurm
+    # ** OUS net: need to add this to sudoers to allow glsai to run as seq-user **
+    # The first example below essentially allows glsai to run any command as seq-user,
+    # thus gaining access to the NSC storage volumes. I haven't found a good way to allow
+    # the script to set
+    # the resources etc., but restrict the command.
+    # TODO: modify sudo 
+    #glsai   ALL=(seq-user)  NOPASSWD:/usr/bin/sbatch
+    #Defaults:glsai          !requiretty
+    SRUN_GLSAI_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/srun", 
+                "--account=nsc", "--qos=high", "--partition=lucky", "--nodes=1"]
+    
+    # When running on the command line we will be using a central user account,
+    # so there's no need to sudo
+    SRUN_OTHER_ARGLIST=["/usr/bin/srun", "--account=nsc", "--qos=high",
+                                        "--partition=lucky", "--nodes=1"]
+    
+    # Args for jobs which mainly do I/O on the secondary storage, not processing
+    SRUN_STORAGE_JOB_ARGS=["--nodelist=loki"]
+
+
+### Site and phase (TAG) dependent configuration ###
 
 # Paths
-PRIMARY_STORAGE = "/data/runScratch.boston"     # source data
-if TAG == "prod":
-    SECONDARY_STORAGE="/data/nsc.loki"         # location of demultiplexed files
-    DELIVERY_DIR="/data/nsc.loki/delivery"     # used by prepare-delivery after QC
-    DIAGNOSTICS_DELIVERY = "/data/diag/nscDelivery"
-elif TAG == "dev":
-    SECONDARY_STORAGE="/data/nsc.loki/test"    # location of demultiplexed files
-    DELIVERY_DIR="/data/nsc.loki/test/delivery"# used by prepare-delivery after QC
-    DIAGNOSTICS_DELIVERY = "/data/nsc.loki/test/diag"
-    
-LOG_DIR = BASE_DIR + "/logs"       # for slurm jobs
+if SITE == "cees":
+    if TAG == "prod":
+        SECONDARY_STORAGE="/data/nsc.loki"         # location of demultiplexed files
+        DELIVERY_DIR="/data/nsc.loki/delivery"     # used by prepare-delivery after QC
+        DIAGNOSTICS_DELIVERY = "/data/diag/nscDelivery"
+        BASE_DIR = "/data/nsc.loki/automation"
+        LOG_DIR = None                              # only used for copy, don't need, demultiplexing in-place
+    elif TAG == "dev":
+        # TODO: dev environment on UiO net?
+        # SECONDARY_STORAGE="/data/nsc.loki/test"    # location of demultiplexed files
+        # DELIVERY_DIR="/data/nsc.loki/test/delivery"# used by prepare-delivery after QC
+        # DIAGNOSTICS_DELIVERY = "/data/nsc.loki/test/diag"
+        # LOG_DIR = None
+        pass
 
-# Log dir in each run folder
-RUN_LOG_DIR="DemultiplexLogs"
+elif SITE == "ous":
+    if TAG == "prod":
+        SECONDARY_STORAGE="/data/nsc.loki"         # location of demultiplexed files
+        DELIVERY_DIR="/data/nsc.loki/delivery"     # used by prepare-delivery after QC
+        DIAGNOSTICS_DELIVERY = "/data/diag/nscDelivery"
+        BASE_DIR = "/data/nsc.loki/automation"
+        LOG_DIR = "/data/nsc.loki/automation/logs" # logs for copy job (10_... script used at OUS)
+    elif TAG == "dev":
+        SECONDARY_STORAGE="/data/nsc.loki/test"    # location of demultiplexed files
+        DELIVERY_DIR="/data/nsc.loki/test/delivery"# used by prepare-delivery after QC
+        DIAGNOSTICS_DELIVERY = "/data/nsc.loki/test/diag"
+        LOG_DIR = "/data/nsc.loki/automation/dev/logs"
+
 
 # Configure LIMS access (should be cleaned up)
 if TAG == "dev":
