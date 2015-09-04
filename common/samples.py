@@ -339,7 +339,8 @@ def get_fastqc_dir(project, sample, fastqfile):
 def qc_pdf_name(run_id, fastq):
     """Get QC report name for a given FastqFile object"""
     report_root_name = re.sub(".fastq.gz$", ".qc", os.path.basename(fastq.path))
-    if fastq.lane == "X": # Merged lanes
+    miseq = utilities.get_instrument_by_runid(run_id) == "miseq"
+    if fastq.lane == "X" or miseq: # Merged lanes or single-lane instrument
         return "{0}.{1}.pdf".format(run_id, report_root_name)
     else:
         return "{0}.{1}.{2}.pdf".format(run_id, fastq.lane, report_root_name)
