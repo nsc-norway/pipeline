@@ -3,6 +3,7 @@
 import re
 import os
 import itertools
+import utilities
 from xml.etree import ElementTree
 from collections import defaultdict
 from Counter import Counter
@@ -340,11 +341,17 @@ def parse_generate_fastq(generate_fastq_path, num_reads=1, aggregate_reads=False
 
     samples = {}
     # Undetermined first
-    for i_read in range(1, num_reads+1):
+    if aggregate_reads:
+        indexes = [(1, None, 1)]
+        factor = num_reads
+    else:
+        indexes = [(1, None, i) for i in range(1, num_reads+1)]
+        factor = 1
+    for index in indexes:
         stats = {}
-        stats['NumberOfClustersRaw'] = totals_dict['NumberOfUnindexedClusters']
-        stats['NumberOfClustersPF'] = totals_dict['NumberOfUnindexedClustersPF']
-        samples[(1, None, i_read)] = stats
+        stats['NumberOfClustersRaw'] = totals_dict['NumberOfUnindexedClusters'] * factor
+        stats['NumberOfClustersPF'] = totals_dict['NumberOfUnindexedClustersPF'] * factor
+        samples[index] = stats
 
     overall = root.findall("OverallSamples")[0]
     for sample_xml in overall.findall("SummarizedSampleStatistics"):
@@ -353,7 +360,7 @@ def parse_generate_fastq(generate_fastq_path, num_reads=1, aggregate_reads=False
         # Needs to be changed if we actually get per-read stats later, but for
         # now they are just dummy values in the XML.
         if aggregate_reads:
-            indexes = [(sample_id,)]
+            indexes = [(1, sample_id, 1)]
             factor = num_reads
         else:
             indexes = [(1, sample_id, i) for i in range(1, num_reads+1)]
@@ -460,9 +467,12 @@ def get_stats(
         return get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes, aggregate_reads)
     elif instrument == 'miseq':
         generate_fastq_path = os.path.join(run_dir, "GenerateFASTQRunStatistics.xml")
-        num_reads = utilities.get_num_reads(run_dir)
+        num_reads, index_reads = utilities.get_num_reads(run_dir)
         miseq_stats = get_miseq_stats(generate_fastq_path, num_reads, aggregate_reads)
-        return [(m[0:1]) + (miseq_uniproject,) + m[1:] for m in miseq_stats]
+        return dict((c[0:1] +
+            (miseq_uniproject if c[1] else None,) + # <handling undetermined (sorry)
+            c[1:], v)
+            for c, v in miseq_stats.items())
     else:
         raise ValueError("Stats requested for unknown instrument " + str(instrument))
 

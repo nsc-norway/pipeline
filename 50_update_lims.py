@@ -1,6 +1,7 @@
 # Write stats to LIMS
 import os
 import sys
+import requests
 from genologics.lims import *
 from common import nsc, taskmgr, stats, utilities
 
