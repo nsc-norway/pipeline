@@ -77,7 +77,7 @@ def write_sample_info_table(output_path, runid, project):
 
         files = sorted(
                 ((s,fi) for s in project.samples for fi in s.files),
-                key=lambda (s,f): (f.lane, s.name, f.i_read)
+                key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
                 )
         for s,f in files:
             out.write(os.path.basename(f.path) + "\t")
