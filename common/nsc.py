@@ -86,8 +86,9 @@ PDFLATEX="/usr/bin/pdflatex"
 
 if SITE == "cees":
     # Data processing/analysis programs
-    BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.17.1.14/nscinstallbin/bin/bcl2fastq"
-    FASTQC="/data/common/tools/nscbin/fastqc"
+    BCL2FASTQ2=""
+    FASTQC=""
+
 
     REMOTE_MODE = "ssh"
 
@@ -99,7 +100,6 @@ elif SITE == "ous":
     BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.17.1.14/nscinstallbin/bin/bcl2fastq"
     FASTQC="/data/common/tools/nscbin/fastqc"
 
-    PRIMARY_STORAGE = "/data/runScratch.boston"     # source data
 
     REMOTE_MODE = "srun"
 
@@ -113,12 +113,12 @@ elif SITE == "ous":
     #glsai   ALL=(seq-user)  NOPASSWD:/usr/bin/sbatch
     #Defaults:glsai          !requiretty
     SRUN_GLSAI_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/srun", 
-                "--account=nsc", "--qos=high", "--partition=lucky", "--nodes=1"]
+                "--account=nsc", "--qos=high", "--partition=main", "--nodes=1"]
     
     # When running on the command line we will be using a central user account,
     # so there's no need to sudo
     SRUN_OTHER_ARGLIST=["/usr/bin/srun", "--account=nsc", "--qos=high",
-                                        "--partition=lucky", "--nodes=1"]
+                                        "--partition=main", "--nodes=1"]
     
     # Args for jobs which mainly do I/O on the secondary storage, not processing
     SRUN_STORAGE_JOB_ARGS=["--nodelist=loki"]
@@ -128,27 +128,25 @@ elif SITE == "ous":
 
 # Paths
 if SITE == "cees":
+    PRIMARY_STORAGE = "/storage/nscdata/runsIllumina"
     if TAG == "prod":
-        SECONDARY_STORAGE="/data/nsc.loki"         # location of demultiplexed files
+        SECONDARY_STORAGE="/storage/nscdata/runsIllumina"
         DELIVERY_DIR="/data/nsc.loki/delivery"     # used by prepare-delivery after QC
-        DIAGNOSTICS_DELIVERY = "/data/diag/nscDelivery"
         BASE_DIR = "/data/nsc.loki/automation"
-        LOG_DIR = None                              # only used for copy, don't need, demultiplexing in-place
+
     elif TAG == "dev":
         # TODO: dev environment on UiO net?
-        # SECONDARY_STORAGE="/data/nsc.loki/test"    # location of demultiplexed files
-        # DELIVERY_DIR="/data/nsc.loki/test/delivery"# used by prepare-delivery after QC
-        # DIAGNOSTICS_DELIVERY = "/data/nsc.loki/test/diag"
-        # LOG_DIR = None
         pass
 
 elif SITE == "ous":
+    PRIMARY_STORAGE = "/data/runScratch.boston"     # source data
     if TAG == "prod":
         SECONDARY_STORAGE="/data/nsc.loki"         # location of demultiplexed files
         DELIVERY_DIR="/data/nsc.loki/delivery"     # used by prepare-delivery after QC
         DIAGNOSTICS_DELIVERY = "/data/diag/nscDelivery"
         BASE_DIR = "/data/nsc.loki/automation"
         LOG_DIR = "/data/nsc.loki/automation/logs" # logs for copy job (10_... script used at OUS)
+
     elif TAG == "dev":
         SECONDARY_STORAGE="/data/nsc.loki/test"    # location of demultiplexed files
         DELIVERY_DIR="/data/nsc.loki/test/delivery"# used by prepare-delivery after QC

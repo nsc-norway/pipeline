@@ -43,7 +43,21 @@ def srun_command(
 
 
 def ssh_command(args, logfile=None, cwd=None, stdout=None):
-    pass
+    if not cwd:
+        cwd = os.getcwd()
+    if logfile:
+        stdoutfile = open(logfile, "w")
+        stderrfile = stdoutfile
+    elif stdout:
+        stdoutfile = open(logfile, "w")
+        stderrfile = None
+    else:
+        stdoutfile = None
+        stderrfile = None
+
+    command_args = nsc.SSH_ARGLIST + ["cd", cwd, ";"] + args
+
+    return subprocess.call(command_args, stdout=stdoutfile, stderr=stderrfile)
 
 
 def run_command(
