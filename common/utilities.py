@@ -63,19 +63,23 @@ def get_bcl2fastq2_version(work_dir):
             nsc.RUN_LOG_DIR,
             "30._demultiplexing.*bcl2fastq2.txt"
             )
-    log_path = sorted(glob.glob(log_path_pattern))[-1]
-    log = open(log_path)
-    for i in xrange(3):
-        l = next(log)
-        if l.startswith("bcl2fastq v"):
-            return l.split(" ")[1].strip("\n")
-
+    log_paths = sorted(glob.glob(log_path_pattern))
+    if log_paths:
+        log_path = log_paths[-1]
+        log = open(log_path)
+        for i in xrange(3):
+            l = next(log)
+            if l.startswith("bcl2fastq v"):
+                return l.split(" ")[1].strip("\n")
     else:
         return None
     
 
 def get_fcid_by_runid(run_id):
-    return re.match(r"[\d]{6}_[\dA-Z]+_[\d]+_[AB]([A-Z\d-]+)$", run_id).group(1)
+    if get_instrument_by_runid(run_id) == "hiseq":
+        return re.match(r"[\d]{6}_[\dA-Z]+_[\d]+_[AB]([A-Z\d-]+)$", run_id).group(1)
+    else:
+        return re.match(r"[\d]{6}_[\dA-Z]+_[\d]+_([A-Z\d-]+)$", run_id).group(1)
 
 def merged_lanes(run_id):
     return get_instrument_by_runid(run_id) == "nextseq"

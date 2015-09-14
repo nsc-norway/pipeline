@@ -29,7 +29,7 @@ def main(task):
     else:
         bcl2fastq_version = utilities.get_bcl2fastq2_version(work_dir)
         if not bcl2fastq_version:
-            task.fail("bcl2fastq version cannot be detected, use the --bcl2fastq-version option to specify!")
+            task.warn("bcl2fastq version cannot be detected, use the --bcl2fastq-version option to specify!")
 
     real_projects = []
     for project in projects:
