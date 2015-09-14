@@ -18,11 +18,12 @@ class Project(object):
     proj_dir: base name of project directory relative to Data/Intensities/BaseCalls
     samples: list of samples
     """
-    def __init__(self, name, proj_dir, samples, is_undetermined=False):
+    def __init__(self, name, proj_dir, samples, is_undetermined=False, is_default=False):
         self.name = name
         self.proj_dir = proj_dir
         self.samples = samples
         self.is_undetermined = is_undetermined
+        self.is_default = is_default
 
 
 class Sample(object):
@@ -72,7 +73,7 @@ class FastqFile(object):
 
 
 ################ Get object tree, with various info #################
-def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lanes=[1]):
+def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lanes=[1], experiment_name=None):
     """Get the "sample object model" tree, one for each project.
     
     The FastqFile objects contain the file names after the post-demultiplexing
@@ -98,13 +99,18 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
     instrument = utilities.get_instrument_by_runid(run_id)
     sample_index = 1
     for entry in sample_sheet_data:
-        project_name = entry.get('sampleproject')
+        project_name = entry.get('project') or entry.get('sampleproject')
+        default_project = False
         if not project_name:
-            project_name = entry['project']
+            if experiment_name:
+                project_name = experiment_name
+                default_project = True
+            else:
+                raise RuntimeError("Project name not found in sample sheet")
         project = projects.get(project_name)
         if not project:
             project_dir = get_project_dir(run_id, project_name) # fn defined in bottom of this file
-            project = Project(project_name, project_dir, [])
+            project = Project(project_name, project_dir, [], is_default=default_project)
             projects[project_name] = project
 
         for sample in project.samples:
@@ -112,6 +118,9 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
                 break
         else: # if not break
             sample_name = entry['samplename']
+            if sample_name == "":
+                # MiSeq only uses Sample ID (at least for non-LIMS sample sheet)
+                sample_name = entry['sampleid']
             sample_dir = get_sample_dir(instrument, sample_name)
             sample = Sample(sample_index, entry['sampleid'], sample_name, sample_dir, [])
             sample_index += 1

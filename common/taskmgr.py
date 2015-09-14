@@ -30,7 +30,7 @@ ARG_OPTIONS = {
         "src_dir": ["src_dir", nsc.SOURCE_RUN_DIR_UDF, str, None, "Source directory (run folder)"],
         "work_dir": ["work_dir", nsc.WORK_RUN_DIR_UDF, str, None, "Destination/working directory (run folder)"],
         "run_id": ["--run-id", nsc.RUN_ID_UDF, str, None, "Override run ID (mostly useless)"],
-        "threads": ["--threads", nsc.THREADS_UDF, int, 1, "Number of threads/cores to use"],
+        "threads": ["--threads", nsc.THREADS_UDF, int, 16, "Number of threads/cores to use"],
         "sample_sheet": ["--sample-sheet", None, str, "<DIR>/DemultiplexingSampleSheet.csv", "Sample sheet"],
         }
 DEFAULT_VAL_INDEX = 3
@@ -122,7 +122,10 @@ class Task(object):
 
         path = self.args.sample_sheet
         if path == "<DIR>/DemultiplexingSampleSheet.csv":
+            # This is the default
             path = os.path.join(self.work_dir, "DemultiplexingSampleSheet.csv")
+            if not os.path.exists(path):
+                path = os.path.join(self.work_dir, "SampleSheet.csv")
         return path
 
     
@@ -160,7 +163,8 @@ class Task(object):
         """Get the list of project objects, defined in the samples module. """
 
         num_reads, index_reads = utilities.get_num_reads(self.work_dir)
-        sample_sheet_data = samples.parse_sample_sheet(self.sample_sheet_content)['data']
+        sample_sheet = samples.parse_sample_sheet(self.sample_sheet_content)
+        sample_sheet_data = sample_sheet['data']
 
         # Supply a list of lanes if lane number isn't given in the sample sheet
         expand_lanes = None
@@ -173,12 +177,17 @@ class Task(object):
             else:
                 expand_lanes = None
 
+        experiment_name = None
+        if sample_sheet.has_key('header'):
+            experiment_name = sample_sheet['header'].get("Experiment Name")
+
         return samples.get_projects(
                 self.run_id,
                 sample_sheet_data,
                 num_reads,
                 self.no_lane_splitting,
-                expand_lanes
+                expand_lanes,
+                experiment_name
                 )
 
     @property

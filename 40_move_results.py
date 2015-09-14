@@ -15,7 +15,8 @@ def move_files(bc_dir, projects):
     list."""
 
     for project in projects:
-        if not project.is_undetermined:
+        # Default project: used for MiSeq when no project is given
+        if not project.is_undetermined and not project.is_default:
             projdir = os.path.join(bc_dir, project.proj_dir)
             if not os.path.exists(projdir):
                 os.mkdir(projdir)
@@ -29,6 +30,7 @@ def move_files(bc_dir, projects):
     for project in projects:
         if not project.is_undetermined:
             for sample in project.samples:
+                # Make new directories for each sample
                 if sample.sample_dir:
                     sample_path = os.path.join(bc_dir, project.proj_dir, sample.sample_dir)
                     if not os.path.exists(sample_path):
@@ -42,19 +44,15 @@ def move_files(bc_dir, projects):
                             f.i_read,
                             f.lane == "X"
                             )
-                    if no_sample_id_dir:
-                        orig_path = os.path.join(
-                                bc_dir,
-                                project.name,
-                                orig_fname
-                                )
-                    else:
-                        orig_path = os.path.join(
-                                bc_dir,
-                                project.name,
-                                sample.sample_id,
-                                orig_fname
-                                )
+
+                    path_components = [bc_dir]
+                    if not project.is_default:
+                        path_components += project.name
+
+                    if not no_sample_id_dir:
+                        path_components += sample.sample_id
+
+                    orig_path = os.path.join(*path_components)
 
                     new_path = os.path.join(bc_dir, f.path)
                     try:
@@ -71,10 +69,11 @@ def move_files(bc_dir, projects):
                         ))
 
             # Remove project dir
-            os.rmdir("{base}/{project}".format(
-                base=bc_dir,
-                project=project.name
-                ))
+            if not project.is_default:
+                os.rmdir("{base}/{project}".format(
+                    base=bc_dir,
+                    project=project.name
+                    ))
 
 
 def main(task):
