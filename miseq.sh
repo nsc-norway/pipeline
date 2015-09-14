@@ -2,7 +2,7 @@
 
 set -e
 
-SCRIPTS="50_emails.py 60_fastqc.py 70_reports.py 80_md5sum.py"
+SCRIPTS="40_move_results.py 50_emails.py 60_fastqc.py 70_reports.py 80_md5sum.py"
 
 if [ -z "$1" ]
 then
