@@ -328,6 +328,14 @@ class Task(object):
         print("INFO   [" + self.task_name + "] " + status, file=sys.stderr)
 
 
+    def warn(self, status):
+        if self.process:
+            self.process.get()
+            self.process.udf[nsc.JOB_STATUS_UDF] = "Running | Warning: {0}".format(status)
+            self.process.put()
+        print("WARN   [" + self.task_name + "] " + status, file=sys.stderr)
+
+
     def fail(self, message, extra_info = None):
         """Report failure.
         
