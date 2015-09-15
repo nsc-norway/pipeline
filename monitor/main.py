@@ -300,7 +300,10 @@ def get_recently_completed_runs():
 
 def get_batch(instances):
     """Lame replacement for batch call, API only support batch resources for 
-    some few types of objects."""
+    some types of objects.
+    
+    Note: when / if batch is implemented for these, we'll need to specify 
+    force=True for the batch call."""
     for instance in instances:
         instance.get(force=True)
 
