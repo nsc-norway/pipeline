@@ -32,6 +32,7 @@ import os.path, sys
 import argparse
 import subprocess
 import datetime
+import re
 
 #from Bio.Seq import Seq
 
@@ -107,7 +108,7 @@ def main(task):
 
     # Doctor the sample sheet, only if using HiSeq and it doesn't have [Data] header
     instrument = utilities.get_instrument_by_runid(task.run_id)
-    if instrument == "hiseq" and sample_sheet.find("\r\n[Data]\r\n") == -1:
+    if instrument == "hiseq" and re.match(r"\[Data\],*$", sample_sheet) == -1:
         sample_sheet = convert_from_bcl2fastqv1(sample_sheet)
 
     # Invert the read2 indexes if using nextseq
@@ -144,7 +145,7 @@ def rev_comp(sequence):
 
 def reverse_complement_index2(original_data):
     original_lines = [l.strip("\r\n") for l in original_data.splitlines()]
-    data_start = next(i for i, d in enumerate(original_lines) if d == "[Data]")
+    data_start = next(i for i, d in enumerate(original_lines) if re.match(r"\[Data\],*$", d))
     data = [l.split(",") for l in original_lines[data_start+1:] if l.strip() != ""]
     try:
         index2_col = next(i for i, c in enumerate(data[0]) if c.lower() == "index2")
