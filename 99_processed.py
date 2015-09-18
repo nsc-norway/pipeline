@@ -29,17 +29,19 @@ def main(task):
             fc.udf[nsc.PROCESSED_DATE_UDF] = date.today()
             fc.put()
 
-
-    if os.path.exists(
-            os.path.join(nsc.PRIMARY_STORAGE, "processed", task.run_id)
-            ):
-        task.info("Run " + task.run_id + " is already in processed directory")
-    else:
-        task.info("Moving " + task.src_dir + " to processed directory")
-        os.rename(
-                task.src_dir,
+    if all(output.qc_flag == "PASSED" for output in task.process.all_outputs()):
+        if os.path.exists(
                 os.path.join(nsc.PRIMARY_STORAGE, "processed", task.run_id)
-                )
+                ):
+            task.info("Run " + task.run_id + " is already in processed directory")
+        else:
+            task.info("Moving " + task.src_dir + " to processed directory")
+            os.rename(
+                    task.src_dir,
+                    os.path.join(nsc.PRIMARY_STORAGE, "processed", task.run_id)
+                    )
+    else:
+        task.info("Not moving to processed because some samples failed")
 
     task.success_finish()
 
