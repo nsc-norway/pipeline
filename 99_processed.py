@@ -29,7 +29,7 @@ def main(task):
             fc.udf[nsc.PROCESSED_DATE_UDF] = date.today()
             fc.put()
 
-    if all(output.qc_flag == "PASSED" for output in task.process.all_outputs()):
+    if not task.process or all(input.qc_flag == "PASSED" for input in inputs):
         if os.path.exists(
                 os.path.join(nsc.PRIMARY_STORAGE, "processed", task.run_id)
                 ):
