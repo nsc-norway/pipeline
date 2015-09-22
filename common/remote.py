@@ -34,7 +34,7 @@ def srun_command(
         if not cwd:
             # sort of a heuristic, when in change_user mode it's typically 
             # run by LIMS, and then it will start in a dir which only exists
-            # on the LIMS server
+            # on the LIMS server -- so instead we move to /tmp
             cwd = "/tmp"
     else:
         arglist = nsc.SRUN_OTHER_ARGLIST
@@ -42,7 +42,7 @@ def srun_command(
     return subprocess.call(arglist + srun_other_args + args , cwd=cwd)
 
 
-def ssh_command(args, logfile=None, cwd=None, stdout=None):
+def local_command(args, logfile=None, cwd=None, stdout=None):
     if not cwd:
         cwd = os.getcwd()
     if logfile:
@@ -55,9 +55,7 @@ def ssh_command(args, logfile=None, cwd=None, stdout=None):
         stdoutfile = None
         stderrfile = None
 
-    command_args = nsc.SSH_ARGLIST + ["cd", cwd, ";"] + args
-
-    return subprocess.call(command_args, stdout=stdoutfile, stderr=stderrfile)
+    return subprocess.call(args, stdout=stdoutfile, stderr=stderrfile, cwd=cwd)
 
 
 def run_command(
@@ -72,6 +70,6 @@ def run_command(
             args, jobname, time, logfile, cpus, mem, cwd,
             stdout, srun_user_args, change_user, storage_job
             )
-    elif nsc.REMOTE_MODE == "ssh": 
-        return ssh_command(args, logfile, cwd, stdout)
+    elif nsc.REMOTE_MODE == "local": 
+        return local_command(args, logfile, cwd, stdout)
 

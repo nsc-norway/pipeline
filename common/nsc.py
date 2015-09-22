@@ -87,10 +87,10 @@ PDFLATEX="/usr/bin/pdflatex"
 if SITE == "cees":
     # Data processing/analysis programs
     BCL2FASTQ2=""
-    FASTQC=""
+    FASTQC="/opt/FastQC/fastqc"
 
 
-    REMOTE_MODE = "ssh"
+    REMOTE_MODE = "local"
 
     SSH_ARGLIST = ["/usr/bin/ssh", "biolinux2.uio.no"]
 
@@ -131,8 +131,8 @@ if SITE == "cees":
     PRIMARY_STORAGE = "/storage/nscdata/runsIllumina"
     if TAG == "prod":
         SECONDARY_STORAGE="/storage/nscdata/runsIllumina"
-        DELIVERY_DIR="/data/nsc.loki/delivery"     # used by prepare-delivery after QC
-        BASE_DIR = "/data/nsc.loki/automation"
+        #DELIVERY_DIR="/data/nsc.loki/delivery"     # used by prepare-delivery after QC
+        BASE_DIR = "/opt/nsc/pipeline"
 
     elif TAG == "dev":
         # TODO: dev environment on UiO net?
