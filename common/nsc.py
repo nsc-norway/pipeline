@@ -2,6 +2,7 @@
 
 from genologics.lims import *
 import getpass
+import os
 from ConfigParser import SafeConfigParser
 
 # Configure prod or dev
