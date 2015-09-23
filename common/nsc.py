@@ -86,20 +86,16 @@ PDFLATEX="/usr/bin/pdflatex"
 
 if SITE == "cees":
     # Data processing/analysis programs
-    BCL2FASTQ2=""
+    BCL2FASTQ2="/usr/bin/bcl2fastq"
     FASTQC="/opt/FastQC/fastqc"
 
-
     REMOTE_MODE = "local"
-
-    SSH_ARGLIST = ["/usr/bin/ssh", "biolinux2.uio.no"]
 
 elif SITE == "ous":
     # Data processing/analysis programs
     #BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
     BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.17.1.14/nscinstallbin/bin/bcl2fastq"
     FASTQC="/data/common/tools/nscbin/fastqc"
-
 
     REMOTE_MODE = "srun"
 
@@ -112,6 +108,8 @@ elif SITE == "ous":
     # TODO: modify sudo 
     #glsai   ALL=(seq-user)  NOPASSWD:/usr/bin/sbatch
     #Defaults:glsai          !requiretty
+    #Defaults:glsai          umask=007,umask_override
+    #Defaults:glsai          !logfile
     SRUN_GLSAI_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/srun", 
                 "--account=nsc", "--qos=high", "--partition=main", "--nodes=1"]
     
@@ -131,8 +129,7 @@ if SITE == "cees":
     PRIMARY_STORAGE = "/storage/nscdata/runsIllumina"
     if TAG == "prod":
         SECONDARY_STORAGE="/storage/nscdata/runsIllumina"
-        #DELIVERY_DIR="/data/nsc.loki/delivery"     # used by prepare-delivery after QC
-        BASE_DIR = "/opt/nsc/pipeline"
+        #DELIVERY_DIR=""     # used by prepare-delivery after QC
 
     elif TAG == "dev":
         # TODO: dev environment on UiO net?
@@ -144,7 +141,6 @@ elif SITE == "ous":
         SECONDARY_STORAGE="/data/nsc.loki"         # location of demultiplexed files
         DELIVERY_DIR="/data/nsc.loki/delivery"     # used by prepare-delivery after QC
         DIAGNOSTICS_DELIVERY = "/data/diag/nscDelivery"
-        BASE_DIR = "/data/nsc.loki/automation"
         LOG_DIR = "/data/nsc.loki/automation/logs" # logs for copy job (10_... script used at OUS)
 
     elif TAG == "dev":
@@ -161,10 +157,15 @@ if TAG == "dev":
 elif TAG == "prod":
     if getpass.getuser() == "seq-user":
         pw_file = "/data/nsc.loki/automation/etc/seq-user/apiuser-password.txt"
+
     elif getpass.getuser() == "glsai":
         pw_file = "/opt/gls/clarity/users/glsai/apiuser-password.txt"
+        if not os.path.exists(pw_file):
+            pw_file = "/opt/nsc/conf/apiuser-password.txt"
+
     elif getpass.getuser() == "limsweb":
         pw_file = "/var/www/limsweb/private/password"
+
     else:
         pw_file = None
     
