@@ -4,8 +4,7 @@ import sys
 import re
 import time
 from genologics.lims import *
-from genologics import config
-from common import utilities
+from common import utilities, nsc
 
 PRESET = {
         "hiseq": "HiSeq auto",
@@ -29,15 +28,14 @@ def start_step(lims, analytes, workflow):
         sys.exit(1)
 
 
-def main(username, password, process_id, workflow_name):
+def main(process_id, workflow_name):
     # Sequencing process
-    lims = Lims(config.BASEURI, username, password)
-    process = Process(lims, id=process_id)
-    workflows = lims.get_workflows(name=workflow_name)
+    process = Process(nsc.lims, id=process_id)
+    workflows = nsc.lims.get_workflows(name=workflow_name)
     workflow = workflows[0]
     analytes = process.all_inputs(unique=True)
-    lims.route_analytes(analytes, workflow)
-    step = start_step(lims, analytes, workflow)
+    nsc.lims.route_analytes(analytes, workflow)
+    step = start_step(nsc.lims, analytes, workflow)
     instrument = utilities.get_instrument(process)
     step.details.get()
     step.details.preset = PRESET[instrument]
