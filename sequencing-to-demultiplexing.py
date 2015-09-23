@@ -5,8 +5,9 @@ import re
 import time
 from genologics.lims import *
 from genologics import config
+from common import utilities
 
-PRESET = (
+PRESET = {
         "hiseq": "HiSeq auto",
         "miseq": "MiSeq auto",
         "nextseq": "NextSeq auto"
@@ -38,6 +39,7 @@ def main(username, password, process_id, workflow_name):
     lims.route_analytes(analytes, workflow)
     step = start_step(lims, analytes, workflow)
     instrument = utilities.get_instrument(process)
+    step.details.get()
     step.details.preset = PRESET[instrument]
     step.details.put()
 
