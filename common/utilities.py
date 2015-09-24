@@ -125,8 +125,7 @@ def upload_file(process, name, path = None, data = None):
             break
     if not attach:
         raise ValueError(name + " is not a valid result file for " + process.id)
-    pf = ProtoFile(process.lims, attach, path)
-    pf = process.lims.glsstorage(pf)
+    pf = process.lims.glsstorage(attach, path)
     f = pf.post()
     process.get(force=True)
     f.upload(data)
