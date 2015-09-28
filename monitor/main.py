@@ -156,7 +156,7 @@ def read_sequencing(process_name, process):
     flowcell_id = flowcell.name
     if "NextSeq" in process_name:
         step = Step(nsc.lims, id=process.id)
-        for lot in step.reagent_lots:
+        for lot in step.reagentlots.reagent_lots:
             if lot.reagent_kit.name == "NextSeq 500 FC v1":
                 flowcell_id = lot.name
     if "MiSeq" in process_name:
