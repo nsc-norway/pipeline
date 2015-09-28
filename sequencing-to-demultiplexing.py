@@ -6,13 +6,6 @@ import time
 from genologics.lims import *
 from common import utilities, nsc
 
-PRESET = {
-        "hiseq": "HiSeq auto",
-        "miseq": "MiSeq auto",
-        "nextseq": "NextSeq auto"
-        }
-
-
 def start_step(lims, analytes, workflow):
     protocol = workflow.protocols[0]
     ps = protocol.steps[0]
@@ -36,11 +29,6 @@ def main(process_id, workflow_name):
     analytes = process.all_inputs(unique=True)
     nsc.lims.route_analytes(analytes, workflow)
     step = start_step(nsc.lims, analytes, workflow)
-    instrument = utilities.get_instrument(process)
-    step.details.get()
-    step.details.preset = PRESET[instrument]
-    step.details.put()
-
 
 main(*sys.argv[1:])
 
