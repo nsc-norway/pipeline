@@ -117,6 +117,8 @@ def proc_url(process_id):
         page = "work-details"
     elif state == 'STEP SETUP':
         page = "work-setup"
+    else:
+        page = "work-details"
     second_part_limsid = re.match(r"[\d]+-([\d]+)$", process_id).group(1)
     return "{0}clarity/{1}/{2}".format(ui_server, page, second_part_limsid)
 
