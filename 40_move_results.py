@@ -57,8 +57,9 @@ def move_files(bc_dir, projects):
                         os.rename(orig_path, new_path)
                     except OSError:
                         print "Failed to move file", orig_path, "to", new_path
-                        if not f.empty:
-                            raise
+                        # We don't know which files are empty at this point. Just ignoring errors.
+                        #if not f.empty:
+                        #    raise
             
                 # Remove sample dir (should now be empty)
                 if not no_sample_id_dir:
