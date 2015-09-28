@@ -130,7 +130,7 @@ def get_resultfile(process, lane, input_limsid, read):
                 # after the corresponding submitted sample.
                 if output.name == nsc.FASTQ_OUTPUT.format(
                         lane=lane,
-                        sample_name=input_sample.name,
+                        sample_name=input_sample.name.encode('utf-8'),
                         read=read
                         ):
                     return output
