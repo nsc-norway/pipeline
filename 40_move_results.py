@@ -48,12 +48,10 @@ def move_files(bc_dir, projects):
                     path_components = [bc_dir]
                     if not project.is_default:
                         path_components.append(project.name)
-
                     if not no_sample_id_dir:
                         path_components.append(sample.sample_id)
-
+                    path_components.append(orig_fname)
                     orig_path = os.path.join(*path_components)
-
                     new_path = os.path.join(bc_dir, f.path)
                     try:
                         os.rename(orig_path, new_path)
