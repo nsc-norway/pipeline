@@ -47,10 +47,10 @@ def move_files(bc_dir, projects):
 
                     path_components = [bc_dir]
                     if not project.is_default:
-                        path_components += project.name
+                        path_components.append(project.name)
 
                     if not no_sample_id_dir:
-                        path_components += sample.sample_id
+                        path_components.append(sample.sample_id)
 
                     orig_path = os.path.join(*path_components)
 
@@ -58,7 +58,10 @@ def move_files(bc_dir, projects):
                     try:
                         os.rename(orig_path, new_path)
                     except OSError:
-                        print "FAIL"
+                        if f.empty:
+                            print "Failed to move empty file", orig_path
+                        else:
+                            raise
             
                 # Remove sample dir (should now be empty)
                 if not no_sample_id_dir:
