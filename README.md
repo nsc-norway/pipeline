@@ -34,7 +34,7 @@ See SETUP.md for setup instructions. (currently out of date)
 ### LIMS integration, automation: scripts to manage LIMS processes / workflow.
 * `sequencing-to-demultiplexing.py` - A button to be added to the sequencing step, to add a run to demultiplexing.
 * `lims-setup-step.py` - Called when entering the demultiplexing step, to set the source / destination folders and get the sample sheet from the cluster generation step.
-* `auto.py` - Automatic "button clicker" to continue calling next script when tasks complete. Runs in cron job.
+* `auto-next-script.py` - Automatic "button clicker" to continue calling next script when tasks complete. Runs in cron job.
 
 ### Batch scripts
 * `lims-qc.sh` - QC scripts combined into one, for use on the QC button in LIMS, to reduce the number of buttons. Called with the process-ID.
