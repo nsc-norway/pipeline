@@ -2,26 +2,30 @@
 
 # Deployment script for pipeline repository for CEES site.
 # Deploys the pipeline and genologics repositories from the local filesystem to
-# cees-lims.
+# cees-lims and biolinux2.
 
 # Usage: first tag the version to send (see tag.sh) then use this script.
 
-# Arguments: tag to send
+# . deploy-cees.sh TAG
 
-( pushd ../../genologics > /dev/null &&
-   git archive $1 &&
-   popd > /dev/null &&
-   pushd .. > /dev/null &&
-   git archive $1 && 
-   popd > /dev/null ) |
-   	ssh biolinux2.uio.no "/bin/bash -c '(pushd /opt/nsc > /dev/null &&
-	mv genologics genologics.2 &&
-	mv pipeline pipeline.2 &&
-	mkdir genologics pipeline &&
-	cd genologics &&
-	tar x &&
-	cd ../pipeline &&
-	tar x && 
-	cd .. &&
-	rm -rf genologics.2 pipeline.2 )'"
+# Arguments: TAG = tag to send
 
+for server in cees-lims.sequencing.uio.no biolinux2.uio.no
+do
+	( pushd ../../genologics > /dev/null &&
+	   git archive $1 &&
+	   popd > /dev/null &&
+	   pushd .. > /dev/null &&
+	   git archive $1 && 
+	   popd > /dev/null ) |
+		ssh $server "/bin/bash -c '(pushd /opt/nsc > /dev/null &&
+		mv genologics genologics.2 &&
+		mv pipeline pipeline.2 &&
+		mkdir genologics pipeline &&
+		cd genologics &&
+		tar x &&
+		cd ../pipeline &&
+		tar x && 
+		cd .. &&
+		rm -rf genologics.2 pipeline.2 )'"
+done
