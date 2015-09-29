@@ -24,6 +24,23 @@ from genologics.lims import *
 import logging
 from common import nsc, utilities
 
+# Set these options
+CHECKED = {
+        "hiseq": [
+            "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing", "Auto 40. Move fastq files",
+            "Auto 50-80. QC", "Auto 90. Prepare delivery"
+            ],
+        "miseq": [
+            "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 40. Move fastq files",
+            "Auto 50-80. QC", "Auto 90. Prepare delivery"
+            ],
+        "nextseq": [
+            "No lane splitting",
+            "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing", "Auto 40. Move fastq files",
+            "Auto 50-80. QC", "Auto 90. Prepare delivery", "Auto 95. Copy run again (NextSeq)"
+            ]
+        }
+
 
 def get_sample_sheet_data(cluster_proc, fcid):
     """Gets the sample sheet from the clustering- or "...load samples" process"""
@@ -87,8 +104,9 @@ def main(process_id, sample_sheet_file):
         else:
             logging.debug('Unable to determine source and destination paths')
 
-        if utilities.get_instrument(seq_proc) == "nextseq":
-            process.udf[nsc.NO_LANE_SPLITTING_UDF] = True
+        instrument = utilities.get_instrument(seq_proc)
+        for udf in CHECKED.get(instrument, []):
+            process.udf[udf] = True
 
         process.put()
         logging.debug('Saved settings in the process')
