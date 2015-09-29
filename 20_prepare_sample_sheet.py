@@ -108,7 +108,7 @@ def main(task):
 
     # Doctor the sample sheet, only if using HiSeq and it doesn't have [Data] header
     instrument = utilities.get_instrument_by_runid(task.run_id)
-    if instrument == "hiseq" and re.match(r"\[Data\],*$", sample_sheet) == -1:
+    if instrument == "hiseq" and not re.match(r"\[Data\],*$", sample_sheet):
         sample_sheet = convert_from_bcl2fastqv1(sample_sheet)
 
     # Invert the read2 indexes if using nextseq
