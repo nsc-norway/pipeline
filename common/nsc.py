@@ -89,6 +89,7 @@ if SITE == "cees":
     # Data processing/analysis programs
     BCL2FASTQ2="/usr/bin/bcl2fastq"
     FASTQC="/opt/FastQC/fastqc"
+    BASEURI="http://cees-lims.sequencing.uio.no:8080"
 
     REMOTE_MODE = "local"
 
@@ -97,6 +98,7 @@ elif SITE == "ous":
     #BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
     BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.17.1.14/nscinstallbin/bin/bcl2fastq"
     FASTQC="/data/common/tools/nscbin/fastqc"
+    BASEURI="http://ous-lims.ous.nsc.local:8080"
 
     REMOTE_MODE = "srun"
 
@@ -172,7 +174,7 @@ elif TAG == "prod":
     
     if pw_file: # make sure this can load w/o pw file, for non-lims tasks
         lims = Lims(
-                "http://ous-lims.ous.nsc.local:8080",
+                BASEURI,
                 "apiuser",
                 open(pw_file).read().strip()
                 )
