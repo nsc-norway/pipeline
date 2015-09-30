@@ -87,6 +87,9 @@ def parse_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_rea
 
                             elif read_or_cc.tag == "Read":
                                 iread = int(read_or_cc.attrib['number'])
+                                if iread == 192: # Hack for samples without barcode: gets
+                                                 # read == 192 TODO confirm always 192?
+                                    iread = 1
                                 if not rst.has_key(iread):
                                     rst[iread] = defaultdict(int)
 
@@ -226,7 +229,6 @@ def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_rea
             aggregate_lanes, aggregate_reads
             )
 
-
     if aggregate_lanes:
         lanes = ("X",)
     else:
@@ -259,26 +261,23 @@ def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_rea
         con_s_raw, con_s_pf = conversion_stats[coordinates]
 
         stats = {}
-        try:
-            stats['# Reads'] = con_s_raw['ClusterCount']
-            stats['# Reads PF'] = con_s_pf['ClusterCount']
-            stats['Yield PF (Gb)'] = con_s_pf['Yield'] / 1e9
-            if con_s_raw['ClusterCount'] > 0:
-                stats['%PF'] = con_s_pf['ClusterCount'] * 100.0 / con_s_raw['ClusterCount']
-            else:
-                stats['%PF'] = "100.0%"
-            stats['% of Raw Clusters Per Lane'] = con_s_raw['ClusterCount'] * 100.0 / all_raw_reads[lane]
-            stats['% of PF Clusters Per Lane'] = con_s_pf['ClusterCount'] * 100.0 / all_pf_reads[lane]
-            if de_s['BarcodeCount'] != 0.0:
-                stats['% Perfect Index Read'] = de_s['PerfectBarcodeCount'] * 100.0 / de_s['BarcodeCount']
-                stats['% One Mismatch Reads (Index)'] = de_s['OneMismatchBarcodeCount'] * 100.0 / de_s['BarcodeCount']
-            else:
-                stats['% Perfect Index Read'] = 0
-                stats['% One Mismatch Reads (Index)'] = 0
-            stats['% Bases >=Q30'] = con_s_pf['YieldQ30'] * 100.0 / con_s_pf['Yield']
-            stats['Ave Q Score'] = con_s_pf['QualityScoreSum'] * 1.0 / con_s_pf['Yield']
-        except ZeroDivisionError:
-            print "Warning: division by zero"
+        stats['# Reads'] = con_s_raw['ClusterCount']
+        stats['# Reads PF'] = con_s_pf['ClusterCount']
+        stats['Yield PF (Gb)'] = con_s_pf['Yield'] / 1e9
+        if con_s_raw['ClusterCount'] > 0:
+            stats['%PF'] = con_s_pf['ClusterCount'] * 100.0 / con_s_raw['ClusterCount']
+        else:
+            stats['%PF'] = "100.0%"
+        stats['% of Raw Clusters Per Lane'] = con_s_raw['ClusterCount'] * 100.0 / all_raw_reads[lane]
+        stats['% of PF Clusters Per Lane'] = con_s_pf['ClusterCount'] * 100.0 / all_pf_reads[lane]
+        if de_s['BarcodeCount'] != 0.0:
+            stats['% Perfect Index Read'] = de_s['PerfectBarcodeCount'] * 100.0 / de_s['BarcodeCount']
+            stats['% One Mismatch Reads (Index)'] = de_s['OneMismatchBarcodeCount'] * 100.0 / de_s['BarcodeCount']
+        else:
+            stats['% Perfect Index Read'] = 0
+            stats['% One Mismatch Reads (Index)'] = 0
+        stats['% Bases >=Q30'] = con_s_pf['YieldQ30'] * 100.0 / con_s_pf['Yield']
+        stats['Ave Q Score'] = con_s_pf['QualityScoreSum'] * 1.0 / con_s_pf['Yield']
         result[coordinates] = stats
 
     return result
