@@ -57,7 +57,10 @@ def make_reports(work_dir, run_id, projects, lane_stats):
     for project in projects:
         if not project.is_undetermined:
             fname = delivery_dir + "/Email_for_" + project.name + ".xls"
-            write_sample_info_table(fname, run_id, project)
+            try:
+                write_sample_info_table(fname, run_id, project)
+            except KeyError:
+                pass # Skip projects with missing info
 
     fname = delivery_dir + "/Table_for_GA_runs_" + run_id + ".xls"
     write_internal_sample_table(fname, run_id, projects, lane_stats)

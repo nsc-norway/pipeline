@@ -306,7 +306,10 @@ def get_fastq_name(instrument, sample_name, sample_index,
     deliveries."""
     
     if instrument == "hiseq":
-        index_seq = index1
+        if index1:
+            index_seq = index1
+        else:
+            index_seq = "NoIndex"
         if index2:
             index_seq += "-" + index2
         name = "{0}_{1}_L{2}_R{3}_001.fastq.gz".format(
@@ -314,6 +317,7 @@ def get_fastq_name(instrument, sample_name, sample_index,
                 index_seq,
                 str(lane_id).zfill(3),
                 i_read)
+
     
     else:
         return bcl2fastq2_file_name(sample_name, sample_index, lane_id, i_read, merged_lanes)
