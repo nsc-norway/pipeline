@@ -121,6 +121,8 @@ def demultiplex_stats(project, undetermined_project, work_dir, basecalls_dir,
             sample_index_sequence = "Undetermined"
             sample_project = "Undetermined_indices"
             description = ""
+            if f.stats == None:
+                continue # If indexing is not used, there won't be an Undetermined.
         else:
             sample_name = sample.name
             sample_index_sequence = f.index_sequence
