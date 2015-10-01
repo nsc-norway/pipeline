@@ -16,7 +16,7 @@ def move_files(bc_dir, projects):
 
     for project in projects:
         # Default project: used for MiSeq when no project is given
-        if not project.is_undetermined and not project.is_default:
+        if not project.is_undetermined:
             projdir = os.path.join(bc_dir, project.proj_dir)
             if not os.path.exists(projdir):
                 os.mkdir(projdir)
