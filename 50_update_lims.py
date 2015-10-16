@@ -60,6 +60,7 @@ def post_stats(process, projects, demultiplex_stats):
         projects_map[project.name] = samples_map
 
 
+    update_artifacts = []
     for coordinates, stats in demultiplex_stats.items():
         # Note: while it may seem that this works for both aggregate_reads and
         # separate reads, it does not, the code must be changed for separate reads
@@ -74,14 +75,16 @@ def post_stats(process, projects, demultiplex_stats):
                         resultfile.udf[statname] = stats[statname]
                     except KeyError:
                         pass
-                resultfile.put()
+                update_artifacts.append(resultfile)
             
 
         else: # Undetermined: sample_name = None in demultiplex_stats
             lane_analyte = get_lane(process, lane)
             if lane_analyte:
                 lane_analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
-                lane_analyte.put()
+                update_artifacts.append(lane_analyte)
+
+    nsc.lims.put_batch(update_artifacts)
 
 
 def get_resultfile(process, lane, input_limsid, read):
