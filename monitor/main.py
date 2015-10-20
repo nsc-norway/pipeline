@@ -244,7 +244,10 @@ def get_recent_run(fc, instrument_index):
     except StopIteration:
         demultiplexing_url = ""
 
-    runid = sequencing_process.udf['Run ID']
+    try:
+        runid = sequencing_process.udf['Run ID']
+    except KeyError:
+        runid = ""
     projects = get_projects(sequencing_process)
 
     return CompletedRunInfo(
