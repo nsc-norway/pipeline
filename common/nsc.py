@@ -39,7 +39,7 @@ LANE_UNDETERMINED_UDF = "NSC % Undetermined Indices (PF)"
 # On Project
 DELIVERY_METHOD_UDF = "Delivery method"
 PROJECT_TYPE_UDF = "Project type"
-# On Container
+# On Container << to be removed when moving overview page
 RECENTLY_COMPLETED_UDF = "Recently completed"
 PROCESSED_DATE_UDF = "Processing completed date"
 
