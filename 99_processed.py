@@ -8,26 +8,13 @@ from genologics.lims import *
 from common import nsc, taskmgr
 
 TASK_NAME = '99. Mark "processed"'
-TASK_DESCRIPTION = """Do some bookkeeping and move original run folder into processed/ 
-                    directory on primary storage, since we are done with it."""
+TASK_DESCRIPTION = """Move original run folder into processed/ directory
+                    on primary storage, since we are done with it."""
 TASK_ARGS = ['src_dir']
 
 
 def main(task):
     task.running()
-
-    runid = task.run_id
-
-    if task.process:
-        inputs = task.process.all_inputs(unique=True)
-        flowcells = set(i.location[0] for i in inputs)
-        if len(flowcells) == 1:
-            fc = next(iter(flowcells))
-            fc.get()
-            # Tracking UDF for "overview" page
-            fc.udf[nsc.RECENTLY_COMPLETED_UDF] = True
-            fc.udf[nsc.PROCESSED_DATE_UDF] = date.today()
-            fc.put()
 
     if not task.process or all(input.qc_flag == "PASSED" for input in inputs):
         if os.path.exists(
