@@ -4,7 +4,7 @@ import sys
 import re
 import time
 from genologics.lims import *
-from common import utilities, nsc
+from genologics import config
 
 def start_step(lims, analytes, workflow):
     protocol = workflow.protocols[0]
@@ -22,13 +22,14 @@ def start_step(lims, analytes, workflow):
 
 
 def main(process_id, workflow_name):
+    lims = Lims(config.BASEURI, config.USERNAME, config.PASSWORD)
     # Sequencing process
-    process = Process(nsc.lims, id=process_id)
-    workflows = nsc.lims.get_workflows(name=workflow_name)
+    process = Process(lims, id=process_id)
+    workflows = lims.get_workflows(name=workflow_name)
     workflow = workflows[0]
     analytes = process.all_inputs(unique=True)
-    nsc.lims.route_analytes(analytes, workflow)
-    step = start_step(nsc.lims, analytes, workflow)
+    lims.route_analytes(analytes, workflow)
+    step = start_step(lims, analytes, workflow)
 
 main(*sys.argv[1:])
 
