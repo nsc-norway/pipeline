@@ -16,6 +16,8 @@ TASK_ARGS = ['src_dir']
 def main(task):
     task.running()
 
+    inputs = task.process.all_inputs(unique=True)
+
     if not task.process or all(input.qc_flag == "PASSED" for input in inputs):
         if os.path.exists(
                 os.path.join(nsc.PRIMARY_STORAGE, "processed", task.run_id)
