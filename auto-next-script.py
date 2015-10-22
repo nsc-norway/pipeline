@@ -83,8 +83,14 @@ def start_programs():
                     + ". Checking if step should be closed...")
             
             if process.udf.get('Close when finished'):
-                logging.debug("Yes, will finish if no program is running.")
-                next_program = None
+                seq_proc = utilities.get_sequencing_process(process)
+                seq_step = Step(nsc.lims, id=seq_proc.id)
+                if not seq_step or seq_step.current_state.upper() == "COMPLETED":
+                    logging.debug("Yes, will finish if no program is running.")
+                    next_program = None
+                else:
+                    logging.debug("Waiting until the sequening step is closed.")
+                    continue
             else:
                 logging.debug("No, that was not requested.")
                 continue
