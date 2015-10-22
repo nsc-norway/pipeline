@@ -79,8 +79,14 @@ def start_programs():
 
         except StopIteration:
             logging.debug("Couldn't find the next checkbox after " + str(previous_program)
-                    + ", no more automation requested")
-            continue
+                    + ". Checking if step should be closed...")
+            
+            if process.udf.get('Close when finished'):
+                logging.debug("Yes, will finish if no program is running.")
+                next_program = None
+            else:
+                logging.debug("No, that was not requested.")
+                continue
 
 
         # Check if sequencing is complete, if no program has been run
@@ -89,24 +95,37 @@ def start_programs():
             if not is_sequencing_finished(process):
                 logging.debug("Wasn't.")
                 continue
-            logging.debug("Sequencing is finished, checking if we can start some jobs")
+
+        logging.debug("Sequencing is finished, checking if we can start some jobs")
 
         # Check the native Clarity program status
         if step.program_status == None or step.program_status.status == "OK":
 
             # Now ready to start the program (push the button)
-            try:
-                button = next(
-                        program 
-                        for program in step.available_programs
-                        if program.name == next_program
-                        )
+            if next_program:
+                try:
+                    button = next(
+                            program 
+                            for program in step.available_programs
+                            if program.name == next_program
+                            )
 
-                logging.debug("Triggering " + next_program)
-                button.trigger()
+                    logging.debug("Triggering " + next_program)
+                    button.trigger()
 
-            except StopIteration:
-                logging.debug("Couldn't find the button for " + next_program)
+                except StopIteration:
+                    logging.debug("Couldn't find the button for " + next_program)
+            else: # Finish the step instead (if the Close.. checkbox is the next one)
+                logging.debug("Finishing process " + process.id)
+                for na in step.actions.next_actions:
+                    na['action'] = 'complete'
+                step.actions.put()
+                while step.current_state.upper() != "COMPLETED":
+                    step.advance()
+                    step.get(force=True)
+                    while step.program_status != "OK":
+                        time.sleep(1)
+                        step.get(force=True)
 
         else:
             if step.program_status.status in ["RUNNING", "QUEUED"]:
