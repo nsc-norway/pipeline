@@ -9,6 +9,7 @@
 
 import logging
 import re
+import time
 
 # scilife genologics library
 from genologics.lims import *
@@ -120,12 +121,18 @@ def start_programs():
                 for na in step.actions.next_actions:
                     na['action'] = 'complete'
                 step.actions.put()
-                while step.current_state.upper() != "COMPLETED":
+                fail = False
+                while not fail and step.current_state.upper() != "COMPLETED":
+                    logging.debug("Advancing the step...")
                     step.advance()
                     step.get(force=True)
-                    while step.program_status != "OK":
+                    while not fail and step.program_status.status != "OK":
+                        logging.debug("A script is running (state: " + step.program_status.status + ")...")
+                        if step.program_status not in ['QUEUED', 'RUNNING']:
+                            fail = True
                         time.sleep(1)
                         step.get(force=True)
+                logging.debug("Completed " + process.id + ".")
 
         else:
             if step.program_status.status in ["RUNNING", "QUEUED"]:
