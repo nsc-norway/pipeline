@@ -465,19 +465,19 @@ def get_stats(
     sooner or later, and then everything will be uniform.
     """
 
-    if instrument in ['nextseq', 'hiseq']:
+    try:
         stats_xml_file_path = os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats")
         return get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes, aggregate_reads)
-    elif instrument == 'miseq':
-        generate_fastq_path = os.path.join(run_dir, "GenerateFASTQRunStatistics.xml")
-        num_reads, index_reads = utilities.get_num_reads(run_dir)
-        miseq_stats = get_miseq_stats(generate_fastq_path, num_reads, aggregate_reads)
-        return dict((c[0:1] +
-            (miseq_uniproject if c[1] else None,) + # <handling undetermined (sorry)
-            c[1:], v)
-            for c, v in miseq_stats.items())
-    else:
-        raise ValueError("Stats requested for unknown instrument " + str(instrument))
-
+    except IOError:
+        if instrument == 'miseq':
+            generate_fastq_path = os.path.join(run_dir, "GenerateFASTQRunStatistics.xml")
+            num_reads, index_reads = utilities.get_num_reads(run_dir)
+            miseq_stats = get_miseq_stats(generate_fastq_path, num_reads, aggregate_reads)
+            return dict((c[0:1] +
+                (miseq_uniproject if c[1] else None,) + # <handling undetermined (sorry)
+                c[1:], v)
+                for c, v in miseq_stats.items())
+        else:
+            raise
 
 
