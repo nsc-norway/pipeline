@@ -24,7 +24,8 @@ def main(task):
 
     threads = task.threads
 
-    default_no_lane_splitting = utilities.get_instrument_by_runid(run_id) == "nextseq"
+    instrument = utilities.get_instrument_by_runid(run_id)
+    default_no_lane_splitting =  instrument == "nextseq"
 
     # bcl2fastq2 options
     if task.process:
@@ -53,7 +54,7 @@ def main(task):
     output_dir = os.path.join(dest_run_dir, "Data", "Intensities", "BaseCalls")
     if run_dmx(
             task, threads, source_run_dir, output_dir, demultiplex_sample_sheet_path,
-            no_lane_splitting, other_options
+            no_lane_splitting, other_options, run_id
             ):
         task.success_finish()
     else:
@@ -73,7 +74,7 @@ def get_thread_args(n_threads):
 
 
 def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
-        no_lane_splitting, other_options):
+        no_lane_splitting, other_options, comment):
     """Run bcl2fastq2 via srun.
     
     Speciy run_dir as the destination directory and input_dir as the source
@@ -95,7 +96,7 @@ def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
 
     rcode = remote.run_command(
             args, jobname, time="1-0", logfile=log_path,
-            cpus=n_threads, mem="16G"
+            cpus=n_threads, mem="16G", comment=comment
             )
 
     # LIMS only:
