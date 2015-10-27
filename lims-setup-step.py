@@ -25,24 +25,32 @@ import logging
 from common import nsc, utilities
 
 # Set these options
-CHECKED = {
-        "hiseq": [
-            "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
-            "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Prepare delivery",
-            "Close when finished"
-            ],
-        "miseq": [
-            "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
-            "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Prepare delivery",
-            "Close when finished"
-            ],
-        "nextseq": [
-            "No lane splitting",
-            "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
-            "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Prepare delivery",
-            "Auto 95. Copy run again (NextSeq)", "Close when finished"
-            ]
-        }
+if nsc.SITE == "cees":
+    CHECKED = {
+            "hiseq": [
+                "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
+                "Auto 40. Move fastq files", "Auto 50-80. QC", "Close when finished"
+                ]
+            }
+else:
+    CHECKED = {
+            "hiseq": [
+                "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
+                "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Prepare delivery",
+                "Close when finished"
+                ],
+            "miseq": [
+                "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
+                "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Prepare delivery",
+                "Close when finished"
+                ],
+            "nextseq": [
+                "No lane splitting",
+                "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
+                "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Prepare delivery",
+                "Auto 95. Copy run again (NextSeq)", "Close when finished"
+                ]
+            }
 
 
 def get_sample_sheet_data(cluster_proc, fcid):
