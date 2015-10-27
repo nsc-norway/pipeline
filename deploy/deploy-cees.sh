@@ -10,7 +10,7 @@
 
 # Arguments: TAG = tag to send
 
-for server in cees-lims.sequencing.uio.no biolinux2.uio.no
+for server in biolinux2.uio.no
 do
 	( pushd ../../genologics > /dev/null &&
 	   git archive $1 &&
