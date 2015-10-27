@@ -53,7 +53,7 @@ def local_command(args, logfile=None, cwd=None, stdout=None):
         stdoutfile = open(logfile, "w")
         stderrfile = stdoutfile
     elif stdout:
-        stdoutfile = open(logfile, "w")
+        stdoutfile = open(stdout, "w")
         stderrfile = None
     else:
         stdoutfile = None
