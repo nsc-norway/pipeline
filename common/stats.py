@@ -36,6 +36,7 @@ def parse_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_rea
     fc = root.find("Flowcell")
 
     projects = []
+    default_project = None
     for pro in fc.findall("Project"):
         if pro.attrib['name'] == "default":
             default_project = pro
@@ -46,8 +47,14 @@ def parse_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_rea
     # We compute the most specific coordinate first, and then take the 
     # aggregates (sum) later.
     samples = {}
-    for is_undetermined, project in [(True, default_project)] +\
-                                    [(False, project) for project in projects]:
+
+    # Which projects to process
+    if default_project:
+        analyse_projects = [(True, default_project)] + [(False, project) for project in projects]
+    else:
+        analyse_projects = [(False, project) for project in projects]
+
+    for is_undetermined, project in analyse_projects:
         for sample in project.findall("Sample"):
             if is_undetermined:
                 sample_id = None
@@ -87,8 +94,8 @@ def parse_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_rea
 
                             elif read_or_cc.tag == "Read":
                                 iread = int(read_or_cc.attrib['number'])
-                                if iread == 192: # Hack for samples without barcode: gets
-                                                 # read == 192 TODO confirm always 192?
+                                if iread == 192 or iread == 49: # Hack for samples without barcode: gets
+                                                                # read == some large number (2 times now)
                                     iread = 1
                                 if not rst.has_key(iread):
                                     rst[iread] = defaultdict(int)
@@ -152,6 +159,7 @@ def parse_demultiplexing_stats(conversion_stats_path, aggregate_lanes):
     fc = root.find("Flowcell")
 
     projects = []
+    default_project = None
     for pro in fc.findall("Project"):
         if pro.attrib['name'] == "default":
             default_project = pro
@@ -181,23 +189,24 @@ def parse_demultiplexing_stats(conversion_stats_path, aggregate_lanes):
                 samples[key] = stats
 
     # Undetermined
-    sample = next(
-            sam for sam in default_project.findall("Sample")
-            if sam.attrib['name'] == "unknown" or sam.attrib['name'] == "Undetermined"
-            )
-    barcode = next(bar for bar in sample.findall("Barcode") if bar.attrib['name'] == 'all')
-    stats = defaultdict(int)
-    for lane in barcode.findall("Lane"):
-        if aggregate_lanes:
-            key = ("X", None, None)
-        else:
-            key = (int(lane.attrib['number']), None, None)
-            stats = defaultdict(int)
+    if default_project:
+        sample = next(
+                sam for sam in default_project.findall("Sample")
+                if sam.attrib['name'] == "unknown" or sam.attrib['name'] == "Undetermined"
+                )
+        barcode = next(bar for bar in sample.findall("Barcode") if bar.attrib['name'] == 'all')
+        stats = defaultdict(int)
+        for lane in barcode.findall("Lane"):
+            if aggregate_lanes:
+                key = ("X", None, None)
+            else:
+                key = (int(lane.attrib['number']), None, None)
+                stats = defaultdict(int)
 
-        for stat in lane:
-            stats[stat.tag] += int(stat.text)
+            for stat in lane:
+                stats[stat.tag] += int(stat.text)
 
-        samples[key] = stats
+            samples[key] = stats
 
     return samples
 
@@ -236,6 +245,8 @@ def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_rea
 
 
     # Totals: sum all sample clusters in each lane (read 1 only)
+    print conversion_stats
+    print lanes
     all_raw_reads = dict(
             (lane, 
                 sum(val[0]['ClusterCount'] 
