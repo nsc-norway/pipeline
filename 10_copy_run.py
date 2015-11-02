@@ -32,7 +32,8 @@ nextseq_exclude_paths = [
 miseq_exclude_paths = [
         "/Thumbnail_Images",
         "/Data/Intensities/L00*",
-        "/Data/Intensities/BaseCalls/L00*"
+        "/Data/Intensities/BaseCalls/L00*",
+        "/Data/Intensities/BaseCalls/*.fastq.gz",
         ]
 
 
