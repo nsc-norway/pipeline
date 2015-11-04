@@ -245,8 +245,6 @@ def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_rea
 
 
     # Totals: sum all sample clusters in each lane (read 1 only)
-    print conversion_stats
-    print lanes
     all_raw_reads = dict(
             (lane, 
                 sum(val[0]['ClusterCount'] 
