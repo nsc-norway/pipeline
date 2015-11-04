@@ -7,7 +7,10 @@ DEST=$2
 
 DIR=`dirname $0`
 
-if [[ -d "$SOURCE" && ! -d "$DEST" && -d `dirname $DEST` ]]
+# Either write to same directory as reading, then it's OK that DEST exists
+# or write to a different dir, then DEST should not exist, but its parent
+# dir should.
+if [[ -d "$SOURCE" && ("$SOURCE" == "$DEST" || (! -d "$DEST" && -d `dirname $DEST`)) ]]
 then
 
 	python $DIR/10_copy_run.py $SOURCE $DEST
