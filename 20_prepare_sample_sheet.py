@@ -213,6 +213,10 @@ def convert_from_bcl2fastqv1(original_data):
                     indexes[0] = ""
             row[index_column_index] = indexes[0]
             row.insert(index_column_index+1, indexes[1])
+    else:
+        for row in data[1:]:
+            if row[index_column_index] == "NoIndex":
+                row[index_column_index] = ""
 
     return main_headers + "\r\n".join(
             [",".join(cells) for cells in data]
