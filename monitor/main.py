@@ -26,7 +26,8 @@ from collections import defaultdict
 
 app = Flask(__name__)
 
-lims = Lims(config.BASEURI, config.USERNAME, config.PASSWORD)
+from common import nsc
+lims = nsc.lims
 
 INSTRUMENTS = ["HiSeq", "NextSeq", "MiSeq"]
 
