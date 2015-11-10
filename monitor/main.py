@@ -1,12 +1,17 @@
 from flask import Flask, render_template, url_for, request, Response, redirect
 from genologics.lims import *
+from genologics import config
 import re
 import requests
-from common import nsc, utilities
 import datetime
 import threading
 from functools import partial
 from collections import defaultdict
+
+# Dependencies:
+# mod_wsgi yum package
+# python-flask yum packages
+# python-jinja2
 
 # Project / Sample progress
 # ---------------------------------
@@ -20,8 +25,8 @@ from collections import defaultdict
 #              step is closed in the LIMS.
 
 app = Flask(__name__)
-if nsc.TAG == "dev":
-    app.debug=True
+
+lims = Lims(config.BASEURI, config.USERNAME, config.PASSWORD)
 
 INSTRUMENTS = ["HiSeq", "NextSeq", "MiSeq"]
 
@@ -46,10 +51,34 @@ DATA_PROCESSING = [
         ("Demultiplexing and QC NSC 2.0"),
         ]
 
+# Process type for project eval.
 PROJECT_EVALUATION = "Project Evaluation Step"
+
+# General, for tracking completed runs
+RECENTLY_COMPLETED_UDF = "Recently completed"
+PROCESSED_DATE_UDF = "Processing completed date"
+
+# Used by pipeline repo
+JOB_STATUS_UDF = "Job status"
+JOB_STATE_CODE_UDF = "Job state code"
+CURRENT_JOB_UDF = "Current job"
+SEQ_PROCESSES=[
+        ('hiseq', 'Illumina Sequencing (Illumina SBS) 5.0'),
+        ('nextseq', 'NextSeq Run (NextSeq) 1.0'),
+        ('miseq', 'MiSeq Run (MiSeq) 5.0')
+        ]
 
 recent_run_cache = {}
 sequencing_process_type = []
+
+def get_sequencing_process(process):
+    """As seen in pipeline/common/utilities.py."""
+    first_io = process.input_output_maps[0]
+    first_in_artifact = first_io[0]['uri']
+    processes = process.lims.get_processes(inputartifactlimsid=first_in_artifact.id)
+    for proc in processes:
+        if proc.type.name in [p[1] for p in SEQ_PROCESSES]:
+            return proc
 
 
 class Project(object):
@@ -109,7 +138,7 @@ def is_step_completed(step):
 
 def proc_url(process_id):
     global ui_server
-    step = Step(nsc.lims, id=process_id)
+    step = Step(lims, id=process_id)
     state = step.current_state.upper()
     if state == 'COMPLETED':
         page = "work-complete"
@@ -157,7 +186,7 @@ def read_sequencing(process_name, process):
     flowcell = process.all_inputs()[0].location[0]
     flowcell_id = flowcell.name
     if "NextSeq" in process_name:
-        step = Step(nsc.lims, id=process.id)
+        step = Step(lims, id=process.id)
         for lot in step.reagentlots.reagent_lots:
             if lot.reagent_kit.name == "NextSeq 500 FC v1":
                 flowcell_id = lot.name
@@ -193,6 +222,20 @@ def read_sequencing(process_name, process):
             process_name, url, flowcell_id, projects, status, runid, finished
             )
 
+def automation_state(process):
+    enabled = any(value for key, value in process.udf.items() if key.startswith("Auto "))
+    if enabled:
+        state_code = process.udf.get(JOB_STATE_CODE_UDF)
+        waiting = not state_code
+        completed = False
+        if state_code == "COMPLETED":
+            checkboxes = sorted(key for key,value in process.udf.items() if key.startswith("Auto "))
+            last_requested_index = int(re.match(r"Auto ([\d]+)", checkboxes[-1]).group(1))
+            last_run_index = int(re.match(r"([\d]+).", process.udf[CURRENT_JOB_UDF]).group(1))
+            completed = last_run_index >= last_requested_index
+        return enabled, waiting, completed
+    else:
+        return False, False, False
 
 def read_post_sequencing_process(process_name, process, sequencing_process):
     url = proc_url(process.id)
@@ -204,16 +247,23 @@ def read_post_sequencing_process(process_name, process, sequencing_process):
         runid = ""
         expt_name = ""
     projects = get_projects(process)
+    automated, waiting, completed = automation_state(process)
 
-    try:
-        status = process.udf[nsc.JOB_STATUS_UDF]
-    except KeyError:
-        status = "Open"
+    current_job = ""
+    if waiting:
+        status = "Waiting for sequencing"
+    elif completed:
+        status = "All jobs completed"
+    else:
+        try:
+            status = process.udf[JOB_STATUS_UDF]
+        except KeyError:
+            status = "Open"
 
-    try:
-        current_job = process.udf[nsc.CURRENT_JOB_UDF]
-    except KeyError:
-        current_job = ""
+        if automated:
+            status = "[auto] " + status
+
+        current_job = process.udf.get(CURRENT_JOB_UDF, "")
 
 
     return DataAnalysisInfo(
@@ -229,14 +279,14 @@ def get_recent_run(fc, instrument_index):
     
     Caching should be done by the caller."""
 
-    sequencing_process = next(iter(nsc.lims.get_processes(
+    sequencing_process = next(iter(lims.get_processes(
             type=SEQUENCING[instrument_index],
             inputartifactlimsid=fc.placements.values()[0].id
             )))
 
     url = proc_url(sequencing_process.id)
     try:
-        demux_process = next(iter(nsc.lims.get_processes(
+        demux_process = next(iter(lims.get_processes(
                 type=DATA_PROCESSING[instrument_index],
                 inputartifactlimsid=fc.placements.values()[0].id
                 )))
@@ -255,15 +305,15 @@ def get_recent_run(fc, instrument_index):
             demultiplexing_url,
             runid,
             list(projects),
-            fc.udf[nsc.PROCESSED_DATE_UDF]
+            fc.udf[PROCESSED_DATE_UDF]
             )
     
 
 
 def get_recently_completed_runs():
     # Look for any flowcells which have a value for this udf
-    flowcells = nsc.lims.get_containers(
-            udf={nsc.RECENTLY_COMPLETED_UDF: True},
+    flowcells = lims.get_containers(
+            udf={RECENTLY_COMPLETED_UDF: True},
             type=FLOWCELL_INSTRUMENTS.keys()
             )
 
@@ -271,11 +321,11 @@ def get_recently_completed_runs():
     results = [[],[],[]]
     for fc in reversed(flowcells):
         try:
-            date = fc.udf[nsc.PROCESSED_DATE_UDF]
+            date = fc.udf[PROCESSED_DATE_UDF]
         except KeyError:
             fc.get(force=True)
             try:
-                date = fc.udf[nsc.PROCESSED_DATE_UDF]
+                date = fc.udf[PROCESSED_DATE_UDF]
             except KeyError:
                 date = cutoff_date
 
@@ -285,7 +335,7 @@ def get_recently_completed_runs():
             except KeyError:
                 pass
             fc.get(force=True)
-            fc.udf[nsc.RECENTLY_COMPLETED_UDF] = False
+            fc.udf[RECENTLY_COMPLETED_UDF] = False
             fc.put()
         else:
             run_info = recent_run_cache.get(fc.id)
@@ -321,24 +371,25 @@ def get_main():
 
     ui_servers = {
             "http://dev-lims.ous.nsc.local:8080/": "https://dev-lims.ous.nsc.local/",
-            "http://ous-lims.ous.nsc.local:8080/": "https://ous-lims.ous.nsc.local/"
+            "http://ous-lims.ous.nsc.local:8080/": "https://ous-lims.ous.nsc.local/",
+            "http://cees-lims.sequencing.uio.no:8080/": "https://cees-lims.sequencing.uio.no/"
             }
-    ui_server = ui_servers.get(nsc.lims.baseuri, nsc.lims.baseuri)
+    ui_server = ui_servers.get(lims.baseuri, lims.baseuri)
 
     all_process_types = SEQUENCING + DATA_PROCESSING
 
     # Get a list of all processes 
     # Of course it can't be this efficient :( Multiple process types not supported
-    #monitored_process_list = nsc.lims.get_processes(udf={'Monitor': True}, type=all_process_types)
+    #monitored_process_list = lims.get_processes(udf={'Monitor': True}, type=all_process_types)
     monitored_process_list = []
     for ptype in set(all_process_types):
-        monitored_process_list += nsc.lims.get_processes(udf={'Monitor': True}, type=ptype)
+        monitored_process_list += lims.get_processes(udf={'Monitor': True}, type=ptype)
 
     # Refresh data for all processes (need this for almost all monitored procs, so
     # doing a batch request)
     processes_with_data = get_batch(monitored_process_list)
     # Need Steps to see if COMPLETED, this loads them into cache
-    steps = [Step(nsc.lims, id=p.id) for p in processes_with_data]
+    steps = [Step(lims, id=p.id) for p in processes_with_data]
     get_batch(steps)
 
     seq_processes = defaultdict(list)
@@ -377,8 +428,8 @@ def get_main():
     for index, step_name in enumerate(DATA_PROCESSING):
         machine_items = [] # all processes for a type of sequencing machine
         for process in post_processes[step_name]:
-            sequencing_process = utilities.get_sequencing_process(process)
-            if sequencing_process.type.name == SEQUENCING[index]:
+            sequencing_process = get_sequencing_process(process)
+            if sequencing_process and sequencing_process.type.name == SEQUENCING[index]:
                 machine_items.append(read_post_sequencing_process(
                     step_name, process, sequencing_process
                     ))
@@ -389,7 +440,7 @@ def get_main():
 
     body = render_template(
             'processes.xhtml',
-            server=nsc.lims.baseuri,
+            server=lims.baseuri,
             sequencing=sequencing,
             post_sequencing=post_sequencing,
             recently_completed=recently_completed,
@@ -401,7 +452,7 @@ def get_main():
 @app.route('/go-eval')
 def go_eval():
     project_name = request.args.get('project_name')
-    processes = nsc.lims.get_processes(projectname=project_name, type=PROJECT_EVALUATION)
+    processes = lims.get_processes(projectname=project_name, type=PROJECT_EVALUATION)
     if len(processes) > 0:
         process = processes[-1]
         return redirect(proc_url(process.id))
@@ -410,5 +461,6 @@ def go_eval():
 
 
 if __name__ == '__main__':
+    app.debug=True
     app.run(host="0.0.0.0", port=5001)
 
