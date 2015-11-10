@@ -1,6 +1,5 @@
 from flask import Flask, render_template, url_for, request, Response, redirect
 from genologics.lims import *
-from genologics import config
 import re
 import requests
 import datetime
