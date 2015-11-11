@@ -113,13 +113,13 @@ elif SITE == "ous":
     #Defaults:glsai          !requiretty
     #Defaults:glsai          umask=007,umask_override
     #Defaults:glsai          !logfile
-    SRUN_GLSAI_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/srun", 
-                "--account=nsc", "--qos=high", "--partition=main", "--nodes=1"]
+    SRUN_GLSAI_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/srun", "--account=nsc",
+                "--qos=high", "--partition=main", "--nodes=1", "--mem_bind=local"]
     
     # When running on the command line we will be using a central user account,
     # so there's no need to sudo
-    SRUN_OTHER_ARGLIST=["/usr/bin/srun", "--account=nsc", "--qos=high",
-                                        "--partition=main", "--nodes=1"]
+    SRUN_OTHER_ARGLIST=["/usr/bin/srun", "--account=nsc", "--qos=high", "--partition=main",
+                "--nodes=1", "--mem_bind=local"]
     
     # Args for jobs which mainly do I/O on the secondary storage, not processing
     SRUN_STORAGE_JOB_ARGS=["--nodelist=loki"]
