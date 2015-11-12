@@ -1,10 +1,8 @@
 # Generate reports after FastQC has completed
 
-# - PDF for each fastq file
-# - HTML summary page
-
 # This task requires an intermediate amount of CPU resources. Will be 
-# executed on the node directly, without slurm.
+# executed on the LIMS server, where we can make sure to have the necessary
+# software installed.
 
 import sys
 import os
@@ -99,7 +97,7 @@ def make_reports(work_dir, run_id, projects, bcl2fastq_version=None):
     # Run one task for each fastq file, giving a sample reference and FastqFile as argument 
     # as well as the ones given above. Debug note: change pool.map to map for better errors.
     map(
-            generate_report_for_user,
+            generate_report_for_customer,
             [tuple(arg_pack + [p,s,f]) 
                 for p in projects for s in p.samples for f in s.files
                 if not f.empty
@@ -130,7 +128,7 @@ def tex_escape(s):
     return re.sub(r"[^\d:a-zA-Z()+-. ]", lambda x: '\\' + x.group(0), s)
 
 
-def generate_report_for_user(args):
+def generate_report_for_customer(args):
     """Generate PDF report for a fastq file.
 
     The last argument, sample_fastq, is a tuple containing a 
@@ -147,10 +145,6 @@ def generate_report_for_user(args):
 
     replacements = {
         '__RunName__': tex_escape(run_id),
-        '__RunMode__': 'RUN MODE',
-        '__ChemistryVersion__': 'CHEMISTRY VERSION',
-        '__ControlSoftwareName__': 'CONTROL SOFTWARE NAME', 
-        '__ControlSoftwareVersion__': 'Control software VERSION',
         '__Programs__': tex_escape(" & ".join(v[0] for v in software_versions)),
         '__VersionString__': tex_escape(" & ".join(v[1] for v in software_versions)),
         '__SampleName__': tex_escape(sample_name),
