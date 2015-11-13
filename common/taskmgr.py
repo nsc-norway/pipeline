@@ -11,6 +11,7 @@ import datetime
 import utilities
 import samples
 import nsc
+import run_parameters
 
 from genologics.lims import *
 
@@ -158,11 +159,19 @@ class Task(object):
                         )
                     )
 
+
+    @property
+    def run_parameters(self):
+        path = os.path.join(self.work_dir, "RunParameters.xml")
+        if not os.path.exists(path):
+            path = os.path.join(self.work_dir, "runParameters.xml")
+        return run_parameters.read_run_parameters(path)
+
     @property
     def projects(self):
         """Get the list of project objects, defined in the samples module. """
 
-        num_reads, index_reads = utilities.get_num_reads(self.work_dir)
+        num_reads = sum(not is_index for cycles, is_index in self.run_parameters['reads'])
         sample_sheet = samples.parse_sample_sheet(self.sample_sheet_content)
         sample_sheet_data = sample_sheet['data']
 

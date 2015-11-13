@@ -4,6 +4,7 @@ import re
 import os
 import itertools
 import utilities
+import run_parameters
 from xml.etree import ElementTree
 from collections import defaultdict
 from Counter import Counter
@@ -480,7 +481,8 @@ def get_stats(
     except IOError:
         if instrument == 'miseq':
             generate_fastq_path = os.path.join(run_dir, "GenerateFASTQRunStatistics.xml")
-            num_reads, index_reads = utilities.get_num_reads(run_dir)
+            rp = run_parameters.read_run_parameters(os.path.join(run_dir, "runParameters.xml"))
+            num_reads = sum(not is_index for cycles, is_index in rp['reads'])
             miseq_stats = get_miseq_stats(generate_fastq_path, num_reads, aggregate_reads)
             return dict((c[0:1] +
                 (miseq_uniproject if c[1] else None,) + # <handling undetermined (sorry)

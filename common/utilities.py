@@ -139,29 +139,6 @@ def get_sample_sheet_proj_name(project):
     return project.name
 
 
-def get_num_reads(run_dir):
-    """Get the number of read passes from the RunInfo.xml file.     
-
-    1=single read, 2=paired end.
-    Also returns the number of index reads.
-
-    Returns a tuple: (number of data reads, number of index reads)
-    """
-
-    run_info = ElementTree.parse(os.path.join(run_dir, "RunInfo.xml")).getroot()
-    reads = run_info.find("Run").find("Reads")
-    n_data, n_index = 0, 0
-    for read in reads.findall("Read"):
-        if read.attrib['IsIndexedRead'] == 'Y':
-            n_index += 1
-        else:
-            n_data += 1
-
-    return n_data, n_index
-
-
-
-
 def get_udf(process, udf, default):
     try:
         return process.udf[udf]
@@ -170,7 +147,6 @@ def get_udf(process, udf, default):
             process.udf[udf] = default
             process.put()
         return default
-
 
 
 locale.setlocale(locale.LC_ALL, 'en_US')

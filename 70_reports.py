@@ -56,37 +56,19 @@ def main(task):
         if not bcl2fastq_version:
             task.warn("bcl2fastq version cannot be detected, use the --bcl2fastq-version option to specify!")
 
-    make_reports(work_dir, run_id, projects, bcl2fastq_version)
+    make_reports(work_dir, run_id, projects, task.run_parameters, bcl2fastq_version)
 
     task.success_finish()
 
 
-def get_rta_version(run_dir):
-    try:
-        xmltree = ElementTree.parse(os.path.join(run_dir, 'RunParameters.xml'))
-    except IOError:
-        xmltree = ElementTree.parse(os.path.join(run_dir, 'runParameters.xml'))
-
-    run_parameters = xmltree.getroot()
-    rta_ver_element = run_parameters.find("RTAVersion")
-    if rta_ver_element == None:
-        rta_ver_element = run_parameters.find("Setup").find("RTAVersion")
-
-    return rta_ver_element.text
-
-
-def make_reports(work_dir, run_id, projects, bcl2fastq_version=None):
+def make_reports(work_dir, run_id, projects, run_parameters, bcl2fastq_version=None):
     basecalls_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls")
     quality_control_dir = os.path.join(basecalls_dir, "QualityControl")
 
-    software_versions = [("RTA", get_rta_version(work_dir))]
-    if bcl2fastq_version:
-        software_versions += [("bcl2fastq", bcl2fastq_version)]
-
     # Generate PDF reports in parallel
     # template_dir defined at top of file
-    template = open(template_dir + "/reportTemplate_indLane_v4.tex").read()
-    arg_pack = [basecalls_dir, quality_control_dir, run_id, software_versions, template]
+    template = open(template_dir + "/reportTemplate_indLane_v5.tex").read()
+    arg_pack = [basecalls_dir, quality_control_dir, run_id, run_parameters, bcl2fastq_version, template]
     pool = multiprocessing.Pool()
 
     # PDF directory (all PDF files generated here)
@@ -135,7 +117,7 @@ def generate_report_for_user(args):
 
     The last argument, sample_fastq, is a tuple containing a 
     Sample object and a FastqFile object"""
-    fastq_dir, quality_control_dir, run_id, software_versions, template,\
+    fastq_dir, quality_control_dir, run_id, run_parameters, bcl2fastq_version, template,\
             project, sample, fastq = args
 
     pdf_dir = os.path.join(quality_control_dir, "pdf")
@@ -147,12 +129,12 @@ def generate_report_for_user(args):
 
     replacements = {
         '__RunName__': tex_escape(run_id),
-        '__RunMode__': 'RUN MODE',
-        '__ChemistryVersion__': 'CHEMISTRY VERSION',
-        '__ControlSoftwareName__': 'CONTROL SOFTWARE NAME', 
-        '__ControlSoftwareVersion__': 'Control software VERSION',
-        '__Programs__': tex_escape(" & ".join(v[0] for v in software_versions)),
-        '__VersionString__': tex_escape(" & ".join(v[1] for v in software_versions)),
+        '__RunMode__': tex_escape(run_parameters['runMode']),
+        '__ChemistryVersion__': tex_escape(run_parameters['chemistryVersion']),
+        '__ControlSoftwareName__': tex_escape(run_parameters['controlSoftwareName']), 
+        '__ControlSoftwareVersion__': tex_escape(run_parameters['controlSoftwareVersion']),
+        '__RTAVersion__': tex_escape(run_parameters['rtaVersion']), 
+        '__bcl2fastqVersion__': (bcl2fastq_version and tex_escape(bcl2fastq_version)) or "N/A",
         '__SampleName__': tex_escape(sample_name),
         '__ReadNum__': str(fastq.i_read),
         '__TotalN__': utilities.display_int(fastq.stats['# Reads PF']),
@@ -166,7 +148,8 @@ def generate_report_for_user(args):
         of.write(replace_multiple(replacements, template))
 
     DEVNULL = open(os.devnull, 'wb') # discard output
-    subprocess.check_call([nsc.PDFLATEX, '-shell-escape', fname], stdout=DEVNULL, stdin=DEVNULL, cwd=pdf_dir)
+    # DEV MODE subprocess.check_call([nsc.PDFLATEX, '-shell-escape', fname], stdout=DEVNULL, stdin=DEVNULL, cwd=pdf_dir)
+    subprocess.check_call([nsc.PDFLATEX, '-shell-escape', fname], cwd=pdf_dir)
 
     orig_pdfname = rootname + ".pdf"
     pdfname = samples.qc_pdf_name(run_id, fastq)

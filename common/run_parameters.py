@@ -17,7 +17,7 @@ def read_run_parameters(runParameters_path):
         rp['instrument'] = 'hiseq'
         rp['runMode'] = hiseq_run_mode
         rp['chemistryVersion'] = get_first(root, "Setup/Sbs")
-        rp['controlSoftware'] = get_first(root, "Setup/ApplicationName")
+        rp['controlSoftwareName'] = get_first(root, "Setup/ApplicationName")
         rp['controlSoftwareVersion'] = get_first(root, "Setup/ApplicationVersion")
         rp['rtaVersion'] = get_first(root, "Setup/RTAVersion")
 
@@ -25,15 +25,14 @@ def read_run_parameters(runParameters_path):
         rp['instrument'] = 'nextseq'
         rp['runMode'] = next_mi_chemistry
         rp['chemistryVersion'] = get_first(root, "ReagentKitVersion")
-        rp['controlSoftware'] = get_first(root, "Setup/ApplicationName")
+        rp['controlSoftwareName'] = get_first(root, "Setup/ApplicationName")
         rp['controlSoftwareVersion'] = get_first(root, "Setup/ApplicationVersion")
         rp['rtaVersion'] = get_first(root, "RTAVersion")
     else:
         rp['instrument'] = 'miseq'
         rp['runMode'] = next_mi_chemistry
-        rp['runMode'] = next_mi_chemistry
         rp['chemistryVersion'] = get_first(root, "ReagentKitVersion")
-        rp['controlSoftware'] = "MiSeq Control Software"
+        rp['controlSoftwareName'] = "MiSeq Control Software"
         rp['controlSoftwareVersion'] = get_first(root, "Setup/ApplicationVersion")
         rp['rtaVersion'] = get_first(root, "RTAVersion")
 
@@ -48,8 +47,8 @@ def read_run_parameters(runParameters_path):
                     ]
 
     else:
-        data_read = [int(root.findall("Setup/Read{0}".format(i)).text) for i in [1,2]]
-        index_read = [int(root.findall("Setup/IndexRead{0}".format(i)).text) for i in [1,2]]
+        data_read = [int(root.findall("Setup/Read{0}".format(i))[0].text) for i in [1,2]]
+        index_read = [int(root.findall("Setup/Index{0}Read".format(i))[0].text) for i in [1,2]]
         rp['reads'] = [(data_read[0], False)]
         for ir in index_read:
             if ir > 0:
