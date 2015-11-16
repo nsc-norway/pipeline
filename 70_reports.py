@@ -129,8 +129,7 @@ def generate_report_for_user(args):
 
     replacements = {
         '__RunName__': tex_escape(run_id),
-        '__RunMode__': tex_escape(run_parameters['runMode']),
-        '__ChemistryVersion__': tex_escape(run_parameters['chemistryVersion']),
+        '__SequencingChemistry__': tex_escape(run_parameters['sequencingChemistry']),
         '__ControlSoftwareName__': tex_escape(run_parameters['controlSoftwareName']), 
         '__ControlSoftwareVersion__': tex_escape(run_parameters['controlSoftwareVersion']),
         '__RTAVersion__': tex_escape(run_parameters['rtaVersion']), 
