@@ -80,7 +80,7 @@ def make_reports(work_dir, run_id, projects, run_parameters, bcl2fastq_version=N
 
     # Run one task for each fastq file, giving a sample reference and FastqFile as argument 
     # as well as the ones given above. Debug note: change pool.map to map for better errors.
-    map(
+    pool.map(
             generate_report_for_user,
             [tuple(arg_pack + [p,s,f]) 
                 for p in projects for s in p.samples for f in s.files
