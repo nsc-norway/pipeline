@@ -105,8 +105,9 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
     lanes = set()
     instrument = utilities.get_instrument_by_runid(run_id)
     sample_index = 1
-    only_process_lanes_set = set(only_process_lanes)
+    only_process_lanes_set = set(only_process_lanes or [])
     for entry in sample_sheet_data:
+
 
         # First determine lanes for this entry, and possibly skip the 
         # whole entry
@@ -118,8 +119,6 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
             except KeyError:
                 file_lanes = set(expand_lanes)
         file_lanes &= only_process_lanes_set
-        if not file_lanes:
-            continue
 
         project_name = entry.get('project') or entry.get('sampleproject')
         default_project = False
@@ -133,7 +132,8 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
         if not project:
             project_dir = get_project_dir(run_id, project_name) # fn defined in bottom of this file
             project = Project(project_name, project_dir, [], is_default=default_project)
-            projects[project_name] = project
+            if file_lanes:
+                projects[project_name] = project # Don't add project if in ignored lane
 
         for sample in project.samples:
             if sample.sample_id == entry['sampleid']:
@@ -146,7 +146,8 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
             sample_dir = get_sample_dir(instrument, sample_name)
             sample = Sample(sample_index, entry['sampleid'], sample_name, sample_dir, [])
             sample_index += 1
-            project.samples.append(sample)
+            if file_lanes: # Don't add sample if in ignored lane
+                project.samples.append(sample)
 
 
         for lane_id in file_lanes:

@@ -34,7 +34,7 @@ def main(task):
             aggregate_lanes = task.no_lane_splitting,
             aggregate_reads = False,
             miseq_uniproject=next(p.name for p in projects if not p.is_undetermined),
-            task.suffix
+            suffix=task.suffix
             )
 
     samples.add_stats(projects, run_stats)

@@ -195,7 +195,8 @@ class Task(object):
                 num_reads,
                 self.no_lane_splitting,
                 expand_lanes,
-                experiment_name
+                experiment_name,
+                self.lanes
                 )
 
     @property

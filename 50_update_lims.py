@@ -40,7 +40,7 @@ def main(task):
             aggregate_lanes = task.no_lane_splitting,
             aggregate_reads = True,
             miseq_uniproject=next(p.name for p in projects if not p.is_undetermined),
-            task.suffix
+            suffix=task.suffix
             )
 
     post_stats(task.process, projects, run_stats)

@@ -103,7 +103,7 @@ def demultiplex_stats(project, undetermined_project, work_dir, basecalls_dir,
             aggregate_lanes = aggregate_lanes,
             aggregate_reads = True,
             miseq_uniproject=project,
-            suffix
+            suffix=suffix
             )
 
     samples.add_stats([undetermined_project, project], run_stats)
