@@ -43,7 +43,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     # Diagnostics wants the QC info in a particular format (file names, etc.). Do not
     # change without consultiing with them. 
 
-    source_qc_dir = os.path.join(basecalls_dir, "QualityControl")
+    source_qc_dir = os.path.join(basecalls_dir, "QualityControl" + task.suffix)
 
     dest_dir = os.path.join(
             nsc.DIAGNOSTICS_DELIVERY,

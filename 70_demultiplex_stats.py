@@ -22,7 +22,7 @@ def main(task):
     work_dir = task.work_dir
     basecalls_dir = task.bc_dir
     projects = task.projects
-    qc_dir = os.path.join(basecalls_dir, "QualityControl")
+    qc_dir = os.path.join(basecalls_dir, "QualityControl" + task.suffix)
 
     if task.process:
         bcl2fastq_version = utilities.get_udf(task.process, nsc.BCL2FASTQ_VERSION_UDF, None)
