@@ -55,7 +55,7 @@ def main(task):
         if not bcl2fastq_version:
             task.warn("bcl2fastq version cannot be detected, use the --bcl2fastq-version option to specify!")
 
-    make_reports(work_dir, run_id, projects, bcl2fastq_version)
+    make_reports(work_dir, task.suffix, run_id, projects, bcl2fastq_version)
 
     task.success_finish()
 
@@ -74,9 +74,9 @@ def get_rta_version(run_dir):
     return rta_ver_element.text
 
 
-def make_reports(work_dir, run_id, projects, bcl2fastq_version=None):
+def make_reports(work_dir, suffix, run_id, projects, bcl2fastq_version=None):
     basecalls_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls")
-    quality_control_dir = os.path.join(basecalls_dir, "QualityControl")
+    quality_control_dir = os.path.join(basecalls_dir, "QualityControl" + suffix)
 
     software_versions = [("RTA", get_rta_version(work_dir))]
     if bcl2fastq_version:
@@ -97,7 +97,7 @@ def make_reports(work_dir, run_id, projects, bcl2fastq_version=None):
 
     # Run one task for each fastq file, giving a sample reference and FastqFile as argument 
     # as well as the ones given above. Debug note: change pool.map to map for better errors.
-    map(
+    pool.map(
             generate_report_for_customer,
             [tuple(arg_pack + [p,s,f]) 
                 for p in projects for s in p.samples for f in s.files
