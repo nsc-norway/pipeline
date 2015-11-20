@@ -40,7 +40,8 @@ def main(task):
             work_dir,
             aggregate_lanes = task.no_lane_splitting,
             aggregate_reads = False,
-            miseq_uniproject=next(p.name for p in projects if not p.is_undetermined)
+            miseq_uniproject=next(p.name for p in projects if not p.is_undetermined),
+            task.suffix
             )
     samples.add_stats(projects, run_stats)
     samples.flag_empty_files(projects, work_dir)

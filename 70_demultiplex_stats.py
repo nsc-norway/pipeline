@@ -41,7 +41,7 @@ def main(task):
     for project in real_projects:
         demultiplex_stats_content = demultiplex_stats.demultiplex_stats(
                 project, undetermined_project, work_dir, basecalls_dir, instrument,
-                task.no_lane_splitting, fcid, bcl2fastq_version
+                task.no_lane_splitting, fcid, bcl2fastq_version, task.suffix
                 )
 
         with open(os.path.join(qc_dir, project.name, "Demultiplex_Stats.htm"), 'w') as f:

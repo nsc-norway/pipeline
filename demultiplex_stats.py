@@ -92,7 +92,7 @@ BOTTOM=""" </table></div>
 
 
 def demultiplex_stats(project, undetermined_project, work_dir, basecalls_dir,
-        instrument, aggregate_lanes, fcid, bcl2fastq_version):
+        instrument, aggregate_lanes, fcid, bcl2fastq_version, suffix):
     """Generate Demultiplexing_stats.htm file.
     
     Note: this function MODIFIES the project object tree, adding stats to the file objects,
@@ -102,7 +102,8 @@ def demultiplex_stats(project, undetermined_project, work_dir, basecalls_dir,
             work_dir,
             aggregate_lanes = aggregate_lanes,
             aggregate_reads = True,
-            miseq_uniproject=project
+            miseq_uniproject=project,
+            suffix
             )
 
     samples.add_stats([undetermined_project, project], run_stats)
@@ -190,7 +191,7 @@ def interactive(task):
             )
 
     print demultiplex_stats(project, undetermined_project, task.work_dir, task.bc_dir, instrument, 
-            task.no_lane_splitting, fcid, bcl2fastq_version)
+            task.no_lane_splitting, fcid, bcl2fastq_version, task.suffix)
     task.success_finish()
 
 

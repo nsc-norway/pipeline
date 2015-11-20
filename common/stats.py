@@ -465,7 +465,8 @@ def get_stats(
         run_dir,
         aggregate_lanes=True,
         aggregate_reads=False,
-        miseq_uniproject=None
+        miseq_uniproject=None,
+        suffix=""
         ):
     """Instrument-independent interfact to the stats module.
 
@@ -475,7 +476,7 @@ def get_stats(
     """
 
     try:
-        stats_xml_file_path = os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats")
+        stats_xml_file_path = os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats" + suffix)
         return get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes, aggregate_reads)
     except IOError:
         if instrument == 'miseq':

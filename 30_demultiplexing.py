@@ -85,6 +85,9 @@ def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
     if no_lane_splitting:
         args += ['--no-lane-splitting']
     args += ['--output-dir', output_dir]
+    if task.suffix:
+        args += ['--reports-dir', os.path.join(output_dir, "Reports" + task.suffix)]
+        args += ['--stats-dir', os.path.join(output_dir, "Stats" + task.suffix)]
     args += get_thread_args(n_threads)
     if other_options:
         args += re.split(" +", other_options)
