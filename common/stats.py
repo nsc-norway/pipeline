@@ -94,7 +94,7 @@ def parse_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_rea
 
                             elif read_or_cc.tag == "Read":
                                 iread = int(read_or_cc.attrib['number'])
-                                if iread == 192 or iread == 49: # Hack for samples without barcode: gets
+                                if iread > 3:                   # Hack for samples without barcode: gets
                                                                 # read == some large number (2 times now)
                                     iread = 1
                                 if not rst.has_key(iread):
