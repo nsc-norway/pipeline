@@ -43,7 +43,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     # Diagnostics wants the QC info in a particular format (file names, etc.). Do not
     # change without consultiing with them. 
 
-    source_qc_dir = os.path.join(basecalls_dir, "QualityControl")
+    source_qc_dir = os.path.join(basecalls_dir, "QualityControl" + task.suffix)
 
     dest_dir = os.path.join(
             nsc.DIAGNOSTICS_DELIVERY,
@@ -57,7 +57,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     # When moving to bcl2fastq2 diag. have to decide how they extract the QC metrics.
     # For now we give them the full Reports and Stats for the whole run. Later we
     # should only give the relevant lanes.
-    for subdir in ["Stats", "Reports"]:
+    for subdir in ["Stats" + task.suffix, "Reports" + task.suffix]:
         source = os.path.join(basecalls_dir, subdir)
         subprocess.check_call([nsc.RSYNC, "-rlt", source, dest_dir])
 
@@ -93,7 +93,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     undetermined_project = next(p for p in task.projects if p.is_undetermined)
     demultiplex_stats_content = demultiplex_stats.demultiplex_stats(
             project, undetermined_project, task.work_dir, basecalls_dir, instrument,
-            task.no_lane_splitting, fcid, bcl2fastq_version
+            task.no_lane_splitting, fcid, bcl2fastq_version, task.suffix
             )
     with open(os.path.join(dest_dir, "Demultiplex_Stats.htm"), 'w') as f:
         f.write(demultiplex_stats_content)

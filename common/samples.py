@@ -74,7 +74,8 @@ class FastqFile(object):
 
 
 ################ Get object tree, with various info #################
-def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lanes=[1], experiment_name=None):
+def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lanes=[1],
+        experiment_name=None, only_process_lanes=None):
     """Get the "sample object model" tree, one for each project.
     
     The FastqFile objects contain the file names after the post-demultiplexing
@@ -93,13 +94,32 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
     merged_lanes        - combine all lanes into one lane with ID "X"
     expand_lanes        - when merged_lanes=False and sample sheet doesn't contain
                           a lane number, copy all samples on these lanes (list)
+    experiment_name     - Used for project name when project is not available
+    only_process_lanes  - Only process these lanes. List of int. Works with both
+                          sample-sheet lanes (as on HiSeq) and expanded lanes (as
+                          on NextSeq).  However I don't see the need to limit
+                          lanes on NS, so it will not be thoroughly tested.
     """ 
 
     projects = {}
     lanes = set()
     instrument = utilities.get_instrument_by_runid(run_id)
     sample_index = 1
+    only_process_lanes_set = set(only_process_lanes or [])
     for entry in sample_sheet_data:
+
+
+        # First determine lanes for this entry, and possibly skip the 
+        # whole entry
+        if merged_lanes:
+            file_lanes = set("X")
+        else:
+            try:
+                file_lanes =  set( (int(entry['lane']),) )
+            except KeyError:
+                file_lanes = set(expand_lanes)
+        file_lanes &= only_process_lanes_set
+
         project_name = entry.get('project') or entry.get('sampleproject')
         default_project = False
         if not project_name:
@@ -112,7 +132,8 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
         if not project:
             project_dir = get_project_dir(run_id, project_name) # fn defined in bottom of this file
             project = Project(project_name, project_dir, [], is_default=default_project)
-            projects[project_name] = project
+            if file_lanes:
+                projects[project_name] = project # Don't add project if in ignored lane
 
         for sample in project.samples:
             if sample.sample_id == entry['sampleid']:
@@ -125,15 +146,9 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
             sample_dir = get_sample_dir(instrument, sample_name)
             sample = Sample(sample_index, entry['sampleid'], sample_name, sample_dir, [])
             sample_index += 1
-            project.samples.append(sample)
+            if file_lanes: # Don't add sample if in ignored lane
+                project.samples.append(sample)
 
-        if merged_lanes:
-            file_lanes = ["X"]
-        else:
-            try:
-                file_lanes = [int(entry['lane'])]
-            except KeyError:
-                file_lanes = expand_lanes
 
         for lane_id in file_lanes:
             lanes.add(lane_id)

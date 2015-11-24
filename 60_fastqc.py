@@ -36,7 +36,7 @@ def main(task):
             reverse=True
             )
 
-    output_dir = os.path.join(bc_dir, "QualityControl")
+    output_dir = os.path.join(bc_dir, "QualityControl" + task.suffix)
     try:
         os.mkdir(output_dir)
     except OSError:

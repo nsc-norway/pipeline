@@ -33,21 +33,21 @@ def main(task):
             work_dir,
             aggregate_lanes = task.no_lane_splitting,
             aggregate_reads = False,
-            miseq_uniproject=next(p.name for p in projects if not p.is_undetermined)
+            miseq_uniproject=next(p.name for p in projects if not p.is_undetermined),
+            suffix=task.suffix
             )
 
     samples.add_stats(projects, run_stats)
     samples.flag_empty_files(projects, work_dir)
 
+    qc_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls", "QualityControl" + task.suffix)
     make_reports(work_dir, run_id, projects, lane_stats)
 
     task.success_finish()
 
 
 
-def make_reports(work_dir, run_id, projects, lane_stats):
-    basecalls_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls")
-    qc_dir = os.path.join(basecalls_dir, "QualityControl")
+def make_reports(qc_dir, run_id, projects, lane_stats):
     if not os.path.exists(qc_dir):
         os.mkdir(qc_dir)
     delivery_dir = os.path.join(qc_dir, "Delivery")

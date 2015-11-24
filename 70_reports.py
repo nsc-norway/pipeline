@@ -42,7 +42,8 @@ def main(task):
             work_dir,
             aggregate_lanes = task.no_lane_splitting,
             aggregate_reads = False,
-            miseq_uniproject=next(p.name for p in projects if not p.is_undetermined)
+            miseq_uniproject=next(p.name for p in projects if not p.is_undetermined),
+            suffix=task.suffix
             )
     samples.add_stats(projects, run_stats)
     samples.flag_empty_files(projects, work_dir)
@@ -56,14 +57,14 @@ def main(task):
         if not bcl2fastq_version:
             task.warn("bcl2fastq version cannot be detected, use the --bcl2fastq-version option to specify!")
 
-    make_reports(work_dir, run_id, projects, task.run_parameters, bcl2fastq_version)
+    make_reports(work_dir, task.suffix, run_id, projects, task.run_parameters, bcl2fastq_version)
 
     task.success_finish()
 
 
-def make_reports(work_dir, run_id, projects, run_parameters, bcl2fastq_version=None):
+def make_reports(work_dir, suffix, run_id, projects, run_parameters, bcl2fastq_version=None):
     basecalls_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls")
-    quality_control_dir = os.path.join(basecalls_dir, "QualityControl")
+    quality_control_dir = os.path.join(basecalls_dir, "QualityControl" + suffix)
 
     # Generate PDF reports in parallel
     # template_dir defined at top of file

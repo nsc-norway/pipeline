@@ -22,7 +22,7 @@ def main(task):
     work_dir = task.work_dir
     basecalls_dir = task.bc_dir
     projects = task.projects
-    qc_dir = os.path.join(basecalls_dir, "QualityControl")
+    qc_dir = os.path.join(basecalls_dir, "QualityControl" + task.suffix)
 
     if task.process:
         bcl2fastq_version = utilities.get_udf(task.process, nsc.BCL2FASTQ_VERSION_UDF, None)
@@ -41,7 +41,7 @@ def main(task):
     for project in real_projects:
         demultiplex_stats_content = demultiplex_stats.demultiplex_stats(
                 project, undetermined_project, work_dir, basecalls_dir, instrument,
-                task.no_lane_splitting, fcid, bcl2fastq_version
+                task.no_lane_splitting, fcid, bcl2fastq_version, task.suffix
                 )
 
         with open(os.path.join(qc_dir, project.name, "Demultiplex_Stats.htm"), 'w') as f:

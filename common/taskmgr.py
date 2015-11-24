@@ -32,7 +32,8 @@ ARG_OPTIONS = {
         "work_dir": ["work_dir", nsc.WORK_RUN_DIR_UDF, str, None, "Destination/working directory (run folder)"],
         "run_id": ["--run-id", nsc.RUN_ID_UDF, str, None, "Override run ID (mostly useless)"],
         "threads": ["--threads", nsc.THREADS_UDF, int, 16, "Number of threads/cores to use"],
-        "sample_sheet": ["--sample-sheet", None, str, "<DIR>/DemultiplexingSampleSheet.csv", "Sample sheet"],
+        "sample_sheet": ["--sample-sheet", None, str, "<DIR>/DemultiplexingSampleSheet[_LXYZ].csv", "Sample sheet"],
+        "lanes": ["--lanes", nsc.LANES_UDF, str, None, "Lanes to process (default: all)"],
         }
 DEFAULT_VAL_INDEX = 3
 
@@ -122,11 +123,18 @@ class Task(object):
         """Get the path to the sample sheet, for non-lims operation only"""
 
         path = self.args.sample_sheet
-        if path == "<DIR>/DemultiplexingSampleSheet.csv":
-            # This is the default
-            path = os.path.join(self.work_dir, "DemultiplexingSampleSheet.csv")
-            if not os.path.exists(path):
-                path = os.path.join(self.work_dir, "SampleSheet.csv")
+        if path == "<DIR>/DemultiplexingSampleSheet[_LXYZ].csv": # This is the default
+            options = [
+                        "DemultiplexingSampleSheet" + self.suffix + ".csv",
+                        "DemultiplexingSampleSheet.csv",
+                        "SampleSheet.csv"
+                        ]
+
+            for filename in options:
+                path = os.path.join(self.work_dir, path)
+                if os.path.exists(path):
+                    break
+
         return path
 
     
@@ -196,7 +204,8 @@ class Task(object):
                 num_reads,
                 self.no_lane_splitting,
                 expand_lanes,
-                experiment_name
+                experiment_name,
+                self.lanes
                 )
 
     @property
@@ -209,8 +218,30 @@ class Task(object):
             return utilities.get_udf(self.process, nsc.NO_LANE_SPLITTING_UDF, False)
         else:
             return samples.check_files_merged_lanes(self.work_dir)
+    
+    @property
+    def lanes(self):
+        """List of lanes to process, specified in LIMS or on the command line.
+        
+        Returns None if all lanes should be processed."""
+        lanes = self.get_arg("lanes")
+        if lanes:
+            return [int(l) for l in lanes] # Convert str to list of int
+        else:
+            return None # None = all
 
+    @property
+    def suffix(self):
+        """Returns a suffix to append to certain files / diretories to allow running
+        multiple demultiplexing jobs with different options. Used for Stats/, Reports/,
+        SampleSheet, ... 
+        
+        For files, it will typically be spliced in before the extension."""
 
+        if self.lanes:
+            return "_L" + "".join([str(c) for c in self.lanes])
+        else:
+            return ""
 
     # Arguments:
     def add_argument(self, *args, **kwargs):

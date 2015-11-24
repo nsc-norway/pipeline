@@ -73,14 +73,21 @@ def main(process_id, sample_sheet_file):
     process = Process(nsc.lims, id=process_id)
 
     fcids = set()
+    wells = set()
     for i in process.all_inputs():
         fcids.add(i.location[0].name)
+        wells.add(i.location[1])
 
     if len(fcids) != 1:
         logging.error("Multiple flowcells in inputs, this is going to end in tears")
         return 1
 
     fcid = next(iter(fcids))
+
+    if len(wells) != i.location[0].occupied_wells:
+        # Use a subset of the lanes
+        lanes = "".join(str(l.split(":")[0]) for l in sorted(wells))
+        process.udf[nsc.LANES_UDF] = lanes
 
     seq_proc = utilities.get_sequencing_process(process)
     parent_processes = process.parent_processes()
@@ -119,12 +126,11 @@ def main(process_id, sample_sheet_file):
         for udf in CHECKED.get(instrument, []):
             process.udf[udf] = True
 
-        process.put()
         logging.debug('Saved settings in the process')
 
     else:
         logging.warning("Couldn't find the sequencing process")
-        return 0
+    process.put()
 
     logging.info("Program completed")
 

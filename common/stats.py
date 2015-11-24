@@ -95,7 +95,7 @@ def parse_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_rea
 
                             elif read_or_cc.tag == "Read":
                                 iread = int(read_or_cc.attrib['number'])
-                                if iread == 192 or iread == 49: # Hack for samples without barcode: gets
+                                if iread > 3:                   # Hack for samples without barcode: gets
                                                                 # read == some large number (2 times now)
                                     iread = 1
                                 if not rst.has_key(iread):
@@ -466,7 +466,8 @@ def get_stats(
         run_dir,
         aggregate_lanes=True,
         aggregate_reads=False,
-        miseq_uniproject=None
+        miseq_uniproject=None,
+        suffix=""
         ):
     """Instrument-independent interfact to the stats module.
 
@@ -476,7 +477,7 @@ def get_stats(
     """
 
     try:
-        stats_xml_file_path = os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats")
+        stats_xml_file_path = os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats" + suffix)
         return get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes, aggregate_reads)
     except IOError:
         if instrument == 'miseq':
