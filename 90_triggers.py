@@ -12,13 +12,13 @@
 
 # project.<PROJECT_NAME>.*
 # Will launch once for each instance of PROJECT_NAME in the completed run.
-# Replace <PROJECT_NAME> with a match string for the project name. The 
-# remainder of the name, represented by *, is ignored, and should usually 
-# contain a hint to what the trigger is for.  PROJECT_NAME is matched
-# partially from the beginning of the project name. E.g. a trigger named
-# project.Olsen-.encryption.sh will be run for Olsen-excap3-2015-04-15, 
-# but a trigger named project.Olsen-RNA.alignment.sh will not.
-#  Example: project.Diag-excap.copy.sh
+# Replace <PROJECT_NAME> with a match string for the project name.  PROJECT_NAME
+# is matched partially from the beginning of the project name. 
+# The remainder of the scripts's name, represented by *, is ignored, and should
+# usually contain a hint to what the trigger is for.
+# Example: a trigger named "project.Olsen-.encryption.sh"
+# will be run for the project Olsen-excap3-2015-04-15, but a trigger named
+# project.Olsen-RNA.alignment.sh will not.
 
 # project..* 
 # Run once for every single project, potentially many times per run. 
@@ -27,8 +27,9 @@
 
 # The triggers are called with the following parameters:
 
-# project.PPP.zzzz PROJECT_PATH PROJECT_NAME RUN_ID
+# project.PPPP.zzzz PROJECT_PATH SAMPLE_SHEET_PATH PROJECT_NAME RUN_ID [PROCESS_ID]
 
+# PPPP: Match string.
 # PROJECT_PATH: path to the directory containing fastq files.
 # SAMPLE_SHEET_PATH: path to the sample sheet used for demultiplexing,
 #   i.e. the pre-processed "DemultiplexingSampleSheet.csv" created by
@@ -59,11 +60,13 @@
 
 # PARAMETERS:
 
-# run.RRRR.zzzz RUN_PATH SAMPLE_SHEET_PATH RUN_ID PROCESS_ID
+# run.RRRR.zzzz RUN_PATH SAMPLE_SHEET_PATH RUN_ID [PROCESS_ID]
 
+# RRRR: Match string.
 # RUN_PATH: The path to the run directory. If demultiplexing into a 
-#   different directory, this is the directory containing the fastq files.
-# Other parameters have the same significance as for projects.
+#   different directory than that which is written by the sequencer,
+#   this is the directory containing the fastq files.
+# Other parameters have the same meaning as for projects.
 
 ###############
 # MORE INFO   #
