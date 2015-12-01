@@ -75,7 +75,7 @@ class FastqFile(object):
 
 ################ Get object tree, with various info #################
 def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lanes=[1],
-        experiment_name=None, only_process_lanes=None):
+        experiment_name=None, only_process_lanes=[]):
     """Get the "sample object model" tree, one for each project.
     
     The FastqFile objects contain the file names after the post-demultiplexing
@@ -99,13 +99,14 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
                           sample-sheet lanes (as on HiSeq) and expanded lanes (as
                           on NextSeq).  However I don't see the need to limit
                           lanes on NS, so it will not be thoroughly tested.
+                          Empty list means process all lanes.
     """ 
 
     projects = {}
     lanes = set()
     instrument = utilities.get_instrument_by_runid(run_id)
     sample_index = 1
-    only_process_lanes_set = set(only_process_lanes or [])
+    only_process_lanes_set = set(only_process_lanes)
     for entry in sample_sheet_data:
 
 
@@ -118,7 +119,9 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
                 file_lanes =  set( (int(entry['lane']),) )
             except KeyError:
                 file_lanes = set(expand_lanes)
-        file_lanes &= only_process_lanes_set
+
+        if only_process_lanes_set:
+            file_lanes &= only_process_lanes_set
 
         project_name = entry.get('project') or entry.get('sampleproject')
         default_project = False
