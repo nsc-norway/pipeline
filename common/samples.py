@@ -75,7 +75,7 @@ class FastqFile(object):
 
 ################ Get object tree, with various info #################
 def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lanes=[1],
-        experiment_name=None, only_process_lanes=[]):
+        experiment_name=None, only_process_lanes=None):
     """Get the "sample object model" tree, one for each project.
     
     The FastqFile objects contain the file names after the post-demultiplexing
@@ -106,7 +106,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
     lanes = set()
     instrument = utilities.get_instrument_by_runid(run_id)
     sample_index = 1
-    only_process_lanes_set = set(only_process_lanes)
+    only_process_lanes_set = set(only_process_lanes or [])
     for entry in sample_sheet_data:
 
 
