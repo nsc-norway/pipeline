@@ -41,7 +41,7 @@ def main(task):
     samples.flag_empty_files(projects, work_dir)
 
     qc_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls", "QualityControl" + task.suffix)
-    make_reports(work_dir, run_id, projects, lane_stats)
+    make_reports(qc_dir, run_id, projects, lane_stats)
 
     task.success_finish()
 
