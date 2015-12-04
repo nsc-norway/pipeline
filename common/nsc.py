@@ -133,7 +133,7 @@ if SITE == "cees":
     PRIMARY_STORAGE = "/storage/nscdata/runsIllumina"
     if TAG == "prod":
         SECONDARY_STORAGE="/storage/nscdata/runsIllumina"
-        #DELIVERY_DIR=""     # used by prepare-delivery after QC
+        TRIGGER_DIR="/opt/nsc/trigger"
 
     elif TAG == "dev":
         # TODO: dev environment on UiO net?
@@ -146,12 +146,14 @@ elif SITE == "ous":
         DELIVERY_DIR="/data/nsc.loki/delivery"     # used by prepare-delivery after QC
         DIAGNOSTICS_DELIVERY = "/data/diag/nscDelivery"
         LOG_DIR = "/data/nsc.loki/automation/logs" # logs for copy job (10_... script used at OUS)
+        TRIGGER_DIR="/data/nsc.loki/automation/trigger"
 
     elif TAG == "dev":
         SECONDARY_STORAGE="/data/nsc.loki/test"    # location of demultiplexed files
         DELIVERY_DIR="/data/nsc.loki/test/delivery"# used by prepare-delivery after QC
         DIAGNOSTICS_DELIVERY = "/data/nsc.loki/test/diag"
         LOG_DIR = "/data/nsc.loki/automation/dev/logs"
+        TRIGGER_DIR="/data/nsc.loki/automation/dev/trigger"
 
 
 # Configure LIMS access (should be cleaned up)

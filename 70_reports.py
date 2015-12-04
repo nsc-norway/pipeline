@@ -4,7 +4,7 @@
 # - HTML summary page
 
 # This task requires an intermediate amount of CPU resources. Will be 
-# executed on the node directly, without slurm.
+# executed on server handling the scripts.
 
 import sys
 import os

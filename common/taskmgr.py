@@ -287,7 +287,13 @@ class Task(object):
         """Users should call this function once at the start of the task to 
         indicate that the program has started.
 
-        parse_args() will exit() if the args are incorrect."""
+        parse_args() will exit() if the args are incorrect.
+        
+        The reason that this function exists, and that it's not handled
+        by the constructor or __enter__, is that the script has a chance
+        to set extra command line arguments before running running().
+        This function can then use those arguments to populate the Task
+        internal state."""
 
         # Initialization code common to all tasks:
         os.umask(007)

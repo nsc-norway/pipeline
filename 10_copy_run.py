@@ -5,7 +5,7 @@
 # the actual data in BCL files, as only the fastq files are stored on secondary 
 # storage.
 
-# For the MiSeq, this also copies the demultiplexed data.
+# For the MiSeq, the data demultiplexed on the machine are also excluded.
 
 import os
 import sys
@@ -38,16 +38,16 @@ miseq_exclude_paths = [
 
 
 def rsync_arglist(source_path, destination_path, exclude):
-    """Runs the rsync command. Note that trailing slashes
-    on paths are significant."""
+    """Return a list of arguments to run the rsync command. 
+        Note that trailing slashes on paths are significant."""
 
     # Note "-L" (copy links as file) -- gives us some flexibility to 
     # symlink source run, and it will still make a real copy.
     # We don't expect any symlinks in the run directories, as it's written
-    # by a Windows machine.
+    # by Windows machines.
 
-    # No "copy source permissions" setting. Using default umask for
-    # seq-user which is set via sudoers. Then use chmod to make sure that
+    # No "copy source permissions" setting. Using default umask.
+    # Then use chmod argument to rsync to make sure that
     # all non-masked permissions are available. (this is the only way to 
     # make it work)
     args = [nsc.RSYNC, '-rLt', '--chmod=ug+rwX']
@@ -65,8 +65,7 @@ def rsync_arglist(source_path, destination_path, exclude):
 
 
 def main(task):
-    """To be run from LIMS on the NSC data processing step"""
-
+    
     task.running()
     runid = task.run_id
 
@@ -75,8 +74,8 @@ def main(task):
     destination = task.work_dir    
     # Check destination
     print runid
-    instr_from_dest = utilities.get_instrument_by_runid(runid)
-    if not instr_from_dest:
+    instrument = utilities.get_instrument_by_runid(runid)
+    if not instrument:
         task.fail("Destination does not look like an Illumina run folder", 
                 """Remember to include the name of the destination directory in the 
 work_dir argument.""")
@@ -85,7 +84,6 @@ work_dir argument.""")
     # Specify source with trailing slash to copy content
     source = source.rstrip('/') + "/"
 
-    instrument = utilities.get_instrument_by_runid(runid)
     if instrument == "hiseq":
         exclude = hiseq_exclude_paths
     elif instrument == "nextseq":
@@ -95,8 +93,8 @@ work_dir argument.""")
 
     args = rsync_arglist(source, destination, exclude)
     
-    if task.process:
-        # Can't use a per-run log dir, as it's not created yet, it's 
+    if task.process: # In LIMS mode
+        # Can't use a per-run log dir, as it's not created yet, it's
         # created by the rsync command. Requires LOG_DIR, not defined for
         # CEES site at the moment
         logfile = os.path.join(nsc.LOG_DIR, task.process.id + "-rsync.txt")
