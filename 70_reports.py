@@ -1,8 +1,7 @@
 # Generate reports after FastQC has completed
 
 # This task requires an intermediate amount of CPU resources. Will be 
-# executed on the LIMS server, where we can make sure to have the necessary
-# software installed.
+# executed on server handling the scripts.
 
 import sys
 import os
