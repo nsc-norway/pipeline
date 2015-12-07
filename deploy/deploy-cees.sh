@@ -19,8 +19,8 @@ do
 	   git archive $1 && 
 	   popd > /dev/null ) |
 		ssh $server "/bin/bash -c '(pushd /opt/nsc > /dev/null &&
-		mv genologics genologics.2 &&
-		mv pipeline pipeline.2 &&
+		(mv genologics genologics.2 || true) &&
+		(mv pipeline pipeline.2 || true) &&
 		mkdir genologics pipeline &&
 		cd genologics &&
 		tar x &&
