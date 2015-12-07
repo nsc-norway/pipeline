@@ -12,7 +12,7 @@ TASK_ARGS = ['work_dir']
 
 
 udf_list = [
-        '# Reads', 'Yield PF (Gb)', '% of Raw Clusters Per Lane',
+        '# Reads', '# Reads PF', 'Yield PF (Gb)', '% of Raw Clusters Per Lane',
         '% of PF Clusters Per Lane',
         '% Perfect Index Read', 'One Mismatch Reads (Index)',
         '% Bases >=Q30', 'Ave Q Score', '%PF'
