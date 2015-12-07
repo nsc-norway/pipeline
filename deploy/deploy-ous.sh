@@ -18,7 +18,7 @@ do
 	for repo in $REPOS
 	do
 		deploy_dir=$installation/$repo
-		mv $deploy_dir $deploy_dir.2
+		mv $deploy_dir $deploy_dir.2 || true
 		mkdir $deploy_dir
 		source_dir=/data/nsc.loki/automation/dev/$repo
 		pushd $source_dir > /dev/null
