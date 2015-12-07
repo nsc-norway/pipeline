@@ -285,7 +285,10 @@ def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_rea
         else:
             stats['% Perfect Index Read'] = 0
             stats['% One Mismatch Reads (Index)'] = 0
-        stats['% Bases >=Q30'] = con_s_pf['YieldQ30'] * 100.0 / con_s_pf['Yield']
+        if con_s_pf['Yield'] > 0:
+            stats['% Bases >=Q30'] = con_s_pf['YieldQ30'] * 100.0 / con_s_pf['Yield']
+        else:
+            stats['% Bases >=Q30'] = 0
         stats['Ave Q Score'] = con_s_pf['QualityScoreSum'] * 1.0 / con_s_pf['Yield']
         result[coordinates] = stats
 
