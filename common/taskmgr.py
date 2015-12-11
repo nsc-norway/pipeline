@@ -130,7 +130,7 @@ class Task(object):
                         ]
 
             for filename in options:
-                path = os.path.join(self.work_dir, path)
+                path = os.path.join(self.work_dir, filename)
                 if os.path.exists(path):
                     break
 
