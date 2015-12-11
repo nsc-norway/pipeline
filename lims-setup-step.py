@@ -47,8 +47,9 @@ else:
             "nextseq": [
                 "No lane splitting",
                 "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
-                "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Prepare delivery",
-                "Auto 95. Copy run again (NextSeq)", "Close when finished"
+                "Auto 40. Move fastq files", "Auto 50-80. QC",
+                "Auto 85. Copy run again (NextSeq)", "Auto 90. Prepare delivery",
+                "Close when finished"
                 ]
             }
 
