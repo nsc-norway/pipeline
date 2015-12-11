@@ -10,6 +10,8 @@ then
     DEST=$SOURCE
 fi
 
+DIR=`dirname $0`
+
 python $DIR/10_copy_run.py $SOURCE $DEST
 python $DIR/20_prepare_sample_sheet.py $DEST
 python $DIR/30_demultiplexing.py $SOURCE $DEST
