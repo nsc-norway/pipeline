@@ -218,7 +218,7 @@ class Task(object):
         try:
             lanes = self.get_arg("lanes")
             return [int(l) for l in lanes] # Convert str to list of int
-        except KeyError:
+        except AttributeError:
             return None # None = all
 
     @property
