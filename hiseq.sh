@@ -5,25 +5,17 @@ set -e
 SOURCE=$1
 DEST=$2
 
-DIR=`dirname $0`
-
-# Either write to same directory as reading, then it's OK that DEST exists
-# or write to a different dir, then DEST should not exist, but its parent
-# dir should.
-if [[ -d "$SOURCE" && ("$SOURCE" == "$DEST" || (! -d "$DEST" && -d `dirname $DEST`)) ]]
+if [[ -z "$DEST" ]]
 then
-
-	python $DIR/10_copy_run.py $SOURCE $DEST
-	python $DIR/20_prepare_sample_sheet.py $DEST
-	python $DIR/30_demultiplexing.py $SOURCE $DEST
-
-	SCRIPTS="40_move_results.py 50_emails.py 60_fastqc.py 70_reports.py 80_md5sum.py"
-
-	for script in $SCRIPTS
-	do
-		python $(dirname $0)/$script $DEST
-	done
-else
-	echo "use: hiseq.sh SOURCE-RUN DEST-RUN"
+    DEST=$SOURCE
 fi
 
+python $DIR/10_copy_run.py $SOURCE $DEST
+python $DIR/20_prepare_sample_sheet.py $DEST
+python $DIR/30_demultiplexing.py $SOURCE $DEST
+
+SCRIPTS="40_move_results.py 50_emails.py 60_fastqc.py 70_reports.py 80_md5sum.py"
+for script in $SCRIPTS
+do
+	python $(dirname $0)/$script $DEST
+done

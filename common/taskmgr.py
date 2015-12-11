@@ -215,10 +215,10 @@ class Task(object):
         """List of lanes to process, specified in LIMS or on the command line.
         
         Returns None if all lanes should be processed."""
-        lanes = self.get_arg("lanes")
-        if lanes:
+        try:
+            lanes = self.get_arg("lanes")
             return [int(l) for l in lanes] # Convert str to list of int
-        else:
+        except KeyError:
             return None # None = all
 
     @property
