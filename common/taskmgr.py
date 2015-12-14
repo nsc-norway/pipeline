@@ -217,7 +217,10 @@ class Task(object):
         Returns None if all lanes should be processed."""
         try:
             lanes = self.get_arg("lanes")
-            return [int(l) for l in lanes] # Convert str to list of int
+            if lanes:
+                return [int(l) for l in lanes] # Convert str to list of int
+            else:
+                return None
         except AttributeError:
             return None # None = all
 
