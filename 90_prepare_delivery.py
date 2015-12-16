@@ -34,7 +34,8 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     # (If there is trouble, see note in copyfiles.py about SELinux and rsync)
     # Adding a generous time limit in case there is other activity going
     # on, 500 GB / 100MB/s = 1:25:00 . 
-    rcode = remote.run_command(args, "delivery_diag", "04:00:00", storage_job=True)
+    log_path = task.logfile("rsync-" + project)
+    rcode = remote.run_command(args, "delivery_diag", "04:00:00", storage_job=True, logfile=log_path)
     if rcode != 0:
         raise RuntimeError("Copying files to diagnostics failed, rsync returned an error")
 
