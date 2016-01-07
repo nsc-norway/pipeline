@@ -17,7 +17,7 @@ from common import nsc, utilities, taskmgr, remote, samples
 
 TASK_NAME = "90. Prepare delivery"
 TASK_DESCRIPTION = """Prepare for delivery."""
-TASK_ARGS = ['work_dir', 'sample_sheet']
+TASK_ARGS = ['work_dir', 'sample_sheet', 'lanes']
 
 if nsc.TAG == "prod":
     from common import secure

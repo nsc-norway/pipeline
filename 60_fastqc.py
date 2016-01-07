@@ -8,7 +8,7 @@ from common import samples, nsc, taskmgr, samples, remote, utilities
 
 TASK_NAME = "60. FastQC"
 TASK_DESCRIPTION = """Run FastQC on the demultiplexed files."""
-TASK_ARGS = ['work_dir', 'sample_sheet', 'threads']
+TASK_ARGS = ['work_dir', 'sample_sheet', 'threads', 'lanes']
 
 def main(task):
     task.running()

@@ -1,4 +1,5 @@
 import os
+import re
 from math import ceil
 
 from genologics.lims import *
@@ -8,10 +9,15 @@ TASK_NAME = "30. Demultiplexing"
 TASK_DESCRIPTION = """Demultiplexing (calls bcl2fastq2). 
                     For advanced command-line options when running outside the
                     lims, just use bcl2fastq2 directly."""
-TASK_ARGS = ['src_dir', 'work_dir', 'threads', 'sample_sheet']
+TASK_ARGS = ['src_dir', 'work_dir', 'threads', 'sample_sheet', 'lanes']
 
 
 def main(task):
+    task.add_argument(
+                      '--extra-options',
+                      default=None,
+                      help="Extra options to give to bcl2fastq."
+                      )
     task.running()
     run_id = task.run_id
 
@@ -36,7 +42,7 @@ def main(task):
     else:
         # for non-lims mode, we don't provide many options, just the defaults
         no_lane_splitting = default_no_lane_splitting
-        other_options = []
+        other_options = task.args.extra_options
 
     # Sample sheet
     if task.process: # LIMS mode

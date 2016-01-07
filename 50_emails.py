@@ -7,7 +7,7 @@ from common import nsc, stats, utilities, lane_info, samples, taskmgr
 
 TASK_NAME = "50. Emails"
 TASK_DESCRIPTION = """Produce delivery reports for emails."""
-TASK_ARGS = ['work_dir', 'sample_sheet']
+TASK_ARGS = ['work_dir', 'sample_sheet', 'lanes']
 
 
 # Generate reports for emails based on demultiplexing stats

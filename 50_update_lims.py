@@ -8,7 +8,7 @@ from common import nsc, taskmgr, stats, utilities
 TASK_NAME = "50. LIMS stats"
 TASK_DESCRIPTION = """Post demultiplexing stats to LIMS (doesn't make an effort
                     to handle the non-LIMS case, obviously)."""
-TASK_ARGS = ['work_dir']
+TASK_ARGS = ['work_dir', 'lanes']
 
 
 udf_list = [

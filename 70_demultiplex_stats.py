@@ -11,7 +11,7 @@ template_dir = os.path.dirname(os.path.realpath(__file__)) + "/template"
 TASK_NAME = "70. Demultiplex_stats"
 TASK_DESCRIPTION = """Generates Demultiplex_Stats.htm for each project."""
 
-TASK_ARGS = ['work_dir', 'sample_sheet']
+TASK_ARGS = ['work_dir', 'sample_sheet', 'lanes']
 
 
 def main(task):
