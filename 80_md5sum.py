@@ -9,7 +9,7 @@ from common import nsc, taskmgr, samples, remote
 TASK_NAME = "80. Checksums"
 TASK_DESCRIPTION = """Compute md5 checksums for fastq files and pdfs."""
 
-TASK_ARGS = ['work_dir', 'sample_sheet', 'threads']
+TASK_ARGS = ['work_dir', 'sample_sheet', 'threads', 'lanes']
 
 
 def paths_for_project(run_id, project):

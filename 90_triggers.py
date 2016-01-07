@@ -99,7 +99,7 @@ from common import nsc, taskmgr
 
 TASK_NAME = "90. Triggers"
 TASK_DESCRIPTION = """Trigger custom scripts."""
-TASK_ARGS = ['work_dir', 'sample_sheet']
+TASK_ARGS = ['work_dir', 'sample_sheet', 'lanes']
 
 
 def main(task):

@@ -4,7 +4,7 @@ from common import taskmgr, samples
 TASK_NAME = "40. Move fastq files"
 TASK_DESCRIPTION = """Move fastq files from demultiplexing into the standard
                     directory structure used by NSC."""
-TASK_ARGS = ['work_dir', 'sample_sheet']
+TASK_ARGS = ['work_dir', 'sample_sheet', 'lanes']
 
 
 def move_files(bc_dir, projects):

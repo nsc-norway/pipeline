@@ -15,7 +15,7 @@ from common import nsc, utilities, remote, taskmgr
 
 TASK_NAME = "10. Copy run"
 TASK_DESCRIPTION = "Copy run metadata"
-TASK_ARGS = ['src_dir', 'work_dir']
+TASK_ARGS = ['src_dir', 'work_dir', 'lanes']
 
 hiseq_exclude_paths = [
         "/Thumbnail_Images",

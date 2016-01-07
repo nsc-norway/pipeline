@@ -41,7 +41,7 @@ from common import nsc, utilities, taskmgr
 
 TASK_NAME = "20. Prepare SampleSheet"
 TASK_DESCRIPTION = "Prepare sample sheet for bcl2fastq2"
-TASK_ARGS = ['work_dir']
+TASK_ARGS = ['work_dir', 'lanes']
 
 
 def main(task):

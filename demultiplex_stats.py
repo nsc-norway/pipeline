@@ -199,7 +199,7 @@ if __name__ == "__main__":
     with taskmgr.Task(
             "Compat module",
             "Compatibility reports (normally called by other scripts)",
-            ['work_dir', 'sample_sheet']
+            ['work_dir', 'sample_sheet', 'lanes']
             ) as task:
         interactive(task)
 
