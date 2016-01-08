@@ -13,7 +13,7 @@ do
 		LANES=$1
 	elif [[ "$1" == --extra-options=* ]]
 	then
-		EXTRA_OPTIONS="--extra-options=${1#--extra-options=}"
+		EXTRA_OPTIONS=$1
 	elif [[ "$1" == --threads=* ]]
 	then
 		THREADS=$1
