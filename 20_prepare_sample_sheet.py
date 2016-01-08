@@ -85,6 +85,8 @@ def main(task):
         sample_sheet_path = task.args.input_sample_sheet
         if not sample_sheet_path:
             sample_sheet_path = os.path.join(task.work_dir, "SampleSheet.csv")
+            if not os.path.exists(sample_sheet_path):
+                sample_sheet_path = os.path.join(task.bc_dir, "SampleSheet.csv")
         
 
     # If not using LIMS, or if LIMS sources failed, try to get a file
