@@ -2,8 +2,33 @@
 
 set -e
 
+LANES=""
+THREADS=""
+EXTRA_OPTIONS=""
+
+while [[ "$1" == --* ]]
+do
+	if [[ "$1" == --lanes=* ]]
+	then
+		LANES=$1
+	elif [[ "$1" == --extra-options=* ]]
+	then
+		EXTRA_OPTIONS="--extra-options=${1#--extra-options=}"
+	elif [[ "$1" == --threads=* ]]
+	then
+		THREADS=$1
+	fi
+	shift
+done
+
 SOURCE=$1
 DEST=$2
+
+if [[ -z "$SOURCE" ]]
+then
+	echo "Use: hiseq.sh [--lanes=XYZ] [--extra-options=OPTIONS] [--threads=N] SOURCE_DIR [DESTINATION_DIR]"
+	exit 1
+fi
 
 if [[ -z "$DEST" ]]
 then
@@ -13,11 +38,11 @@ fi
 DIR=`dirname $0`
 
 python $DIR/10_copy_run.py $SOURCE $DEST
-python $DIR/20_prepare_sample_sheet.py $DEST
-python $DIR/30_demultiplexing.py $SOURCE $DEST
+python $DIR/20_prepare_sample_sheet.py $LANES $DEST
+python $DIR/30_demultiplexing.py $LANES "$EXTRA_OPTIONS" $SOURCE $DEST
+python $DIR/40_move_results.py $LANES $DEST
+python $DIR/50_emails.py $LANES $DEST
+python $DIR/60_fastqc.py $THREADS $LANES $DEST
+python $DIR/70_reports.py $LANES $DEST
+python $DIR/80_md5sum.py $THREADS $LANES $DEST
 
-SCRIPTS="40_move_results.py 50_emails.py 60_fastqc.py 70_reports.py 80_md5sum.py"
-for script in $SCRIPTS
-do
-	python $(dirname $0)/$script $DEST
-done

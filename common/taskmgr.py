@@ -156,6 +156,16 @@ class Task(object):
                         extension
                         )
                     )
+        elif self.suffix:
+            return os.path.join(
+                    logdir,
+                    "{0}.{1}.{2}.{3}".format(
+                        self.task_name.lower().replace(" ","_"),
+                        self.suffix,
+                        command.split("/")[-1],
+                        extension
+                        )
+                    )
         else:
             return os.path.join(
                     logdir,
