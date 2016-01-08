@@ -328,6 +328,11 @@ class Task(object):
             self.finished = True
             raise
 
+        if not self.args.pid and not self.args.work_dir:
+            self.fail("Missing required options", 
+                    "You must specify either the LIMS process ID (--pid) or the working directory. " +
+                    "Use -h option for usage info.")
+
         if self.args.pid:
             # LIMS operation
             self.process = Process(nsc.lims, id=self.args.pid)
