@@ -10,7 +10,7 @@ TAG="dev"
 
 try:
     with open("/etc/pipeline-site") as f: 
-        SITE = f.read.strip()
+        SITE = f.read().strip()
 except IOError:
     pass
 
