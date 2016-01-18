@@ -134,14 +134,16 @@ elif SITE == "ous":
 
 # Paths
 if SITE == "cees":
-    PRIMARY_STORAGE = "/storage/nscdata/runsIllumina"
     if TAG == "prod":
+        PRIMARY_STORAGE = "/storage/nscdata/runsIllumina"
         SECONDARY_STORAGE="/storage/nscdata/runsIllumina"
         TRIGGER_DIR="/opt/nsc/trigger"
 
     elif TAG == "dev":
-        # TODO: dev environment on UiO net?
-        pass
+        PRIMARY_STORAGE = "/var/pipeline-test/runsIllumina"
+        SECONDARY_STORAGE="/var/pipeline-test/runsIllumina"
+        LOG_DIR = "/data/nsc.loki/automation/dev/logs"
+        #TRIGGER_DIR="/opt/nsc/trigger"
 
 elif SITE == "ous":
     PRIMARY_STORAGE = "/data/runScratch.boston"     # source data
