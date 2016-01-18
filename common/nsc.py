@@ -8,7 +8,11 @@ from ConfigParser import SafeConfigParser
 # Configure prod or dev
 TAG="dev"
 
-SITE="ous"
+try:
+    with open("/etc/pipeline-site") as f: 
+        SITE = f.read.strip()
+except IOError:
+    pass
 
 ### Configuration for all sites, for production and dev ###
 
