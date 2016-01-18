@@ -173,9 +173,6 @@ elif TAG == "prod":
         if not os.path.exists(pw_file):
             pw_file = "/opt/nsc/conf/apiuser-password.txt"
 
-    elif getpass.getuser() == "limsweb":
-        pw_file = "/var/www/limsweb/private/password"
-
     else:
         pw_file = None
     
