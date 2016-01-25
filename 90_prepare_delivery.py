@@ -139,7 +139,7 @@ def delivery_norstore(process, project_name, source_path):
                 "md5deep returned an error")
 
     # Generate username / password files
-    match = re.match("^([^-]+)-(.*)-\d\d\d\d-\d\d-\d\d", project_name)
+    match = re.match("^([^-]+)-(.*)-[\d-]+", project_name)
     name = match.group(1)
     proj_type = match.group(2)
     username = name.lower() + "-" + proj_type.lower()
