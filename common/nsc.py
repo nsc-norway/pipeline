@@ -63,7 +63,8 @@ FASTQ_OUTPUT = "{sample_name}"
 SEQ_PROCESSES=[
         ('hiseq', 'Illumina Sequencing (Illumina SBS) 5.0'),
         ('nextseq', 'NextSeq Run (NextSeq) 1.0'),
-        ('miseq', 'MiSeq Run (MiSeq) 5.0')
+        ('miseq', 'MiSeq Run (MiSeq) 5.0'),
+        ('hiseqx', 'Illumina Sequencing (Illumina SBS) 5.0'),
         ]
 
 DEMULTIPLEXING_QC_PROCESS = "Demultiplexing and QC NSC 2.0"

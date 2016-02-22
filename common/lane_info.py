@@ -64,6 +64,12 @@ def get_from_files(run_dir, instrument, expand_lanes=None):
                 (lane_id, (clus_den, clus_den * pf_ratio, pf_ratio))
                 for lane_id in lane_ids
                 )
+    elif instrument == "hiseqx":
+        # TODO not implemented
+        lanes = dict(
+                (lane_id, (None, None, None))
+                for lane_id in [1,2,3,4,5,6,7,8]
+                )
 
     return lanes
 
@@ -90,12 +96,15 @@ def get_from_lims(process, instrument, expand_lanes=None):
 
         # Get info for this lane (or lanes, for expand_lanes)
         for lane_id in lane_ids:
-            density_raw_1000 = lane.udf['Cluster Density (K/mm^2) R1']
-            n_raw = lane.udf['Clusters Raw R1']
-            n_pf = lane.udf['Clusters PF R1']
-            density_pf_1000 = int(density_raw_1000 * n_pf * 1.0 / n_raw)
-            pf_ratio = lane.udf['%PF R1'] / 100.0
-            lanes[lane_id] = (density_raw_1000 * 1000.0, density_pf_1000 * 1000.0, pf_ratio)
+            try:
+                density_raw_1000 = lane.udf['Cluster Density (K/mm^2) R1']
+                n_raw = lane.udf['Clusters Raw R1']
+                n_pf = lane.udf['Clusters PF R1']
+                density_pf_1000 = int(density_raw_1000 * n_pf * 1.0 / n_raw)
+                pf_ratio = lane.udf['%PF R1'] / 100.0
+                lanes[lane_id] = (density_raw_1000 * 1000.0, density_pf_1000 * 1000.0, pf_ratio)
+            except KeyError: # Missing data in LIMS, proceed anyway
+                lanes[lane_id] = (None, None, None)
 
     return lanes
 
