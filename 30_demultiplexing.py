@@ -71,7 +71,7 @@ def get_thread_args(n_threads):
     # Computing number of threads: use the standard allocation 
     # logic for bcl2fastq 2.17, but based on n_threads instead of
     # the number of threads on the machine
-    loading = 4 + n_threads//10
+    loading = 4 + n_threads//4
     writing = 4 + n_threads//10
     demultiplexing = int(ceil(n_threads * 0.2)) #  20 %
     processing = n_threads                      # 100 %
