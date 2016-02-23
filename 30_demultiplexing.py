@@ -109,7 +109,7 @@ def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
 
     rcode = remote.run_command(
             args, jobname, time="1-0", logfile=log_path,
-            cpus=n_threads, mem="16G", comment=comment
+            cpus=n_threads, mem="15G", comment=comment
             )
 
     # LIMS only:
