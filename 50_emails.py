@@ -113,7 +113,10 @@ def write_internal_sample_table(output_path, runid, projects, lane_stats):
                     else:
                         # For the HiSeq it has always been PF clusters here, so let's continue
                         # with that
-                        out.write("%4.2f" % (f.stats['% of PF Clusters Per Lane']) + "%\t")
+                        try:
+                            out.write("%4.2f" % (f.stats['% of PF Clusters Per Lane']) + "%\t")
+                        except KeyError:
+                            out.write("%4s" % ('?') + "%\t")
                         out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
                     out.write("ok\t\tok\n")
 
@@ -173,7 +176,10 @@ Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2
             out.write(utilities.display_int(lane[0]) + '\t')
             out.write(utilities.display_int(lane[1]) + '\t')
             if undetermined_file and not undetermined_file.empty:
-                out.write("%4.2f" % (undetermined_file.stats['% of PF Clusters Per Lane'],) + "%\t")
+                try:
+                    out.write("%4.2f" % (undetermined_file.stats['% of PF Clusters Per Lane'],) + "%\t")
+                except KeyError:
+                    out.write("%4s" % ('?') + "%\t")
             else:
                 out.write("-\t")
             out.write("ok\n")

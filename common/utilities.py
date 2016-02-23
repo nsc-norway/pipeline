@@ -179,7 +179,10 @@ locale.setlocale(locale.LC_ALL, 'en_US')
 def display_int(val):
     """Adds thousands separators. To be replaced with "{:,}".format(val) when 
     upgrading to Python 2.7"""
-    return locale.format("%d", round(val), grouping=True)
+    if val is None:
+        return "-"
+    else:
+        return locale.format("%d", round(val), grouping=True)
 
 
 # The check_output function is only available in Python >=2.7, but we also support 2.6,
