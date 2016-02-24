@@ -26,7 +26,7 @@ DEST=$2
 
 if [[ -z "$SOURCE" ]]
 then
-	echo "Use: hiseq.sh [--lanes=XYZ] [--extra-options=OPTIONS] [--threads=N] SOURCE_DIR [DESTINATION_DIR]"
+	echo "Use: hiseq.sh [--lanes=XYZ] [--extra-options=OPTIONS] [--threads=N] SOURCE_DIR [DESTINATION_DIR]"
 	exit 1
 fi
 
@@ -39,7 +39,7 @@ DIR=`dirname $0`
 
 python $DIR/10_copy_run.py $SOURCE $DEST
 python $DIR/20_prepare_sample_sheet.py $LANES $DEST
-python $DIR/30_demultiplexing.py $LANES "$EXTRA_OPTIONS" $SOURCE $DEST
+python $DIR/30_demultiplexing.py $LANES $SOURCE $DEST
 python $DIR/40_move_results.py $LANES $DEST
 python $DIR/50_emails.py $LANES $DEST
 python $DIR/60_fastqc.py $THREADS $LANES $DEST
