@@ -172,7 +172,7 @@ Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2
                     if f.lane == l and f.i_read == 1 and not f.empty)
             out.write(utilities.display_int(cluster_no) + '\t')
             lane = lane_stats[l]
-            out.write("%4.2f" % (lane[2]) + "\t")
+            out.write("%4.2f" % (lane[2] if lane[2] is not None else 0.0) + "\t")
             out.write(utilities.display_int(lane[0]) + '\t')
             out.write(utilities.display_int(lane[1]) + '\t')
             if undetermined_file and not undetermined_file.empty:
