@@ -120,8 +120,7 @@ def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
             utilities.upload_file(task.process, nsc.BCL2FASTQ_LOG, log_path)
             log = open(log_path)
             log_iter = iter(log)
-            for i in xrange(3):
-                l = next(log_iter)
+            for l,i in zip(log_iter,range(3)):
                 if l.startswith("bcl2fastq v"):
                     task.process.udf[nsc.BCL2FASTQ_VERSION_UDF] = l.split(" ")[1].strip("\n")
                     # Will put() when calling success_finish() or fail()
