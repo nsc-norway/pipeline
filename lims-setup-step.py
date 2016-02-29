@@ -85,7 +85,7 @@ def main(process_id, sample_sheet_file):
         wells.add(i.location[1])
 
     if len(fcids) != 1:
-        logging.error("Multiple flowcells in inputs, this is going to end in tears")
+        logging.error("Multiple flowcells in inputs, this is going to end in frustration")
         return 1
 
     fcid = next(iter(fcids))
