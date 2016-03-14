@@ -118,7 +118,7 @@ def delivery_norstore(process, project_name, source_path):
     tarname = project_dir + ".tar"
     args = ["/bin/tar", "cf", save_path + "/" + tarname , project_dir]
     rcode = remote.run_command(
-            args, "tar", "02:00:00",
+            args, "tar", "04:00:00",
             cwd=os.path.dirname(source_path),
             storage_job=True
             ) # dirname = parent dir
