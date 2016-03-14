@@ -2,7 +2,7 @@
 
 set -e
 
-SCRIPTS="90_prepare_delivery.sh 90_triggers.sh"
+SCRIPTS="90_prepare_delivery.py 90_triggers.py"
 
 if [ -z "$1" ]
 then
