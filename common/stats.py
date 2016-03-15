@@ -276,7 +276,7 @@ def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_rea
         if con_s_raw['ClusterCount'] > 0:
             stats['%PF'] = con_s_pf['ClusterCount'] * 100.0 / con_s_raw['ClusterCount']
         else:
-            stats['%PF'] = "100.0%"
+            stats['%PF'] = 0.0
         if all_raw_reads[lane] != 0.0:
             stats['% of Raw Clusters Per Lane'] = con_s_raw['ClusterCount'] * 100.0 / all_raw_reads[lane]
         else:
