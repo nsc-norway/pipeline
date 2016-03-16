@@ -42,6 +42,8 @@ def main(task):
         if not project.is_undetermined:
 
             paths = paths_for_project(run_id, project)
+            if not paths:
+                continue # No files to check
             stdout = os.path.join(bc_dir, project.proj_dir, "md5sum.txt")
             jobname = "md5deep"
             if task.process:
