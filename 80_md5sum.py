@@ -47,7 +47,7 @@ def main(task):
             if task.process:
                 jobname = task.process.id + "." + jobname
             rcode = remote.run_command(
-                    [nsc.MD5DEEP, '-rl'] + paths, jobname, time="04:00:00",
+                    [nsc.MD5DEEP, '-rl'] + paths, jobname, time="08:00:00",
                     cpus=n_threads, mem="2048M",
                     cwd=os.path.join(bc_dir, project.proj_dir),
                     stdout = stdout
