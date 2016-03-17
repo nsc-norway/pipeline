@@ -10,7 +10,7 @@ umask 002
 echo $1
 
 REPOS="pipeline genologics"
-INSTALLATIONS="/data/nsc.loki/automation /var/www/limsweb"
+INSTALLATIONS="/data/nsc.loki/automation"
 
 # Deploy to installations from dev area
 for installation in $INSTALLATIONS
