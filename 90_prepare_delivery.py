@@ -187,7 +187,7 @@ def main(task):
         project_type = lims_project.udf[nsc.PROJECT_TYPE_UDF]
 
         if project_type == "Diagnostics":
-            task.info("Delivering " + project.name + " to diagnostics...")
+            task.info("Copying " + project.name + " to diagnostics...")
             delivery_diag(task, project, task.bc_dir, project_path)
         elif delivery_type == "User HDD" or delivery_type == "New HDD":
             task.info("Hard-linking " + project.name + " to delivery area...")
