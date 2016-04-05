@@ -68,7 +68,10 @@ def post_stats(process, projects, demultiplex_stats):
         lane, project, sample_name = coordinates[0:3]
         
         if sample_name: # Not undetermined
-            limsid = projects_map[project][sample_name].sample_id
+            try:
+                limsid = projects_map[project][sample_name].sample_id
+            except KeyError:
+                continue # Skip unknown samples / project
             resultfile = get_resultfile(process, lane, limsid, 1)
             if resultfile:
                 for statname in udf_list:
