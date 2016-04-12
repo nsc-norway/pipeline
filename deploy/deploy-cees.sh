@@ -30,3 +30,5 @@ do
 		cd .. &&
 		rm -rf genologics.2 pipeline.2 )'"
 done
+
+ln -s /opt/nsc/secure.py /opt/nsc/pipeline/common/secure.py

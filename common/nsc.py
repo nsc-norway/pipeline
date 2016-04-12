@@ -138,6 +138,7 @@ if SITE == "cees":
     if TAG == "prod":
         PRIMARY_STORAGE = "/storage/nscdata/runsIllumina"
         SECONDARY_STORAGE="/storage/nscdata/runsIllumina"
+        DELIVERY_DIR="/storage/nscdata/runsIllumina/delivery" 
         TRIGGER_DIR="/opt/nsc/trigger"
 
     elif TAG == "dev":
