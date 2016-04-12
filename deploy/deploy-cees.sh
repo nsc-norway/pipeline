@@ -28,5 +28,7 @@ do
 		tar x && 
 		sed -i \"s/^TAG=\\\"dev\\\"$/TAG=\\\"prod\\\"/\" common/nsc.py &&
 		cd .. &&
+		ln -s /opt/nsc/secure.py /opt/nsc/pipeline/common/secure.py &&
 		rm -rf genologics.2 pipeline.2 )'"
 done
+
