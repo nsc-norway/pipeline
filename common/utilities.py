@@ -48,6 +48,8 @@ def get_instrument_by_runid(run_id):
         return 'nextseq'
     elif re.match(r"\d{6}_E", run_id):
         return 'hiseqx'
+    elif re.match(r"\d{6}_J", run_id):
+        return 'hiseq3k4k'
     elif re.match(r"\d{6}_[A-Z0-9]", run_id):
         return 'hiseq'
     else:
@@ -77,7 +79,8 @@ def get_bcl2fastq2_version(work_dir):
     
 
 def get_fcid_by_runid(run_id):
-    if get_instrument_by_runid(run_id) == "hiseq":
+    runid = get_instrument_by_runid(run_id)
+    if runid.startswith("hiseq") or runid == "nextseq":
         return re.match(r"[\d]{6}_[\dA-Z]+_[\d]+_[AB]([A-Z\d-]+)$", run_id).group(1)
     else:
         return re.match(r"[\d]{6}_[\dA-Z]+_[\d]+_([A-Z\d-]+)$", run_id).group(1)
