@@ -292,7 +292,7 @@ def parse_sample_sheet(sample_sheet):
 
 ################# FILE STRUCTURE #################
 def get_project_dir(run_id, project_name):
-    if utilities.get_instrument_by_runid(run_id) == 'hiseq':
+    if utilities.get_instrument_by_runid(run_id).startswith('hiseq'):
         return get_hiseq_project_dir(run_id, project_name)
     else:
         return get_ne_mi_project_dir(run_id, project_name)
