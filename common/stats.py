@@ -488,6 +488,7 @@ def get_stats(
         return get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes, aggregate_reads)
     except IOError:
         if instrument == 'miseq':
+            # MiSeq on-instrument demultiplexing results
             generate_fastq_path = os.path.join(run_dir, "GenerateFASTQRunStatistics.xml")
             num_reads, index_reads = utilities.get_num_reads(run_dir)
             miseq_stats = get_miseq_stats(generate_fastq_path, num_reads, aggregate_reads)
