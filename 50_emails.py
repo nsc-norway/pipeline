@@ -41,13 +41,13 @@ def main(task):
     samples.flag_empty_files(projects, work_dir)
 
     qc_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls", "QualityControl" + task.suffix)
-    make_reports(qc_dir, run_id, projects, lane_stats)
+    make_reports(instrument, qc_dir, run_id, projects, lane_stats)
 
     task.success_finish()
 
 
 
-def make_reports(qc_dir, run_id, projects, lane_stats):
+def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats):
     if not os.path.exists(qc_dir):
         os.mkdir(qc_dir)
     delivery_dir = os.path.join(qc_dir, "Delivery")
@@ -63,8 +63,7 @@ def make_reports(qc_dir, run_id, projects, lane_stats):
     write_internal_sample_table(fname, run_id, projects, lane_stats)
 
     fname = delivery_dir + "/Summary_email_for_NSC_" + run_id + ".xls"
-    instrument_type = utilities.get_instrument_by_runid(run_id)
-    write_summary_email(fname, run_id, projects, instrument_type=='hiseq', lane_stats)
+    write_summary_email(fname, run_id, projects, instrument_type.startswith('hiseq'), lane_stats)
 
 
 def write_sample_info_table(output_path, runid, project):
