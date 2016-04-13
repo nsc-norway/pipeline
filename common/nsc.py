@@ -65,7 +65,7 @@ SEQ_PROCESSES=[
         ('nextseq', 'NextSeq Run (NextSeq) 1.0'),
         ('miseq', 'MiSeq Run (MiSeq) 5.0'),
         ('hiseqx', 'Illumina Sequencing (Illumina SBS) 5.0'),
-# TODO        ('hiseq3k4k', '')
+# TODO        ('hiseq4k', '')
         ]
 
 DEMULTIPLEXING_QC_PROCESS = "Demultiplexing and QC NSC 2.0"

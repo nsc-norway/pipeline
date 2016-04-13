@@ -84,7 +84,7 @@ work_dir argument.""")
     # Specify source with trailing slash to copy content
     source = source.rstrip('/') + "/"
 
-    if instrument == "hiseq" or instrument == "hiseqx":
+    if instrument in ["hiseq", "hiseqx", "hiseq4k"]:
         exclude = hiseq_exclude_paths
     elif instrument == "nextseq":
         exclude = nextseq_exclude_paths
