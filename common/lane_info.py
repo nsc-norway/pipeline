@@ -64,8 +64,10 @@ def get_from_files(run_dir, instrument, expand_lanes=None):
                 (lane_id, (clus_den, clus_den * pf_ratio, pf_ratio))
                 for lane_id in lane_ids
                 )
-    elif instrument == "hiseqx":
-        # TODO not implemented
+    else:
+        # HiSeq 3000/4000/X Lane statistics is not implemented here. Could use
+        # illuminate library to parse interop files, but maybe it is sufficient to
+        # use LIMS.
         lanes = dict(
                 (lane_id, (None, None, None))
                 for lane_id in [1,2,3,4,5,6,7,8]
