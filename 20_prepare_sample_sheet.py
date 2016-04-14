@@ -114,7 +114,7 @@ def main(task):
         sample_sheet = convert_from_bcl2fastqv1(sample_sheet)
 
     # Invert the read2 indexes if using nextseq
-    if instrument in ["nextseq", "hiseq4k"]:
+    if instrument == "nextseq":
         sample_sheet = reverse_complement_index2(sample_sheet)
     
     # Post the result, as appropriate...
