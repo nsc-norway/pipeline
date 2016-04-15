@@ -312,7 +312,7 @@ def get_ne_mi_project_dir(run_id, project_name):
 
 
 def get_sample_dir(instrument, sample_name):
-    if instrument == 'hiseq':
+    if instrument.startswith('hiseq'):
         return "Sample_" + sample_name
     else:
         return None
@@ -323,7 +323,7 @@ def get_fastq_name(instrument, sample_name, sample_index,
     """The file name we want depends on the instument type, for consistency with older
     deliveries."""
     
-    if instrument == "hiseq":
+    if instrument.startswith("hiseq"):
         if index1:
             index_seq = index1
         else:
@@ -335,7 +335,6 @@ def get_fastq_name(instrument, sample_name, sample_index,
                 index_seq,
                 str(lane_id).zfill(3),
                 i_read)
-
     
     else:
         return bcl2fastq2_file_name(sample_name, sample_index, lane_id, i_read, merged_lanes)
