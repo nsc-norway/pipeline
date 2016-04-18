@@ -326,7 +326,7 @@ def get_fastq_name(instrument, sample_name, sample_index,
     """The file name we want depends on the instument type, for consistency with older
     deliveries."""
     
-    if instrument.startswith("hiseq"):
+    if instrument == "hiseq":
         if index1:
             index_seq = index1
         else:
