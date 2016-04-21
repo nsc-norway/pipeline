@@ -140,7 +140,7 @@ def get_sample_sheet_proj_name(project):
     """Get the project name as it would appear in the sample sheet.
     Will become really complex if we allow other than [A-Za-z0-9\-] in 
     sample sheet."""
-    return project.name
+    return re.sub(r'[^a-zA-Z0-9_\-]', '_', project.name)
 
 
 def get_num_reads(run_dir):

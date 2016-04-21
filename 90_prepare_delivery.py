@@ -172,7 +172,7 @@ def main(task):
     lims_projects = {}
     for i in task.process.all_inputs(unique=True):
         pro = i.samples[0].project
-        lims_projects[pro.name] = pro
+        lims_projects[utilities.get_sample_sheet_proj_name(pro.name)] = pro
 
     runid = task.run_id
     projects = (project for project in task.projects if not project.is_undetermined)
