@@ -136,11 +136,11 @@ def upload_file(process, name, path = None, data = None):
 
 
 
-def get_sample_sheet_proj_name(project):
+def get_sample_sheet_proj_name(lims_project_name):
     """Get the project name as it would appear in the sample sheet.
     Will become really complex if we allow other than [A-Za-z0-9\-] in 
     sample sheet."""
-    return re.sub(r'[^a-zA-Z0-9_\-]', '_', project.name)
+    return re.sub(r'[^a-zA-Z0-9_\-]', '_', lims_project_name)
 
 
 def get_num_reads(run_dir):
