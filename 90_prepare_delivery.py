@@ -162,7 +162,7 @@ require user {username}
         htpasswd = "{username}:{crypt_pw}\n".format(username=username, crypt_pw=crypt_pw)
         open(save_path + "/.htpasswd", "w").write(htpasswd)
     except Exception, e:
-        task.warning("Password generation failed: " + str(e))
+        task.warn("Password generation failed: " + str(e))
     
 
 
