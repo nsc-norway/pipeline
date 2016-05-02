@@ -140,7 +140,7 @@ def delivery_norstore(process, project_name, source_path):
 
     # Generate username / password files
     try:
-        match = re.match("^([^-]+)-(.*)-[\d-]+", project_name)
+        match = re.match("^([^-]+)-([^-]+)-\d\d\d\d-\d\d-\d\d$", project_name)
         name = match.group(1)
         proj_type = match.group(2)
         username = name.lower() + "-" + proj_type.lower()
