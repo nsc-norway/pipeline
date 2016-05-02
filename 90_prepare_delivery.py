@@ -148,7 +148,7 @@ def delivery_norstore(process, project_name, source_path):
         crypt_pw = crypt.crypt(password)
         
         htaccess = """\
-AuthUserFile /norstore_osl/projects/N59012K/www/hts-nonsecure.uio.no/{project_dir}/.htpasswd
+AuthUserFile /norstore_osl/projects/NS9012K/www/hts-nonsecure.uio.no/{project_dir}/.htpasswd
 AuthGroupFile /dev/null
 AuthName ByPassword
 AuthType Basic
