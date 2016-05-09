@@ -113,10 +113,6 @@ def main(task):
     if instrument.startswith("hiseq") and not re.search(r"\[Data\]", sample_sheet):
         sample_sheet = convert_from_bcl2fastqv1(sample_sheet)
 
-    # Invert the read2 indexes if using nextseq
-    if instrument == "nextseq":
-        sample_sheet = reverse_complement_index2(sample_sheet)
-    
     # Post the result, as appropriate...
     if task.process:
         utilities.upload_file(
@@ -143,24 +139,6 @@ def replace_special_chars(sample_sheet_data):
 def rev_comp(sequence):
     COMPLEMENTARY = {'A':'T', 'T':'A', 'G':'C', 'C':'G'}
     return "".join(COMPLEMENTARY[b] for b in reversed(sequence))
-
-
-def reverse_complement_index2(original_data):
-    original_lines = [l.strip("\r\n") for l in original_data.splitlines()]
-    data_start = next(i for i, d in enumerate(original_lines) if re.match(r"\[Data\],*$", d))
-    data = [l.split(",") for l in original_lines[data_start+1:] if l.strip() != ""]
-    try:
-        index2_col = next(i for i, c in enumerate(data[0]) if c.lower() == "index2")
-        for row in data[1:]:
-            #row[index2_col] = str(Seq(row[index2_col]).reverse_complement())
-            row[index2_col] = rev_comp(row[index2_col])
-
-        return "\r\n".join(
-                original_lines[0:data_start+1] +\
-                [",".join(cells) for cells in data]
-                )
-    except StopIteration: # index2 column not found
-        return original_data
 
 
 def convert_from_bcl2fastqv1(original_data):
