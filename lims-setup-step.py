@@ -68,10 +68,14 @@ def get_sample_sheet_data(cluster_proc, fcid):
         o = io[1]
         if o['output-type'] == 'ResultFile' and o['output-generation-type'] == 'PerAllInputs':
             if o['uri'].name == 'SampleSheet csv':
+                files = []
                 if len(o['uri'].files) == 1:
                     f = o['uri'].files[0]
+                    files.append(f)
                     if f.original_location == "{0}.csv".format(fcid):
                         return f.download()
+                if len(files) == 1: # Return sample sheet file even if wrong name, if it's the only one
+                    return f.download()
     return None
 
 
