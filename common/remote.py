@@ -4,6 +4,7 @@ import subprocess
 import nsc
 import os
 import getpass
+import tempfile
 
 def srun_command(
         args, jobname, time, logfile=None,
@@ -78,4 +79,25 @@ def run_command(
             )
     elif nsc.REMOTE_MODE == "local": 
         return local_command(args, logfile, cwd, stdout)
+
+
+def schedule_multiple(
+        args, jobname, time, logfile=None,
+        cpus_per_task, mem_per_task=1024, cwd=None, stdout=None,
+        change_user=True, comment=None
+        ):
+    commandfile, path = templfile.mkstemp()
+    commandfile.writelines("\n".join("%d %s" % (i, arg) for i, arg in enumerate(args)) + "\n")
+    commandfile.close()
+    try:
+        return srun_command([path], jobname, time, logfile,
+            cpus_per_task, mem_per_task, cwd, stdout, srun_user_args=['--multi-prog'],
+            change_user, storage_job=False, comment=comment
+            )
+    finally:
+        os.remove(path)
+
+
+def is_scheduler_available():
+    return nsc.REMOTE_MODE == "srun"
 
