@@ -48,7 +48,7 @@ def get_instrument_by_runid(run_id):
         return 'nextseq'
     elif re.match(r"\d{6}_E", run_id):
         return 'hiseqx'
-    elif re.match(r"\d{6}_J", run_id):
+    elif re.match(r"\d{6}_[JK]", run_id):
         return 'hiseq4k'
     elif re.match(r"\d{6}_[A-Z0-9]", run_id):
         return 'hiseq'
