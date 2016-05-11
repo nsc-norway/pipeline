@@ -87,18 +87,47 @@ def schedule_multiple(
         comment=None
         ):
     change_user = getpass.getuser() == "glsai" 
-    commandfile_handle, path = tempfile.mkstemp()
-    cmd_list = ["%d %s" % (i, " ".join(args)) for i, args in enumerate(args_list)]
-    os.write(commandfile_handle, "\n".join(cmd_list) + "\n")
-    os.close(commandfile_handle)
-    try:
-        return srun_command([path], jobname, time, logfile,
-            cpus_per_task, mem_per_task, cwd, stdout, 
-            srun_user_args=['--multi-prog', '-l'],
-            change_user=change_user, storage_job=False, comment=comment
-            )
-    finally:
-        os.remove(path)
+
+    # "multi_prog config file" maximum size is than 60000 bytes
+    # And each line should be less than 256.
+
+    MAX_LINE = 256
+    MAX_SIZE = 60000
+
+    i_line = 0
+    batch_i = 0
+    index_commands = list(enumerate(args_list))
+    while batch_i < len(index_commands):
+        current_batch = []
+        next_size = 0
+        for i, c in index_commands[batch_i:]:
+            i_line += 1
+            format_line = "%d %s" % (i, " ".join(c))
+            line_size = 1+len(format_line) # Includes line break
+            if line_size >= MAX_LINE:
+                raise ValueError("Line {0} is longer than {1} bytes".format(i_line, MAX_LINE))
+            if next_size + line_size < MAX_SIZE:
+                current_batch.append(c)
+                next_size += line_size
+            else:
+                break
+        else:
+            i += 1 # If not break, we are done!
+
+        batch_i = i
+
+        commandfile_handle, path = tempfile.mkstemp()
+        cmd_list = ["%d %s" % (i, " ".join(args)) for i, args in enumerate(current_batch)]
+        os.write(commandfile_handle, "\n".join(cmd_list) + "\n")
+        os.close(commandfile_handle)
+        try:
+            return srun_command([path], jobname, time, logfile,
+                cpus_per_task, mem_per_task, cwd, stdout, 
+                srun_user_args=['--multi-prog', '-l'],
+                change_user=change_user, storage_job=False, comment=comment
+                )
+        finally:
+            os.remove(path)
 
 
 def is_scheduler_available():

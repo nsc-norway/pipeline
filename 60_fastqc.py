@@ -44,8 +44,7 @@ def main(task):
 
     threads = task.threads
 
-    fastqc_args = ["--extract", "--threads=" + str(threads)]
-    fastqc_args += ["--outdir=" + output_dir]
+    fastqc_args = ["--extract", "--outdir=" + output_dir]
 
     if task.process:
         jobname = task.process.id + ".fastqc"
@@ -60,28 +59,32 @@ def main(task):
         pass
 
 
-    # Process the files in groups of 500 files to prevent the 
-    # "argument list too long" error. The groups are processed 
-    # sequentially. 
-    n_groups = (len(fastq_paths) + 499) // 500
-    # Note: also required for scheduler mode, to avoid an error
-    # "multi_prog config file is too large" when the list of 
-    # commands is greater than 60000 bytes
-    for i_group in xrange(n_groups):
-        # process interleaved e.g. #1, #3, #5, ... then #2, #4, #6...
-        # to preserve order
-        proc_paths = fastq_paths[i_group::n_groups]
-        grp_fastqc_args = fastqc_args + proc_paths
-        print "Fastqc-" + str(i_group), ": Processing", len(proc_paths), "of", len(fastq_paths), "files..."
+    if remote.is_scheduler_available():
+        # Need to reduce the size of the command list 
+        # "multi_prog config file is too large" when the list of 
+        # commands is greater than 60000 bytes
+        # And each line should be less than 256.
+        bc_dir = task.bc_dir
+        commands = [[nsc.FASTQC] + fastqc_args + [os.path.relpath(path, bc_dir)] for path in fastq_paths]
 
-        if remote.is_scheduler_available():
-            commands = [[nsc.FASTQC] + fastqc_args + [path] for path in proc_paths]
-            rcode = remote.schedule_multiple(
-                   commands,  jobname, time="1-0", logfile=log_path,
-                   cpus_per_task=1, mem_per_task=1024
-                   )
-        else:
+        rcode = remote.schedule_multiple(
+               commands,  jobname, time="1-0", logfile=log_path,
+               cpus_per_task=1, mem_per_task=1024, cwd=bc_dir
+               )
+        i_group = 0
+    else:
+        # Process the files in groups of 500 files to prevent the 
+        # "argument list too long" error. The groups are processed 
+        # sequentially. 
+        n_groups = (len(fastq_paths) + 499) // 500
+        for i_group in xrange(n_groups):
+            # process interleaved e.g. #1, #3, #5, ... then #2, #4, #6...
+            # to preserve order
+            proc_paths = fastq_paths[i_group::n_groups]
+            task.info("Fastqc-" + str(i_group), ": Processing", len(proc_paths), "of", len(fastq_paths), "files...")
+
             threads_to_request=min(len(proc_paths), threads)
+            grp_fastqc_args = fastqc_args + ["--threads=" + str(threads)] + proc_paths
             rcode = remote.run_command(
                     [nsc.FASTQC] + grp_fastqc_args, jobname, time="1-0", 
                     logfile=log_path, cpus=threads_to_request,
@@ -89,12 +92,9 @@ def main(task):
                     srun_user_args=['--open-mode=append']
                     )
 
-        if rcode != 0:
-            # The following function will call exit(1)
-            sched_message = ""
-            if remote.is_scheduler_available():
-                sched_message = "
-            task.fail("fastqc failure", "Group " + str(i_group))
+    if rcode != 0:
+        # The following function will call exit(1)
+        task.fail("fastqc failure", "Group " + str(i_group))
 
     
     if task.process:
