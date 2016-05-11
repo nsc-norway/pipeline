@@ -82,17 +82,20 @@ def run_command(
 
 
 def schedule_multiple(
-        args, jobname, time, logfile=None,
-        cpus_per_task, mem_per_task=1024, cwd=None, stdout=None,
-        change_user=True, comment=None
+        args_list, jobname, time, logfile=None,
+        cpus_per_task=1, mem_per_task=1024, cwd=None, stdout=None,
+        comment=None
         ):
-    commandfile, path = templfile.mkstemp()
-    commandfile.writelines("\n".join("%d %s" % (i, arg) for i, arg in enumerate(args)) + "\n")
-    commandfile.close()
+    change_user = getpass.getuser() == "glsai" 
+    commandfile_handle, path = tempfile.mkstemp()
+    cmd_list = ["%d %s" % (i, " ".join(args)) for i, args in enumerate(args_list)]
+    os.write(commandfile_handle, "\n".join(cmd_list) + "\n")
+    os.close(commandfile_handle)
     try:
         return srun_command([path], jobname, time, logfile,
-            cpus_per_task, mem_per_task, cwd, stdout, srun_user_args=['--multi-prog'],
-            change_user, storage_job=False, comment=comment
+            cpus_per_task, mem_per_task, cwd, stdout, 
+            srun_user_args=['--multi-prog', '-l'],
+            change_user=change_user, storage_job=False, comment=comment
             )
     finally:
         os.remove(path)

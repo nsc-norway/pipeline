@@ -63,7 +63,11 @@ def main(task):
     if remote.is_scheduler_available():
         commands = [[nsc.FASTQC] + fastqc_args + [path] for path in fastq_paths]
         rcode = remote.schedule_multiple(
-                
+               commands,  jobname, time="1-0", logfile=log_path,
+               cpus_per_task=1, mem_per_task=1024
+               )
+        if rcode != 0:
+            task.fail("fastqc failure")
 
     else:
         # Process the files in groups of 500 files to prevent the 
