@@ -59,28 +59,39 @@ def main(task):
     except IOError:
         pass
 
-    # Process the files in groups of 500 files to prevent the 
-    # "argument list too long" error. The groups are processed 
-    # sequentially. The +499 is a "trick" to round up with int
-    # division.
-    n_groups = (len(fastq_paths) + 499) // 500
-    for i_group in xrange(n_groups):
-        # process interleaved e.g. #1, #3, #5, ... then #2, #4, #6...
-        # to preserve order
-        proc_paths = fastq_paths[i_group::n_groups]
-        grp_fastqc_args = fastqc_args + proc_paths
-        print "Fastqc-" + str(i_group), ": Processing", len(proc_paths), "of", len(fastq_paths), "files..."
-        threads_to_request=min(len(proc_paths), threads)
-        rcode = remote.run_command(
-                [nsc.FASTQC] + grp_fastqc_args, jobname, time="1-0", 
-                logfile=log_path, cpus=threads_to_request,
-                mem=str(1024+256*threads)+"M",
-                srun_user_args=['--open-mode=append']
-                )
-
+    
+    if remote.is_scheduler_available():
+        commands = [[nsc.FASTQC] + fastqc_args + [path] for path in fastq_paths]
+        rcode = remote.schedule_multiple(
+               commands,  jobname, time="1-0", logfile=log_path,
+               cpus_per_task=1, mem_per_task=1024
+               )
         if rcode != 0:
-            # The following function will call exit(1)
-            task.fail("fastqc failure", "Group " + str(i_group))
+            task.fail("fastqc failure")
+
+    else:
+        # Process the files in groups of 500 files to prevent the 
+        # "argument list too long" error. The groups are processed 
+        # sequentially. The +499 is a "trick" to round up with int
+        # division.
+        n_groups = (len(fastq_paths) + 499) // 500
+        for i_group in xrange(n_groups):
+            # process interleaved e.g. #1, #3, #5, ... then #2, #4, #6...
+            # to preserve order
+            proc_paths = fastq_paths[i_group::n_groups]
+            grp_fastqc_args = fastqc_args + proc_paths
+            print "Fastqc-" + str(i_group), ": Processing", len(proc_paths), "of", len(fastq_paths), "files..."
+            threads_to_request=min(len(proc_paths), threads)
+            rcode = remote.run_command(
+                    [nsc.FASTQC] + grp_fastqc_args, jobname, time="1-0", 
+                    logfile=log_path, cpus=threads_to_request,
+                    mem=str(1024+256*threads)+"M",
+                    srun_user_args=['--open-mode=append']
+                    )
+
+            if rcode != 0:
+                # The following function will call exit(1)
+                task.fail("fastqc failure", "Group " + str(i_group))
 
     
     if task.process:
