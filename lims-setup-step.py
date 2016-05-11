@@ -30,8 +30,15 @@ if nsc.SITE == "cees":
             "hiseq": [
                 "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
                 "Auto 40. Move fastq files", "Auto 50-80. QC", "Close when finished"
+                ],
+            "hiseq4k": [
+                "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
+                "Auto 40. Move fastq files", "Auto 50-80. QC", "Close when finished"
                 ]
             }
+    # Used to set different number of threads for different machines. Probably
+    # not needed, as both HiSeq 2500 and HiSeq 4000 can use 20 threads here.
+    THREADS_OVERRIDE = {}
 else:
     CHECKED = {
             "hiseq": [
@@ -56,6 +63,18 @@ else:
                 "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Delivery and triggers",
                 "Close when finished"
                 ],
+            "hiseq4k": [
+                "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
+                "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Delivery and triggers",
+                "Close when finished"
+                ],
+            }
+    THREADS_OVERRIDE = {
+            "hiseq": 16,
+            "hiseqx": 16,
+            "hiseq4k": 16,
+            "miseq": 8,
+            "nextseq": 8
             }
 
 
@@ -135,6 +154,9 @@ def main(process_id, sample_sheet_file):
         instrument = utilities.get_instrument(seq_proc)
         for udf in CHECKED.get(instrument, []):
             process.udf[udf] = True
+        threads = THREADS_OVERRIDE.get(instrument)
+        if threads is not None:
+            process.udf[nsc.THREADS_UDF] = threads
 
         logging.debug('Saved settings in the process')
 
