@@ -52,7 +52,7 @@ def main(task):
                     [nsc.MD5DEEP, '-rl'] + paths, jobname, time="08:00:00",
                     cpus=n_threads, mem="2048M",
                     cwd=os.path.join(bc_dir, project.proj_dir),
-                    stdout = stdout, storage_job = True
+                    stdout = stdout
                     )
 
             if rcode != 0:
