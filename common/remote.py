@@ -81,15 +81,29 @@ def run_command(
         return local_command(args, logfile, cwd, stdout)
 
 
-def schedule_multiple(
-        args_list, jobname, time, logfile=None,
+class JobArray(object):
+    
+    def __init__(self, args_list, jobname, time, logfile=None,
         cpus_per_task=1, mem_per_task=1024, cwd=None, stdout=None,
         comment=None
         ):
-    change_user = getpass.getuser() == "glsai" 
 
-    # "multi_prog config file" maximum size is than 60000 bytes
-    # And each line should be less than 256.
+        self.args_list = args_list
+        self.jobname = jobname
+        self.time = time
+        self.logfile = logfile 
+        self.cpus_per_task = cpus_per_task
+        self.mem_per_task = mem_per_task
+        self.cwd = cwd
+        self.stdout = stdout
+        self.comment = comment
+
+
+    def start(self):
+        change_user = getpass.getuser() == "glsai" 
+
+
+
 
     MAX_LINE = 256
     MAX_SIZE = 60000
