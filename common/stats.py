@@ -94,8 +94,8 @@ def parse_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_rea
 
                             elif read_or_cc.tag == "Read":
                                 iread = int(read_or_cc.attrib['number'])
-                                if iread > 3:                   # Hack for samples without barcode: gets
-                                                                # read == some large number (2 times now)
+                                if iread > 3 or iread <= 0:     # Hack for samples without barcode: gets
+                                                                # read == some random number
                                     iread = 1
                                 if not rst.has_key(iread):
                                     rst[iread] = defaultdict(int)
@@ -265,9 +265,11 @@ def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_rea
 
     result = {}
     for coordinates in conversion_stats.keys():
+        print coordinates
         lane, project, sample, read = coordinates
         de_s = demultiplexing_stats[(lane, project, sample)]
         con_s_raw, con_s_pf = conversion_stats[coordinates]
+        print con_s_raw
 
         stats = {}
         stats['# Reads'] = con_s_raw['ClusterCount']
