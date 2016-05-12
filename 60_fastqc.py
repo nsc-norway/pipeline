@@ -4,6 +4,7 @@
 import os
 import re
 import shutil
+import time
 from common import samples, nsc, taskmgr, samples, remote, utilities
 
 TASK_NAME = "60. FastQC"
@@ -60,18 +61,23 @@ def main(task):
 
 
     if remote.is_scheduler_available():
-        # Need to reduce the size of the command list 
-        # "multi_prog config file is too large" when the list of 
-        # commands is greater than 60000 bytes
-        # And each line should be less than 256.
-        bc_dir = task.bc_dir
-        commands = [[nsc.FASTQC] + fastqc_args + [os.path.relpath(path, bc_dir)] for path in fastq_paths]
+        commands = [[nsc.FASTQC] + fastqc_args + [path] for path in fastq_paths]
+	aj = remote.ArrayJob(commands, jobname, "1-0", log_path.replace(".txt", ".%a.txt"))
+	aj.cpus_per_task = 1
+	aj.mem_per_task = 1
+        aj.max_simultaneous = 32 # Limit due to I/O bottlenecks
+        # This is highly dependent on the computing environment. Should be configurable, or
+        # maybe the admin could limit the number of jobs in slurm.
+        aj.start()
+        task.array_job_status(aj)
+        while not aj.is_finished:
+            time.sleep(30)
+            aj.check_status()
+            task.array_job_status(aj)
 
-        rcode = remote.schedule_multiple(
-               commands,  jobname, time="1-0", logfile=log_path,
-               cpus_per_task=1, mem_per_task=1024, cwd=bc_dir
-               )
-        i_group = 0
+	if aj.summary.keys() != ["COMPLETED"]:
+            task.fail("fastqc failure", str(aj.summary))
+	
     else:
         # Process the files in groups of 500 files to prevent the 
         # "argument list too long" error. The groups are processed 
@@ -92,9 +98,9 @@ def main(task):
                     srun_user_args=['--open-mode=append']
                     )
 
-    if rcode != 0:
-        # The following function will call exit(1)
-        task.fail("fastqc failure", "Group " + str(i_group))
+	    if rcode != 0:
+		# The following function will call exit(1)
+		task.fail("fastqc failure", "Group " + str(i_group))
 
     
     if task.process:

@@ -109,27 +109,35 @@ elif SITE == "ous":
 
     REMOTE_MODE = "srun"
 
-    # Command line to run slurm
-    # ** OUS net: need to add this to sudoers to allow glsai to run as seq-user **
+    # * Command line to run slurm *
+
+    # Special case to allow glsai to run commands as seq-user through sudo. This is only
+    # needed on the development system. In the production environment, the commands are executed
+    # on the server loki directly as seq-user.
     # The first example below essentially allows glsai to run any command as seq-user,
     # thus gaining access to the NSC storage volumes. I haven't found a good way to allow
     # the script to set
     # the resources etc., but restrict the command.
-    # TODO: modify sudo 
     #glsai   ALL=(seq-user)  NOPASSWD:/usr/bin/sbatch
     #Defaults:glsai          !requiretty
     #Defaults:glsai          umask=007,umask_override
     #Defaults:glsai          !logfile
     SRUN_GLSAI_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/srun", "--account=nsc",
-                "--qos=high", "--partition=main", "--mem_bind=local"]
+                "--qos=high", "--partition=main"]
+    SBATCH_GLSAI_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/sbatch", "--account=nsc",
+                "--qos=high", "--partition=main"]
     
     # When running on the command line we will be using a central user account,
     # so there's no need to sudo
-    SRUN_OTHER_ARGLIST=["/usr/bin/srun", "--account=nsc", "--qos=high", "--partition=main",
-                "--mem_bind=local"]
+    SRUN_OTHER_ARGLIST=["/usr/bin/srun", "--account=nsc", "--qos=high", "--partition=main"]
+
+    # sbatch commands for "scheduler mode". Sudo mode is not supported.
+    SBATCH_ARGLIST=["/usr/bin/sbatch", "--account=nsc", "--qos=high", "--partition=main"]
     
     # Args for jobs which mainly do I/O on the secondary storage, not processing
     SRUN_STORAGE_JOB_ARGS=["--nodelist=loki"]
+
+    SQUEUE=["/usr/bin/squeue"]
 
 
 ### Site and phase (TAG) dependent configuration ###

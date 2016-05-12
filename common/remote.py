@@ -1,10 +1,14 @@
 # Slurm script
 
-import subprocess
-import nsc
 import os
+import subprocess
 import getpass
 import tempfile
+import StringIO
+from itertools import groupby
+
+import nsc
+import utilities
 
 def srun_command(
         args, jobname, time, logfile=None,
@@ -80,69 +84,77 @@ def run_command(
     elif nsc.REMOTE_MODE == "local": 
         return local_command(args, logfile, cwd, stdout)
 
+class JobMonitoringException(Exception):
+    pass
 
-class JobArray(object):
-    
-    def __init__(self, args_list, jobname, time, logfile=None,
-        cpus_per_task=1, mem_per_task=1024, cwd=None, stdout=None,
-        comment=None
-        ):
+class ArrayJob(object):
 
-        self.args_list = args_list
+    def __init__(self, arg_lists, jobname, time, stdout_pattern):
+        
+        self.arg_lists = arg_lists
         self.jobname = jobname
         self.time = time
-        self.logfile = logfile 
-        self.cpus_per_task = cpus_per_task
-        self.mem_per_task = mem_per_task
-        self.cwd = cwd
-        self.stdout = stdout
-        self.comment = comment
+        self.stdout_pattern = stdout_pattern
+        self.cpus_per_task = 1
+        self.max_simultaneous = None
+        self.mem_per_task = 1024
+        self.cwd = None
+        self.comment = None
 
+        self.job_id = None
+        self.states = {}
+        self.summary = {}
 
     def start(self):
-        change_user = getpass.getuser() == "glsai" 
+        handle, path = tempfile.mkstemp()
+        os.write(handle, "#!/bin/bash\n\n")
+        os.write(handle, "#SBATCH --job-name=\"{0}\"\n".format(self.jobname))
+        os.write(handle, "#SBATCH --time={0}\n".format(self.time))
+        os.write(handle, "#SBATCH --output=\"{0}\"\n".format(self.stdout_pattern))
+        if self.cpus_per_task:
+            os.write(handle, "#SBATCH --cpus-per-task={0}\n".format(self.cpus_per_task))
+        if self.mem_per_task:
+            os.write(handle, "#SBATCH --mem={0}\n".format(self.mem_per_task))
+        if self.comment:
+            os.write(handle, "#SBATCH --comment=\"{0}\"\n".format(self.comment))
 
 
+        for i, arg_list in enumerate(self.arg_lists):
+            argv = " ".join("'" + s.replace("'", "'\\''") + "'" for s in arg_list)
+            os.write(handle, "[ $SLURM_ARRAY_TASK_ID == {0} ] && {1} && exit 0\n".format(i, argv))
+        os.write(handle, "exit 1\n")
+        os.close(handle)
+        
+        array = '--array=0-'+str(len(self.arg_lists) - 1)
+        if self.max_simultaneous is not None:
+            array += "%%%d" % (self.max_simultaneous)
+        self.job_id = utilities.check_output(nsc.SBATCH_ARGLIST + ['--parsable', array, path], cwd=self.cwd).strip()
+        self.states = dict((str(j), 'PENDING') for j in range(int(self.job_id), int(self.job_id)+len(self.arg_lists)))
+        self.summary = {'PENDING': len(self.arg_lists)}
+        os.remove(path)
 
-
-    MAX_LINE = 256
-    MAX_SIZE = 60000
-
-    i_line = 0
-    batch_i = 0
-    index_commands = list(enumerate(args_list))
-    while batch_i < len(index_commands):
-        current_batch = []
-        next_size = 0
-        for i, c in index_commands[batch_i:]:
-            i_line += 1
-            format_line = "%d %s" % (i, " ".join(c))
-            line_size = 1+len(format_line) # Includes line break
-            if line_size >= MAX_LINE:
-                raise ValueError("Line {0} is longer than {1} bytes".format(i_line, MAX_LINE))
-            if next_size + line_size < MAX_SIZE:
-                current_batch.append(c)
-                next_size += line_size
-            else:
-                break
-        else:
-            i += 1 # If not break, we are done!
-
-        batch_i = i
-
-        commandfile_handle, path = tempfile.mkstemp()
-        cmd_list = ["%d %s" % (i, " ".join(args)) for i, args in enumerate(current_batch)]
-        os.write(commandfile_handle, "\n".join(cmd_list) + "\n")
-        os.close(commandfile_handle)
+    def check_status(self):
         try:
-            return srun_command([path], jobname, time, logfile,
-                cpus_per_task, mem_per_task, cwd, stdout, 
-                srun_user_args=['--multi-prog', '-l'],
-                change_user=change_user, storage_job=False, comment=comment
-                )
-        finally:
-            os.remove(path)
+            squeue_out = utilities.check_output(nsc.SQUEUE + ['-j', self.job_id, '-O', 'JobID,State', '-h', '-t', 'all', '-r'])
+        except subprocess.CalledProcessError:
+            squeue_out = ""
+        new_states = dict(line.split() for line in squeue_out.splitlines() if line)
+    
+        # State of subjob with same ID as array job will be PENDING until no more jobs are pending.
+        # If this job cancelled, make sure others are marked as the same state too.
+        if new_states and all(state in set(('COMPLETED', 'FAILED', 'CANCELLED')) for state in new_states.values()):
+            for jid in self.states.keys():
+                if not jid in new_states.keys() and self.states[jid] == "PENDING":
+                    self.states[jid] = 'CANCELLED'
 
+        self.states.update(new_states)
+        if not squeue_out and "RUNNING" in self.states.values():
+            raise JobMonitoringException()
+        self.summary = dict((key, len(list(group))) for key, group in groupby(sorted(self.states.values())))
+
+    @property
+    def is_finished(self):
+        return all(state in set(('COMPLETED', 'FAILED', 'CANCELLED')) for state in self.states.values())
 
 def is_scheduler_available():
     return nsc.REMOTE_MODE == "srun"

@@ -61,6 +61,7 @@ class Task(object):
         self.process = None
         self.finished = False
         self.success = False
+        self.prev_array_job_summary = {}
 
 
     def get_arg(self, arg_name):
@@ -383,6 +384,24 @@ class Task(object):
         print("INFO   [" + self.task_name + "] " + status, file=sys.stderr)
 
 
+    def array_job_status(self, array_job):
+        """Shpw progress information for array job (#Pending/Running/Completed...) as 
+        INFO message if it is changed since last invocation of this method."""
+        if array_job.summary != self.prev_array_job_summary:
+            known_codes = ['PENDING', 'RUNNING', 'FAILED', 'COMPLETED']
+            states = [
+                    "{0}:{1}".format(code[0:1], array_job.summary[code]) 
+                    for code in known_codes
+                    if array_job.summary.get(code)
+                    ]
+            other_states = sum(v for code, v in array_job.summary.items() if code not in known_codes) 
+            if other_states:
+                states.append("?:{0}".format(other_states))
+
+            self.info("[JobId %s] " % array_job.job_id + ", ".join(states))
+            self.prev_array_job_summary = dict(array_job.summary)
+
+
     def warn(self, status):
         if self.process:
             self.process.get()
@@ -432,6 +451,7 @@ class Task(object):
 
         print("SUCCESS[" + self.task_name + "] " + complete_str, file=sys.stderr)
         sys.exit(0)
+
 
 
 
