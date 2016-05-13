@@ -398,7 +398,7 @@ class Task(object):
             if other_states:
                 states.append("?:{0}".format(other_states))
 
-            self.info("[JobId %s] " % array_job.job_id + ", ".join(states))
+            self.info("[%s] " % array_job.job_id + ", ".join(states))
             self.prev_array_job_summary = dict(array_job.summary)
 
 
