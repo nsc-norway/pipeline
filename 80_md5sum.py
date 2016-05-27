@@ -35,7 +35,7 @@ def main(task):
     task.running()
     bc_dir = task.bc_dir
     run_id = task.run_id
-    n_threads = task.threads
+    n_threads = max(task.threads, 4)
     projects = task.projects
     samples.flag_empty_files(projects, task.work_dir)
     for project in projects:
