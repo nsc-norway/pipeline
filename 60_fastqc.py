@@ -71,7 +71,7 @@ def main(task):
         aj.start()
         task.array_job_status(aj)
         while not aj.is_finished:
-            time.sleep(15)
+            time.sleep(30)
             aj.check_status()
             task.array_job_status(aj)
 
