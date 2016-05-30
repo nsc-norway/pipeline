@@ -134,6 +134,7 @@ class ArrayJob(object):
         os.remove(path)
 
     def check_status(self):
+        """Refresh status of jobs. Should be called at least every 15 seconds to avoid missing jobs."""
         try:
             squeue_out = utilities.check_output(nsc.SQUEUE + ['-j', self.job_id, '-O', 'JobID,State', '-h', '-t', 'all', '-r'])
         except subprocess.CalledProcessError:
