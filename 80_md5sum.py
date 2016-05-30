@@ -35,7 +35,7 @@ def main(task):
     task.running()
     bc_dir = task.bc_dir
     run_id = task.run_id
-    n_threads = max(task.threads, 4)
+    n_threads = max(task.threads, 2)
     projects = task.projects
     samples.flag_empty_files(projects, task.work_dir)
     for project in projects:
@@ -50,7 +50,7 @@ def main(task):
                 jobname = task.process.id + "." + jobname
             rcode = remote.run_command(
                     [nsc.MD5DEEP, '-rl'] + paths, jobname, time="08:00:00",
-                    cpus=n_threads, mem="2048M",
+                    cpus=n_threads, mem="2048M", storage_job=True,
                     cwd=os.path.join(bc_dir, project.proj_dir),
                     stdout = stdout
                     )
