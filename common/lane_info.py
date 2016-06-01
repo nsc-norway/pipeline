@@ -28,7 +28,7 @@ def get_lane_cluster_density(path):
         return dict((i+1, lane_sum[i] / lane_ntile[i]) for i in lane_sum.keys())
 
 
-def get_from_files(run_dir, instrument, expand_lanes=None):
+def get_from_files(run_dir, instrument, expand_lanes=False):
     """Returns a dict indexed by lane number with values of cluster density tuples. Each
     tuple contains the raw cluster density, the PF cluster density and the PF ratio (this
     is redundant information, but various methods provide various values, so keeping all
@@ -40,6 +40,7 @@ def get_from_files(run_dir, instrument, expand_lanes=None):
     Returns merged (average) lane stats for NextSeq.
     """
     lanes = {}
+
     if instrument == "miseq" or instrument == "hiseq":
         # MiSeq has the Data/reports info, like HiSeq, getting clu. density from files
         pf_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane PF.txt")
@@ -72,6 +73,34 @@ def get_from_files(run_dir, instrument, expand_lanes=None):
                 (lane_id, (None, None, None))
                 for lane_id in [1,2,3,4,5,6,7,8]
                 )
+
+    return lanes
+
+
+def get_from_interop(run_dir, merge_lanes=False):
+    """Get cluster density and PF ratio from the "InterOp" files. (binary
+    run statistics format)
+
+    Uses the Illuminate library to parse the files. This creates a Pandas dataframe,
+    from which the relevant metrics are easily obtained.
+    """
+
+    import illuminate
+    dataset = illuminate.InteropDataset(run_dir)
+    df = dataset.TileMetrics().df
+    if merge_lanes:
+        means = df[df.code.isin((100,101))].groupby(by=df.code).mean()
+    else:
+        means = df[df.code.isin((100,101))].groupby(by=(df.lane,df.code)).mean()
+
+    raw = means[means.code==100].value.values
+    pf = means[means.code==101].value.values
+
+    if merge_lanes:
+        lanes = dict([("X", (raw[0], pf[0], pf[0] / raw[0]))])
+    else:
+        lane_id = means[means.code==100]['lane'].values.astype('uint64')
+        lanes = dict(zip(lane_id, zip(raw, pf, pf/raw)))
 
     return lanes
 
