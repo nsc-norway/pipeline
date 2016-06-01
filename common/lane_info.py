@@ -14,6 +14,8 @@ class LaneStats(object):
         self.cluster_den_pf = cluster_den_pf
         self.pf_ratio = pf_ratio
 
+class NotSupportedException(Exception):
+    pass
 
 def get_lane_cluster_density(path):
     """Get cluster density for lanes from report files in Data/reports.
@@ -92,7 +94,11 @@ def get_from_interop(run_dir, merge_lanes=False):
     from which the relevant metrics are easily obtained.
     """
 
-    import illuminate
+    try:
+        import illuminate
+    except ImportError:
+        raise NotSupportedException
+
     dataset = illuminate.InteropDataset(run_dir)
     df = dataset.TileMetrics().df
     if merge_lanes:
