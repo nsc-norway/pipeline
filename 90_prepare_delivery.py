@@ -173,10 +173,13 @@ def main(task):
         task.fail("Sorry, delivery prep is only available through LIMS")
 
     lims_projects = {}
-    for i in task.process.all_inputs(unique=True):
-        pro = i.samples[0].project
-        if pro: # Otherwise it's a control
-            lims_projects[utilities.get_sample_sheet_proj_name(pro.name)] = pro
+    inputs = task.process.all_inputs(unique=True, resolve=True)
+    samples = sum(input.samples, [])
+    lims_projects = dict(
+            (utilities.get_sample_sheet_proj_name(sample.project.name), sample.project)
+            for sample in samples
+            if sample.project
+            )
 
     runid = task.run_id
     projects = (project for project in task.projects if not project.is_undetermined)
