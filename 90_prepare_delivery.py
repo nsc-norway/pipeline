@@ -174,7 +174,7 @@ def main(task):
 
     lims_projects = {}
     inputs = task.process.all_inputs(unique=True, resolve=True)
-    samples = sum(input.samples, [])
+    samples = (sample for i in inputs for sample in i.samples)
     lims_projects = dict(
             (utilities.get_sample_sheet_proj_name(sample.project.name), sample.project)
             for sample in samples
