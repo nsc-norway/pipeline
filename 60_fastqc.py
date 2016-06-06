@@ -62,9 +62,9 @@ def main(task):
 
     if remote.is_scheduler_available():
         commands = [[nsc.FASTQC] + fastqc_args + [path] for path in fastq_paths]
-	aj = remote.ArrayJob(commands, jobname, "1-0", log_path.replace(".txt", ".%a.txt"))
-	aj.cpus_per_task = 1
-	aj.mem_per_task = 1
+        aj = remote.ArrayJob(commands, jobname, "1-0", log_path.replace(".txt", ".%a.txt"))
+        aj.cpus_per_task = 1
+        aj.mem_per_task = 1
         aj.max_simultaneous = 32 # Limit due to I/O bottlenecks
         # This is highly dependent on the computing environment. Should be configurable, or
         # maybe the admin could limit the number of jobs in slurm.
@@ -74,8 +74,8 @@ def main(task):
             time.sleep(30)
             aj.check_status()
             task.array_job_status(aj)
-
-	if aj.summary.keys() != ["COMPLETED"]:
+        
+        if aj.summary.keys() != ["COMPLETED"]:
             task.fail("fastqc failure", str(aj.summary))
 	
     else:
@@ -87,7 +87,7 @@ def main(task):
             # process interleaved e.g. #1, #3, #5, ... then #2, #4, #6...
             # to preserve order
             proc_paths = fastq_paths[i_group::n_groups]
-            task.info("Fastqc-" + str(i_group), ": Processing", len(proc_paths), "of", len(fastq_paths), "files...")
+            task.info("Fastqc-{0}: Processing {1} of {2} files...".format(i_group, len(proc_paths), len(fastq_paths)))
 
             threads_to_request=min(len(proc_paths), threads)
             grp_fastqc_args = fastqc_args + ["--threads=" + str(threads)] + proc_paths
@@ -98,9 +98,9 @@ def main(task):
                     srun_user_args=['--open-mode=append']
                     )
 
-	    if rcode != 0:
-		# The following function will call exit(1)
-		task.fail("fastqc failure", "Group " + str(i_group))
+            if rcode != 0:
+                # The following function will call exit(1)
+                task.fail("fastqc failure", "Group " + str(i_group))
 
     
     if task.process:
