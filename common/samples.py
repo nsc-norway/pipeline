@@ -352,7 +352,7 @@ def get_fastq_name(instrument, sample_name, sample_index,
         name = "{sample_name}_{index_seq}_L{lane_id:03}_R{i_read}_001.fastq.gz".format(parameters)
     elif nsc.SITE == "cees":
         # Format for CEES site
-        parameters['fcid'] = re.match(r"_[AB]([A-Z0-9]+)$", run_id)
+        parameters['fcid'] = re.search(r"_[AB]([A-Z0-9]+)$", run_id)
         name = "{sample_name}_S{sample_index}_L{lane_id:03}_R{i_read}_001.fastq.gz".format(parameters)
     else:
         name = bcl2fastq2_file_name(sample_name, sample_index, lane_id, i_read, merged_lanes)
