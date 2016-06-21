@@ -165,13 +165,14 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
             for i_read in xrange(1, num_reads+1):
 
                 fastq_name = get_fastq_name(
-                        instrument, 
+                        instrument,
                         sample.name,
                         sample.sample_index,
                         entry.get('index'),
                         entry.get('index2'),
                         lane_id,
                         i_read,
+                        run_id,
                         merged_lanes
                         )
 
@@ -322,10 +323,25 @@ def get_sample_dir(instrument, sample_name):
 
 
 def get_fastq_name(instrument, sample_name, sample_index,
-        index1, index2, lane_id, i_read, merged_lanes):
+        index1, index2, lane_id, i_read, run_id, merged_lanes):
     """The file name we want depends on the instument type, for consistency with older
-    deliveries."""
+    deliveries.
     
+    HiSeq 2500: Use CASAVA naming scheme.
+
+    Others: Use bcl2fastq v2 naming scheme. 
+
+    CEES site: Using a naming scheme which includes the flowcell ID.
+    """
+    
+    parameters = {
+            "sample_name":sample.name,
+            "sample_index":sample.sample_index,
+            "barcode_index1":entry.get('index'),
+            "barcode_index2":entry.get('index2'),
+            "lane_id": lane_id,
+            "i_read":i_read,
+        }
     if instrument == "hiseq":
         if index1:
             index_seq = index1
@@ -333,17 +349,16 @@ def get_fastq_name(instrument, sample_name, sample_index,
             index_seq = "NoIndex"
         if index2:
             index_seq += "-" + index2
-        name = "{0}_{1}_L{2}_R{3}_001.fastq.gz".format(
-                sample_name,
-                index_seq,
-                str(lane_id).zfill(3),
-                i_read)
-    
+        name = "{sample_name}_{index_seq}_L{lane_id:03}_R{i_read}_001.fastq.gz".format(parameters)
+    elif nsc.SITE == "cees":
+        # Format for CEES site
+        parameters['fcid'] = re.match(r"_[AB]([A-Z0-9]+)$", run_id)
+        name = "{sample_name}_S{sample_index}_L{lane_id:03}_R{i_read}_001.fastq.gz".format(parameters)
     else:
-        return bcl2fastq2_file_name(sample_name, sample_index, lane_id, i_read, merged_lanes)
+        name = bcl2fastq2_file_name(sample_name, sample_index, lane_id, i_read, merged_lanes)
 
     return name
-    
+
 
 def bcl2fastq2_file_name(sample_name, sample_index, lane_id, i_read, merged_lanes):
     if merged_lanes:
