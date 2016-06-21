@@ -265,11 +265,9 @@ def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_rea
 
     result = {}
     for coordinates in conversion_stats.keys():
-        print coordinates
         lane, project, sample, read = coordinates
         de_s = demultiplexing_stats[(lane, project, sample)]
         con_s_raw, con_s_pf = conversion_stats[coordinates]
-        print con_s_raw
 
         stats = {}
         stats['# Reads'] = con_s_raw['ClusterCount']

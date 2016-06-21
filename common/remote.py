@@ -129,23 +129,23 @@ class ArrayJob(object):
         if self.max_simultaneous is not None:
             array += "%%%d" % (self.max_simultaneous)
         self.job_id = utilities.check_output(nsc.SBATCH_ARGLIST + ['--parsable', array, path], cwd=self.cwd).strip()
-        self.states = dict((str(j), 'PENDING') for j in range(int(self.job_id), int(self.job_id)+len(self.arg_lists)))
+        self.states = dict((str(j), 'PENDING') for j in range(len(self.arg_lists)))
         self.summary = {'PENDING': len(self.arg_lists)}
         os.remove(path)
 
     def check_status(self):
+        """Refresh status of jobs. Should be called periodically (every minute)."""
         try:
-            squeue_out = utilities.check_output(nsc.SQUEUE + ['-j', self.job_id, '-O', 'JobID,State', '-h', '-t', 'all', '-r'])
+            squeue_out = utilities.check_output(nsc.SQUEUE + ['-j', self.job_id, '-O', 'ArrayTaskID,State', '-h', '-t', 'all', '-r'])
         except subprocess.CalledProcessError:
             squeue_out = ""
         new_states = dict(line.split() for line in squeue_out.splitlines() if line)
     
-        # State of subjob with same ID as array job will be PENDING until no more jobs are pending.
         # If this job cancelled, make sure others are marked as the same state too.
         if new_states and all(state in set(('COMPLETED', 'FAILED', 'CANCELLED')) for state in new_states.values()):
-            for jid in self.states.keys():
-                if not jid in new_states.keys() and self.states[jid] == "PENDING":
-                    self.states[jid] = 'CANCELLED'
+            for jix in self.states.keys():
+                if not jix in new_states.keys() and self.states[jix] == "PENDING":
+                    self.states[jix] = 'CANCELLED'
 
         self.states.update(new_states)
         if not squeue_out and "RUNNING" in self.states.values():

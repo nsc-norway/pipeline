@@ -173,36 +173,42 @@ def main(task):
         task.fail("Sorry, delivery prep is only available through LIMS")
 
     lims_projects = {}
-    for i in task.process.all_inputs(unique=True):
-        pro = i.samples[0].project
-        lims_projects[utilities.get_sample_sheet_proj_name(pro.name)] = pro
+    inputs = task.process.all_inputs(unique=True, resolve=True)
+    samples = (sample for i in inputs for sample in i.samples)
+    lims_projects = dict(
+            (utilities.get_sample_sheet_proj_name(sample.project.name), sample.project)
+            for sample in samples
+            if sample.project
+            )
 
     runid = task.run_id
     projects = (project for project in task.projects if not project.is_undetermined)
 
     sensitive_fail = []
     for project in projects:
-        lims_project = lims_projects[project.name]
+        lims_project = lims_projects.get(project.name)
 
-        project_path = os.path.join(task.bc_dir, project.proj_dir)
+        if lims_project:
 
-        delivery_type = lims_project.udf[nsc.DELIVERY_METHOD_UDF]
-        project_type = lims_project.udf[nsc.PROJECT_TYPE_UDF]
+            project_path = os.path.join(task.bc_dir, project.proj_dir)
 
-        if project_type == "Diagnostics":
-            task.info("Copying " + project.name + " to diagnostics...")
-            delivery_diag(task, project, task.bc_dir, project_path)
-        elif delivery_type == "User HDD" or delivery_type == "New HDD":
-            task.info("Hard-linking " + project.name + " to delivery area...")
-            delivery_harddrive(project.name, project_path)
-        elif delivery_type == "Norstore":
-            if project_type != "Non-Sensitive":
-                sensitive_fail.append(project.name)
-                continue
-            task.info("Tar'ing and copying " + project.name + " to delivery area, for Norstore...")
-            delivery_norstore(task.process, project.name, project_path)
-        else:
-            print "No delivery prep done for project", project_name
+            delivery_type = lims_project.udf[nsc.DELIVERY_METHOD_UDF]
+            project_type = lims_project.udf[nsc.PROJECT_TYPE_UDF]
+
+            if project_type == "Diagnostics":
+                task.info("Copying " + project.name + " to diagnostics...")
+                delivery_diag(task, project, task.bc_dir, project_path)
+            elif delivery_type == "User HDD" or delivery_type == "New HDD":
+                task.info("Hard-linking " + project.name + " to delivery area...")
+                delivery_harddrive(project.name, project_path)
+            elif delivery_type == "Norstore":
+                if project_type != "Non-Sensitive":
+                    sensitive_fail.append(project.name)
+                    continue
+                task.info("Tar'ing and copying " + project.name + " to delivery area, for Norstore...")
+                delivery_norstore(task.process, project.name, project_path)
+            else:
+                print "No delivery prep done for project", project_name
 
     if sensitive_fail:
         task.fail("Selected Norstore delivery for sensitive data, nothing done for: " + ",".join(sensitive_fail))

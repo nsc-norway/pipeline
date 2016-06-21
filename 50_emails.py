@@ -20,11 +20,15 @@ def main(task):
     work_dir = task.work_dir
     instrument = utilities.get_instrument_by_runid(run_id)
     
-    expand_lanes = instrument == "nextseq" and not task.no_lane_splitting
-    if task.process: # lims mode
-        lane_stats = lane_info.get_from_lims(task.process, instrument, expand_lanes)
-    else:
-        lane_stats = lane_info.get_from_files(work_dir, instrument, expand_lanes)
+    try:
+        lane_stats = lane_info.get_from_interop(task.work_dir, task.no_lane_splitting)
+    except lane_info.NotSupportedException:
+        expand_lanes = instrument == "nextseq" and not task.no_lane_splitting
+
+        if task.process: # lims mode
+            lane_stats = lane_info.get_from_lims(task.process, instrument, expand_lanes)
+        else:
+            lane_stats = lane_info.get_from_files(work_dir, instrument, expand_lanes)
 
     projects = task.projects
 
@@ -104,8 +108,8 @@ def write_internal_sample_table(output_path, runid, projects, lane_stats):
                 if f.i_read == 1:
                     out.write(s.name + "\t")
                     lane = lane_stats[f.lane]
-                    out.write(utilities.display_int(lane[0]) + "\t")
-                    out.write(utilities.display_int(lane[1]) + "\t")
+                    out.write(utilities.display_int(lane.cluster_den_raw) + "\t")
+                    out.write(utilities.display_int(lane.cluster_den_pf) + "\t")
                     if f.empty:
                         out.write("%4.2f" % (0,) + "%\t")
                         out.write("0\t")
@@ -171,9 +175,9 @@ Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2
                     if f.lane == l and f.i_read == 1 and not f.empty)
             out.write(utilities.display_int(cluster_no) + '\t')
             lane = lane_stats[l]
-            out.write("%4.2f" % (lane[2] if lane[2] is not None else 0.0) + "\t")
-            out.write(utilities.display_int(lane[0]) + '\t')
-            out.write(utilities.display_int(lane[1]) + '\t')
+            out.write("%4.2f" % (lane.pf_ratio if lane.pf_ratio is not None else 0.0) + "\t")
+            out.write(utilities.display_int(lane.cluster_den_raw) + '\t')
+            out.write(utilities.display_int(lane.cluster_den_pf) + '\t')
             if undetermined_file and not undetermined_file.empty:
                 try:
                     out.write("%4.2f" % (undetermined_file.stats['% of PF Clusters Per Lane'],) + "%\t")

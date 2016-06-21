@@ -316,7 +316,7 @@ def get_ne_mi_project_dir(run_id, project_name):
 
 
 def get_sample_dir(instrument, sample_name):
-    if instrument in ['hiseq', 'hiseq4k']:
+    if instrument in ['hiseq', 'hiseq4k', 'hiseqx']:
         return "Sample_" + sample_name
     else:
         return None
