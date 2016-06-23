@@ -334,24 +334,28 @@ def get_fastq_name(instrument, sample_name, sample_index,
     CEES site: Using a naming scheme which includes the flowcell ID.
     """
     
+    # Single / dual index string
+    if index1:
+        index_seq = index1
+    else:
+        index_seq = "NoIndex"
+    if index2:
+        index_seq += "-" + index2
+
+    # All parameters used for formatting
     parameters = {
             "sample_name":sample_name,
             "sample_index":sample_index,
+            "index_seq":index_seq,
             "lane_id": lane_id,
             "i_read":i_read,
         }
-    if instrument == "hiseq":
-        if index1:
-            index_seq = index1
-        else:
-            index_seq = "NoIndex"
-        if index2:
-            index_seq += "-" + index2
-        name = "{sample_name}_{index_seq}_L{lane_id:03}_R{i_read}_001.fastq.gz".format(parameters)
-    elif nsc.SITE == "cees":
+    if nsc.SITE == "cees":
         # Format for CEES site
         parameters['fcid'] = re.search(r"_[AB]([A-Z0-9]+)$", run_id)
-        name = "{sample_name}_S{sample_index}_L{lane_id:03}_R{i_read}_001.fastq.gz".format(parameters)
+        name = "{sample_name}_{index_seq}_L{lane_id:03}_R{i_read}_001.fastq.gz".format(parameters)
+    elif instrument == "hiseq":
+        name = "{sample_name}_{index_seq}_L{lane_id:03}_R{i_read}_001.fastq.gz".format(parameters)
     else:
         name = bcl2fastq2_file_name(sample_name, sample_index, lane_id, i_read, merged_lanes)
 
