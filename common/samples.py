@@ -335,10 +335,8 @@ def get_fastq_name(instrument, sample_name, sample_index,
     """
     
     parameters = {
-            "sample_name":sample.name,
-            "sample_index":sample.sample_index,
-            "barcode_index1":entry.get('index'),
-            "barcode_index2":entry.get('index2'),
+            "sample_name":sample_name,
+            "sample_index":sample_index,
             "lane_id": lane_id,
             "i_read":i_read,
         }
