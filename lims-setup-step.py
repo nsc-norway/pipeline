@@ -29,11 +29,11 @@ if nsc.SITE == "cees":
     CHECKED = {
             "hiseq": [
                 "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
-                "Auto 40. Move fastq files", "Auto 50-80. QC", "Close when finished"
+                "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Delivery and triggers", "Close when finished"
                 ],
             "hiseq4k": [
                 "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
-                "Auto 40. Move fastq files", "Auto 50-80. QC", "Close when finished"
+                "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Delivery and triggers", "Close when finished"
                 ]
             }
     # Used to set different number of threads for different machines. Probably

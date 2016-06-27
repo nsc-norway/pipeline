@@ -352,8 +352,8 @@ def get_fastq_name(instrument, sample_name, sample_index,
         }
     if nsc.SITE == "cees":
         # Format for CEES site
-        parameters['fcid'] = re.search(r"_[AB]([A-Z0-9]+)$", run_id)
-        name = "{sample_name}_{index_seq}_L{lane_id:03}_R{i_read}_001.fastq.gz".format(**parameters)
+        parameters['fcid'] = re.search(r"_[AB]([A-Z0-9]+)$", run_id).group(1)
+        name = "{fcid}_{sample_name}_{index_seq}_L{lane_id:03}_R{i_read}_001.fastq.gz".format(**parameters)
     elif instrument == "hiseq":
         name = "{sample_name}_{index_seq}_L{lane_id:03}_R{i_read}_001.fastq.gz".format(**parameters)
     else:
