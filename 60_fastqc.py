@@ -65,7 +65,7 @@ def main(task):
         aj = remote.ArrayJob(commands, jobname, "1-0", log_path.replace(".txt", ".%a.txt"))
         aj.cpus_per_task = 1
         aj.mem_per_task = 1
-        aj.max_simultaneous = 32 # Limit due to I/O bottlenecks
+        aj.max_simultaneous = 64 # Limit due to I/O bottlenecks
         # This is highly dependent on the computing environment. Should be configurable, or
         # maybe the admin could limit the number of jobs in slurm.
         aj.start()
