@@ -122,7 +122,10 @@ def get_resultfile(process, lane, input_limsid, read):
         # Would only do this for 404, but there is no e.response.status_code
         # (that is, e.response is None)
         input_sample = Sample(nsc.lims, id=input_limsid)
-        input_sample.get()
+        try:
+            input_sample.get()
+        except requests.exceptions.HTTPError:
+            return None
 
     # Find the result file corresponding to this artifact
     for i, o in process.input_output_maps:
