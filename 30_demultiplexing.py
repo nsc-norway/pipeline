@@ -74,7 +74,7 @@ def get_thread_args(n_threads):
     loading = 4 + n_threads//4
     writing = 4 + n_threads//10
     demultiplexing = int(ceil(n_threads * 0.7)) #  70 %
-    processing = int(ceil(n_threads * 0.8))     #  80 %
+    processing = int(ceil(n_threads * 1.0))     #  100 %
     return ['-r', str(loading), '-d', str(demultiplexing),
             '-p', str(processing), '-w', str(writing)]
 
