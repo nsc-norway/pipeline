@@ -131,7 +131,7 @@ def delivery_norstore(process, project_name, source_path):
     # a single file, so just requesting one core, and a "storage job"
     rcode = remote.run_command(
             [nsc.MD5DEEP, "-l", "-j1", tarname],
-            "md5deep", "02:00:00", cwd=save_path, stdout=md5_path,
+            "md5deep", "08:00:00", cwd=save_path, stdout=md5_path,
             storage_job=True
             )
     if rcode != 0:
