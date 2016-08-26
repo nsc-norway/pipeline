@@ -7,8 +7,8 @@ import shutil
 import time
 from common import samples, nsc, taskmgr, samples, remote, utilities
 
-TASK_NAME = "60. FastQC"
-TASK_DESCRIPTION = """Run FastQC on the demultiplexed files."""
+TASK_NAME = "60. QC analysis"
+TASK_DESCRIPTION = """Run QC tools on the demultiplexed files."""
 TASK_ARGS = ['work_dir', 'sample_sheet', 'threads', 'lanes']
 
 def main(task):
@@ -62,18 +62,23 @@ def main(task):
 
     if remote.is_scheduler_available():
         commands = [[nsc.FASTQC] + fastqc_args + [path] for path in fastq_paths]
-        aj = remote.ArrayJob(commands, jobname, "1-0", log_path.replace(".txt", ".%a.txt"))
-        aj.cpus_per_task = 1
-        aj.mem_per_task = 1
-        aj.max_simultaneous = 64 # Limit due to I/O bottlenecks
+        jobs = []
+        fqc = remote.ArrayJob(commands, jobname, "1-0", log_path.replace(".txt", ".%a.txt"))
+        fqc.cpus_per_task = 1
+        fqc.mem_per_task = 1
+        fqc.max_simultaneous = 64 # Limit due to I/O bottlenecks
         # This is highly dependent on the computing environment. Should be configurable, or
         # maybe the admin could limit the number of jobs in slurm.
-        aj.start()
-        task.array_job_status(aj)
-        while not aj.is_finished:
+        fqc.start()
+
+        jobs = [fqc]
+
+        task.array_job_status(jobs)
+        while not all(job.is_finished for job in jobs):
             time.sleep(30)
-            aj.check_status()
-            task.array_job_status(aj)
+            for job in jobs:
+                job.check_status()
+            task.array_job_status(jobs)
         
         if aj.summary.keys() != ["COMPLETED"]:
             task.fail("fastqc failure", str(aj.summary))
