@@ -80,7 +80,7 @@ def main(task):
                 job.check_status()
             task.array_job_status(jobs)
         
-        if sum((job.summary.keys() for job in jobs), {}) != ["COMPLETED"]:
+        if sum((set(job.summary.keys()) for job in jobs), set()) != set(("COMPLETED",)):
             task.fail("fastqc failure", str(aj.summary))
 	
     else:
