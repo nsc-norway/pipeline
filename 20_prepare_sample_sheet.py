@@ -112,6 +112,8 @@ def main(task):
     instrument = utilities.get_instrument_by_runid(task.run_id)
     if instrument.startswith("hiseq") and not re.search(r"\[Data\]", sample_sheet):
         sample_sheet = convert_from_bcl2fastqv1(sample_sheet)
+    if instrument == "hiseqx":
+        sample_sheet = clear_index2_column(sample_sheet)
 
     # Post the result, as appropriate...
     if task.process:
@@ -139,6 +141,33 @@ def replace_special_chars(sample_sheet_data):
 def rev_comp(sequence):
     COMPLEMENTARY = {'A':'T', 'T':'A', 'G':'C', 'C':'G'}
     return "".join(COMPLEMENTARY[b] for b in reversed(sequence))
+
+
+def clear_index2_column(original_data):
+    lines = original_data.splitlines()
+    output_rows = []
+    data = False
+    header = False
+    index2index = 0
+    for l in lines:
+        line = l.strip("\r\n")
+        if not data and line.lower().startswith("[data]"):
+            data = True
+        elif data:
+            if not header:
+                header = line.strip().lower().split(",")
+                try:
+                    index2index = header.index("index2")
+                except ValueError:
+                    return original_data
+            else:
+                parts = line.split(",")
+                if len(parts) > index2index:
+                    parts[index2index] = ""
+                line = ",".join(parts)
+        output_rows.append(line)
+
+    return "\r\n".join(output_rows)
 
 
 def convert_from_bcl2fastqv1(original_data):
