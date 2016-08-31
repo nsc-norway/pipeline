@@ -85,7 +85,7 @@ def main(task):
             if not os.path.exists(sample_dir):
                 os.mkdir(sample_dir)
             for f in sample.files:
-                if not f.empty:
+                if f.i_read == 1 and not f.empty:
                     output_path = os.path.join(
                             output_dir,
                             samples.get_fastdup_path(project, sample, f),

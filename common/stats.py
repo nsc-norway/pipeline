@@ -321,15 +321,25 @@ def get_stats(
     stats_xml_file_path = os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats" + suffix)
     return get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes, aggregate_reads)
 
+
 ###################### Other metrics #######################
 
 def add_duplication_results(basecalls_dir, projects):
     for project in projects:
         for sample in project.samples:
             for f in sample.files:
-                with open(samples) as metrics_file:
-                    num_reads, num_dupes, num_dupes_dedup = metrics_file.read().strip().split("\t")
-                    stats = f.stats or {}
-                    stats['% Sequencing Duplicates (R1)'] = num_dupes_dedup * 100.0 / num_reads
-                    f.stats = stats
+                if f.i_read == 1 and not f.empty: # Don't need the empty flag, but skip it 
+                                                  # quickly when we know it's empty
+                    try:
+                        with open(samples) as metrics_file:
+                            lines = [line.strip().split("\t") for line in metrics_file.readlines()]
+                            assert lines[0] == ["NUM_READS", "READS_WITH_DUP", "DUPLICATES_DEDUP"]
+                            num_reads, reads_with_dup, num_dupes_dedup = lines[1].split("\t")
+                            stats = f.stats or {}
+                            stats['% Sequencing Duplicates (R1)'] = reads_with_dup * 100.0 / num_reads
+                            stats['fastdup reads with duplicate'] = reads_with_dup
+                            stats['fastdup reads analysed'] = num_reads
+                            f.stats = stats
+                    except IOError:
+                        pass
 
