@@ -378,20 +378,32 @@ def bcl2fastq2_file_name(sample_name, sample_index, lane_id, i_read, merged_lane
                 i_read)
     return name
 
-    
 
-def get_fastqc_dir(project, sample, fastqfile):
-    """Get the directory in which the fastqc results are stored
-    (after moving it)."""
-
-    fqc_name = re.sub(r".fastq.gz$", "_fastqc", fastqfile.filename)
+def get_sample_qc_dir(project, sample):
+    """Get the directory of the QC files for a sample."""
     if project.name:
         project_name = project.name
         sample_name = sample.name
     else:
         project_name = "Undetermined"
         sample_name = "Undetermined"
-    return os.path.join(project_name, "Sample_" + sample_name, fqc_name)
+    return os.path.join(project_name, "Sample_" + sample_name)
+
+
+def get_fastqc_dir(project, sample, fastqfile):
+    """Get the directory in which the fastqc results are stored
+    (after moving it)."""
+
+    fqc_name = re.sub(r".fastq.gz$", "_fastqc", fastqfile.filename)
+    return os.path.join(get_sample_qc_dir(project, sample), fqc_name)
+
+
+def get_fastdup_path(project, sample, fastqfile):
+    """Get the directory in which the fastqc results are stored
+    (after moving it)."""
+
+    fd_name = re.sub(r".fastq.gz$", "_fastdup.txt", fastqfile.filename)
+    return os.path.join(get_sample_qc_dir(project, sample), fd_name)
 
 
 def qc_pdf_name(run_id, fastq):

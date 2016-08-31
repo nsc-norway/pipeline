@@ -42,6 +42,8 @@ def main(task):
             )
 
     samples.add_stats(projects, run_stats)
+    if task.instrument in ["hiseq4k", "hiseqx"]:
+        stats.add_duplication_results(task.bc_dir, projects)
     samples.flag_empty_files(projects, work_dir)
 
     qc_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls", "QualityControl" + task.suffix)

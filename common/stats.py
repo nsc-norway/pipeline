@@ -4,10 +4,13 @@ import re
 import os
 import itertools
 import utilities
+import samples
 from xml.etree import ElementTree
 from collections import defaultdict
 from Counter import Counter
 
+
+###################### BCL2FASTQ2 STATS #######################
 
 def parse_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_reads):
     """Get "conversion stats" from the bcl2fastq2 stats.
@@ -304,6 +307,8 @@ def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_rea
 
 
 ###################### MISEQ STATS #######################
+# MiSeq stats no longer used at NSC. MiSeq runs processed 
+# with bcl2fastq2.
 
 def get_miseq_totals(run_stats):
     """Get the run totals for miseq. Argument is the RunStats XML element
@@ -476,27 +481,24 @@ def get_stats(
         miseq_uniproject=None,
         suffix=""
         ):
-    """Instrument-independent interfact to the stats module.
+    """Instrument-independent interface to the stats module.
 
-    MiSeq handling is kind of hackish because the stats file doesn't contain info
-    on reads or project. I expect Illumina may start to use bcl2fastq2 for MiSeq too
-    sooner or later, and then everything will be uniform.
+    We used to handle MiSeq on-instrument demultiplexing, but that 
+    support is now dropped, since we use bcl2fastq2.
     """
 
-    try:
-        stats_xml_file_path = os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats" + suffix)
-        return get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes, aggregate_reads)
-    except IOError:
-        if instrument == 'miseq':
-            # MiSeq on-instrument demultiplexing results
-            generate_fastq_path = os.path.join(run_dir, "GenerateFASTQRunStatistics.xml")
-            num_reads, index_reads = utilities.get_num_reads(run_dir)
-            miseq_stats = get_miseq_stats(generate_fastq_path, num_reads, aggregate_reads)
-            return dict((c[0:1] +
-                (miseq_uniproject if c[1] else None,) + # <handling undetermined (sorry)
-                c[1:], v)
-                for c, v in miseq_stats.items())
-        else:
-            raise
+    stats_xml_file_path = os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats" + suffix)
+    return get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes, aggregate_reads)
 
+###################### Other metrics #######################
+
+def add_duplication_results(basecalls_dir, projects):
+    for project in projects:
+        for sample in project.samples:
+            for f in sample.files:
+                with open(samples) as metrics_file:
+                    num_reads, num_dupes, num_dupes_dedup = metrics_file.read().strip().split("\t")
+                    stats = f.stats or {}
+                    stats['% Sequencing Duplicates (R1)'] = num_dupes_dedup * 100.0 / num_reads
+                    f.stats = stats
 

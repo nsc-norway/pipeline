@@ -31,11 +31,11 @@ def main(task):
     # then get the paths
     # Put large files first in the list, so that the fastqc process won't be
     # stuck processing one or two large files long after all others have finished
-    fastq_paths = sorted(
-            (os.path.join(bc_dir, f.path) for f in fastq_files),
-            key=os.path.getsize,
+    fastq_sorted = sorted(fastq_files,
+            key=lambda f: os.path.getsize(os.path.join(bc_dir, f.path)),
             reverse=True
             )
+    fastq_paths = [os.path.join(bc_dir, f.path) for f in fastq_sorted]
 
     output_dir = os.path.join(bc_dir, "QualityControl" + task.suffix)
     try:
@@ -51,9 +51,11 @@ def main(task):
     fastqc_args = ["--extract", "--outdir=" + output_dir]
 
     if task.process:
-        fqc_jobname = task.process.id + ".fastqc"
+        fqc_jobname = "fastqc." + task.process.id
+        dup_jobname = "fastdup." + task.process.id
     else:
         fqc_jobname = "fastqc"
+        dup_jobname = "fastdup"
 
     fqc_log_path = task.logfile("fastqc")
     dup_log_path = task.logfile("fastdup")
@@ -62,8 +64,38 @@ def main(task):
         with open(fqc_log_path, 'w') as f:
             f.truncate()
 
-    # Dupe commands are the same for scheduler mode and normal mode.
-    dup_commands = [[nsc.FASTDUP, path] for path in fastq_paths]
+    # This loop has two purposes: 
+    # - Generate commands for fastdup
+    #   (Dupe commands are the same for scheduler mode and normal mode.)
+    # - Create the directory structure for results for FastQC and fastdup
+    # So it should run for all instrument types, not just X and 4k
+    dup_commands = []
+    for project in task.projects:
+        if project.is_undetermined:
+            project_dir = os.path.join(output_dir, "Undetermined")
+        else:
+            project_dir = os.path.join(output_dir, project.name)
+        if not os.path.exists(project_dir):
+            os.mkdir(project_dir)
+        for sample in project.samples:
+            if project.is_undetermined:
+                sample_dir = os.path.join(project_dir, "Sample_Undetermined")
+            else:
+                sample_dir = os.path.join(project_dir, "Sample_" + sample.name)
+            if not os.path.exists(sample_dir):
+                os.mkdir(sample_dir)
+            for f in sample.files:
+                if not f.empty:
+                    output_path = os.path.join(
+                            output_dir,
+                            samples.get_fastdup_path(project, sample, f),
+                            )
+                    dup_commands.append(
+                            nsc.FASTDUP_ARGLIST + [
+                                os.path.join(bc_dir, f.path),
+                                output_path
+                                ]
+                            )
 
     if remote.is_scheduler_available():
         fqc_commands = [[nsc.FASTQC] + fastqc_args + [path] for path in fastq_paths]
@@ -77,12 +109,15 @@ def main(task):
         # maybe the admin could limit the number of jobs in slurm.
         fqc.start()
 
-        dup = remote.ArrayJob(dup_commands, dup_jobname, "6-0", 
-                dup_log_path.replace(".txt", "%.a.txt"))
-        dup.max_simultaneous = 8 # Again with the limit due to I/O, let's fix this in slurm
-        dup.start()
 
-        jobs = [fqc, dup]
+        if task.instrument in ["hiseqx", "hiseq4k"] or "DEBUG"=="DEBUG":
+            dup = remote.ArrayJob(dup_commands, dup_jobname, "6:00:00", 
+                    dup_log_path.replace(".txt", ".%a.txt"))
+            dup.max_simultaneous = 8 # Again with the limit due to I/O (let's fix this in slurm)
+            dup.start()
+            jobs = [fqc, dup]
+        else:
+            jobs = [fqc]
 
         task.array_job_status(jobs)
         while not all(job.is_finished for job in jobs):
@@ -105,7 +140,7 @@ def main(task):
     else:
         # Process the files in groups of 500 files to prevent the 
         # "argument list too long" error. The groups are processed 
-        # sequentially. 
+        # serially. 
         n_groups = (len(fastq_paths) + 499) // 500
         for i_group in xrange(n_groups):
             # process interleaved e.g. #1, #3, #5, ... then #2, #4, #6...
@@ -146,27 +181,7 @@ def move_fastqc_results(qc_dir, projects):
     Gets the desired name of the fastqc dir from the "samples" module."""
 
     for project in projects:
-        # Create the project dir (and sample dir below)
-        # while most of the code only depends on samples.get_fastqc_dir
-        # for locating the fastqc files, this function also hast to 
-        # create the directories in between 
-        if project.is_undetermined:
-            project_dir = os.path.join(qc_dir, "Undetermined")
-        else:
-            project_dir = os.path.join(qc_dir, project.name)
-
-        if not os.path.exists(project_dir):
-            os.mkdir(project_dir)
-
         for sample in project.samples:
-            if project.is_undetermined:
-                sample_dir = os.path.join(project_dir, "Sample_Undetermined")
-            else:
-                sample_dir = os.path.join(project_dir, "Sample_" + sample.name)
-
-            if not os.path.exists(sample_dir):
-                os.mkdir(sample_dir)
-
             for f in sample.files:
                 if not f.empty:
                     original_fqc_dir = os.path.join(qc_dir, fastqc_dir(f.path))
@@ -177,7 +192,6 @@ def move_fastqc_results(qc_dir, projects):
                     fqc_dir = os.path.join(qc_dir, samples.get_fastqc_dir(project, sample, f))
                     if os.path.exists(fqc_dir):
                         shutil.rmtree(fqc_dir)
-
                     os.rename(original_fqc_dir, fqc_dir)
                     os.rename(original_fqc_dir + ".html", fqc_dir + ".html")
 
