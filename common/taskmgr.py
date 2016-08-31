@@ -247,6 +247,10 @@ class Task(object):
         else:
             return ""
 
+    @property
+    def instrument(self):
+        return utilities.get_instrument_by_runid(self.run_id)
+
     # Arguments:
     def add_argument(self, *args, **kwargs):
         """Add an extra argument for command line. Used for args which
