@@ -45,25 +45,31 @@ def main(task):
 
     threads = task.threads
 
+    # Using a single output path is required for the code path without
+    # scheduler. So we do the same for both, to limit the amount of code
+    # to maintain.
     fastqc_args = ["--extract", "--outdir=" + output_dir]
 
     if task.process:
-        jobname = task.process.id + ".fastqc"
+        fqc_jobname = task.process.id + ".fastqc"
     else:
-        jobname = "fastqc"
+        fqc_jobname = "fastqc"
 
-    log_path = task.logfile("fastqc")
-    try:
-        with open(log_path, 'w') as f:
+    fqc_log_path = task.logfile("fastqc")
+    dup_log_path = task.logfile("fastdup")
+
+    if os.path.exists(fqc_log_path):
+        with open(fqc_log_path, 'w') as f:
             f.truncate()
-    except IOError:
-        pass
 
+    # Dupe commands are the same for scheduler mode and normal mode.
+    dup_commands = [[nsc.FASTDUP, path] for path in fastq_paths]
 
     if remote.is_scheduler_available():
-        commands = [[nsc.FASTQC] + fastqc_args + [path] for path in fastq_paths]
+        fqc_commands = [[nsc.FASTQC] + fastqc_args + [path] for path in fastq_paths]
         jobs = []
-        fqc = remote.ArrayJob(commands, jobname, "1-0", log_path.replace(".txt", ".%a.txt"))
+        fqc = remote.ArrayJob(fqc_commands, fqc_jobname, "1-0",
+                fqc_log_path.replace(".txt", ".%a.txt"))
         fqc.cpus_per_task = 1
         fqc.mem_per_task = 1
         fqc.max_simultaneous = 64 # Limit due to I/O bottlenecks
@@ -71,7 +77,12 @@ def main(task):
         # maybe the admin could limit the number of jobs in slurm.
         fqc.start()
 
-        jobs = [fqc]
+        dup = remote.ArrayJob(dup_commands, dup_jobname, "6-0", 
+                dup_log_path.replace(".txt", "%.a.txt"))
+        dup.max_simultaneous = 8 # Again with the limit due to I/O, let's fix this in slurm
+        dup.start()
+
+        jobs = [fqc, dup]
 
         task.array_job_status(jobs)
         while not all(job.is_finished for job in jobs):
@@ -80,8 +91,16 @@ def main(task):
                 job.check_status()
             task.array_job_status(jobs)
         
-        if set.union(*(set(job.summary.keys()) for job in jobs)) != set(("COMPLETED",)):
-            task.fail("fastqc failure", str(aj.summary))
+        fail = ""
+        detail = ""
+        if fqc.summary.keys() != ["COMPLETED"]:
+            fail += "fastqc failure "
+            detail = str(fqc.summary)
+        if dup.summary.keys() != ["COMPLETED"]:
+            fail += "fastdup failure "
+            detail = str(dup.summary)
+        if fail:
+            task.fail(fail, detail)
 	
     else:
         # Process the files in groups of 500 files to prevent the 
@@ -92,13 +111,14 @@ def main(task):
             # process interleaved e.g. #1, #3, #5, ... then #2, #4, #6...
             # to preserve order
             proc_paths = fastq_paths[i_group::n_groups]
-            task.info("Fastqc-{0}: Processing {1} of {2} files...".format(i_group, len(proc_paths), len(fastq_paths)))
+            task.info("Fastqc-{0}: Processing {1} of {2} files...".format(
+                i_group, len(proc_paths), len(fastq_paths)))
 
             threads_to_request=min(len(proc_paths), threads)
             grp_fastqc_args = fastqc_args + ["--threads=" + str(threads)] + proc_paths
             rcode = remote.run_command(
-                    [nsc.FASTQC] + grp_fastqc_args, jobname, time="1-0", 
-                    logfile=log_path, cpus=threads_to_request,
+                    [nsc.FASTQC] + grp_fastqc_args, fqc_jobname, time="1-0", 
+                    logfile=fqc_log_path, cpus=threads_to_request,
                     mem=str(1024+256*threads)+"M",
                     srun_user_args=['--open-mode=append']
                     )
@@ -109,7 +129,7 @@ def main(task):
 
     
     if task.process:
-        utilities.upload_file(task.process, nsc.FASTQC_LOG, log_path)
+        utilities.upload_file(task.process, nsc.FASTQC_LOG, fqc_log_path)
 
     move_fastqc_results(output_dir, projects)
     task.success_finish() # Calls exit(0)
