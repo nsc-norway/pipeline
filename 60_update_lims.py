@@ -39,7 +39,6 @@ def main(task):
             task.work_dir,
             aggregate_lanes = task.no_lane_splitting,
             aggregate_reads = True,
-            miseq_uniproject=next(p.name for p in projects if not p.is_undetermined),
             suffix=task.suffix
             )
 

@@ -102,7 +102,6 @@ def demultiplex_stats(project, undetermined_project, work_dir, basecalls_dir,
             work_dir,
             aggregate_lanes = aggregate_lanes,
             aggregate_reads = True,
-            miseq_uniproject=project,
             suffix=suffix
             )
 
