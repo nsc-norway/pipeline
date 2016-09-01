@@ -105,7 +105,7 @@ elif SITE == "ous":
     #BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
     BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.17.1.14/nscinstallbin/bin/bcl2fastq"
     FASTQC="/data/common/tools/nscbin/fastqc"
-    FASTDUP_ARGLIST=["/data/common/tools/nscbin/fastdup"]
+    FASTDUP_ARGLIST=["/data/common/tools/nscbin/fastdup", "-s", "20", "-e", "70"]
     BASEURI="https://ous-lims.sequencing.uio.no"
 
     REMOTE_MODE = "srun"
