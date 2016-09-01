@@ -7,7 +7,7 @@ import shutil
 import time
 from common import samples, nsc, taskmgr, samples, remote, utilities
 
-TASK_NAME = "60. QC analysis"
+TASK_NAME = "50. QC analysis"
 TASK_DESCRIPTION = """Run QC tools on the demultiplexed files."""
 TASK_ARGS = ['work_dir', 'sample_sheet', 'threads', 'lanes']
 
@@ -97,14 +97,14 @@ def main(task):
                                 ]
                             )
 
-    if remote.is_scheduler_available():
+    if remote.is_scheduler_available:
         fqc_commands = [[nsc.FASTQC] + fastqc_args + [path] for path in fastq_paths]
         jobs = []
         fqc = remote.ArrayJob(fqc_commands, fqc_jobname, "1-0",
                 fqc_log_path.replace(".txt", ".%a.txt"))
         fqc.cpus_per_task = 1
         fqc.mem_per_task = 1
-        fqc.max_simultaneous = 64 # Limit due to I/O bottlenecks
+        fqc.max_simultaneous = 32 # Limit due to I/O bottlenecks
         # This is highly dependent on the computing environment. Should be configurable, or
         # maybe the admin could limit the number of jobs in slurm.
         fqc.start()
@@ -113,7 +113,7 @@ def main(task):
         if task.instrument in ["hiseqx", "hiseq4k"] or "DEBUG"=="DEBUG":
             dup = remote.ArrayJob(dup_commands, dup_jobname, "6:00:00", 
                     dup_log_path.replace(".txt", ".%a.txt"))
-            dup.max_simultaneous = 8 # Again with the limit due to I/O (let's fix this in slurm)
+            dup.max_simultaneous = 32 # Again with the limit due to I/O (let's fix this in slurm)
             dup.start()
             jobs = [fqc, dup]
         else:
@@ -163,7 +163,7 @@ def main(task):
                 task.fail("fastqc failure", "Group " + str(i_group))
 
     
-    if task.process:
+    if task.process and not remote.is_scheduler_available:
         utilities.upload_file(task.process, nsc.FASTQC_LOG, fqc_log_path)
 
     move_fastqc_results(output_dir, projects)

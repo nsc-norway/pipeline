@@ -310,6 +310,7 @@ def get_stats(
         instrument, 
         run_dir,
         aggregate_lanes=True,
+        aggregate_reads=False,
         suffix=""
         ):
     """Instrument-independent interface to the stats module.
@@ -324,19 +325,20 @@ def get_stats(
 
 ###################### Other metrics #######################
 
-def add_duplication_results(basecalls_dir, projects):
+def add_duplication_results(qc_dir, projects):
     for project in projects:
         for sample in project.samples:
             for f in sample.files:
                 if f.i_read == 1 and not f.empty: # Don't need the empty flag, but skip it 
                                                   # quickly when we know it's empty
                     try:
-                        with open(samples) as metrics_file:
+                        path = os.path.join(qc_dir, samples.get_fastdup_path(project, sample, f))
+                        with open(path) as metrics_file:
                             lines = [line.strip().split("\t") for line in metrics_file.readlines()]
                             assert lines[0] == ["NUM_READS", "READS_WITH_DUP", "DUPLICATES_DEDUP"]
-                            num_reads, reads_with_dup, num_dupes_dedup = lines[1].split("\t")
+                            num_reads, reads_with_dup, num_dupes_dedup = [int(v) for v in lines[1]]
                             stats = f.stats or {}
-                            stats['% Sequencing Duplicates (R1)'] = reads_with_dup * 100.0 / num_reads
+                            stats['% Sequencing Duplicates'] = reads_with_dup * 100.0 / num_reads
                             stats['fastdup reads with duplicate'] = reads_with_dup
                             stats['fastdup reads analysed'] = num_reads
                             f.stats = stats

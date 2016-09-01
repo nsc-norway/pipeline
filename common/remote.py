@@ -156,6 +156,7 @@ class ArrayJob(object):
     def is_finished(self):
         return all(state in set(('COMPLETED', 'FAILED', 'CANCELLED')) for state in self.states.values())
 
+@property
 def is_scheduler_available():
     return nsc.REMOTE_MODE == "srun"
 

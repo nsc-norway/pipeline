@@ -8,7 +8,7 @@ from common import nsc, stats, samples, utilities, taskmgr
 
 template_dir = os.path.dirname(os.path.realpath(__file__)) + "/template"
 
-TASK_NAME = "70. Demultiplex_stats"
+TASK_NAME = "60. Demultiplex_stats"
 TASK_DESCRIPTION = """Generates Demultiplex_Stats.htm for each project."""
 
 TASK_ARGS = ['work_dir', 'sample_sheet', 'lanes']

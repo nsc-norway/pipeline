@@ -6,7 +6,7 @@ from collections import defaultdict
 from genologics.lims import *
 from common import nsc, taskmgr, stats, utilities
 
-TASK_NAME = "50. LIMS stats"
+TASK_NAME = "60. LIMS stats"
 TASK_DESCRIPTION = """Post demultiplexing stats to LIMS (doesn't make an effort
                     to handle the non-LIMS case, obviously)."""
 TASK_ARGS = ['work_dir', 'lanes']
@@ -16,8 +16,7 @@ udf_list = [
         '# Reads', '# Reads PF', 'Yield PF (Gb)', '% of Raw Clusters Per Lane',
         '% of PF Clusters Per Lane',
         '% Perfect Index Read', 'One Mismatch Reads (Index)',
-        '% Bases >=Q30', 'Ave Q Score', '%PF',
-        '% Sequencing Duplicates (R1)'
+        '% Bases >=Q30', 'Ave Q Score', '%PF'
         ]
 # Note: see main(), adding stats for Hi4k/X
 
@@ -44,19 +43,20 @@ def main(task):
             aggregate_reads = True,
             suffix=task.suffix
             )
-    stats.add_duplication_results(task.bc_dir, projects)
+    qc_dir = os.path.join(task.bc_dir, "QualityControl" + task.suffix)
+    stats.add_duplication_results(qc_dir, projects)
     lane_metrics = get_lane_metrics(projects)
     post_stats(task.process, projects, run_stats, lane_metrics)
     task.success_finish()
 
 
-def post_stats(process, udf_list, projects, demultiplex_stats, lane_metrics):
+def post_stats(process, projects, demultiplex_stats, lane_metrics):
     """Find the resultfiles in the LIMS and post the demultiplexing
     stats.
     """ 
 
-    lims.get_batch(process.all_inputs(unique=True) + process.all_outputs(unique=True))
-    lims.get_batch(sum(a.samples for a in process.all_inputs(), []))
+    nsc.lims.get_batch(process.all_inputs(unique=True) + process.all_outputs(unique=True))
+    nsc.lims.get_batch(sum((a.samples for a in process.all_inputs()), []))
 
     projects_map = {}
     for project in projects:
@@ -91,9 +91,9 @@ def post_stats(process, udf_list, projects, demultiplex_stats, lane_metrics):
             lane_analyte = get_lane(process, lane)
             if lane_analyte:
                 lane_analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
-                duplicates = lane_metrics.get(lane, {}).get('# Sequencing Duplicates (R1)', None)
+                duplicates = lane_metrics.get(lane, {}).get('% Sequencing Duplicates', None)
                 if duplicates is not None:
-                    lane_analyte.udf['# Sequencing Duplicates (R1)'] = duplicates
+                    lane_analyte.udf['% Sequencing Duplicates'] = duplicates
                 update_artifacts.append(lane_analyte)
 
     nsc.lims.put_batch(update_artifacts)
@@ -105,12 +105,12 @@ def get_lane_metrics(projects):
     for project in projects:
         for sample in project.samples:
             for f in sample.files:
-                if f.i_read == 1:
+                if f.i_read == 1 and f.stats and f.stats.has_key('fastdup reads with duplicate'):
                     lane_n_with_dup[f.lane] += f.stats['fastdup reads with duplicate']
                     lane_count[f.lane] += f.stats['fastdup reads analysed']
     metrics = {}
     for lane in lane_n_with_dup.keys():
-        metrics[lane] = {'% Sequencing Duplicates (R1)': lane_n_with_dup[lane] * 100.0 / lane_count[lane]}
+        metrics[lane] = {'% Sequencing Duplicates': lane_n_with_dup[lane] * 100.0 / lane_count[lane]}
     return metrics
 
 

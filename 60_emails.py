@@ -5,7 +5,7 @@ import operator
 from genologics.lims import *
 from common import nsc, stats, utilities, lane_info, samples, taskmgr
 
-TASK_NAME = "50. Emails"
+TASK_NAME = "60. Emails"
 TASK_DESCRIPTION = """Produce delivery reports for emails."""
 TASK_ARGS = ['work_dir', 'sample_sheet', 'lanes']
 
@@ -39,7 +39,6 @@ def main(task):
             aggregate_reads = False,
             suffix=task.suffix
             )
-
     samples.add_stats(projects, run_stats)
     if task.instrument in ["hiseq4k", "hiseqx"]:
         stats.add_duplication_results(task.bc_dir, projects)
@@ -49,7 +48,6 @@ def main(task):
     make_reports(instrument, qc_dir, run_id, projects, lane_stats)
 
     task.success_finish()
-
 
 
 def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats):
@@ -89,7 +87,6 @@ def write_sample_info_table(output_path, runid, project):
             out.write("fragments\n")
 
 
-
 def write_internal_sample_table(output_path, runid, projects, lane_stats):
     with open(output_path, 'w') as out:
         out.write("--------------------------------\n")
@@ -123,7 +120,6 @@ def write_internal_sample_table(output_path, runid, projects, lane_stats):
                             out.write("%4s" % ('?') + "%\t")
                         out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
                     out.write("ok\t\tok\n")
-
 
 
 def write_summary_email(output_path, runid, projects, print_lane_number, lane_stats):
