@@ -44,8 +44,11 @@ def main(task):
             suffix=task.suffix
             )
     qc_dir = os.path.join(task.bc_dir, "QualityControl" + task.suffix)
-    stats.add_duplication_results(qc_dir, projects)
-    lane_metrics = get_lane_metrics(projects)
+    if task.instrument in ['hiseq4k', 'hiseqx']:
+        stats.add_duplication_results(qc_dir, projects)
+        lane_metrics = get_lane_metrics(projects)
+    else:
+        lane_metrics = {}
     post_stats(task.process, projects, run_stats, lane_metrics)
     task.success_finish()
 
