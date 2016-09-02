@@ -123,17 +123,15 @@ elif SITE == "ous":
     #Defaults:glsai          !requiretty
     #Defaults:glsai          umask=007,umask_override
     #Defaults:glsai          !logfile
-    SRUN_GLSAI_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/srun", "--account=nsc",
-                "--qos=high", "--partition=main"]
-    SBATCH_GLSAI_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/sbatch", "--account=nsc",
-                "--qos=high", "--partition=main"]
+    SRUN_GLSAI_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/srun"]
+    SBATCH_GLSAI_ARGLIST=["/usr/bin/sudo", "-u", "seq-user", "/usr/bin/sbatch"]
     
     # When running on the command line we will be using a central user account,
     # so there's no need to sudo
-    SRUN_OTHER_ARGLIST=["/usr/bin/srun", "--account=nsc", "--qos=high", "--partition=main"]
+    SRUN_OTHER_ARGLIST=["/usr/bin/srun"]
 
     # sbatch commands for "scheduler mode". Sudo mode is not supported.
-    SBATCH_ARGLIST=["/usr/bin/sbatch", "--account=nsc", "--qos=high", "--partition=main"]
+    SBATCH_ARGLIST=["/usr/bin/sbatch"]
     
     # Args for jobs which mainly do I/O on the secondary storage, not processing
     SRUN_STORAGE_JOB_ARGS=["--nodelist=loki"]
