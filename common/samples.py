@@ -104,6 +104,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
 
     projects = {}
     lanes = set()
+    not_multiplexed_lanes = set()
     instrument = utilities.get_instrument_by_runid(run_id)
     sample_index = 1
     only_process_lanes_set = set(only_process_lanes or [])
@@ -156,6 +157,10 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
         for lane_id in file_lanes:
             lanes.add(lane_id)
 
+            # Keep track of non-indexed lanes. Non-indexed lanes don't have Undetermined
+            if not entry.get('index'):
+                not_multiplexed_lanes.add(lane_id)
+
             path = ""
             if project.proj_dir:
                 path = project.proj_dir + "/"
@@ -180,8 +185,8 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
                 fastq_path = path + fastq_name
 
                 index_sequence = entry.get("index")
-                if entry.has_key("index2"):
-                    index_sequence += "-" + entry.get("index2")
+                if entry.has_key("index2") and entry['index2']:
+                    index_sequence += "-" + entry["index2"]
 
                 sample.files.append(FastqFile(lane_id, i_read, fastq_name, fastq_path, index_sequence, None))
                 # Stats can be added in later
@@ -191,6 +196,8 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
     undetermined_sample = Sample(0, None, None, None, [])
     undetermined_project.samples.append(undetermined_sample)
     for lane in lanes:
+        if lane in not_multiplexed_lanes:
+            continue
         for i_read in xrange(1, num_reads+1):
             if merged_lanes:
                 path = "Undetermined_S0_R{0}_001.fastq.gz".format(i_read)
