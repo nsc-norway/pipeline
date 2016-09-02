@@ -104,16 +104,12 @@ def main(task):
                 fqc_log_path.replace(".txt", ".%a.txt"))
         fqc.cpus_per_task = 1
         fqc.mem_per_task = 1
-        fqc.max_simultaneous = 32 # Limit due to I/O bottlenecks
-        # This is highly dependent on the computing environment. Should be configurable, or
-        # maybe the admin could limit the number of jobs in slurm.
         fqc.start()
 
 
         if task.instrument in ["hiseqx", "hiseq4k"] or "DEBUG"=="DEBUG":
             dup = remote.ArrayJob(dup_commands, dup_jobname, "6:00:00", 
                     dup_log_path.replace(".txt", ".%a.txt"))
-            dup.max_simultaneous = 32 # Again with the limit due to I/O (let's fix this in slurm)
             dup.start()
             jobs = [fqc, dup]
         else:
