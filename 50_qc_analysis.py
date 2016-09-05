@@ -107,13 +107,14 @@ def main(task):
         fqc.start()
 
 
-        if task.instrument in ["hiseqx", "hiseq4k"] or "DEBUG"=="DEBUG":
+        if task.instrument in ["hiseqx", "hiseq4k"]:
             dup = remote.ArrayJob(dup_commands, dup_jobname, "6:00:00", 
                     dup_log_path.replace(".txt", ".%a.txt"))
             dup.start()
             jobs = [fqc, dup]
         else:
             jobs = [fqc]
+            dup = None
 
         task.array_job_status(jobs)
         while not all(job.is_finished for job in jobs):
@@ -127,7 +128,7 @@ def main(task):
         if fqc.summary.keys() != ["COMPLETED"]:
             fail += "fastqc failure "
             detail = str(fqc.summary)
-        if dup.summary.keys() != ["COMPLETED"]:
+        if dup and dup.summary.keys() != ["COMPLETED"]:
             fail += "fastdup failure "
             detail = str(dup.summary)
         if fail:
