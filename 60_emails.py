@@ -67,14 +67,8 @@ def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats):
     write_internal_sample_table(fname, run_id, projects, lane_stats)
 
     fname = delivery_dir + "/Summary_email_for_NSC_" + run_id + ".xls"
-    write_summary_email(fname, run_id, projects, instrument_type.startswith('hiseq'), lane_stats)
-
-    fname = delivery_dir + "/Summary_email_for_NSC_" + run_id + "_v2test.xls"
-    try:
-        duplicates = instrument_type in ["hiseqx", "hiseq4k"]
-        write_summary_email2(fname, run_id, projects, instrument_type.startswith('hiseq'), lane_stats, duplicates)
-    except Exception, e:
-        print e
+    patterned = instrument_type in ["hiseqx", "hiseq4k"]
+    write_summary_email(fname, run_id, projects, instrument_type.startswith('hiseq'), lane_stats, patterned)
 
 
 def write_sample_info_table(output_path, runid, project):
@@ -130,70 +124,7 @@ def write_internal_sample_table(output_path, runid, projects, lane_stats):
                     out.write("ok\t\tok\n")
 
 
-def write_summary_email(output_path, runid, projects, print_lane_number, lane_stats):
-    with open(output_path, 'w') as out:
-        summary_email_head = """\
---------------------------------							
-Summary email to NSC members							
---------------------------------							
-							
-Summary for run {runId}							
-							
-PF = pass illumina filter							
-PF cluster no = number of PF cluster in the lane							
-Undetermined ratio = how much proportion of fragments can not be assigned to a sample in the indexed lane							
-Quality = summary of the overall quality							
-""".format(runId = runid)
-        if print_lane_number:
-            summary_email_head += """
-Lane	Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2)	Undetermined ratio	Quality
-"""
-        else:
-            summary_email_head += """
-Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2)	Undetermined ratio	Quality
-"""
-
-        out.write(summary_email_head)
-        # assumes 1 project per lane, and undetermined
-        # Dict: lane ID => (lane object, project object)
-        lane_proj = dict((f.lane, proj) for proj in projects
-                for s in proj.samples for f in s.files if not proj.is_undetermined)
-        # lane ID => file object (will be the last one)
-        lane_undetermined = dict(
-                (f.lane, f)
-                for proj in projects
-                for s in proj.samples
-                for f in s.files
-                if proj.is_undetermined)
-
-        for l in sorted(lane_proj.keys()):
-            proj = lane_proj[l]
-            undetermined_file = lane_undetermined.get(l)
-
-            if print_lane_number:
-                out.write(str(l) + "\t")
-            out.write(proj.name + "\t")
-            cluster_no = sum(f.stats['# Reads PF']
-                    for proj in projects
-                    for s in proj.samples
-                    for f in s.files
-                    if f.lane == l and f.i_read == 1 and not f.empty)
-            out.write(utilities.display_int(cluster_no) + '\t')
-            lane = lane_stats[l]
-            out.write("%4.2f" % (lane.pf_ratio if lane.pf_ratio is not None else 0.0) + "\t")
-            out.write(utilities.display_int(lane.cluster_den_raw) + '\t')
-            out.write(utilities.display_int(lane.cluster_den_pf) + '\t')
-            if undetermined_file and not undetermined_file.empty:
-                try:
-                    out.write("%4.2f" % (undetermined_file.stats['% of PF Clusters Per Lane'],) + "%\t")
-                except KeyError:
-                    out.write("%4s" % ('?') + "%\t")
-            else:
-                out.write("-\t")
-            out.write("ok\n")
-
-
-def write_summary_email2(output_path, runid, projects, print_lane_number, lane_stats, duplicates):
+def write_summary_email(output_path, runid, projects, print_lane_number, lane_stats, duplicates):
     with open(output_path, 'w') as out:
         summary_email_head = """\
 --------------------------------							
@@ -214,11 +145,11 @@ Lane\tProject\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster de
 """
             else:
                 summary_email_head += """
-Lane\tProject\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\tQ30\tQuality
+Lane\tProject\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\t>=Q30\tQuality
 """
         else:
             summary_email_head += """
-Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2)	Undetermined ratio	Quality
+Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\t>=Q30\tQuality
 """
 
         out.write(summary_email_head)
