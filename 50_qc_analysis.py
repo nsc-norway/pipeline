@@ -70,7 +70,7 @@ def main(task):
     # - Create the directory structure for results for FastQC and fastdup
     # So it should run for all instrument types, not just X and 4k
     dup_commands = []
-    for project in task.projects:
+    for project in projects:
         if project.is_undetermined:
             project_dir = os.path.join(output_dir, "Undetermined")
         else:
