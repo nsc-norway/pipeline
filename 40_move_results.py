@@ -63,18 +63,25 @@ def move_files(bc_dir, projects):
             
                 # Remove sample dir (should now be empty)
                 if not no_sample_id_dir:
-                    os.rmdir("{base}/{project}/{sampleid}".format(
-                        base=bc_dir,
-                        project=project.name,
-                        sampleid=sample.sample_id
-                        ))
+                    try:
+                        path = "{base}/{project}/{sampleid}".format(
+                                    base=bc_dir,
+                                    project=project.name,
+                                    sampleid=sample.sample_id
+                                    )
+                        os.rmdir(path)
+                    except OSError:
+                        print "Failed to remove directory ", path
 
             # Remove project dir
             if not project.is_default:
-                os.rmdir("{base}/{project}".format(
-                    base=bc_dir,
-                    project=project.name
-                    ))
+                try:
+                    os.rmdir("{base}/{project}".format(
+                        base=bc_dir,
+                        project=project.name
+                        ))
+                except OSError:
+                    print "Failed to remove directory", project.name
 
 
 def main(task):
