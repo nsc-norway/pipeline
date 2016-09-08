@@ -144,7 +144,7 @@ def delivery_norstore(process, project_name, source_path):
         name = match.group(1)
         proj_type = match.group(2)
         username = name.lower() + "-" + proj_type.lower()
-        password = secure.get_norstore_password(process)
+        password = secure.get_norstore_password(process, project_name)
         crypt_pw = crypt.crypt(password)
         
         htaccess = """\
