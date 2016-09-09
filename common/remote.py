@@ -5,7 +5,8 @@ import subprocess
 import getpass
 import tempfile
 import StringIO
-from itertools import groupby
+import itertools
+import multiprocessing
 
 import nsc
 import utilities
@@ -164,7 +165,7 @@ class SlurmArrayJob(object):
         self.states.update(new_states)
         if not squeue_out and "RUNNING" in self.states.values():
             raise JobMonitoringException()
-        self.summary = dict((key, len(list(group))) for key, group in groupby(sorted(self.states.values())))
+        self.summary = dict((key, len(list(group))) for key, group in itertools.groupby(sorted(self.states.values())))
 
     @property
     def is_finished(self):
@@ -182,11 +183,18 @@ class SlurmArrayJob(object):
             job.check_status()
 
 
-class JobStatus(object):
-    pass
 
-def local_run_it(args):
-    pass
+class JobStatus(object):
+    def __init__(self, job):
+        pass
+
+
+
+def LocalJob(object):
+    def __init__(self, parameter_package):
+        job, args = parameter_package
+
+        self.ok = True
 
 
 class CountingQueue(object):
@@ -204,8 +212,23 @@ class CountingQueue(object):
         finally:
             self.remaining -= 1
 
-class PassMoo:
-    pass
+
+class LocalExecutor(object):
+    def __init__(self, jobs):
+        self.jobs = jobs
+        self.iterator = None
+
+    def start(self):
+        for job in self.jobs:
+
+
+        itertools.chain((job.arg_lists for job in self.jobs))
+        self.iterator = multiprocessing.imap()
+
+    def polling(self):
+        try:
+            finised_unit = self.iterator
+
 
 class LocalArrayJob(object):
     def __init__(self, arg_lists, jobname, time, stdout_pattern):
@@ -215,6 +238,7 @@ class LocalArrayJob(object):
         self.cwd = None
         self.failed = 0
         self.completed = 0
+        self.executor = None
 
     @staticmethod
     def start_jobs(jobs, max_local_threads=None):
@@ -229,4 +253,5 @@ if nsc.REMOTE_MODE == "srun":
     ArrayJob = SlurmArrayJob
 elif nsc.REMOTE_MODE == "local":
     ArrayJob = LocalArrayJob
+
 
