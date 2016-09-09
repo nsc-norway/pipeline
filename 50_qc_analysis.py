@@ -43,11 +43,6 @@ def main(task):
     except OSError:
         pass
 
-    threads = task.threads
-
-    # Using a single output path is required for the code path without
-    # scheduler. So we do the same for both, to limit the amount of code
-    # to maintain.
     fastqc_args = ["--extract", "--outdir=" + output_dir]
 
     if task.process:
@@ -65,11 +60,12 @@ def main(task):
             f.truncate()
 
     # This loop has two purposes: 
-    # - Generate commands for fastdup
+    # - Generate commands for fastdup and fastqc
     #   (Dupe commands are the same for scheduler mode and normal mode.)
     # - Create the directory structure for results for FastQC and fastdup
-    # So it should run for all instrument types, not just X and 4k
     dup_commands = []
+    fqc_commands = []
+    fastqc_zipfiles = []
     for project in projects:
         if project.is_undetermined:
             project_dir = os.path.join(output_dir, "Undetermined")
@@ -96,101 +92,54 @@ def main(task):
                                 output_path
                                 ]
                             )
-
-    if remote.is_scheduler_available:
-        fqc_commands = [[nsc.FASTQC] + fastqc_args + [path] for path in fastq_paths]
-        jobs = []
-        fqc = remote.ArrayJob(fqc_commands, fqc_jobname, "1-0",
-                fqc_log_path.replace(".txt", ".%a.txt"))
-        fqc.cpus_per_task = 1
-        fqc.mem_per_task = 1
-        fqc.start()
-
-
-        if task.instrument in ["hiseqx", "hiseq4k"]:
-            dup = remote.ArrayJob(dup_commands, dup_jobname, "6:00:00", 
-                    dup_log_path.replace(".txt", ".%a.txt"))
-            dup.start()
-            jobs = [fqc, dup]
-        else:
-            jobs = [fqc]
-            dup = None
-
-        task.array_job_status(jobs)
-        while not all(job.is_finished for job in jobs):
-            time.sleep(30)
-            for job in jobs:
-                job.check_status()
-            task.array_job_status(jobs)
-        
-        fail = ""
-        detail = ""
-        if fqc.summary.keys() != ["COMPLETED"]:
-            fail += "fastqc failure "
-            detail = str(fqc.summary)
-        if dup and dup.summary.keys() != ["COMPLETED"]:
-            fail += "fastdup failure "
-            detail = str(dup.summary)
-        if fail:
-            task.fail(fail, detail)
-	
-    else:
-        # Process the files in groups of 500 files to prevent the 
-        # "argument list too long" error. The groups are processed 
-        # serially. 
-        n_groups = (len(fastq_paths) + 499) // 500
-        for i_group in xrange(n_groups):
-            # process interleaved e.g. #1, #3, #5, ... then #2, #4, #6...
-            # to preserve order
-            proc_paths = fastq_paths[i_group::n_groups]
-            task.info("Fastqc-{0}: Processing {1} of {2} files...".format(
-                i_group, len(proc_paths), len(fastq_paths)))
-
-            threads_to_request=min(len(proc_paths), threads)
-            grp_fastqc_args = fastqc_args + ["--threads=" + str(threads)] + proc_paths
-            rcode = remote.run_command(
-                    [nsc.FASTQC] + grp_fastqc_args, fqc_jobname, time="1-0", 
-                    logfile=fqc_log_path, cpus=threads_to_request,
-                    mem=str(1024+256*threads)+"M",
-                    srun_user_args=['--open-mode=append']
-                    )
-
-            if rcode != 0:
-                # The following function will call exit(1)
-                task.fail("fastqc failure", "Group " + str(i_group))
-
+                    fqc_basedir = os.path.join(
+                            output_dir,
+                            os.path.dirname(samples.get_fastqc_dir(project, sample, f))
+                            )
+                    fqc_commands.append([nsc.FASTQC, "--extract",
+                            "--outdir=" + fqc_basedir,
+                            os.path.join(bc_dir, f.path)
+                            ])
+                    fastqc_zipfiles.append(fqc_basedir + ".zip")
     
-    if task.process and not remote.is_scheduler_available:
-        utilities.upload_file(task.process, nsc.FASTQC_LOG, fqc_log_path)
 
-    move_fastqc_results(output_dir, projects)
+    fqc = remote.ArrayJob(fqc_commands, fqc_jobname, "1-0",
+            fqc_log_path.replace(".txt", ".%a.txt"))
+    jobs = []
+
+    if task.instrument in ["hiseqx", "hiseq4k"]:
+        dup = remote.ArrayJob(dup_commands, dup_jobname, "6:00:00", 
+                dup_log_path.replace(".txt", ".%a.txt"))
+        jobs = [fqc, dup]
+    else:
+        jobs = [fqc]
+        dup = None
+
+    remote.ArrayJob.start_jobs(jobs, max_local_threads=task.threads)
+
+    task.array_job_status(jobs)
+    while not all(job.is_finished for job in jobs):
+        remote.ArryJob.update_status(jobs)
+        task.array_job_status(jobs)
+    
+    fail = ""
+    detail = ""
+    if fqc.summary.keys() != ["COMPLETED"]:
+        fail += "fastqc failure "
+        detail = str(fqc.summary)
+    if dup and dup.summary.keys() != ["COMPLETED"]:
+        fail += "fastdup failure "
+        detail = str(dup.summary)
+    if fail:
+        task.fail(fail, detail)
+	
+    for zipfile in fastqc_zipfiles:
+        try:
+            os.path.remove(zipfile)
+        except OSError:
+            pass
+
     task.success_finish() # Calls exit(0)
-
-
-
-def fastqc_dir(fastq_path):
-    """Get name of directory written by fastqc"""
-    return re.sub(r".fastq.gz$", "_fastqc", os.path.basename(fastq_path))
-
-
-def move_fastqc_results(qc_dir, projects):
-    """Organises the fastqc results into a more manageable structure. Deletes zip files.
-    Gets the desired name of the fastqc dir from the "samples" module."""
-
-    for project in projects:
-        for sample in project.samples:
-            for f in sample.files:
-                if not f.empty:
-                    original_fqc_dir = os.path.join(qc_dir, fastqc_dir(f.path))
-                    try:
-                        os.remove(original_fqc_dir + ".zip")
-                    except OSError:
-                        pass
-                    fqc_dir = os.path.join(qc_dir, samples.get_fastqc_dir(project, sample, f))
-                    if os.path.exists(fqc_dir):
-                        shutil.rmtree(fqc_dir)
-                    os.rename(original_fqc_dir, fqc_dir)
-                    os.rename(original_fqc_dir + ".html", fqc_dir + ".html")
 
 
 if __name__ == "__main__":

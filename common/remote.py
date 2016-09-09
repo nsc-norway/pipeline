@@ -87,8 +87,22 @@ def run_command(
 class JobMonitoringException(Exception):
     pass
 
-class ArrayJob(object):
 
+# ArrayJob architecture excuse:
+# There are different implementations of ArrayJob depending on the 
+# execution backend: local or slurm.
+# The correct class is then aliased to ArrayJob depending on the configuration.
+# So far so good? Well, sometimes one needs to start and montior multiple job 
+# arrays with different parameters. For local jobs, it should be coordinated 
+# so that the total number of concurrent jobs is limited (not just the jobs
+# for each array separately).
+
+# To allow coordination between different job arrays, the starting and polling 
+# of jobs is handled by static methods on the ArrayJob class: start_jobs(),
+# update_status(). Thus, instances of different implementations cannt be used 
+# together (use the ArrayJob alias).
+
+class SlurmArrayJob(object):
     def __init__(self, arg_lists, jobname, time, stdout_pattern):
         
         self.arg_lists = arg_lists
@@ -156,7 +170,63 @@ class ArrayJob(object):
     def is_finished(self):
         return all(state in set(('COMPLETED', 'FAILED', 'CANCELLED')) for state in self.states.values())
 
-@property
-def is_scheduler_available():
-    return nsc.REMOTE_MODE == "srun"
+    @staticmethod
+    def start_jobs(jobs, max_local_threads):
+        for job in jobs:
+            job.start()
+
+    @staticmethod
+    def update_status(jobs):
+        time.sleep(30)
+        for job in jobs:
+            job.check_status()
+
+
+class JobStatus(object):
+    pass
+
+def local_run_it(args):
+    pass
+
+
+class CountingQueue(object):
+    def __init__(self, elements):
+        self.element_iter = iter(elements)
+        self.total = len(elements)
+        self.remaining = len(elements)
+
+    def __next__(self):
+        try:
+            return next(self.element_iter)
+        except StopIteration:
+            self.remaining += 1
+            raise
+        finally:
+            self.remaining -= 1
+
+class PassMoo:
+    pass
+
+class LocalArrayJob(object):
+    def __init__(self, arg_lists, jobname, time, stdout_pattern):
+        self.job_queue = CountingQueue(arg_lists)
+        self.statuses = []
+        self.stdout_pattern = stdout_pattern
+        self.cwd = None
+        self.failed = 0
+        self.completed = 0
+
+    @staticmethod
+    def start_jobs(jobs, max_local_threads=None):
+        pool = Pool(max_local_threads)
+
+    @staticmethod
+    def update_status(jobs):
+        pass
+
+
+if nsc.REMOTE_MODE == "srun":
+    ArrayJob = SlurmArrayJob
+elif nsc.REMOTE_MODE == "local":
+    ArrayJob = LocalArrayJob
 

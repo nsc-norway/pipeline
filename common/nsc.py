@@ -108,7 +108,7 @@ elif SITE == "ous":
     FASTDUP_ARGLIST=["/data/common/tools/nscbin/fastdup", "-s", "10", "-e", "60"]
     BASEURI="https://ous-lims.sequencing.uio.no"
 
-    REMOTE_MODE = "srun"
+    REMOTE_MODE = "local"
 
     # * Command line to run slurm *
 
