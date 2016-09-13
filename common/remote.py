@@ -201,16 +201,12 @@ class LocalArrayJob(object):
         self.job_id = local_job_id
         local_job_id += 1
         self.arg_lists = arg_lists
-        self.summary = {"PENDING": len(arg_lists)}
         self.stdout_pattern = stdout_pattern
         self.cwd = None
         self.results = []
         self.pool = None
         self.max_async = 0
-
-    @property
-    def is_finished(self):
-        return set(self.summary.keys()) <= set(('COMPLETED', 'FAILED', 'CANCELLED'))
+        self.is_finished = False
 
     @staticmethod
     def start_jobs(jobs, max_local_threads=None):
@@ -242,6 +238,7 @@ class LocalArrayJob(object):
                     else:
                         pending += 1
             job.summary = {"COMPLETED": completed, "FAILED": failed, "RUNNING": running, "PENDING": pending}
+            job.is_finished = running == 0 and pending == 0
 
 
 if nsc.REMOTE_MODE == "srun":
