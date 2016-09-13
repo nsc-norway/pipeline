@@ -202,6 +202,7 @@ class LocalArrayJob(object):
         local_job_id += 1
         self.arg_lists = arg_lists
         self.stdout_pattern = stdout_pattern
+        self.summary = {"PENDING": len(arg_lists)}
         self.cwd = None
         self.results = []
         self.pool = None
@@ -237,7 +238,13 @@ class LocalArrayJob(object):
                         total_running += 1
                     else:
                         pending += 1
-            job.summary = {"COMPLETED": completed, "FAILED": failed, "RUNNING": running, "PENDING": pending}
+            # Only add to summary if non-zero
+            job.summary = dict(
+                    [(k, v) for k, v in
+                    [("COMPLETED", completed), ("FAILED", failed),
+                     ("RUNNING", running), ("PENDING", pending)]
+                    if v > 0
+                    ])
             job.is_finished = running == 0 and pending == 0
 
 
