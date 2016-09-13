@@ -11,6 +11,8 @@ import multiprocessing
 import nsc
 import utilities
 
+local_job_id = 1
+
 def srun_command(
         args, jobname, time, logfile=None,
         cpus_per_task=1, mem=1024, cwd=None,
@@ -92,8 +94,9 @@ class JobMonitoringException(Exception):
 # ArrayJob architecture excuse:
 # There are different implementations of ArrayJob depending on the 
 # execution backend: local or slurm.
-# The correct class is then aliased to ArrayJob depending on the configuration.
-# So far so good? Well, sometimes one needs to start and montior multiple job 
+# The relevant class for the current environment is then aliased to ArrayJob
+# depending on the configuration. So far so good?
+# Well, sometimes one needs to start and montior multiple job 
 # arrays with different parameters. For local jobs, it should be coordinated 
 # so that the total number of concurrent jobs is limited (not just the jobs
 # for each array separately).
@@ -101,7 +104,7 @@ class JobMonitoringException(Exception):
 # To allow coordination between different job arrays, the starting and polling 
 # of jobs is handled by static methods on the ArrayJob class: start_jobs(),
 # update_status(). Thus, instances of different implementations cannt be used 
-# together (use the ArrayJob alias).
+# together (use the ArrayJob alias, not SlurmArrayJob, LocalArrayJob).
 
 class SlurmArrayJob(object):
     def __init__(self, arg_lists, jobname, time, stdout_pattern):
@@ -178,75 +181,67 @@ class SlurmArrayJob(object):
 
     @staticmethod
     def update_status(jobs):
-        time.sleep(30)
         for job in jobs:
             job.check_status()
 
 
-
-class JobStatus(object):
-    def __init__(self, job):
-        pass
-
-
-
-def LocalJob(object):
-    def __init__(self, parameter_package):
-        job, args = parameter_package
-
-        self.ok = True
-
-
-class CountingQueue(object):
-    def __init__(self, elements):
-        self.element_iter = iter(elements)
-        self.total = len(elements)
-        self.remaining = len(elements)
-
-    def __next__(self):
-        try:
-            return next(self.element_iter)
-        except StopIteration:
-            self.remaining += 1
-            raise
-        finally:
-            self.remaining -= 1
-
-
-class LocalExecutor(object):
-    def __init__(self, jobs):
-        self.jobs = jobs
-        self.iterator = None
-
-    def start(self):
-        for job in self.jobs:
-
-
-        itertools.chain((job.arg_lists for job in self.jobs))
-        self.iterator = multiprocessing.imap()
-
-    def polling(self):
-        try:
-            finised_unit = self.iterator
+def local_execute(arg_list, logfile, cwd):
+    res = local_command(arg_list, logfile, cwd)
+    if res != 0:
+        raise subprocess.CalledProcessError("Non-zero exit code")
 
 
 class LocalArrayJob(object):
+    """Local process pool.
+    
+    It only supports jobs which require a single CPU (this is a lot easier
+    to implement, since it works with the multiprocessing package)."""
     def __init__(self, arg_lists, jobname, time, stdout_pattern):
-        self.job_queue = CountingQueue(arg_lists)
-        self.statuses = []
+        global local_job_id
+        self.job_id = local_job_id
+        local_job_id += 1
+        self.arg_lists = arg_lists
+        self.summary = {"PENDING": len(arg_lists)}
         self.stdout_pattern = stdout_pattern
         self.cwd = None
-        self.failed = 0
-        self.completed = 0
-        self.executor = None
+        self.results = []
+        self.pool = None
+        self.max_async = 0
+
+    @property
+    def is_finished(self):
+        return set(self.summary.keys()) <= set(('COMPLETED', 'FAILED', 'CANCELLED'))
 
     @staticmethod
     def start_jobs(jobs, max_local_threads=None):
-        pool = Pool(max_local_threads)
+        pool = multiprocessing.Pool(max_local_threads)
+        for job in jobs:
+            job.results = []
+            job.pool = pool
+            job.max_async = max_local_threads
+            for i, arg_list in enumerate(job.arg_lists):
+                logfile = job.stdout_pattern.replace("%a", str(i))
+                res = pool.apply_async(local_execute, [arg_list, logfile, job.cwd])
+                job.results.append(res)
 
     @staticmethod
     def update_status(jobs):
-        pass
+        total_running = 0
+        for job in jobs:
+            completed, failed, running, pending = 0,0,0,0
+            for i, res in enumerate(job.results):
+                if res.ready():
+                    if res.successful():
+                        completed += 1
+                    else:
+                        failed += 1
+                else:
+                    if total_running < job.max_async:
+                        running += 1
+                        total_running += 1
+                    else:
+                        pending += 1
+            job.summary = {"COMPLETED": completed, "FAILED": failed, "RUNNING": running, "PENDING": pending}
 
 
 if nsc.REMOTE_MODE == "srun":

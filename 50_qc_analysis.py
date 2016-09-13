@@ -119,7 +119,8 @@ def main(task):
 
     task.array_job_status(jobs)
     while not all(job.is_finished for job in jobs):
-        remote.ArryJob.update_status(jobs)
+        time.sleep(30)
+        remote.ArrayJob.update_status(jobs)
         task.array_job_status(jobs)
     
     fail = ""
@@ -135,7 +136,7 @@ def main(task):
 	
     for zipfile in fastqc_zipfiles:
         try:
-            os.path.remove(zipfile)
+            os.remove(zipfile)
         except OSError:
             pass
 
