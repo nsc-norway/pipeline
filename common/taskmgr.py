@@ -131,7 +131,7 @@ class Task(object):
                         ]
 
             for filename in options:
-                path = os.path.join(self.work_dir, path)
+                path = os.path.join(self.work_dir, filename)
                 if os.path.exists(path):
                     break
 
@@ -153,6 +153,16 @@ class Task(object):
                     "{0}.{1}.{2}.{3}".format(
                         self.task_name.lower().replace(" ","_"),
                         self.process.id,
+                        command.split("/")[-1],
+                        extension
+                        )
+                    )
+        elif self.suffix:
+            return os.path.join(
+                    logdir,
+                    "{0}.{1}.{2}.{3}".format(
+                        self.task_name.lower().replace(" ","_"),
+                        self.suffix,
                         command.split("/")[-1],
                         extension
                         )
@@ -224,10 +234,13 @@ class Task(object):
         """List of lanes to process, specified in LIMS or on the command line.
         
         Returns None if all lanes should be processed."""
-        lanes = self.get_arg("lanes")
-        if lanes:
-            return [int(l) for l in lanes] # Convert str to list of int
-        else:
+        try:
+            lanes = self.get_arg("lanes")
+            if lanes:
+                return [int(l) for l in lanes] # Convert str to list of int
+            else:
+                return None
+        except AttributeError:
             return None # None = all
 
     @property
@@ -324,6 +337,11 @@ class Task(object):
             self.finished = True
             raise
 
+        if not self.args.pid and not self.args.work_dir:
+            self.fail("Missing required options", 
+                    "You must specify either the LIMS process ID (--pid) or the working directory. " +
+                    "Use -h option for usage info.")
+
         if self.args.pid:
             # LIMS operation
             self.process = Process(nsc.lims, id=self.args.pid)
@@ -372,6 +390,25 @@ class Task(object):
             self.process.udf[nsc.JOB_STATUS_UDF] = "Running ({0})".format(status)
             self.process.put()
         print("INFO   [" + self.task_name + "] " + status, file=sys.stderr)
+
+
+    def array_job_status(self, array_jobs):
+        """Shpw progress information for array jobs (#Pending/Running/Completed...) as 
+        INFO message if it is changed since last invocation of this method."""
+        info_strings = []
+        for array_job in array_jobs:
+            known_codes = ['PENDING', 'RUNNING', 'FAILED', 'COMPLETED']
+            states = [
+                    "{0}:{1}".format(code[0:1], array_job.summary[code]) 
+                    for code in known_codes
+                    if array_job.summary.get(code)
+                    ]
+            other_states = sum(v for code, v in array_job.summary.items() if code not in known_codes) 
+            if other_states:
+                states.append("?:{0}".format(other_states))
+
+            info_strings.append("[%s] " % array_job.job_id + ", ".join(states))
+        self.info(" / ".join(info_strings))
 
 
     def warn(self, status):
@@ -423,6 +460,7 @@ class Task(object):
 
         print("SUCCESS[" + self.task_name + "] " + complete_str, file=sys.stderr)
         sys.exit(0)
+
 
 
 

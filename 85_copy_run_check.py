@@ -11,9 +11,9 @@ import time
 from genologics.lims import *
 from common import nsc, utilities, taskmgr, remote
 
-TASK_NAME = "95. Copy run again (NextSeq)"
+TASK_NAME = "85. Copy run again (NextSeq)"
 TASK_DESCRIPTION = "Check for completion and copy run metadata again"
-TASK_ARGS = ['src_dir', 'work_dir']
+TASK_ARGS = ['src_dir', 'work_dir', 'lanes']
 
 nextseq_exclude_paths = [
         "/Thumbnail_Images",

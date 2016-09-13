@@ -1,4 +1,5 @@
 import os
+import re
 from math import ceil
 
 from genologics.lims import *
@@ -8,10 +9,15 @@ TASK_NAME = "30. Demultiplexing"
 TASK_DESCRIPTION = """Demultiplexing (calls bcl2fastq2). 
                     For advanced command-line options when running outside the
                     lims, just use bcl2fastq2 directly."""
-TASK_ARGS = ['src_dir', 'work_dir', 'threads', 'sample_sheet']
+TASK_ARGS = ['src_dir', 'work_dir', 'threads', 'sample_sheet', 'lanes']
 
 
 def main(task):
+    task.add_argument(
+                      '--extra-options',
+                      default=None,
+                      help="Extra options to give to bcl2fastq."
+                      )
     task.running()
     run_id = task.run_id
 
@@ -36,7 +42,7 @@ def main(task):
     else:
         # for non-lims mode, we don't provide many options, just the defaults
         no_lane_splitting = default_no_lane_splitting
-        other_options = []
+        other_options = task.args.extra_options
 
     # Sample sheet
     if task.process: # LIMS mode
@@ -65,10 +71,10 @@ def get_thread_args(n_threads):
     # Computing number of threads: use the standard allocation 
     # logic for bcl2fastq 2.17, but based on n_threads instead of
     # the number of threads on the machine
-    loading = 4 + n_threads//10
+    loading = 4 + n_threads//4
     writing = 4 + n_threads//10
-    demultiplexing = int(ceil(n_threads * 0.2)) #  20 %
-    processing = n_threads                      # 100 %
+    demultiplexing = int(ceil(n_threads * 0.7)) #  70 %
+    processing = int(ceil(n_threads * 1.0))     #  100 %
     return ['-r', str(loading), '-d', str(demultiplexing),
             '-p', str(processing), '-w', str(writing)]
 
@@ -99,9 +105,11 @@ def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
     if task.process:
         jobname = task.process.id + "." + jobname
 
+    print "Calling bcl2fastq with:", " ".join(args)
+
     rcode = remote.run_command(
             args, jobname, time="1-0", logfile=log_path,
-            cpus=n_threads, mem="16G", comment=comment
+            cpus=n_threads, mem="15G", comment=comment
             )
 
     # LIMS only:
@@ -112,8 +120,7 @@ def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
             utilities.upload_file(task.process, nsc.BCL2FASTQ_LOG, log_path)
             log = open(log_path)
             log_iter = iter(log)
-            for i in xrange(3):
-                l = next(log_iter)
+            for l,i in zip(log_iter,range(3)):
                 if l.startswith("bcl2fastq v"):
                     task.process.udf[nsc.BCL2FASTQ_VERSION_UDF] = l.split(" ")[1].strip("\n")
                     # Will put() when calling success_finish() or fail()

@@ -7,7 +7,7 @@ from common import nsc, stats, utilities, lane_info, samples, taskmgr
 
 TASK_NAME = "50. Emails"
 TASK_DESCRIPTION = """Produce delivery reports for emails."""
-TASK_ARGS = ['work_dir', 'sample_sheet']
+TASK_ARGS = ['work_dir', 'sample_sheet', 'lanes']
 
 
 # Generate reports for emails based on demultiplexing stats
@@ -20,11 +20,15 @@ def main(task):
     work_dir = task.work_dir
     instrument = utilities.get_instrument_by_runid(run_id)
     
-    expand_lanes = instrument == "nextseq" and not task.no_lane_splitting
-    if task.process: # lims mode
-        lane_stats = lane_info.get_from_lims(task.process, instrument, expand_lanes)
-    else:
-        lane_stats = lane_info.get_from_files(work_dir, instrument, expand_lanes)
+    try:
+        lane_stats = lane_info.get_from_interop(task.work_dir, task.no_lane_splitting)
+    except lane_info.NotSupportedException:
+        expand_lanes = instrument == "nextseq" and not task.no_lane_splitting
+
+        if task.process: # lims mode
+            lane_stats = lane_info.get_from_lims(task.process, instrument, expand_lanes)
+        else:
+            lane_stats = lane_info.get_from_files(work_dir, instrument, expand_lanes)
 
     projects = task.projects
 
@@ -41,13 +45,13 @@ def main(task):
     samples.flag_empty_files(projects, work_dir)
 
     qc_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls", "QualityControl" + task.suffix)
-    make_reports(qc_dir, run_id, projects, lane_stats)
+    make_reports(instrument, qc_dir, run_id, projects, lane_stats)
 
     task.success_finish()
 
 
 
-def make_reports(qc_dir, run_id, projects, lane_stats):
+def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats):
     if not os.path.exists(qc_dir):
         os.mkdir(qc_dir)
     delivery_dir = os.path.join(qc_dir, "Delivery")
@@ -63,8 +67,7 @@ def make_reports(qc_dir, run_id, projects, lane_stats):
     write_internal_sample_table(fname, run_id, projects, lane_stats)
 
     fname = delivery_dir + "/Summary_email_for_NSC_" + run_id + ".xls"
-    instrument_type = utilities.get_instrument_by_runid(run_id)
-    write_summary_email(fname, run_id, projects, instrument_type=='hiseq', lane_stats)
+    write_summary_email(fname, run_id, projects, instrument_type.startswith('hiseq'), lane_stats)
 
 
 def write_sample_info_table(output_path, runid, project):
@@ -105,15 +108,18 @@ def write_internal_sample_table(output_path, runid, projects, lane_stats):
                 if f.i_read == 1:
                     out.write(s.name + "\t")
                     lane = lane_stats[f.lane]
-                    out.write(utilities.display_int(lane[0]) + "\t")
-                    out.write(utilities.display_int(lane[1]) + "\t")
+                    out.write(utilities.display_int(lane.cluster_den_raw) + "\t")
+                    out.write(utilities.display_int(lane.cluster_den_pf) + "\t")
                     if f.empty:
                         out.write("%4.2f" % (0,) + "%\t")
                         out.write("0\t")
                     else:
                         # For the HiSeq it has always been PF clusters here, so let's continue
                         # with that
-                        out.write("%4.2f" % (f.stats['% of PF Clusters Per Lane']) + "%\t")
+                        try:
+                            out.write("%4.2f" % (f.stats['% of PF Clusters Per Lane']) + "%\t")
+                        except KeyError:
+                            out.write("%4s" % ('?') + "%\t")
                         out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
                     out.write("ok\t\tok\n")
 
@@ -169,11 +175,14 @@ Project	PF cluster no	PF ratio	Raw cluster density(/mm2)	PF cluster density(/mm2
                     if f.lane == l and f.i_read == 1 and not f.empty)
             out.write(utilities.display_int(cluster_no) + '\t')
             lane = lane_stats[l]
-            out.write("%4.2f" % (lane[2]) + "\t")
-            out.write(utilities.display_int(lane[0]) + '\t')
-            out.write(utilities.display_int(lane[1]) + '\t')
+            out.write("%4.2f" % (lane.pf_ratio if lane.pf_ratio is not None else 0.0) + "\t")
+            out.write(utilities.display_int(lane.cluster_den_raw) + '\t')
+            out.write(utilities.display_int(lane.cluster_den_pf) + '\t')
             if undetermined_file and not undetermined_file.empty:
-                out.write("%4.2f" % (undetermined_file.stats['% of PF Clusters Per Lane'],) + "%\t")
+                try:
+                    out.write("%4.2f" % (undetermined_file.stats['% of PF Clusters Per Lane'],) + "%\t")
+                except KeyError:
+                    out.write("%4s" % ('?') + "%\t")
             else:
                 out.write("-\t")
             out.write("ok\n")

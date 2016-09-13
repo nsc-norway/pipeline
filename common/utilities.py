@@ -32,10 +32,9 @@ def get_sequencing_process(process):
     first_in_artifact = first_io[0]['uri']
 
     processes = process.lims.get_processes(inputartifactlimsid=first_in_artifact.id)
-
-    for proc in processes:
-        if proc.type.name in [p[1] for p in nsc.SEQ_PROCESSES]:
-            return proc
+    seq_processes = [proc for proc in processes if proc.type.name in [p[1] for p in nsc.SEQ_PROCESSES]]
+    # Use the last sequencing process. In case of crashed runs, this will be the right one.
+    return seq_processes[-1]
 
 
 def get_instrument(seq_process):
@@ -45,8 +44,12 @@ def get_instrument(seq_process):
 def get_instrument_by_runid(run_id):
     if re.match(r"\d{6}_M", run_id):
         return 'miseq'
-    elif re.match(r"\d{6}_NS", run_id):
+    elif re.match(r"\d{6}_N", run_id):
         return 'nextseq'
+    elif re.match(r"\d{6}_E", run_id):
+        return 'hiseqx'
+    elif re.match(r"\d{6}_[JK]", run_id):
+        return 'hiseq4k'
     elif re.match(r"\d{6}_[A-Z0-9]", run_id):
         return 'hiseq'
     else:
@@ -76,7 +79,8 @@ def get_bcl2fastq2_version(work_dir):
     
 
 def get_fcid_by_runid(run_id):
-    if get_instrument_by_runid(run_id) == "hiseq":
+    runid = get_instrument_by_runid(run_id)
+    if runid.startswith("hiseq") or runid == "nextseq":
         return re.match(r"[\d]{6}_[\dA-Z]+_[\d]+_[AB]([A-Z\d-]+)$", run_id).group(1)
     else:
         return re.match(r"[\d]{6}_[\dA-Z]+_[\d]+_([A-Z\d-]+)$", run_id).group(1)
@@ -132,11 +136,11 @@ def upload_file(process, name, path = None, data = None):
 
 
 
-def get_sample_sheet_proj_name(project):
+def get_sample_sheet_proj_name(lims_project_name):
     """Get the project name as it would appear in the sample sheet.
     Will become really complex if we allow other than [A-Za-z0-9\-] in 
     sample sheet."""
-    return project.name
+    return re.sub(r'[^a-zA-Z0-9_\-]', '_', lims_project_name)
 
 
 def get_udf(process, udf, default):
@@ -153,7 +157,10 @@ locale.setlocale(locale.LC_ALL, 'en_US')
 def display_int(val):
     """Adds thousands separators. To be replaced with "{:,}".format(val) when 
     upgrading to Python 2.7"""
-    return locale.format("%d", round(val), grouping=True)
+    if val is None:
+        return "-"
+    else:
+        return locale.format("%d", round(val), grouping=True)
 
 
 # The check_output function is only available in Python >=2.7, but we also support 2.6,

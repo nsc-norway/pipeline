@@ -9,7 +9,7 @@ from common import nsc, taskmgr, samples, remote
 TASK_NAME = "80. Checksums"
 TASK_DESCRIPTION = """Compute md5 checksums for fastq files and pdfs."""
 
-TASK_ARGS = ['work_dir', 'sample_sheet', 'threads']
+TASK_ARGS = ['work_dir', 'sample_sheet', 'threads', 'lanes']
 
 
 def paths_for_project(run_id, project):
@@ -35,20 +35,23 @@ def main(task):
     task.running()
     bc_dir = task.bc_dir
     run_id = task.run_id
-    n_threads = task.threads
+    n_threads = min(task.threads, 4)
     projects = task.projects
     samples.flag_empty_files(projects, task.work_dir)
     for project in projects:
         if not project.is_undetermined:
 
             paths = paths_for_project(run_id, project)
+            task.info(project.name)
+            if not paths:
+                continue # No files to check
             stdout = os.path.join(bc_dir, project.proj_dir, "md5sum.txt")
             jobname = "md5deep"
             if task.process:
                 jobname = task.process.id + "." + jobname
             rcode = remote.run_command(
-                    [nsc.MD5DEEP, '-rl'] + paths, jobname, time="04:00:00",
-                    cpus=n_threads, mem="2048M",
+                    [nsc.MD5DEEP, '-rl', '-j' + str(n_threads)] + paths, jobname,
+                    time="08:00:00", cpus=n_threads, mem="2048M", storage_job=True,
                     cwd=os.path.join(bc_dir, project.proj_dir),
                     stdout = stdout
                     )

@@ -22,7 +22,7 @@ TASK_NAME = "70. Reports"
 TASK_DESCRIPTION = """Generates HTML and PDF reports based on demultiplexing stats
                     and FastQC results."""
 
-TASK_ARGS = ['work_dir', 'sample_sheet']
+TASK_ARGS = ['work_dir', 'sample_sheet', 'lanes']
 
 
 def main(task):

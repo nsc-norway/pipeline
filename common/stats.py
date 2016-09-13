@@ -95,8 +95,8 @@ def parse_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_rea
 
                             elif read_or_cc.tag == "Read":
                                 iread = int(read_or_cc.attrib['number'])
-                                if iread > 3:                   # Hack for samples without barcode: gets
-                                                                # read == some large number (2 times now)
+                                if iread > 3 or iread <= 0:     # Hack for samples without barcode: gets
+                                                                # read == some random number
                                     iread = 1
                                 if not rst.has_key(iread):
                                     rst[iread] = defaultdict(int)
@@ -277,22 +277,30 @@ def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_rea
         if con_s_raw['ClusterCount'] > 0:
             stats['%PF'] = con_s_pf['ClusterCount'] * 100.0 / con_s_raw['ClusterCount']
         else:
-            stats['%PF'] = "100.0%"
-        stats['% of Raw Clusters Per Lane'] = con_s_raw['ClusterCount'] * 100.0 / all_raw_reads[lane]
-        stats['% of PF Clusters Per Lane'] = con_s_pf['ClusterCount'] * 100.0 / all_pf_reads[lane]
+            stats['%PF'] = 0.0
+        if all_raw_reads[lane] != 0.0:
+            stats['% of Raw Clusters Per Lane'] = con_s_raw['ClusterCount'] * 100.0 / all_raw_reads[lane]
+        else:
+            stats['% of Raw Clusters Per Lane'] = 0.0
+        if all_pf_reads[lane] != 0.0:
+            stats['% of PF Clusters Per Lane'] = con_s_pf['ClusterCount'] * 100.0 / all_pf_reads[lane]
+        else:
+            stats['% of PF Clusters Per Lane'] = 0.0
         if de_s['BarcodeCount'] != 0.0:
             stats['% Perfect Index Read'] = de_s['PerfectBarcodeCount'] * 100.0 / de_s['BarcodeCount']
             stats['% One Mismatch Reads (Index)'] = de_s['OneMismatchBarcodeCount'] * 100.0 / de_s['BarcodeCount']
         else:
             stats['% Perfect Index Read'] = 0
             stats['% One Mismatch Reads (Index)'] = 0
-        stats['% Bases >=Q30'] = con_s_pf['YieldQ30'] * 100.0 / con_s_pf['Yield']
-        stats['Ave Q Score'] = con_s_pf['QualityScoreSum'] * 1.0 / con_s_pf['Yield']
+        if con_s_pf['Yield'] > 0:
+            stats['% Bases >=Q30'] = con_s_pf['YieldQ30'] * 100.0 / con_s_pf['Yield']
+            stats['Ave Q Score'] = con_s_pf['QualityScoreSum'] * 1.0 / con_s_pf['Yield']
+        else:
+            stats['% Bases >=Q30'] = 0.0
+            stats['Ave Q Score'] = 0.0
         result[coordinates] = stats
 
     return result
-
-
 
 
 
@@ -481,6 +489,7 @@ def get_stats(
         return get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes, aggregate_reads)
     except IOError:
         if instrument == 'miseq':
+            # MiSeq on-instrument demultiplexing results
             generate_fastq_path = os.path.join(run_dir, "GenerateFASTQRunStatistics.xml")
             rp = run_parameters.read_run_parameters(os.path.join(run_dir, "runParameters.xml"))
             num_reads = sum(not is_index for cycles, is_index in rp['reads'])

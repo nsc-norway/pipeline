@@ -8,6 +8,15 @@ from collections import defaultdict
 from xml.etree import ElementTree
 from genologics.lims import *
 
+class LaneStats(object):
+    def __init__(self, cluster_den_raw, cluster_den_pf, pf_ratio):
+        self.cluster_den_raw = cluster_den_raw
+        self.cluster_den_pf = cluster_den_pf
+        self.pf_ratio = pf_ratio
+
+class NotSupportedException(Exception):
+    pass
+
 def get_lane_cluster_density(path):
     """Get cluster density for lanes from report files in Data/reports.
 
@@ -28,7 +37,7 @@ def get_lane_cluster_density(path):
         return dict((i+1, lane_sum[i] / lane_ntile[i]) for i in lane_sum.keys())
 
 
-def get_from_files(run_dir, instrument, expand_lanes=None):
+def get_from_files(run_dir, instrument, expand_lanes=False):
     """Returns a dict indexed by lane number with values of cluster density tuples. Each
     tuple contains the raw cluster density, the PF cluster density and the PF ratio (this
     is redundant information, but various methods provide various values, so keeping all
@@ -40,6 +49,7 @@ def get_from_files(run_dir, instrument, expand_lanes=None):
     Returns merged (average) lane stats for NextSeq.
     """
     lanes = {}
+
     if instrument == "miseq" or instrument == "hiseq":
         # MiSeq has the Data/reports info, like HiSeq, getting clu. density from files
         pf_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane PF.txt")
@@ -47,7 +57,7 @@ def get_from_files(run_dir, instrument, expand_lanes=None):
         raw_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane.txt")
         lane_raw = get_lane_cluster_density(raw_path)
         for l in sorted(lane_raw.keys()):
-            lanes[l] = (lane_raw[l], lane_pf[l], lane_pf[l] / lane_raw[l])
+            lanes[l] = LaneStats(lane_raw[l], lane_pf[l], lane_pf[l] / lane_raw[l])
 
     elif instrument == "nextseq":
         run_completion = ElementTree.parse(
@@ -61,9 +71,49 @@ def get_from_files(run_dir, instrument, expand_lanes=None):
             lane_ids = ["X"]
 
         lanes = dict(
-                (lane_id, (clus_den, clus_den * pf_ratio, pf_ratio))
+                (lane_id, LaneStats(clus_den, clus_den * pf_ratio, pf_ratio))
                 for lane_id in lane_ids
                 )
+    else:
+        # HiSeq 3000/4000/X Lane statistics is not implemented here. Could use
+        # illuminate library to parse interop files, but maybe it is sufficient to
+        # use LIMS.
+        lanes = dict(
+                (lane_id, LaneStats(None, None, None))
+                for lane_id in [1,2,3,4,5,6,7,8]
+                )
+
+    return lanes
+
+
+def get_from_interop(run_dir, merge_lanes=False):
+    """Get cluster density and PF ratio from the "InterOp" files. (binary
+    run statistics format)
+
+    Uses the Illuminate library to parse the files. This creates a Pandas dataframe,
+    from which the relevant metrics are easily obtained.
+    """
+
+    try:
+        import illuminate
+    except ImportError:
+        raise NotSupportedException
+
+    dataset = illuminate.InteropDataset(run_dir)
+    df = dataset.TileMetrics().df
+    if merge_lanes:
+        means = df[df.code.isin((100,101))].groupby(by=df.code).mean()
+    else:
+        means = df[df.code.isin((100,101))].groupby(by=(df.lane,df.code)).mean()
+
+    raw = means[means.code==100].value.values
+    pf = means[means.code==101].value.values
+
+    if merge_lanes:
+        lanes = dict([("X", LaneStats(raw[0], pf[0], pf[0] / raw[0]))])
+    else:
+        lane_id = means[means.code==100]['lane'].values.astype('uint64')
+        lanes = dict(zip(lane_id, (LaneStats(*args) for args in zip(raw, pf, pf/raw))))
 
     return lanes
 
@@ -90,12 +140,15 @@ def get_from_lims(process, instrument, expand_lanes=None):
 
         # Get info for this lane (or lanes, for expand_lanes)
         for lane_id in lane_ids:
-            density_raw_1000 = lane.udf['Cluster Density (K/mm^2) R1']
-            n_raw = lane.udf['Clusters Raw R1']
-            n_pf = lane.udf['Clusters PF R1']
-            density_pf_1000 = int(density_raw_1000 * n_pf * 1.0 / n_raw)
-            pf_ratio = lane.udf['%PF R1'] / 100.0
-            lanes[lane_id] = (density_raw_1000 * 1000.0, density_pf_1000 * 1000.0, pf_ratio)
+            try:
+                density_raw_1000 = lane.udf['Cluster Density (K/mm^2) R1']
+                n_raw = lane.udf['Clusters Raw R1']
+                n_pf = lane.udf['Clusters PF R1']
+                density_pf_1000 = int(density_raw_1000 * n_pf * 1.0 / n_raw)
+                pf_ratio = lane.udf['%PF R1'] / 100.0
+                lanes[lane_id] = LaneStats(density_raw_1000 * 1000.0, density_pf_1000 * 1000.0, pf_ratio)
+            except KeyError: # Missing data in LIMS, proceed anyway
+                lanes[lane_id] = LaneStats(None, None, None)
 
     return lanes
 

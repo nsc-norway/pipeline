@@ -4,11 +4,12 @@
 import os
 import re
 import shutil
+import time
 from common import samples, nsc, taskmgr, samples, remote, utilities
 
-TASK_NAME = "60. FastQC"
-TASK_DESCRIPTION = """Run FastQC on the demultiplexed files."""
-TASK_ARGS = ['work_dir', 'sample_sheet', 'threads']
+TASK_NAME = "60. QC analysis"
+TASK_DESCRIPTION = """Run QC tools on the demultiplexed files."""
+TASK_ARGS = ['work_dir', 'sample_sheet', 'threads', 'lanes']
 
 def main(task):
     task.running()
@@ -44,8 +45,7 @@ def main(task):
 
     threads = task.threads
 
-    fastqc_args = ["--extract", "--threads=" + str(threads)]
-    fastqc_args += ["--outdir=" + output_dir]
+    fastqc_args = ["--extract", "--outdir=" + output_dir]
 
     if task.process:
         jobname = task.process.id + ".fastqc"
@@ -59,28 +59,53 @@ def main(task):
     except IOError:
         pass
 
-    # Process the files in groups of 500 files to prevent the 
-    # "argument list too long" error. The groups are processed 
-    # sequentially. The +499 is a "trick" to round up with int
-    # division.
-    n_groups = (len(fastq_paths) + 499) // 500
-    for i_group in xrange(n_groups):
-        # process interleaved e.g. #1, #3, #5, ... then #2, #4, #6...
-        # to preserve order
-        proc_paths = fastq_paths[i_group::n_groups]
-        grp_fastqc_args = fastqc_args + proc_paths
-        print "Fastqc-" + str(i_group), ": Processing", len(proc_paths), "of", len(fastq_paths), "files..."
-        threads_to_request=min(len(proc_paths), threads)
-        rcode = remote.run_command(
-                [nsc.FASTQC] + grp_fastqc_args, jobname, time="1-0", 
-                logfile=log_path, cpus=threads_to_request,
-                mem=str(1024+256*threads)+"M",
-                srun_user_args=['--open-mode=append']
-                )
 
-        if rcode != 0:
-            # The following function will call exit(1)
-            task.fail("fastqc failure", "Group " + str(i_group))
+    if remote.is_scheduler_available():
+        commands = [[nsc.FASTQC] + fastqc_args + [path] for path in fastq_paths]
+        jobs = []
+        fqc = remote.ArrayJob(commands, jobname, "1-0", log_path.replace(".txt", ".%a.txt"))
+        fqc.cpus_per_task = 1
+        fqc.mem_per_task = 1
+        fqc.max_simultaneous = 64 # Limit due to I/O bottlenecks
+        # This is highly dependent on the computing environment. Should be configurable, or
+        # maybe the admin could limit the number of jobs in slurm.
+        fqc.start()
+
+        jobs = [fqc]
+
+        task.array_job_status(jobs)
+        while not all(job.is_finished for job in jobs):
+            time.sleep(30)
+            for job in jobs:
+                job.check_status()
+            task.array_job_status(jobs)
+        
+        if set.union(*(set(job.summary.keys()) for job in jobs)) != set(("COMPLETED",)):
+            task.fail("fastqc failure", str(aj.summary))
+	
+    else:
+        # Process the files in groups of 500 files to prevent the 
+        # "argument list too long" error. The groups are processed 
+        # sequentially. 
+        n_groups = (len(fastq_paths) + 499) // 500
+        for i_group in xrange(n_groups):
+            # process interleaved e.g. #1, #3, #5, ... then #2, #4, #6...
+            # to preserve order
+            proc_paths = fastq_paths[i_group::n_groups]
+            task.info("Fastqc-{0}: Processing {1} of {2} files...".format(i_group, len(proc_paths), len(fastq_paths)))
+
+            threads_to_request=min(len(proc_paths), threads)
+            grp_fastqc_args = fastqc_args + ["--threads=" + str(threads)] + proc_paths
+            rcode = remote.run_command(
+                    [nsc.FASTQC] + grp_fastqc_args, jobname, time="1-0", 
+                    logfile=log_path, cpus=threads_to_request,
+                    mem=str(1024+256*threads)+"M",
+                    srun_user_args=['--open-mode=append']
+                    )
+
+            if rcode != 0:
+                # The following function will call exit(1)
+                task.fail("fastqc failure", "Group " + str(i_group))
 
     
     if task.process:

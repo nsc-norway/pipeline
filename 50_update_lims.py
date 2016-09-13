@@ -8,11 +8,11 @@ from common import nsc, taskmgr, stats, utilities
 TASK_NAME = "50. LIMS stats"
 TASK_DESCRIPTION = """Post demultiplexing stats to LIMS (doesn't make an effort
                     to handle the non-LIMS case, obviously)."""
-TASK_ARGS = ['work_dir']
+TASK_ARGS = ['work_dir', 'lanes']
 
 
 udf_list = [
-        '# Reads', 'Yield PF (Gb)', '% of Raw Clusters Per Lane',
+        '# Reads', '# Reads PF', 'Yield PF (Gb)', '% of Raw Clusters Per Lane',
         '% of PF Clusters Per Lane',
         '% Perfect Index Read', 'One Mismatch Reads (Index)',
         '% Bases >=Q30', 'Ave Q Score', '%PF'
@@ -68,7 +68,10 @@ def post_stats(process, projects, demultiplex_stats):
         lane, project, sample_name = coordinates[0:3]
         
         if sample_name: # Not undetermined
-            limsid = projects_map[project][sample_name].sample_id
+            try:
+                limsid = projects_map[project][sample_name].sample_id
+            except KeyError:
+                continue # Skip unknown samples / project
             resultfile = get_resultfile(process, lane, limsid, 1)
             if resultfile:
                 for statname in udf_list:
@@ -119,7 +122,10 @@ def get_resultfile(process, lane, input_limsid, read):
         # Would only do this for 404, but there is no e.response.status_code
         # (that is, e.response is None)
         input_sample = Sample(nsc.lims, id=input_limsid)
-        input_sample.get()
+        try:
+            input_sample.get()
+        except requests.exceptions.HTTPError:
+            return None
 
     # Find the result file corresponding to this artifact
     for i, o in process.input_output_maps:

@@ -15,7 +15,7 @@ from common import nsc, utilities, remote, taskmgr
 
 TASK_NAME = "10. Copy run"
 TASK_DESCRIPTION = "Copy run metadata"
-TASK_ARGS = ['src_dir', 'work_dir']
+TASK_ARGS = ['src_dir', 'work_dir', 'lanes']
 
 hiseq_exclude_paths = [
         "/Thumbnail_Images",
@@ -84,7 +84,7 @@ work_dir argument.""")
     # Specify source with trailing slash to copy content
     source = source.rstrip('/') + "/"
 
-    if instrument == "hiseq":
+    if instrument in ["hiseq", "hiseqx", "hiseq4k"]:
         exclude = hiseq_exclude_paths
     elif instrument == "nextseq":
         exclude = nextseq_exclude_paths

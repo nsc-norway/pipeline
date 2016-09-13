@@ -29,27 +29,52 @@ if nsc.SITE == "cees":
     CHECKED = {
             "hiseq": [
                 "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
-                "Auto 40. Move fastq files", "Auto 50-80. QC", "Close when finished"
+                "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Delivery and triggers", "Close when finished"
+                ],
+            "hiseq4k": [
+                "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
+                "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Delivery and triggers", "Close when finished"
                 ]
             }
+    # Used to set different number of threads for different machines. Probably
+    # not needed, as both HiSeq 2500 and HiSeq 4000 can use 20 threads here.
+    THREADS_OVERRIDE = {}
 else:
     CHECKED = {
             "hiseq": [
                 "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
-                "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Prepare delivery",
+                "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Delivery and triggers",
                 "Close when finished"
                 ],
             "miseq": [
                 "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
-                "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Prepare delivery",
+                "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Delivery and triggers",
                 "Close when finished"
                 ],
             "nextseq": [
                 "No lane splitting",
                 "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
-                "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Prepare delivery",
-                "Auto 95. Copy run again (NextSeq)", "Close when finished"
-                ]
+                "Auto 40. Move fastq files", "Auto 50-80. QC",
+                "Auto 85. Copy run again (NextSeq)", "Auto 90. Delivery and triggers",
+                "Close when finished"
+                ],
+            "hiseqx": [
+                "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
+                "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Delivery and triggers",
+                "Close when finished"
+                ],
+            "hiseq4k": [
+                "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
+                "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Delivery and triggers",
+                "Close when finished"
+                ],
+            }
+    THREADS_OVERRIDE = {
+            "hiseq": 16,
+            "hiseqx": 16,
+            "hiseq4k": 16,
+            "miseq": 8,
+            "nextseq": 8
             }
 
 
@@ -61,11 +86,16 @@ def get_sample_sheet_data(cluster_proc, fcid):
         i = io[0]
         o = io[1]
         if o['output-type'] == 'ResultFile' and o['output-generation-type'] == 'PerAllInputs':
-            if o['uri'].name == 'SampleSheet csv':
+            name = o['uri'].name
+            if name == 'SampleSheet csv' or name == "bcl2fastq Sample Sheet" or name == "HiSeq 3000-4000 Sample Sheet":
+                files = []
                 if len(o['uri'].files) == 1:
                     f = o['uri'].files[0]
+                    files.append(f)
                     if f.original_location == "{0}.csv".format(fcid):
                         return f.download()
+                if len(files) == 1: # Return sample sheet file even if wrong name, if it's the only one
+                    return f.download()
     return None
 
 
@@ -79,7 +109,7 @@ def main(process_id, sample_sheet_file):
         wells.add(i.location[1])
 
     if len(fcids) != 1:
-        logging.error("Multiple flowcells in inputs, this is going to end in tears")
+        logging.error("Multiple flowcells in inputs, this is going to end in frustration")
         return 1
 
     fcid = next(iter(fcids))
@@ -125,6 +155,9 @@ def main(process_id, sample_sheet_file):
         instrument = utilities.get_instrument(seq_proc)
         for udf in CHECKED.get(instrument, []):
             process.udf[udf] = True
+        threads = THREADS_OVERRIDE.get(instrument)
+        if threads is not None:
+            process.udf[nsc.THREADS_UDF] = threads
 
         logging.debug('Saved settings in the process')
 

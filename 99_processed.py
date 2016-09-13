@@ -10,7 +10,7 @@ from common import nsc, taskmgr
 TASK_NAME = '99. Mark "processed"'
 TASK_DESCRIPTION = """Move original run folder into processed/ directory
                     on primary storage, since we are done with it."""
-TASK_ARGS = ['src_dir']
+TASK_ARGS = ['src_dir', 'lanes']
 
 
 def main(task):

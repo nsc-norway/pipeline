@@ -10,7 +10,7 @@ umask 002
 echo $1
 
 REPOS="pipeline genologics"
-INSTALLATIONS="/data/nsc.loki/automation /var/www/limsweb"
+INSTALLATIONS="/data/nsc.loki/automation"
 
 # Deploy to installations from dev area
 for installation in $INSTALLATIONS
@@ -18,7 +18,7 @@ do
 	for repo in $REPOS
 	do
 		deploy_dir=$installation/$repo
-		mv $deploy_dir $deploy_dir.2
+		mv $deploy_dir $deploy_dir.2 || true
 		mkdir $deploy_dir
 		source_dir=/data/nsc.loki/automation/dev/$repo
 		pushd $source_dir > /dev/null

@@ -17,7 +17,7 @@ from common import nsc, utilities, taskmgr, remote, samples
 
 TASK_NAME = "90. Prepare delivery"
 TASK_DESCRIPTION = """Prepare for delivery."""
-TASK_ARGS = ['work_dir', 'sample_sheet']
+TASK_ARGS = ['work_dir', 'sample_sheet', 'lanes']
 
 if nsc.TAG == "prod":
     from common import secure
@@ -34,7 +34,8 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     # (If there is trouble, see note in copyfiles.py about SELinux and rsync)
     # Adding a generous time limit in case there is other activity going
     # on, 500 GB / 100MB/s = 1:25:00 . 
-    rcode = remote.run_command(args, "delivery_diag", "04:00:00", storage_job=True)
+    log_path = task.logfile("rsync-" + project.name)
+    rcode = remote.run_command(args, "delivery_diag", "04:00:00", storage_job=True, logfile=log_path)
     if rcode != 0:
         raise RuntimeError("Copying files to diagnostics failed, rsync returned an error")
 
@@ -117,7 +118,7 @@ def delivery_norstore(process, project_name, source_path):
     tarname = project_dir + ".tar"
     args = ["/bin/tar", "cf", save_path + "/" + tarname , project_dir]
     rcode = remote.run_command(
-            args, "tar", "02:00:00",
+            args, "tar", "04:00:00",
             cwd=os.path.dirname(source_path),
             storage_job=True
             ) # dirname = parent dir
@@ -130,7 +131,7 @@ def delivery_norstore(process, project_name, source_path):
     # a single file, so just requesting one core, and a "storage job"
     rcode = remote.run_command(
             [nsc.MD5DEEP, "-l", "-j1", tarname],
-            "md5deep", "02:00:00", cwd=save_path, stdout=md5_path,
+            "md5deep", "08:00:00", cwd=save_path, stdout=md5_path,
             storage_job=True
             )
     if rcode != 0:
@@ -138,15 +139,16 @@ def delivery_norstore(process, project_name, source_path):
                 "md5deep returned an error")
 
     # Generate username / password files
-    match = re.match("^([^-]+)-(.*)-\d\d\d\d-\d\d-\d\d", project_name)
-    name = match.group(1)
-    proj_type = match.group(2)
-    username = name.lower() + "-" + proj_type.lower()
-    password = secure.get_norstore_password(process)
-    crypt_pw = crypt.crypt(password)
-    
-    htaccess = """\
-AuthUserFile /norstore_osl/projects/N59012K/www/hts-nonsecure.uio.no/{project_dir}/.htpasswd
+    try:
+        match = re.match("^([^-]+)-([^-]+)-\d\d\d\d-\d\d-\d\d$", project_name)
+        name = match.group(1)
+        proj_type = match.group(2)
+        username = name.lower() + "-" + proj_type.lower()
+        password = secure.get_norstore_password(process, project_name)
+        crypt_pw = crypt.crypt(password)
+        
+        htaccess = """\
+AuthUserFile /norstore_osl/projects/NS9012K/www/hts-nonsecure.uio.no/{project_dir}/.htpasswd
 AuthGroupFile /dev/null
 AuthName ByPassword
 AuthType Basic
@@ -154,11 +156,13 @@ AuthType Basic
 <Limit GET>
 require user {username}
 </Limit>
-    """.format(project_dir=project_dir, username=username)
-    open(save_path + "/.htaccess", "w").write(htaccess)
+        """.format(project_dir=project_dir, username=username)
+        open(save_path + "/.htaccess", "w").write(htaccess)
 
-    htpasswd = "{username}:{crypt_pw}\n".format(username=username, crypt_pw=crypt_pw)
-    open(save_path + "/.htpasswd", "w").write(htpasswd)
+        htpasswd = "{username}:{crypt_pw}\n".format(username=username, crypt_pw=crypt_pw)
+        open(save_path + "/.htpasswd", "w").write(htpasswd)
+    except Exception, e:
+        task.warn("Password generation failed: " + str(e))
     
 
 
@@ -169,36 +173,42 @@ def main(task):
         task.fail("Sorry, delivery prep is only available through LIMS")
 
     lims_projects = {}
-    for i in task.process.all_inputs(unique=True):
-        pro = i.samples[0].project
-        lims_projects[pro.name] = pro
+    inputs = task.process.all_inputs(unique=True, resolve=True)
+    samples = (sample for i in inputs for sample in i.samples)
+    lims_projects = dict(
+            (utilities.get_sample_sheet_proj_name(sample.project.name), sample.project)
+            for sample in samples
+            if sample.project
+            )
 
     runid = task.run_id
     projects = (project for project in task.projects if not project.is_undetermined)
 
     sensitive_fail = []
     for project in projects:
-        lims_project = lims_projects[project.name]
+        lims_project = lims_projects.get(project.name)
 
-        project_path = os.path.join(task.bc_dir, project.proj_dir)
+        if lims_project:
 
-        delivery_type = lims_project.udf[nsc.DELIVERY_METHOD_UDF]
-        project_type = lims_project.udf[nsc.PROJECT_TYPE_UDF]
+            project_path = os.path.join(task.bc_dir, project.proj_dir)
 
-        if project_type == "Diagnostics":
-            task.info("Delivering " + project.name + " to diagnostics...")
-            delivery_diag(task, project, task.bc_dir, project_path)
-        elif delivery_type == "User HDD" or delivery_type == "New HDD":
-            task.info("Hard-linking " + project.name + " to delivery area...")
-            delivery_harddrive(project.name, project_path)
-        elif delivery_type == "Norstore":
-            if project_type != "Non-Sensitive":
-                sensitive_fail.append(project.name)
-                continue
-            task.info("Tar'ing and copying " + project.name + " to delivery area, for Norstore...")
-            delivery_norstore(task.process, project.name, project_path)
-        else:
-            print "No delivery prep done for project", project_name
+            delivery_type = lims_project.udf[nsc.DELIVERY_METHOD_UDF]
+            project_type = lims_project.udf[nsc.PROJECT_TYPE_UDF]
+
+            if project_type == "Diagnostics":
+                task.info("Copying " + project.name + " to diagnostics...")
+                delivery_diag(task, project, task.bc_dir, project_path)
+            elif delivery_type == "User HDD" or delivery_type == "New HDD":
+                task.info("Hard-linking " + project.name + " to delivery area...")
+                delivery_harddrive(project.name, project_path)
+            elif delivery_type == "Norstore":
+                if project_type != "Non-Sensitive":
+                    sensitive_fail.append(project.name)
+                    continue
+                task.info("Tar'ing and copying " + project.name + " to delivery area, for Norstore...")
+                delivery_norstore(task.process, project.name, project_path)
+            else:
+                print "No delivery prep done for project", project_name
 
     if sensitive_fail:
         task.fail("Selected Norstore delivery for sensitive data, nothing done for: " + ",".join(sensitive_fail))

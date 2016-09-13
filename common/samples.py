@@ -165,13 +165,14 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
             for i_read in xrange(1, num_reads+1):
 
                 fastq_name = get_fastq_name(
-                        instrument, 
+                        instrument,
                         sample.name,
                         sample.sample_index,
                         entry.get('index'),
                         entry.get('index2'),
                         lane_id,
                         i_read,
+                        run_id,
                         merged_lanes
                         )
 
@@ -206,6 +207,9 @@ def check_files_merged_lanes(run_dir):
     basecalls_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
     unmerged_exists = len(glob.glob(basecalls_dir + "/Undetermined_S0_L*_R1_001.fastq.gz")) > 0
     merged_exists = os.path.exists(basecalls_dir + "/Undetermined_S0_R1_001.fastq.gz")
+    if not unmerged_exists and not merged_exists:
+        unmerged_exists = len(glob.glob(basecalls_dir + "/*/*_S1_L*_R1_001.fastq.gz")) > 0
+        merged_exists = os.path.exists(basecalls_dir + "/*/*_S1_R1_001.fastq.gz")
     if merged_exists and not unmerged_exists:
         return True
     elif unmerged_exists and not merged_exists:
@@ -292,7 +296,7 @@ def parse_sample_sheet(sample_sheet):
 
 ################# FILE STRUCTURE #################
 def get_project_dir(run_id, project_name):
-    if utilities.get_instrument_by_runid(run_id) == 'hiseq':
+    if utilities.get_instrument_by_runid(run_id).startswith('hiseq'):
         return get_hiseq_project_dir(run_id, project_name)
     else:
         return get_ne_mi_project_dir(run_id, project_name)
@@ -312,36 +316,54 @@ def get_ne_mi_project_dir(run_id, project_name):
 
 
 def get_sample_dir(instrument, sample_name):
-    if instrument == 'hiseq':
+    if instrument in ['hiseq', 'hiseq4k', 'hiseqx']:
         return "Sample_" + sample_name
     else:
         return None
 
 
 def get_fastq_name(instrument, sample_name, sample_index,
-        index1, index2, lane_id, i_read, merged_lanes):
+        index1, index2, lane_id, i_read, run_id, merged_lanes):
     """The file name we want depends on the instument type, for consistency with older
-    deliveries."""
+    deliveries.
     
-    if instrument == "hiseq":
-        if index1:
-            index_seq = index1
-        else:
-            index_seq = "NoIndex"
-        if index2:
-            index_seq += "-" + index2
-        name = "{0}_{1}_L{2}_R{3}_001.fastq.gz".format(
-                sample_name,
-                index_seq,
-                str(lane_id).zfill(3),
-                i_read)
+    HiSeq 2500: Use CASAVA naming scheme.
 
+    Others: Use bcl2fastq v2 naming scheme. 
+
+    CEES site: Using a naming scheme which includes the flowcell ID.
+    """
     
+    # Single / dual index string
+    if index1:
+        index_seq = index1
     else:
-        return bcl2fastq2_file_name(sample_name, sample_index, lane_id, i_read, merged_lanes)
+        index_seq = "NoIndex"
+    if index2:
+        index_seq += "-" + index2
+
+    # All parameters used for formatting
+    parameters = {
+            "sample_name":sample_name,
+            "sample_index":sample_index,
+            "index_seq":index_seq,
+            "lane_id": lane_id,
+            "i_read":i_read,
+        }
+    if nsc.SITE == "cees":
+        # Format for CEES site
+        parameters['fcid'] = re.search(r"_[AB]([A-Z0-9]+)$", run_id).group(1)
+        name = "{fcid}_{sample_name}_{index_seq}_L{lane_id:03}_R{i_read}_001.fastq.gz".format(**parameters)
+    elif instrument == "hiseq":
+        name = "{sample_name}_{index_seq}_L{lane_id:03}_R{i_read}_001.fastq.gz".format(**parameters)
+    else:
+        if merged_lanes:
+            name = "{sample_name}_S{sample_index}_R{i_read}_001.fastq.gz".format(**parameters)
+        else:
+            name = "{sample_name}_S{sample_index}_L{lane_id:03}_R{i_read}_001.fastq.gz".format(**parameters)
 
     return name
-    
+
 
 def bcl2fastq2_file_name(sample_name, sample_index, lane_id, i_read, merged_lanes):
     if merged_lanes:

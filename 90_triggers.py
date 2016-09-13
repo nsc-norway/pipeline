@@ -4,12 +4,11 @@
 # Triggers are located in nsc.TRIGGER_DIR (see common/nsc.py for site-
 # dependent location). Each trigger must be an executable file. 
 
-# Trigger naming for automatic execution:
-
 ####################
 # PROJECT TRIGGERS #
 ####################
 
+# Trigger files matching the glob pattern:
 # project.<PROJECT_NAME>.*
 # Will launch once for each instance of PROJECT_NAME in the completed run.
 # Replace <PROJECT_NAME> with a match string for the project name.  PROJECT_NAME
@@ -27,9 +26,8 @@
 
 # The triggers are called with the following parameters:
 
-# project.PPPP.zzzz PROJECT_PATH SAMPLE_SHEET_PATH PROJECT_NAME RUN_ID [PROCESS_ID]
+#  PROJECT_PATH SAMPLE_SHEET_PATH PROJECT_NAME RUN_ID [PROCESS_ID]
 
-# PPPP: Match string.
 # PROJECT_PATH: path to the directory containing fastq files.
 # SAMPLE_SHEET_PATH: path to the sample sheet used for demultiplexing,
 #   i.e. the pre-processed "DemultiplexingSampleSheet.csv" created by
@@ -60,9 +58,8 @@
 
 # PARAMETERS:
 
-# run.RRRR.zzzz RUN_PATH SAMPLE_SHEET_PATH RUN_ID [PROCESS_ID]
+#  RUN_PATH SAMPLE_SHEET_PATH RUN_ID [PROCESS_ID]
 
-# RRRR: Match string.
 # RUN_PATH: The path to the run directory. If demultiplexing into a 
 #   different directory than that which is written by the sequencer,
 #   this is the directory containing the fastq files.
@@ -86,7 +83,7 @@
 # EXECUTION CONTEXT
 
 # The triggers are run as the automatic demutliplexing user. Triggers
-# are executed serially, and also block some of the last  "official"
+# are executed serially, and also block some of the last "official"
 # processing scripts. For this reason they should be short.
 # If launching longer compute jobs, do it via nohup, slurm, or similar.
 
@@ -99,7 +96,7 @@ from common import nsc, taskmgr
 
 TASK_NAME = "90. Triggers"
 TASK_DESCRIPTION = """Trigger custom scripts."""
-TASK_ARGS = ['work_dir', 'sample_sheet']
+TASK_ARGS = ['work_dir', 'sample_sheet', 'lanes']
 
 
 def main(task):

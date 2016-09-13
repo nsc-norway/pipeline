@@ -41,7 +41,7 @@ from common import nsc, utilities, taskmgr
 
 TASK_NAME = "20. Prepare SampleSheet"
 TASK_DESCRIPTION = "Prepare sample sheet for bcl2fastq2"
-TASK_ARGS = ['work_dir']
+TASK_ARGS = ['work_dir', 'lanes']
 
 
 def main(task):
@@ -85,6 +85,8 @@ def main(task):
         sample_sheet_path = task.args.input_sample_sheet
         if not sample_sheet_path:
             sample_sheet_path = os.path.join(task.work_dir, "SampleSheet.csv")
+            if not os.path.exists(sample_sheet_path):
+                sample_sheet_path = os.path.join(task.bc_dir, "SampleSheet.csv")
         
 
     # If not using LIMS, or if LIMS sources failed, try to get a file
@@ -108,13 +110,11 @@ def main(task):
 
     # Doctor the sample sheet, only if using HiSeq and it doesn't have [Data] header
     instrument = utilities.get_instrument_by_runid(task.run_id)
-    if instrument == "hiseq" and not re.match(r"\[Data\],*$", sample_sheet):
+    if instrument.startswith("hiseq") and not re.search(r"\[Data\]", sample_sheet):
         sample_sheet = convert_from_bcl2fastqv1(sample_sheet)
+    if instrument == "hiseqx":
+        sample_sheet = clear_index2_column(sample_sheet)
 
-    # Invert the read2 indexes if using nextseq
-    if instrument == "nextseq":
-        sample_sheet = reverse_complement_index2(sample_sheet)
-    
     # Post the result, as appropriate...
     if task.process:
         utilities.upload_file(
@@ -143,22 +143,31 @@ def rev_comp(sequence):
     return "".join(COMPLEMENTARY[b] for b in reversed(sequence))
 
 
-def reverse_complement_index2(original_data):
-    original_lines = [l.strip("\r\n") for l in original_data.splitlines()]
-    data_start = next(i for i, d in enumerate(original_lines) if re.match(r"\[Data\],*$", d))
-    data = [l.split(",") for l in original_lines[data_start+1:] if l.strip() != ""]
-    try:
-        index2_col = next(i for i, c in enumerate(data[0]) if c.lower() == "index2")
-        for row in data[1:]:
-            #row[index2_col] = str(Seq(row[index2_col]).reverse_complement())
-            row[index2_col] = rev_comp(row[index2_col])
+def clear_index2_column(original_data):
+    lines = original_data.splitlines()
+    output_rows = []
+    data = False
+    header = False
+    index2index = 0
+    for l in lines:
+        line = l.strip("\r\n")
+        if not data and line.lower().startswith("[data]"):
+            data = True
+        elif data:
+            if not header:
+                header = line.strip().lower().split(",")
+                try:
+                    index2index = header.index("index2")
+                except ValueError:
+                    return original_data
+            else:
+                parts = line.split(",")
+                if len(parts) > index2index:
+                    parts[index2index] = ""
+                line = ",".join(parts)
+        output_rows.append(line)
 
-        return "\r\n".join(
-                original_lines[0:data_start+1] +\
-                [",".join(cells) for cells in data]
-                )
-    except StopIteration: # index2 column not found
-        return original_data
+    return "\r\n".join(output_rows)
 
 
 def convert_from_bcl2fastqv1(original_data):
