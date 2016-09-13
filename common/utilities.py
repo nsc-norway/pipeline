@@ -177,7 +177,14 @@ def get_udf(process, udf, default):
 
 
 
-locale.setlocale(locale.LC_ALL, 'en_US')
+# *** Compatibility support functions ***
+
+# Locale setting is used for the function below
+try:
+    locale.setlocale(locale.LC_ALL, 'en_US')
+except locale.Error:
+    pass # Can't be sure we use correct thousands separator
+
 def display_int(val):
     """Adds thousands separators. To be replaced with "{:,}".format(val) when 
     upgrading to Python 2.7"""

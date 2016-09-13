@@ -12,7 +12,8 @@ try:
     with open("/etc/pipeline-site") as f: 
         SITE = f.read().strip()
 except IOError:
-    pass
+    print "Warning: unknown site, you may set the site in /etc/pipeline-site"
+    SITE = None
 
 ### Configuration for all sites, for production and dev ###
 
@@ -137,6 +138,11 @@ elif SITE == "ous":
     SRUN_STORAGE_JOB_ARGS=["--nodelist=loki"]
 
     SQUEUE=["/usr/bin/squeue"]
+
+else:
+    BCL2FASTQ="bcl2fastq"
+    FASTQC="fastqc"
+    REMOTE_MODE="local"
 
 
 ### Site and phase (TAG) dependent configuration ###
