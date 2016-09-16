@@ -81,17 +81,7 @@ def main(task):
             if not os.path.exists(sample_dir):
                 os.mkdir(sample_dir)
             for f in sample.files:
-                if f.i_read == 1 and not f.empty:
-                    output_path = os.path.join(
-                            output_dir,
-                            samples.get_fastdup_path(project, sample, f),
-                            )
-                    dup_commands.append(
-                            nsc.FASTDUP_ARGLIST + [
-                                os.path.join(bc_dir, f.path),
-                                output_path
-                                ]
-                            )
+                if not f.empty:
                     fqc_basedir = os.path.join(
                             output_dir,
                             os.path.dirname(samples.get_fastqc_dir(project, sample, f))
@@ -101,6 +91,17 @@ def main(task):
                             os.path.join(bc_dir, f.path)
                             ])
                     fastqc_zipfiles.append(fqc_basedir + ".zip")
+                    if f.i_read == 1:
+                        output_path = os.path.join(
+                                output_dir,
+                                samples.get_fastdup_path(project, sample, f),
+                                )
+                        dup_commands.append(
+                                nsc.FASTDUP_ARGLIST + [
+                                    os.path.join(bc_dir, f.path),
+                                    output_path
+                                    ]
+                                )
     
 
     fqc = remote.ArrayJob(fqc_commands, fqc_jobname, "1-0",
