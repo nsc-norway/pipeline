@@ -52,7 +52,7 @@ def parse_conversion_stats(conversion_stats_path, aggregate_lanes, aggregate_rea
     samples = {}
 
     # Which projects to process
-    if default_project:
+    if default_project is not None:
         analyse_projects = [(True, default_project)] + [(False, project) for project in projects]
     else:
         analyse_projects = [(False, project) for project in projects]
@@ -192,7 +192,7 @@ def parse_demultiplexing_stats(conversion_stats_path, aggregate_lanes):
                 samples[key] = stats
 
     # Undetermined
-    if default_project:
+    if default_project is not None:
         sample = next(
                 sam for sam in default_project.findall("Sample")
                 if sam.attrib['name'] == "unknown" or sam.attrib['name'] == "Undetermined"
