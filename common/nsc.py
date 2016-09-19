@@ -97,6 +97,7 @@ if SITE == "cees":
     # Data processing/analysis programs
     BCL2FASTQ2="/usr/local/bin/bcl2fastq"
     FASTQC="/opt/FastQC/fastqc"
+    FASTDUP="/opt/nsc/fastdup"
     BASEURI="https://cees-lims.sequencing.uio.no"
 
     REMOTE_MODE = "local"
@@ -106,7 +107,7 @@ elif SITE == "ous":
     #BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
     BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.17.1.14/nscinstallbin/bin/bcl2fastq"
     FASTQC="/data/common/tools/nscbin/fastqc"
-    FASTDUP_ARGLIST=["/data/common/tools/nscbin/fastdup", "-s", "10", "-e", "60"]
+    FASTDUP="/data/common/tools/nscbin/fastdup"
     BASEURI="https://ous-lims.sequencing.uio.no"
 
     REMOTE_MODE = "srun"
@@ -143,6 +144,9 @@ else:
     BCL2FASTQ2="bcl2fastq"
     FASTQC="fastqc"
     REMOTE_MODE="local"
+    FASTDUP="fastdup"
+
+FASTDUP_ARGLIST=[FASTDUP, "-s", "10", "-e", "60"]
 
 
 ### Site and phase (TAG) dependent configuration ###
