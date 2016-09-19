@@ -140,7 +140,7 @@ elif SITE == "ous":
     SQUEUE=["/usr/bin/squeue"]
 
 else:
-    BCL2FASTQ="bcl2fastq"
+    BCL2FASTQ2="bcl2fastq"
     FASTQC="fastqc"
     REMOTE_MODE="local"
 
