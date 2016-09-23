@@ -136,7 +136,9 @@ elif SITE == "ous":
     SBATCH_ARGLIST=["/usr/bin/sbatch"]
     
     # Args for jobs which mainly do I/O on the secondary storage, not processing
-    SRUN_STORAGE_JOB_ARGS=["--nodelist=loki"]
+    # Set a higher than default priority to make sure they run in preference of 
+    # jobs that can run anywhere.
+    SRUN_STORAGE_JOB_ARGS=["--nodelist=loki", "--nice=10"]
 
     SQUEUE=["/usr/bin/squeue"]
 
