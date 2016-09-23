@@ -20,30 +20,11 @@ def main(task):
     projects = task.projects
     samples.flag_empty_files(projects, task.work_dir)
 
-    # First get a list of FastqFile objects
-    # Empty fastq files (no sequences) will not be created by the new 
-    # bcl2fastq so skip those
-    fastq_files = [
-            f
-            for p in projects for s in p.samples for f in s.files
-            if not f.empty
-            ]
-    # then get the paths
-    # Put large files first in the list, so that the fastqc process won't be
-    # stuck processing one or two large files long after all others have finished
-    fastq_sorted = sorted(fastq_files,
-            key=lambda f: os.path.getsize(os.path.join(bc_dir, f.path)),
-            reverse=True
-            )
-    fastq_paths = [os.path.join(bc_dir, f.path) for f in fastq_sorted]
-
     output_dir = os.path.join(bc_dir, "QualityControl" + task.suffix)
     try:
         os.mkdir(output_dir)
     except OSError:
         pass
-
-    fastqc_args = ["--extract", "--outdir=" + output_dir]
 
     if task.process:
         fqc_jobname = "fastqc." + task.process.id
