@@ -85,7 +85,10 @@ def write_sample_info_table(output_path, runid, project):
                 )
         for s,f in files:
             out.write(os.path.basename(f.path) + "\t")
-            out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
+            if f.empty:
+                out.write("0\t")
+            else:
+                out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
             out.write("fragments\n")
 
 
