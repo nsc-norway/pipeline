@@ -87,11 +87,15 @@ def main(task):
 
     fqc = remote.ArrayJob(fqc_commands, fqc_jobname, "1-0",
             fqc_log_path.replace(".txt", ".%a.txt"))
+    fqc.mem_per_task = 1900
+    fqc.cpus_per_task = 1
     jobs = []
 
     if task.instrument in ["hiseqx", "hiseq4k"]:
         dup = remote.ArrayJob(dup_commands, dup_jobname, "6:00:00", 
                 dup_log_path.replace(".txt", ".%a.txt"))
+        dup.mem_per_task 500
+        dup.cpus_per_task = 1
         jobs = [fqc, dup]
     else:
         jobs = [fqc]

@@ -208,6 +208,8 @@ class LocalArrayJob(object):
         self.pool = None
         self.max_async = 0
         self.is_finished = False
+        self.mem_per_task = 1024
+        self.cpus_per_task = 1
 
     @staticmethod
     def start_jobs(jobs, max_local_threads=None):
