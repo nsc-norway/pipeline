@@ -94,7 +94,7 @@ def main(task):
     if task.instrument in ["hiseqx", "hiseq4k"]:
         dup = remote.ArrayJob(dup_commands, dup_jobname, "6:00:00", 
                 dup_log_path.replace(".txt", ".%a.txt"))
-        dup.mem_per_task 500
+        dup.mem_per_task = 500
         dup.cpus_per_task = 1
         jobs = [fqc, dup]
     else:
