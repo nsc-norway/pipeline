@@ -192,8 +192,11 @@ Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(
                         for s in proj.samples
                         for f in s.files
                         if f.lane == l and f.i_read == 1 and not f.empty)
-                duppct = dupsum * 100.0 / cluster_no
-                out.write("%4.2f%%\t" % duppct)
+                try:
+                    duppct = dupsum * 100.0 / cluster_no
+                    out.write("%4.2f%%\t" % duppct)
+                except ZeroDivisionError:
+                    out.write("-\t")
 
             if undetermined_file and not undetermined_file.empty:
                 try:
