@@ -116,13 +116,13 @@ def demultiplex_stats(project, undetermined_project, work_dir, basecalls_dir,
             key=lambda item: (item[0].lane, item[1].sample_index == 0, item[1].sample_index)
             )
     for f, sample, p in file_sample_sorted:
+        if f.stats == None:
+            continue # If there is no stats for the file, skip it alltoghether
         if p.is_undetermined:
             sample_name = "lane{0}".format(f.lane)
             sample_index_sequence = "Undetermined"
             sample_project = "Undetermined_indices"
             description = ""
-            if f.stats == None:
-                continue # If indexing is not used, there won't be an Undetermined.
         else:
             sample_name = sample.name
             sample_index_sequence = f.index_sequence
