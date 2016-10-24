@@ -33,8 +33,13 @@ def get_sequencing_process(process):
 
     processes = process.lims.get_processes(inputartifactlimsid=first_in_artifact.id)
     seq_processes = [proc for proc in processes if proc.type.name in [p[1] for p in nsc.SEQ_PROCESSES]]
-    # Use the last sequencing process. In case of crashed runs, this will be the right one.
-    return seq_processes[-1]
+    try:
+        # Use the last sequencing process. There may be more than one process if 
+        # the sequencing step was repeated, but not the clustering step (this should
+        # not be done)
+        return seq_processes[-1]
+    except IndexError:
+        return None
 
 
 def get_instrument(seq_process):
