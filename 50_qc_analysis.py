@@ -91,7 +91,7 @@ def main(task):
     fqc.cpus_per_task = 1
     jobs = []
 
-    if task.instrument in ["hiseqx", "hiseq4k"]:
+    if task.instrument in ["hiseqx", "hiseq4k"] and nsc.FASTDUP != None:
         dup = remote.ArrayJob(dup_commands, dup_jobname, "6:00:00", 
                 dup_log_path.replace(".txt", ".%a.txt"))
         dup.mem_per_task = 500
