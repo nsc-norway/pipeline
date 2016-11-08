@@ -103,6 +103,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
     """ 
 
     projects = {}
+    known_samples = {}
     lanes = set()
     not_multiplexed_lanes = set()
     instrument = utilities.get_instrument_by_runid(run_id)
@@ -139,10 +140,8 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
             if file_lanes:
                 projects[project_name] = project # Don't add project if in ignored lane
 
-        for sample in project.samples:
-            if sample.sample_id == entry['sampleid']:
-                break
-        else: # if not break
+        sample = known_samples.get((project_name, entry['sampleid']))
+        if not sample:
             sample_name = entry['samplename']
             if sample_name == "":
                 # MiSeq only uses Sample ID (at least for non-LIMS sample sheet)
@@ -150,6 +149,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
             sample_dir = get_sample_dir(instrument, sample_name)
             sample = Sample(sample_index, entry['sampleid'], sample_name, sample_dir, [])
             sample_index += 1
+            known_samples[(project.name, sample.sample_id)] = sample
             if file_lanes: # Don't add sample if in ignored lane
                 project.samples.append(sample)
 
