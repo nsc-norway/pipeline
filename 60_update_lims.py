@@ -36,6 +36,7 @@ def main(task):
     # Aggregate reads must match the setup in the LIMS -- it should be 
     # true if there is one resultfile for both reads, false if separate
     # resultfiles.
+    #print "Getting stats"
     run_stats = stats.get_stats(
             task.instrument,
             task.work_dir,
@@ -57,9 +58,10 @@ def post_stats(process, projects, demultiplex_stats, lane_metrics):
     """Find the resultfiles in the LIMS and post the demultiplexing
     stats.
     """ 
-
+    #print "Loading samples"
     nsc.lims.get_batch(process.all_inputs(unique=True) + process.all_outputs(unique=True))
     nsc.lims.get_batch(sum((a.samples for a in process.all_inputs()), []))
+    #print "Done loading"
 
     projects_map = {}
     for project in projects:
@@ -99,6 +101,7 @@ def post_stats(process, projects, demultiplex_stats, lane_metrics):
                     lane_analyte.udf['% Sequencing Duplicates'] = duplicates
                 update_artifacts.append(lane_analyte)
 
+    #print "Updating"
     nsc.lims.put_batch(update_artifacts)
 
 
