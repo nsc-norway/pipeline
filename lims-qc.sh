@@ -12,6 +12,6 @@ fi
 
 for script in $SCRIPTS
 do
-	python $(dirname $0)/$script --pid=$1
+	/usr/bin/python $(dirname $0)/$script --pid=$1
 done
 
