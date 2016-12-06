@@ -97,7 +97,7 @@ if SITE == "cees":
     # Data processing/analysis programs
     BCL2FASTQ2="/usr/local/bin/bcl2fastq"
     FASTQC="/opt/FastQC/fastqc"
-    FASTDUP=None
+    FASTDUP="/opt/nsc/bin/fastdup"
     BASEURI="https://cees-lims.sequencing.uio.no"
 
     REMOTE_MODE = "local"
