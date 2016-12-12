@@ -210,6 +210,7 @@ class LocalArrayJob(object):
         self.is_finished = False
         self.mem_per_task = 1024
         self.cpus_per_task = 1
+        self.comment = None
 
     @staticmethod
     def start_jobs(jobs, max_local_threads=None):
