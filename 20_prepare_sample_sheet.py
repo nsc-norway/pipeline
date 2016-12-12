@@ -121,7 +121,7 @@ def main(task):
     if instrument == "nextseq":
         if task.process: # LIMS mode
             seq_process = utilities.get_sequencing_process(task.process)
-            if seq_process.udf.get('Read 1 Cycles') and not seq_process.udf.get('Read 2 Cycles'):
+            if seq_process and seq_process.udf.get('Read 1 Cycles') and not seq_process.udf.get('Read 2 Cycles'):
                 sample_sheet = reverse_complement_index2(sample_sheet)
         else:
             task.info("Not in LIMS mode, don't know if we should reverse index2, leaving it as on Sample Sheet.")
