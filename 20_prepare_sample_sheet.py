@@ -112,8 +112,19 @@ def main(task):
     instrument = utilities.get_instrument_by_runid(task.run_id)
     if instrument.startswith("hiseq") and not re.search(r"\[Data\]", sample_sheet):
         sample_sheet = convert_from_bcl2fastqv1(sample_sheet)
+    # Remove index2, as only one index read supported on X
     if instrument == "hiseqx":
         sample_sheet = clear_index2_column(sample_sheet)
+    # NextSeq run will have index2 reversed by sample sheet generator -- unconditionally.
+    # However, single-read flow cells read the index2 in forward direction. So we re-reverse
+    # it.
+    if instrument == "nextseq":
+        if task.process: # LIMS mode
+            seq_process = utilities.get_sequencing_process(task.process)
+            if seq_process.udf.get('Read 1 Cycles') and not seq_process.udf.get('Read 2 Cycles'):
+                sample_sheet = reverse_complement_index2(sample_sheet)
+        else:
+            task.info("Not in LIMS mode, don't know if we should reverse index2, leaving it as on Sample Sheet.")
 
     # Post the result, as appropriate...
     if task.process:
@@ -141,6 +152,24 @@ def replace_special_chars(sample_sheet_data):
 def rev_comp(sequence):
     COMPLEMENTARY = {'A':'T', 'T':'A', 'G':'C', 'C':'G'}
     return "".join(COMPLEMENTARY[b] for b in reversed(sequence))
+
+
+def reverse_complement_index2(original_data):
+    original_lines = [l.strip("\r\n") for l in original_data.splitlines()]
+    data_start = next(i for i, d in enumerate(original_lines) if re.match(r"\[Data\],*$", d))
+    data = [l.split(",") for l in original_lines[data_start+1:] if l.strip() != ""]
+    try:
+        index2_col = next(i for i, c in enumerate(data[0]) if c.lower() == "index2")
+        for row in data[1:]:
+            #row[index2_col] = str(Seq(row[index2_col]).reverse_complement())
+            row[index2_col] = rev_comp(row[index2_col])
+
+        return "\r\n".join(
+                original_lines[0:data_start+1] +\
+                [",".join(cells) for cells in data]
+                )
+    except StopIteration: # index2 column not found
+        return original_data
 
 
 def clear_index2_column(original_data):
@@ -235,4 +264,3 @@ def convert_from_bcl2fastqv1(original_data):
 
 with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
     main(task)
-
