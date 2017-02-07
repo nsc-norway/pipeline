@@ -103,7 +103,8 @@ def delivery_diag(task, project, basecalls_dir, project_path):
 def delivery_harddrive(project_name, source_path):
     # There's no need to consider remote execution, creating hard-links is
     # done within an instant
-    subprocess.check_call(["/bin/cp", "-rl", source_path, nsc.DELIVERY_DIR])
+    # TODO : removing link option: writing to another filesystem now (will be slower)
+    subprocess.check_call(["/bin/cp", "-r", source_path, nsc.DELIVERY_DIR])
 
 
 def delivery_norstore(process, project_name, source_path):
