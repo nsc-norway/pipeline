@@ -101,10 +101,15 @@ def delivery_diag(task, project, basecalls_dir, project_path):
 
 
 def delivery_harddrive(project_name, source_path):
-    # There's no need to consider remote execution, creating hard-links is
-    # done within an instant
-    # TODO : removing link option: writing to another filesystem now (will be slower)
-    subprocess.check_call(["/bin/cp", "-r", source_path, nsc.DELIVERY_DIR])
+    # Copy to nsc.loki
+    log_path = task.logfile("rsync-" + project_name)
+    #subprocess.check_call(["/bin/cp", "-r", source_path, nsc.DELIVERY_DIR])
+    args = [nsc.RSYNC, '-rlt', '--chmod=ug+rwX,o-rwx'] # chmod 660
+    args += [source_path.rstrip("/"), nsc.DELIVERY_DIR]
+    rcode = remote.run_command(args, "delivery_hdd", "04:00:00", storage_job=True, logfile=log_path)
+    if rcode != 0:
+        raise RuntimeError("Copying files to loki failed, rsync returned an error")
+
 
 
 def delivery_norstore(process, project_name, source_path):
