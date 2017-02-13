@@ -172,7 +172,7 @@ elif SITE == "ous":
     PRIMARY_STORAGE = "/data/runScratch.boston"     # source data
     if TAG == "prod":
         SECONDARY_STORAGE="/data/runScratch.boston/demultiplexed"         # location of demultiplexed files
-        DELIVERY_DIR="/data/nsc.loki/delivery"     # used by prepare-delivery after QC
+        DELIVERY_DIR="/data/runScratch.boston/demultiplexed/delivery"     # used by prepare-delivery after QC
         DIAGNOSTICS_DELIVERY = "/data/diag/nscDelivery"
         LOG_DIR = "/data/nsc.loki/automation/logs" # logs for copy job (10_... script used at OUS)
         TRIGGER_DIR="/data/nsc.loki/automation/trigger"
