@@ -1,6 +1,7 @@
 import sys
 import os
 import operator
+from collections import defaultdict
 
 from common import nsc, stats, utilities, lane_info, samples, taskmgr
 
@@ -68,7 +69,7 @@ def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, process)
 
     if process:
         inputs = process.all_inputs(unique=True, resolve=True)
-        samples = lims.get_batch((sample for i in inputs for sample in i.samples))
+        samples = nsc.lims.get_batch((sample for i in inputs for sample in i.samples))
         lims_projects = dict(
                 (utilities.get_sample_sheet_proj_name(sample.project.name), sample.project)
                 for sample in samples
@@ -124,11 +125,15 @@ def write_lims_info(output_path, runid, project, lims_project):
         out.write('--------------------------------		\n\n')
 
         for key in ["Contact person", "Contact email", "Number of lanes"]:
-            out.write(key + "\t" + lims_project.udf.get(key) + "\n")
+            val = lims_project.udf.get(key, "")
+            if isinstance(val, type(u"")):
+                out.write(key + ":\t" + val.encode('utf-8') + "\n")
+            else:
+                out.write(key + ":\t" + str(val) + "\n")
 
         out.write("Completed lanes:\t")
         completed_runs = nsc.lims.get_processes(
-                type=(t[1] for t in SEQ_PROCESSES),
+                type=(t[1] for t in nsc.SEQ_PROCESSES),
                 projectname=lims_project.name
                 )
         completed_lanes = sum(
@@ -136,12 +141,12 @@ def write_lims_info(output_path, runid, project, lims_project):
                 for run_process in completed_runs),
                 []
                 )
-        lims.get_batch(completed_lanes)
-        lims.get_batch(lane.samples[0] for lane in completed_lanes)
+        nsc.lims.get_batch(completed_lanes)
+        nsc.lims.get_batch(lane.samples[0] for lane in completed_lanes)
         state_count = defaultdict(int)
-        for lane in completd_lanes:
+        for lane in completed_lanes:
             state_count[lane.qc_flag]+=1
-        out.write(", ".join(state + ": " + str(count) for state, count in state_count.items))
+        out.write(", ".join(state + ": " + str(count) for state, count in state_count.items()) + "\n")
         out.write("Lanes in this run:\t" + str(len(set(f.lane for sample in project.samples for f in sample.files))) + "\n")
 
 
@@ -264,7 +269,7 @@ Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(
             if lane.phix is None:
                 out.write("-\t")
             else:
-                out.write("%4.2%%\t" % lane.phix)
+                out.write("%4.2f%%\t" % lane.phix)
 
             q30sum = sum(f.stats['% Bases >=Q30']*f.stats['# Reads PF']
                     for proj in projects
