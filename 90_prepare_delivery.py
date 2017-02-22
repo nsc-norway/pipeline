@@ -195,7 +195,7 @@ def main(task):
         if lims_project:
             delivery_type = lims_project.udf[nsc.DELIVERY_METHOD_UDF]
             project_type = lims_project.udf[nsc.PROJECT_TYPE_UDF]
-        else if not task.process:
+        elif not task.process:
             delivery_type = nsc.DEFAULT_DELIVERY_MODE
             if delivery_type is None:
                 continue
