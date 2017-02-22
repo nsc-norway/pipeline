@@ -264,7 +264,7 @@ Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(
             if lane.phix is None:
                 out.write("-\t")
             else:
-                out.write("%4.2%%\t" % phix)
+                out.write("%4.2%%\t" % lane.phix)
 
             q30sum = sum(f.stats['% Bases >=Q30']*f.stats['# Reads PF']
                     for proj in projects
