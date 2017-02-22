@@ -9,10 +9,11 @@ from xml.etree import ElementTree
 from genologics.lims import *
 
 class LaneStats(object):
-    def __init__(self, cluster_den_raw, cluster_den_pf, pf_ratio):
+    def __init__(self, cluster_den_raw, cluster_den_pf, pf_ratio, phix):
         self.cluster_den_raw = cluster_den_raw
         self.cluster_den_pf = cluster_den_pf
         self.pf_ratio = pf_ratio
+        self.phix = phix
 
 class NotSupportedException(Exception):
     pass
@@ -57,7 +58,7 @@ def get_from_files(run_dir, instrument, expand_lanes=False):
         raw_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane.txt")
         lane_raw = get_lane_cluster_density(raw_path)
         for l in sorted(lane_raw.keys()):
-            lanes[l] = LaneStats(lane_raw[l], lane_pf[l], lane_pf[l] / lane_raw[l])
+            lanes[l] = LaneStats(lane_raw[l], lane_pf[l], lane_pf[l] / lane_raw[l], None)
 
     elif instrument == "nextseq":
         run_completion = ElementTree.parse(
@@ -71,7 +72,7 @@ def get_from_files(run_dir, instrument, expand_lanes=False):
             lane_ids = ["X"]
 
         lanes = dict(
-                (lane_id, LaneStats(clus_den, clus_den * pf_ratio, pf_ratio))
+                (lane_id, LaneStats(clus_den, clus_den * pf_ratio, pf_ratio, None))
                 for lane_id in lane_ids
                 )
     else:
@@ -79,7 +80,7 @@ def get_from_files(run_dir, instrument, expand_lanes=False):
         # illuminate library to parse interop files, but maybe it is sufficient to
         # use LIMS.
         lanes = dict(
-                (lane_id, LaneStats(None, None, None))
+                (lane_id, LaneStats(None, None, None, None))
                 for lane_id in [1,2,3,4,5,6,7,8]
                 )
 
@@ -102,18 +103,19 @@ def get_from_interop(run_dir, merge_lanes=False):
     dataset = illuminate.InteropDataset(run_dir)
     df = dataset.TileMetrics().df
     if merge_lanes:
-        means = df[df.code.isin((100,101))].groupby(by=df.code).mean()
+        means = df[df.code.isin((100,101,300))].groupby(by=df.code).mean()
     else:
-        means = df[df.code.isin((100,101))].groupby(by=(df.lane,df.code)).mean()
+        means = df[df.code.isin((100,101,300))].groupby(by=(df.lane,df.code)).mean()
 
     raw = means[means.code==100].value.values
     pf = means[means.code==101].value.values
+    phix = means[means.code==300].value.values
 
     if merge_lanes:
-        lanes = dict([("X", LaneStats(raw[0], pf[0], pf[0] / raw[0]))])
+        lanes = dict([("X", LaneStats(raw[0], pf[0], pf[0] / raw[0], phix[0]))])
     else:
         lane_id = means[means.code==100]['lane'].values.astype('uint64')
-        lanes = dict(zip(lane_id, (LaneStats(*args) for args in zip(raw, pf, pf/raw))))
+        lanes = dict(zip(lane_id, (LaneStats(*args) for args in zip(raw, pf, pf/raw, phix))))
 
     return lanes
 
@@ -146,9 +148,10 @@ def get_from_lims(process, instrument, expand_lanes=None):
                 n_pf = lane.udf['Clusters PF R1']
                 density_pf_1000 = int(density_raw_1000 * n_pf * 1.0 / n_raw)
                 pf_ratio = lane.udf['%PF R1'] / 100.0
-                lanes[lane_id] = LaneStats(density_raw_1000 * 1000.0, density_pf_1000 * 1000.0, pf_ratio)
+                phix = lane.udf['% Aligned R1'] / 100.0
+                lanes[lane_id] = LaneStats(density_raw_1000 * 1000.0, density_pf_1000 * 1000.0, pf_ratio, phix)
             except KeyError: # Missing data in LIMS, proceed anyway
-                lanes[lane_id] = LaneStats(None, None, None)
+                lanes[lane_id] = LaneStats(None, None, None, None)
 
     return lanes
 

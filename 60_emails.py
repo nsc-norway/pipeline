@@ -140,7 +140,7 @@ def write_internal_sample_table(output_path, runid, projects, lane_stats):
                     out.write("ok\t\tok\n")
 
 
-def write_summary_email(output_path, runid, projects, print_lane_number, lane_stats, duplicates):
+def write_summary_email(output_path, runid, projects, print_lane_number, lane_stats, patterned):
     with open(output_path, 'w') as out:
         summary_email_head = """\
 --------------------------------							
@@ -155,17 +155,17 @@ Undetermined ratio = how much proportion of fragments can not be assigned to a s
 Quality = summary of the overall quality							
 """.format(runId = runid)
         if print_lane_number:
-            if duplicates:
+            if patterned:
                 summary_email_head += """
-Lane\tProject\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tDuplicate\tUndetermined ratio\t>=Q30\tQuality
+Lane\tProject\tPF cluster no\tPF ratio\tDuplicate\tUndetermined ratio\tPhiX\t>=Q30\tQuality
 """
             else:
                 summary_email_head += """
-Lane\tProject\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\t>=Q30\tQuality
+Lane\tProject\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\tPhiX\t>=Q30\tQuality
 """
         else:
             summary_email_head += """
-Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\t>=Q30\tQuality
+Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\tPhiX\t>=Q30\tQuality
 """
 
         out.write(summary_email_head)
@@ -196,10 +196,11 @@ Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(
             out.write(utilities.display_int(cluster_no) + '\t')
             lane = lane_stats[l]
             out.write("%4.2f" % (lane.pf_ratio if lane.pf_ratio is not None else 0.0) + "\t")
-            out.write(utilities.display_int(lane.cluster_den_raw) + '\t')
-            out.write(utilities.display_int(lane.cluster_den_pf) + '\t')
+            if not patterned:
+                out.write(utilities.display_int(lane.cluster_den_raw) + '\t')
+                out.write(utilities.display_int(lane.cluster_den_pf) + '\t')
 
-            if duplicates:
+            if patterned:
                 dupsum = sum(f.stats['fastdup reads with duplicate']
                         for proj in projects
                         for s in proj.samples
@@ -218,6 +219,12 @@ Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(
                     out.write("%4s" % ('?') + "%\t")
             else:
                 out.write("-\t")
+
+            if lane.phix is None:
+                out.write("-\t")
+            else:
+                out.write("%4.2%%\t" % phix)
+
             q30sum = sum(f.stats['% Bases >=Q30']*f.stats['# Reads PF']
                     for proj in projects
                     for s in proj.samples
