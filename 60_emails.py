@@ -2,7 +2,6 @@ import sys
 import os
 import operator
 
-from genologics.lims import *
 from common import nsc, stats, utilities, lane_info, samples, taskmgr
 
 TASK_NAME = "60. Emails"
@@ -63,6 +62,10 @@ def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, process)
             fname = delivery_dir + "/Email_for_" + project.name + ".xls"
             write_sample_info_table(fname, run_id, project)
 
+    fname = delivery_dir + "/Summary_email_for_NSC_" + run_id + ".xls"
+    patterned = instrument_type in ["hiseqx", "hiseq4k"]
+    write_summary_email(fname, run_id, projects, instrument_type.startswith('hiseq'), lane_stats, patterned)
+
     if process:
         inputs = process.all_inputs(unique=True, resolve=True)
         samples = lims.get_batch((sample for i in inputs for sample in i.samples))
@@ -79,11 +82,6 @@ def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, process)
 
     fname = delivery_dir + "/Table_for_GA_runs_" + run_id + ".xls"
     write_internal_sample_table(fname, run_id, projects, lane_stats)
-
-    fname = delivery_dir + "/Summary_email_for_NSC_" + run_id + ".xls"
-    patterned = instrument_type in ["hiseqx", "hiseq4k"]
-    write_summary_email(fname, run_id, projects, instrument_type.startswith('hiseq'), lane_stats, patterned)
-
 
 def write_sample_info_table(output_path, runid, project):
     with open(output_path, 'w') as out:
@@ -122,56 +120,30 @@ def write_sample_info_table(output_path, runid, project):
 def write_lims_info(output_path, runid, project, lims_project):
     with open(output_path, 'w') as out:
         out.write('--------------------------------		\n')
-        out.write('Email & LIMS info for ' + project.name + "\n")
+        out.write('LIMS info for ' + project.name + "\n")
         out.write('--------------------------------		\n\n')
 
         for key in ["Contact person", "Contact email", "Number of lanes"]:
             out.write(key + "\t" + lims_project.udf.get(key) + "\n")
 
         out.write("Completed lanes:\t")
-        completed_runs = lims.get_processes(
+        completed_runs = nsc.lims.get_processes(
                 type=(t[1] for t in SEQ_PROCESSES),
                 projectname=lims_project.name
                 )
         completed_lanes = sum(
-                run_process.all_inputs(unique=True)
-                for run_process in completed_runs,
+                (run_process.all_inputs(unique=True)
+                for run_process in completed_runs),
                 []
                 )
         lims.get_batch(completed_lanes)
         lims.get_batch(lane.samples[0] for lane in completed_lanes)
         state_count = defaultdict(int)
         for lane in completd_lanes:
-            state_count[lane.qc_flag]++
-        out.write(", ".join(state + ": " + str(count) for state, count in state_count.items) + "\n")
+            state_count[lane.qc_flag]+=1
+        out.write(", ".join(state + ": " + str(count) for state, count in state_count.items))
+        out.write("Lanes in this run:\t" + str(len(set(f.lane for sample in project.samples for f in sample.files))) + "\n")
 
-        nsamples = len(project.samples)
-        out.write('Sequence ready for download - sequencing run ' + runid + ' - Project_' + project.name + ' (' + str(nsamples) + ' samples)\n\n')
-
-        if project.name.startswith("Diag-"):
-            files = sorted(
-                    ((s,fi) for s in project.samples for fi in s.files if fi.i_read == 1),
-                    key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
-                    )
-            for i, (s,f) in enumerate(files, 1):
-                out.write("Sample\t" + str(i) + "\t")
-                if f.empty:
-                    out.write("0\t")
-                else:
-                    out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
-                out.write("fragments\n")
-        else:
-            files = sorted(
-                    ((s,fi) for s in project.samples for fi in s.files),
-                    key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
-                    )
-            for s,f in files:
-                out.write(os.path.basename(f.path) + "\t")
-                if f.empty:
-                    out.write("0\t")
-                else:
-                    out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
-                out.write("fragments\n")
 
 
 def write_internal_sample_table(output_path, runid, projects, lane_stats):
