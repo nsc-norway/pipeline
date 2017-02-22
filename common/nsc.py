@@ -6,7 +6,7 @@ import os
 from ConfigParser import SafeConfigParser
 
 # Configure prod or dev
-TAG="dev"
+TAG="prod"
 
 try:
     with open("/etc/pipeline-site") as f: 
@@ -101,6 +101,7 @@ if SITE == "cees":
     BASEURI="https://cees-lims.sequencing.uio.no"
 
     REMOTE_MODE = "local"
+    DEFAULT_DELIVERY_MODE="Norstore"
 
 elif SITE == "ous":
     # Data processing/analysis programs
@@ -111,6 +112,7 @@ elif SITE == "ous":
     BASEURI="https://ous-lims.sequencing.uio.no"
 
     REMOTE_MODE = "srun"
+    DEFAULT_DELIVERY_MODE="User HDD"
 
     # * Command line to run slurm *
 
