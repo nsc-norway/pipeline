@@ -197,6 +197,8 @@ def main(task):
             project_type = lims_project.udf[nsc.PROJECT_TYPE_UDF]
         else if not task.process:
             delivery_type = nsc.DEFAULT_DELIVERY_MODE
+            if delivery_type is None:
+                continue
             project_type = "Non-Sensitive"
         else:
             task.warn("Project " + project.name + " is missing delivery information!")
