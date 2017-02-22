@@ -79,17 +79,30 @@ def write_sample_info_table(output_path, runid, project):
         nsamples = len(project.samples)
         out.write('Sequence ready for download - sequencing run ' + runid + ' - Project_' + project.name + ' (' + str(nsamples) + ' samples)\n\n')
 
-        files = sorted(
-                ((s,fi) for s in project.samples for fi in s.files),
-                key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
-                )
-        for s,f in files:
-            out.write(os.path.basename(f.path) + "\t")
-            if f.empty:
-                out.write("0\t")
-            else:
-                out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
-            out.write("fragments\n")
+        if project.name.startswith("Diag-"):
+            files = sorted(
+                    ((s,fi) for s in project.samples for fi in s.files if fi.i_read == 1),
+                    key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
+                    )
+            for i, (s,f) in enumerate(files, 1):
+                out.write("Sample\t" + str(i) + "\t")
+                if f.empty:
+                    out.write("0\t")
+                else:
+                    out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
+                out.write("fragments\n")
+        else:
+            files = sorted(
+                    ((s,fi) for s in project.samples for fi in s.files),
+                    key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
+                    )
+            for s,f in files:
+                out.write(os.path.basename(f.path) + "\t")
+                if f.empty:
+                    out.write("0\t")
+                else:
+                    out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
+                out.write("fragments\n")
 
 
 def write_internal_sample_table(output_path, runid, projects, lane_stats):
