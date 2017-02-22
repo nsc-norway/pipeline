@@ -46,12 +46,12 @@ def main(task):
     samples.flag_empty_files(projects, work_dir)
 
     qc_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls", "QualityControl" + task.suffix)
-    make_reports(instrument, qc_dir, run_id, projects, lane_stats)
+    make_reports(instrument, qc_dir, run_id, projects, lane_stats, task.process)
 
     task.success_finish()
 
 
-def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats):
+def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, process):
     if not os.path.exists(qc_dir):
         os.mkdir(qc_dir)
     delivery_dir = os.path.join(qc_dir, "Delivery")
@@ -62,6 +62,20 @@ def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats):
         if not project.is_undetermined:
             fname = delivery_dir + "/Email_for_" + project.name + ".xls"
             write_sample_info_table(fname, run_id, project)
+
+    if process:
+        inputs = process.all_inputs(unique=True, resolve=True)
+        samples = lims.get_batch((sample for i in inputs for sample in i.samples))
+        lims_projects = dict(
+                (utilities.get_sample_sheet_proj_name(sample.project.name), sample.project)
+                for sample in samples
+                if sample.project
+                )
+        for project in task.projects:
+            lims_project = lims_projects.get(project.name)
+            if lims_project:
+                fname = delivery_dir + "/LIMS_for_" + project.name + ".txt"
+                write_lims_info(fname, run_id, project, lims_project)
 
     fname = delivery_dir + "/Table_for_GA_runs_" + run_id + ".xls"
     write_internal_sample_table(fname, run_id, projects, lane_stats)
@@ -76,6 +90,61 @@ def write_sample_info_table(output_path, runid, project):
         out.write('--------------------------------		\n')
         out.write('Email for ' + project.name + "\n")
         out.write('--------------------------------		\n\n')
+        nsamples = len(project.samples)
+        out.write('Sequence ready for download - sequencing run ' + runid + ' - Project_' + project.name + ' (' + str(nsamples) + ' samples)\n\n')
+
+        if project.name.startswith("Diag-"):
+            files = sorted(
+                    ((s,fi) for s in project.samples for fi in s.files if fi.i_read == 1),
+                    key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
+                    )
+            for i, (s,f) in enumerate(files, 1):
+                out.write("Sample\t" + str(i) + "\t")
+                if f.empty:
+                    out.write("0\t")
+                else:
+                    out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
+                out.write("fragments\n")
+        else:
+            files = sorted(
+                    ((s,fi) for s in project.samples for fi in s.files),
+                    key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
+                    )
+            for s,f in files:
+                out.write(os.path.basename(f.path) + "\t")
+                if f.empty:
+                    out.write("0\t")
+                else:
+                    out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
+                out.write("fragments\n")
+
+
+def write_lims_info(output_path, runid, project, lims_project):
+    with open(output_path, 'w') as out:
+        out.write('--------------------------------		\n')
+        out.write('Email & LIMS info for ' + project.name + "\n")
+        out.write('--------------------------------		\n\n')
+
+        for key in ["Contact person", "Contact email", "Number of lanes"]:
+            out.write(key + "\t" + lims_project.udf.get(key) + "\n")
+
+        out.write("Completed lanes:\t")
+        completed_runs = lims.get_processes(
+                type=(t[1] for t in SEQ_PROCESSES),
+                projectname=lims_project.name
+                )
+        completed_lanes = sum(
+                run_process.all_inputs(unique=True)
+                for run_process in completed_runs,
+                []
+                )
+        lims.get_batch(completed_lanes)
+        lims.get_batch(lane.samples[0] for lane in completed_lanes)
+        state_count = defaultdict(int)
+        for lane in completd_lanes:
+            state_count[lane.qc_flag]++
+        out.write(", ".join(state + ": " + str(count) for state, count in state_count.items) + "\n")
+
         nsamples = len(project.samples)
         out.write('Sequence ready for download - sequencing run ' + runid + ' - Project_' + project.name + ' (' + str(nsamples) + ' samples)\n\n')
 
