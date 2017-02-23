@@ -145,7 +145,7 @@ def write_lims_info(output_path, runid, project, lims_project):
         nsc.lims.get_batch(lane.samples[0] for lane in completed_lanes)
         state_count = defaultdict(int)
         for lane in completed_lanes:
-            if lane.samples and lane.samples[0].project == lims_project:
+            if lane.samples[0].project == lims_project:
                 state_count[lane.qc_flag]+=1
         out.write(", ".join(state + ": " + str(count) for state, count in state_count.items()) + "\n")
         out.write("Lanes in this run:\t" + str(len(set(f.lane for sample in project.samples for f in sample.files))) + "\n")
