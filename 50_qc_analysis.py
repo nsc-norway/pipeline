@@ -47,6 +47,7 @@ def main(task):
     dup_commands = []
     fqc_commands = []
     fastqc_zipfiles = []
+    file_sizes = []
     for project in projects:
         if project.is_undetermined:
             project_dir = os.path.join(output_dir, "Undetermined")
@@ -67,10 +68,12 @@ def main(task):
                             output_dir,
                             os.path.dirname(samples.get_fastqc_dir(project, sample, f))
                             )
+                    fq_path = os.path.join(bc_dir, f.path)
                     fqc_commands.append([nsc.FASTQC, "--extract",
                             "--outdir=" + fqc_basedir,
-                            os.path.join(bc_dir, f.path)
+                            fq_path
                             ])
+                    file_sizes.append(os.path.getsize(fq_path))
                     fastqc_zipfiles.append(fqc_basedir + ".zip")
                     if f.i_read == 1:
                         output_path = os.path.join(
@@ -91,6 +94,14 @@ def main(task):
     fqc.cpus_per_task = 1
     fqc.comment = run_id
     jobs = []
+
+    # FastQC crashes is too many jobs complete on the same node at the same time
+    # For small jobs (< about 500k reads), this may be a problem, and we reduce the max
+    # simultaneous jobs to be safe. Use median size 50MB as cut-off; parameters may need
+    # tuning.
+    median_size = list(sorted(file_sizes))[len(file_sizes)/2]
+    if median_size < 50 * 1024**2:
+        fqc.max_simultaneous = 10
 
     if task.instrument in ["hiseqx", "hiseq4k"] and nsc.FASTDUP != None:
         dup = remote.ArrayJob(dup_commands, dup_jobname, "6:00:00", 
