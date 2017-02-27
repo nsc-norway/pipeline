@@ -139,9 +139,9 @@ elif SITE == "ous":
     
     # Args for jobs which mainly do I/O on the secondary storage, not processing
     # Set a higher than default priority to make sure they run in preference of 
-    # jobs that can run anywhere. (Now deprecated, storage access is the same
+    # jobs that can run anywhere. (Now less relevant, storage access is the same
     # from all nodes)
-    SRUN_STORAGE_JOB_ARGS=[]#["--nodelist=loki", "--nice=10"]
+    SRUN_STORAGE_JOB_ARGS=["--nice=10"]
 
     SQUEUE=["/usr/bin/squeue"]
 
