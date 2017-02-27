@@ -27,6 +27,8 @@ def srun_command(
             ] + srun_user_args
     if bandwidth != 0:
         srun_other_args.append('--gres=rsc:' + str(bandwidth))
+    elif storage_job:
+        srun_other_args.append('--gres=rsc:1G')
     if logfile:
         logpath = os.path.realpath(logfile)
         srun_other_args += ['--output=' + logpath, '--error=' + logpath]
