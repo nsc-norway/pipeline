@@ -61,6 +61,7 @@ class Task(object):
         self.process = None
         self.finished = False
         self.success = False
+        self.message = ""
 
 
     def get_arg(self, arg_name):
@@ -404,6 +405,16 @@ class Task(object):
 
             info_strings.append("[%s] " % array_job.job_id + ", ".join(states))
         self.info(" / ".join(info_strings))
+
+    def job_status(self, job, status):
+        new_message = job + " " + status
+        if new_message != self.message:
+            self.message = new_message
+            if self.process:
+                self.process.get()
+                self.process.udf[nsc.JOB_STATUS_UDF] = message
+                self.process.put()
+            print("INFO   [" + self.task_name + "] " + message, file=sys.stderr)
 
 
     def warn(self, status):

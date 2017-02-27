@@ -104,7 +104,7 @@ work_dir argument.""")
         job_name = TASK_NAME
 
     rc = remote.run_command(
-            args, job_name, "02:00:00", logfile=logfile, 
+            args, task, job_name, "02:00:00", logfile=logfile, 
             storage_job=True
             )
     

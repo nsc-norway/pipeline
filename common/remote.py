@@ -7,6 +7,7 @@ import tempfile
 import StringIO
 import itertools
 import multiprocessing
+import time
 
 import nsc
 import utilities
@@ -14,42 +15,58 @@ import utilities
 local_job_id = 1
 
 def srun_command(
-        args, jobname, time, logfile=None,
+        args, task, jobname, jobtime, logfile=None,
         cpus_per_task=1, mem=1024, bandwidth=0, cwd=None,
         stdout=None, srun_user_args=[],
         storage_job=False, comment=None
         ):
-    srun_other_args = [
+    sbatch_other_args = [
             '--job-name=' + jobname,
             '--cpus-per-task=' + str(cpus_per_task),
-            '--time=' + time,
+            '--time=' + jobtime,
             '--mem=' + str(mem)
             ] + srun_user_args
     if bandwidth != 0:
-        srun_other_args.append('--gres=rsc:' + str(bandwidth))
+        sbatch_other_args.append('--gres=rsc:' + str(bandwidth))
     elif storage_job:
-        srun_other_args.append('--gres=rsc:1G')
+        sbatch_other_args.append('--gres=rsc:1G')
     if logfile:
         logpath = os.path.realpath(logfile)
-        srun_other_args += ['--output=' + logpath, '--error=' + logpath]
+        sbatch_other_args += ['--output=' + logpath, '--error=' + logpath]
         if stdout:
             raise ValueError("Options stdout and logfile may not be used at the same time")
     elif stdout:
         stdoutpath = os.path.realpath(stdout)
-        srun_other_args += ['--output=' + stdoutpath]
+        sbatch_other_args += ['--output=' + stdoutpath]
 
     if storage_job:
-        srun_other_args += nsc.SRUN_STORAGE_JOB_ARGS
+        sbatch_other_args += nsc.SRUN_STORAGE_JOB_ARGS
 
     if comment:
-        srun_other_args += ['--comment=' + comment]
+        sbatch_other_args += ['--comment=' + comment]
 
-    arglist = nsc.SRUN_OTHER_ARGLIST
+    arglist = nsc.SBATCH_ARGLIST + ['--parsable']
+    cmd = "'" + "' '".join(arg.replace("'", "'\\''") for arg in args) + "'"
 
-    return subprocess.call(arglist + srun_other_args + args , cwd=cwd)
+    job_id = utilities.check_output(arglist + sbatch_other_args + ['--wrap', cmd] , cwd=cwd)
+    complete = False
+    while not complete:
+        try:
+            state = utilities.check_output(nsc.SQUEUE + ['-j', job_id, '-O', 'State', '-h', '-t', 'all']).strip()
+        except subprocess.CalledProcessError:
+            state = "UNKNOWN"
+        complete = state in ['FAILED', 'CANCELLED', 'COMPLETED']
+        if task:
+            task.info(jobname + " " + state.lower())
+        if not complete:
+            time.sleep(30)
+    if state == "COMPLETED":
+        return 0
+    else:
+        return 1
 
 
-def local_command(args, logfile=None, cwd=None, stdout=None):
+def local_command(args, task, logfile=None, cwd=None, stdout=None):
     if not cwd:
         cwd = os.getcwd()
     if logfile:
@@ -66,14 +83,14 @@ def local_command(args, logfile=None, cwd=None, stdout=None):
 
 
 def run_command(
-        args, jobname, time, logfile=None,
+        args, task, jobname, time, logfile=None,
         cpus=1, mem=1024, bandwidth=0, cwd=None,
         stdout=None, srun_user_args=[],
         storage_job=False, comment=None
         ):
     if nsc.REMOTE_MODE == "srun":
         return srun_command(
-            args, jobname, time, logfile, cpus, mem, bandwidth, cwd,
+            args, task, jobname, time, logfile, cpus, mem, bandwidth, cwd,
             stdout, srun_user_args, storage_job, comment
             )
     elif nsc.REMOTE_MODE == "local": 

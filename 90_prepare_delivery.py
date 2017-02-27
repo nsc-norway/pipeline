@@ -35,7 +35,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     # Adding a generous time limit in case there is other activity going
     # on, 500 GB / 100MB/s = 1:25:00 . 
     log_path = task.logfile("rsync-" + project.name)
-    rcode = remote.run_command(args, "delivery_diag", "04:00:00", storage_job=True, logfile=log_path)
+    rcode = remote.run_command(args, task, "delivery_diag", "04:00:00", storage_job=True, logfile=log_path)
     if rcode != 0:
         raise RuntimeError("Copying files to diagnostics failed, rsync returned an error")
 
@@ -106,13 +106,13 @@ def delivery_harddrive(project_name, source_path):
     #log_path = task.logfile("rsync-" + project_name)
     #args = [nsc.RSYNC, '-rlt', '--chmod=ug+rwX,o-rwx'] # chmod 660
     #args += [source_path.rstrip("/"), nsc.DELIVERY_DIR]
-    #rcode = remote.run_command(args, "delivery_hdd", "04:00:00", storage_job=True, logfile=log_path)
+    #rcode = remote.run_command(args, task,  "delivery_hdd", "04:00:00", storage_job=True, logfile=log_path)
     #if rcode != 0:
     #    raise RuntimeError("Copying files to loki failed, rsync returned an error")
 
 
 
-def delivery_norstore(process, project_name, source_path):
+def delivery_norstore(process, project_name, source_path, task):
     """Create a tar file"""
 
     project_dir = os.path.basename(source_path).rstrip("/")
@@ -124,7 +124,7 @@ def delivery_norstore(process, project_name, source_path):
     tarname = project_dir + ".tar"
     args = ["/bin/tar", "cf", save_path + "/" + tarname , project_dir]
     rcode = remote.run_command(
-            args, "tar", "04:00:00",
+            args, task, "tar", "04:00:00",
             cwd=os.path.dirname(source_path),
             storage_job=True
             ) # dirname = parent dir
@@ -136,7 +136,7 @@ def delivery_norstore(process, project_name, source_path):
     # rudimentary test indicates that md5deep only uses one thread when processing
     # a single file, so just requesting one core, and a "storage job"
     rcode = remote.run_command(
-            [nsc.MD5DEEP, "-l", "-j1", tarname],
+            [nsc.MD5DEEP, "-l", "-j1", tarname], task,
             "md5deep", "08:00:00", cwd=save_path, stdout=md5_path,
             storage_job=True
             )
@@ -215,7 +215,7 @@ def main(task):
                 sensitive_fail.append(project.name)
                 continue
             task.info("Tar'ing and copying " + project.name + " to delivery area, for Norstore...")
-            delivery_norstore(task.process, project.name, project_path)
+            delivery_norstore(task.process, project.name, project_path, task)
         else:
             print "No delivery prep done for project", project_name
 
