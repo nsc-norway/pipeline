@@ -35,7 +35,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     # Adding a generous time limit in case there is other activity going
     # on, 500 GB / 100MB/s = 1:25:00 . 
     log_path = task.logfile("rsync-" + project.name)
-    rcode = remote.run_command(args, "delivery_diag", "04:00:00", storage_job=True, logfile=log_path)
+    rcode = remote.run_command(args, "delivery_diag", "04:00:00", storage_job=True, bandwidth="1G", logfile=log_path)
     if rcode != 0:
         raise RuntimeError("Copying files to diagnostics failed, rsync returned an error")
 
@@ -126,6 +126,7 @@ def delivery_norstore(process, project_name, source_path):
     rcode = remote.run_command(
             args, "tar", "04:00:00",
             cwd=os.path.dirname(source_path),
+            bandwidth="1G",
             storage_job=True
             ) # dirname = parent dir
     if rcode != 0:
@@ -138,7 +139,7 @@ def delivery_norstore(process, project_name, source_path):
     rcode = remote.run_command(
             [nsc.MD5DEEP, "-l", "-j1", tarname],
             "md5deep", "08:00:00", cwd=save_path, stdout=md5_path,
-            storage_job=True
+            bandwidth="1G", storage_job=True
             )
     if rcode != 0:
         raise RuntimeError("Failed to compute checksum for tar file for Norstore, "+

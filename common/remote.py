@@ -15,7 +15,7 @@ local_job_id = 1
 
 def srun_command(
         args, jobname, time, logfile=None,
-        cpus_per_task=1, mem=1024, cwd=None,
+        cpus_per_task=1, mem=1024, bandwidth=0, cwd=None,
         stdout=None, srun_user_args=[],
         storage_job=False, comment=None
         ):
@@ -25,6 +25,8 @@ def srun_command(
             '--time=' + time,
             '--mem=' + str(mem)
             ] + srun_user_args
+    if bandwidth != 0:
+        srun_other_args.append('--gres=rsc:' + str(bandwidth))
     if logfile:
         logpath = os.path.realpath(logfile)
         srun_other_args += ['--output=' + logpath, '--error=' + logpath]
@@ -63,13 +65,13 @@ def local_command(args, logfile=None, cwd=None, stdout=None):
 
 def run_command(
         args, jobname, time, logfile=None,
-        cpus=1, mem=1024, cwd=None,
+        cpus=1, mem=1024, bandwidth=0, cwd=None,
         stdout=None, srun_user_args=[],
         storage_job=False, comment=None
         ):
     if nsc.REMOTE_MODE == "srun":
         return srun_command(
-            args, jobname, time, logfile, cpus, mem, cwd,
+            args, jobname, time, logfile, cpus, mem, bandwidth, cwd,
             stdout, srun_user_args, storage_job, comment
             )
     elif nsc.REMOTE_MODE == "local": 
@@ -104,6 +106,7 @@ class SlurmArrayJob(object):
         self.cpus_per_task = 1
         self.max_simultaneous = None
         self.mem_per_task = 1024
+        self.bandwidth_per_task = 0
         self.cwd = None
         self.comment = None
 
@@ -121,6 +124,8 @@ class SlurmArrayJob(object):
             os.write(handle, "#SBATCH --cpus-per-task={0}\n".format(self.cpus_per_task))
         if self.mem_per_task:
             os.write(handle, "#SBATCH --mem={0}\n".format(self.mem_per_task))
+        if self.bandwidth_per_task != 0:
+            os.write(handle, "#SBATCH --gres=rsc:{0}\n".format(self.bandwidth_per_task))
         if self.comment:
             os.write(handle, "#SBATCH --comment=\"{0}\"\n".format(self.comment))
 
@@ -198,6 +203,7 @@ class LocalArrayJob(object):
         self.is_finished = False
         self.mem_per_task = 1024
         self.cpus_per_task = 1
+        self.bandwidth_per_task = 0
         self.comment = None
 
     @staticmethod
