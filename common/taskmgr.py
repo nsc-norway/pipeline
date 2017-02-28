@@ -409,8 +409,8 @@ class Task(object):
         new_message = job + " " + status
         if new_message != self.message:
             self.message = new_message
-            self.safe_lims_update(message)
-            print("INFO   [" + self.task_name + "] " + message, file=sys.stderr)
+            self.safe_lims_update(new_message)
+            print("INFO   [" + self.task_name + "] " + new_message, file=sys.stderr)
 
 
     def warn(self, status):
