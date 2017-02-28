@@ -405,8 +405,8 @@ class Task(object):
         self.info(" / ".join(info_strings))
 
 
-    def job_status(self, job, status):
-        new_message = job + " " + status
+    def job_status(self, job_id, job_name, status):
+        new_message = "[{0}] {1} {2}".format(job_id, job_name, status)
         if new_message != self.message:
             self.message = new_message
             self.safe_lims_update(new_message)
