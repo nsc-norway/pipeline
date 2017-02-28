@@ -404,6 +404,7 @@ class Task(object):
             info_strings.append("[%s] " % array_job.job_id + ", ".join(states))
         self.info(" / ".join(info_strings))
 
+
     def job_status(self, job, status):
         new_message = job + " " + status
         if new_message != self.message:
