@@ -50,6 +50,7 @@ def srun_command(
 
     job_id = utilities.check_output(arglist + sbatch_other_args + ['--wrap', cmd] , cwd=cwd)
     complete = False
+    delay = 2
     while not complete:
         try:
             state = utilities.check_output(nsc.SQUEUE + ['-j', job_id, '-O', 'State', '-h', '-t', 'all']).strip()
@@ -59,7 +60,8 @@ def srun_command(
         if task:
             task.info(jobname + " " + state.lower())
         if not complete:
-            time.sleep(30)
+            time.sleep(delay)
+            delay = 30
     if state == "COMPLETED":
         return 0
     else:
