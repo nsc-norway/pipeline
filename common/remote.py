@@ -56,7 +56,11 @@ def srun_command(
         delay = 30
         try:
             data = utilities.check_output(nsc.SQUEUE + ['-j', job_id, '-O', 'State,NodeList', '-h', '-t', 'all'])
-            state, node = data.split()
+            parts = data.split()
+            if len(parts) == 2:
+                state, node = parts
+            else:
+                state, node = (parts[0], None)
         except (subprocess.CalledProcessError, ValueError):
             state = "UNKNOWN"
         complete = state in ['FAILED', 'CANCELLED', 'COMPLETED']
