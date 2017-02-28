@@ -58,7 +58,7 @@ def srun_command(
             state = "UNKNOWN"
         complete = state in ['FAILED', 'CANCELLED', 'COMPLETED']
         if task:
-            task.info(jobname + " " + state.lower())
+            task.job_status(job_id, state.lower())
         if not complete:
             time.sleep(delay)
             delay = 30
