@@ -52,17 +52,17 @@ def srun_command(
     complete = False
     delay = 2
     while not complete:
+        time.sleep(delay)
+        delay = 30
         try:
             data = utilities.check_output(nsc.SQUEUE + ['-j', job_id, '-O', 'State,NodeList', '-h', '-t', 'all'])
             state, node = data.split()
-        except subprocess.CalledProcessError:
+        except (subprocess.CalledProcessError, ValueError):
             state = "UNKNOWN"
         complete = state in ['FAILED', 'CANCELLED', 'COMPLETED']
         if task:
             task.job_status(job_id, jobname, node, state.lower())
-        if not complete:
-            time.sleep(delay)
-            delay = 30
+
     if state == "COMPLETED":
         return 0
     else:
