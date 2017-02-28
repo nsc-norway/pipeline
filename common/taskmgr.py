@@ -6,6 +6,7 @@ import sys
 import traceback
 import argparse
 import datetime
+import time
 
 # local
 import utilities
@@ -381,10 +382,7 @@ class Task(object):
 
 
     def info(self, status):
-        if self.process:
-            self.process.get()
-            self.process.udf[nsc.JOB_STATUS_UDF] = "Running ({0})".format(status)
-            self.process.put()
+        self.safe_lims_update("Running ({0})".format(status))
         print("INFO   [" + self.task_name + "] " + status, file=sys.stderr)
 
 
@@ -410,18 +408,12 @@ class Task(object):
         new_message = job + " " + status
         if new_message != self.message:
             self.message = new_message
-            if self.process:
-                self.process.get()
-                self.process.udf[nsc.JOB_STATUS_UDF] = message
-                self.process.put()
+            self.safe_lims_update(message)
             print("INFO   [" + self.task_name + "] " + message, file=sys.stderr)
 
 
     def warn(self, status):
-        if self.process:
-            self.process.get()
-            self.process.udf[nsc.JOB_STATUS_UDF] = "Running | Warning: {0}".format(status)
-            self.process.put()
+        self.safe_lims_update("Running | Warning: {0}".format(status))
         print("WARN   [" + self.task_name + "] " + status, file=sys.stderr)
 
 
@@ -435,12 +427,8 @@ class Task(object):
 
         self.finished = True
         self.success = False
-        if self.process:
-            self.process.udf[nsc.JOB_STATUS_UDF] = "Failed: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ": " + message
-            self.process.udf[nsc.JOB_STATE_CODE_UDF] = 'FAILED'
-            if extra_info:
-                self.process.udf[nsc.ERROR_DETAILS_UDF] = extra_info
-            self.process.put()
+        status = "Failed: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + ": " + message
+        self.safe_lims_update(status, 'FAILED', extra_info)
         if extra_info:
             print("ERROR  [" + self.task_name + "] " + message, file=sys.stderr)
             print("-----------", file=sys.stderr)
@@ -458,15 +446,28 @@ class Task(object):
         self.finished = True
         self.success = True
         complete_str = 'Completed successfully ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-        if self.process:
-            self.process.udf[nsc.JOB_STATUS_UDF] = complete_str
-            self.process.udf[nsc.JOB_STATE_CODE_UDF] = 'COMPLETED'
-            self.process.put()
-            #TODO : would have some processing status UDF
-
+        self.safe_lims_update(complete_str, 'COMPLETED')
         print("SUCCESS[" + self.task_name + "] " + complete_str, file=sys.stderr)
         sys.exit(0)
 
 
-
+    def safe_lims_update(self, message, state_code=None, error_details=None, force=False):
+        if self.process:
+            started = time.time()
+            while time.time() < started + 4*24*3600:
+                try:
+                    self.process.get(force=force)
+                    self.process.udf[nsc.JOB_STATUS_UDF] = message
+                    if state_code is not None:
+                        self.process.udf[nsc.JOB_STATE_CODE_UDF] = state_code
+                    if error_details is not None:
+                        self.process.udf[nsc.ERROR_DETAILS_UDF] = error_details
+                    self.process.put()
+                    break
+                except Exception, e:
+                    force = True
+                    time.sleep(300) # Try every 5 minutes
+            else:
+                # If we didn't break out, we timed out
+                raise e
 
