@@ -48,7 +48,7 @@ def srun_command(
     arglist = nsc.SBATCH_ARGLIST + ['--parsable']
     cmd = "'" + "' '".join(arg.replace("'", "'\\''") for arg in args) + "'"
 
-    job_id = utilities.check_output(arglist + sbatch_other_args + ['--wrap', cmd] , cwd=cwd)
+    job_id = utilities.check_output(arglist + sbatch_other_args + ['--wrap', cmd] , cwd=cwd).strip()
     complete = False
     delay = 2
     while not complete:
