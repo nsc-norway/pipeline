@@ -61,7 +61,7 @@ def srun_command(
             state = "UNKNOWN"
         complete = state in ['FAILED', 'CANCELLED', 'COMPLETED']
         if task:
-            task.job_status(job_id, jobname, node, state.lower())
+            task.job_status(job_id, jobname, state.lower(), node)
 
     if state == "COMPLETED":
         return 0
