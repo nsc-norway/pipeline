@@ -5,7 +5,7 @@ import getpass
 import os
 
 # Configure prod or dev
-TAG="prod"
+TAG="dev"
 
 try:
     with open("/etc/pipeline-site") as f: 
