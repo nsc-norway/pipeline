@@ -136,11 +136,12 @@ def write_lims_info(output_path, runid, project, lims_project):
                 type=(t[1] for t in nsc.SEQ_PROCESSES),
                 projectname=lims_project.name
                 )
-        completed_lanes = sum(
+        completed_lanes_all = sum(
                 (run_process.all_inputs(unique=True)
                 for run_process in completed_runs),
                 []
                 )
+        completed_lanes = set(lane.stateless for lane in completed_lanes_all)
         nsc.lims.get_batch(completed_lanes)
         nsc.lims.get_batch(lane.samples[0] for lane in completed_lanes)
         state_count = defaultdict(int)
