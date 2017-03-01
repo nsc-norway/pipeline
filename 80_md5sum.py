@@ -46,11 +46,8 @@ def main(task):
             if not paths:
                 continue # No files to check
             stdout = os.path.join(bc_dir, project.proj_dir, "md5sum.txt")
-            jobname = "md5deep"
-            if task.process:
-                jobname = task.process.id + "." + jobname
             rcode = remote.run_command(
-                    [nsc.MD5DEEP, '-rl', '-j' + str(n_threads)] + paths, task, jobname,
+                    [nsc.MD5DEEP, '-rl', '-j' + str(n_threads)] + paths, task, "md5deep",
                     time="08:00:00", cpus=n_threads, mem="2048M", storage_job=True,
                     cwd=os.path.join(bc_dir, project.proj_dir),
                     stdout = stdout

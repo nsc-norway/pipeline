@@ -101,14 +101,10 @@ def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
         args += re.split(" +", other_options)
 
     log_path = task.logfile("bcl2fastq2")
-    jobname = "bcl2fastq2"
-    if task.process:
-        jobname = task.process.id + "." + jobname
 
     print "Calling bcl2fastq with:", " ".join(args)
-
     rcode = remote.run_command(
-            args, task, jobname, time="1-0", logfile=log_path,
+            args, task, "bcl2fastq2", time="1-0", logfile=log_path,
             cpus=n_threads, mem="15G", bandwidth=str(n_threads*50)+"M",
             comment=comment
             )

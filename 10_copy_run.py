@@ -98,13 +98,11 @@ work_dir argument.""")
         # created by the rsync command. Requires LOG_DIR, not defined for
         # CEES site at the moment
         logfile = os.path.join(nsc.LOG_DIR, task.process.id + "-rsync.txt")
-        job_name = task.process.id + "." + TASK_NAME
     else:
         logfile = None
-        job_name = TASK_NAME
 
     rc = remote.run_command(
-            args, task, job_name, "02:00:00", logfile=logfile, 
+            args, task, "rsync", "02:00:00", logfile=logfile, 
             storage_job=True
             )
     

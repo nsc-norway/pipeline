@@ -69,13 +69,9 @@ work_dir argument.""")
     args = rsync_arglist(source, destination, exclude)
     
     logfile=task.logfile("rsync-2")
-    if task.process:
-        job_name = task.process.id + "." + TASK_NAME
-    else:
-        job_name = TASK_NAME
 
     rc = remote.run_command(
-            args, task, job_name, "00:05:00", logfile=logfile, 
+            args, task, "rsync", "00:05:00", logfile=logfile, 
             storage_job=True
             )
     
