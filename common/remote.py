@@ -32,12 +32,13 @@ def srun_command(
         sbatch_other_args.append('--gres=rsc:1G')
     if logfile:
         logpath = os.path.realpath(logfile)
-        sbatch_other_args += ['--output=' + logpath, '--error=' + logpath]
-        if stdout:
-            raise ValueError("Options stdout and logfile may not be used at the same time")
-    elif stdout:
+    else:
+        logpath = task.logfile(jobname)
+    if stdout:
         stdoutpath = os.path.realpath(stdout)
-        sbatch_other_args += ['--output=' + stdoutpath]
+        sbatch_other_args += ['--output=' + stdoutpath, '--error=' + logpath]
+    else:
+        sbatch_other_args += ['--output=' + logpath, '--error=' + logpath]
 
     if storage_job:
         sbatch_other_args += nsc.SRUN_STORAGE_JOB_ARGS
