@@ -71,9 +71,9 @@ def get_thread_args(n_threads):
     # Computing number of threads: use the standard allocation 
     # logic for bcl2fastq 2.17, but based on n_threads instead of
     # the number of threads on the machine
-    loading = 4 + n_threads//4
-    writing = 4 + n_threads//10
-    demultiplexing = int(ceil(n_threads * 0.7)) #  70 %
+    loading = int(ceil(n_threads*0.25))
+    writing = int(ceil(n_threads*0.25))
+    demultiplexing = int(ceil(n_threads * 0.7))
     processing = int(ceil(n_threads * 1.0))     #  100 %
     return ['-r', str(loading), '-d', str(demultiplexing),
             '-p', str(processing), '-w', str(writing)]
@@ -105,7 +105,7 @@ def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
     print "Calling bcl2fastq with:", " ".join(args)
     rcode = remote.run_command(
             args, task, "bcl2fastq2", time="1-0", logfile=log_path,
-            cpus=n_threads, mem="15G", bandwidth=str(n_threads*50)+"M",
+            cpus=n_threads, mem="15G", bandwidth=str(n_threads*28)+"M",
             comment=comment
             )
 
