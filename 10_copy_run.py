@@ -92,18 +92,17 @@ work_dir argument.""")
         exclude = miseq_exclude_paths
 
     args = rsync_arglist(source, destination, exclude)
-    
-    if task.process: # In LIMS mode
-        # Can't use a per-run log dir, as it's not created yet, it's
-        # created by the rsync command. Requires LOG_DIR, not defined for
-        # CEES site at the moment
-        logfile = os.path.join(nsc.LOG_DIR, task.process.id + "-rsync.txt")
-    else:
-        logfile = None
+
+    try:
+        os.mkdir(destination)
+    except OSError, e:
+        if e.errno == 17: # Already exists
+            pass
+        else:
+            raise
 
     rc = remote.run_command(
-            args, task, "rsync", "02:00:00", logfile=logfile, 
-            storage_job=True
+            args, task, "rsync", "02:00:00", storage_job=True
             )
     
     if rc == 0:
