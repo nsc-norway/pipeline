@@ -116,7 +116,7 @@ elif SITE == "ous":
     # * Command line to run slurm *
 
     # sbatch commands for "scheduler mode". Sudo mode is not supported.
-    SBATCH_ARGLIST=["/usr/bin/sbatch"]
+    SBATCH_ARGLIST=["/usr/bin/sbatch", "--partition=prod"]
     
     # Args for jobs which mainly do I/O on the secondary storage, not processing
     # Set a higher than default priority to make sure they run in preference of 
