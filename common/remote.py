@@ -186,8 +186,8 @@ class SlurmArrayJob(object):
                     self.states[jix] = 'CANCELLED'
 
         self.states.update(new_states)
-        if not squeue_out and "RUNNING" in self.states.values():
-            raise JobMonitoringException()
+        #if not squeue_out and "RUNNING" in self.states.values():
+        #    raise JobMonitoringException()
         self.summary = dict((key, len(list(group))) for key, group in itertools.groupby(sorted(self.states.values())))
 
     @property
