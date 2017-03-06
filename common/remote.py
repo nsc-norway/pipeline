@@ -54,7 +54,7 @@ def srun_command(
     delay = 2
     while not complete:
         time.sleep(delay)
-        delay = 30
+        delay = min(30, delay + 1)
         try:
             data = utilities.check_output(nsc.SQUEUE + ['-j', job_id, '-O', 'State,NodeList', '-h', '-t', 'all'])
             parts = data.split()
