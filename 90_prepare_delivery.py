@@ -90,7 +90,10 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     # Need to get the instrument and fcid
     instrument = utilities.get_instrument_by_runid(task.run_id)
     fcid = utilities.get_fcid_by_runid(task.run_id)
-    bcl2fastq_version = utilities.get_udf(task.process, nsc.BCL2FASTQ_VERSION_UDF, None)
+    if task.process:
+        bcl2fastq_version = utilities.get_udf(task.process, nsc.BCL2FASTQ_VERSION_UDF, None)
+    else:
+        bcl2fastq_version = utilities.get_bcl2fastq2_version(task.work_dir)
     undetermined_project = next(p for p in task.projects if p.is_undetermined)
     demultiplex_stats_content = demultiplex_stats.demultiplex_stats(
             project, undetermined_project, task.work_dir, basecalls_dir, instrument,
@@ -176,13 +179,16 @@ def main(task):
     task.running()
 
     lims_projects = {}
-    inputs = task.process.all_inputs(unique=True, resolve=True)
-    samples = (sample for i in inputs for sample in i.samples)
-    lims_projects = dict(
-            (utilities.get_sample_sheet_proj_name(sample.project.name), sample.project)
-            for sample in samples
-            if sample.project
-            )
+    if task.process:
+        inputs = task.process.all_inputs(unique=True, resolve=True)
+        samples = (sample for i in inputs for sample in i.samples)
+        lims_projects = dict(
+                (utilities.get_sample_sheet_proj_name(sample.project.name), sample.project)
+                for sample in samples
+                if sample.project
+                )
+    else:
+        lims_projects = {}
 
     runid = task.run_id
     projects = (project for project in task.projects if not project.is_undetermined)
@@ -200,6 +206,8 @@ def main(task):
             if delivery_type is None:
                 continue
             project_type = "Non-Sensitive"
+            if project.name.startswith("Diag-"):
+                project_type = "Diagnostics"
         else:
             task.warn("Project " + project.name + " is missing delivery information!")
             continue
