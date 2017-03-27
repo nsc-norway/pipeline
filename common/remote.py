@@ -64,7 +64,7 @@ def srun_command(
                 state, node = (parts[0], None)
         except (subprocess.CalledProcessError, ValueError):
             state = "UNKNOWN"
-        complete = state in ['FAILED', 'CANCELLED', 'COMPLETED']
+        complete = state in ['FAILED', 'CANCELLED', 'COMPLETED', 'TIMEOUT']
         if task:
             task.job_status(job_id, jobname, state.lower(), node)
 
