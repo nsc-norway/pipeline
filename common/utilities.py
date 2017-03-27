@@ -32,7 +32,7 @@ def get_sequencing_process(process):
     first_in_artifact = first_io[0]['uri']
 
     processes = process.lims.get_processes(inputartifactlimsid=first_in_artifact.id)
-    seq_processes = [proc for proc in processes if proc.type.name in [p[1] for p in nsc.SEQ_PROCESSES]]
+    seq_processes = [proc for proc in processes if proc.type_name in [p[1] for p in nsc.SEQ_PROCESSES]]
     try:
         # Use the last sequencing process. There may be more than one process if 
         # the sequencing step was repeated, but not the clustering step (this should
@@ -43,7 +43,7 @@ def get_sequencing_process(process):
 
 
 def get_instrument(seq_process):
-    return next(p[0] for p in nsc.SEQ_PROCESSES if seq_process.type.name == p[1])
+    return next(p[0] for p in nsc.SEQ_PROCESSES if seq_process.type_name == p[1])
 
 
 def get_instrument_by_runid(run_id):
