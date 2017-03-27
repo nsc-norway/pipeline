@@ -121,11 +121,11 @@ def main(process_id, sample_sheet_file):
 
     seq_proc = utilities.get_sequencing_process(process)
     parent_processes = process.parent_processes()
-    parent_pids = set(p.uri for p in parent_processes)
+    parent_uris = set(p.uri for p in parent_processes if p is not None)
 
     # This script can only handle the case when there is a single clustering process
     # (or for Mi/NextSeq, ...Load samples process)
-    if len(parent_pids) == 1:
+    if len(parent_uris) == 1:
         # look for clustering (HiSeq) or "load samples" proceess (Ne/MiSeq)
         # This is where the sample sheet is generated
         parent_proc = parent_processes[0]
