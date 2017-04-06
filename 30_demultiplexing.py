@@ -68,15 +68,13 @@ def main(task):
 
 
 def get_thread_args(n_threads):
-    # Computing number of threads: use the standard allocation 
-    # logic for bcl2fastq 2.17, but based on n_threads instead of
-    # the number of threads on the machine
-    loading = int(ceil(n_threads*0.25))
-    writing = int(ceil(n_threads*0.25))
-    demultiplexing = int(ceil(n_threads * 0.7))
+    # Computing number of threads: use something similar to the
+    # standard allocation, but by default it considers the total
+    # number of threads on the system.
+    loading = max(4, int(ceil(n_threads*0.20)))
+    writing = max(4, int(ceil(n_threads*0.20)))
     processing = int(ceil(n_threads * 1.0))     #  100 %
-    return ['-r', str(loading), '-d', str(demultiplexing),
-            '-p', str(processing), '-w', str(writing)]
+    return ['-r', str(loading), '-p', str(processing), '-w', str(writing)]
 
 
 def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
