@@ -19,12 +19,11 @@ class Project(object):
     proj_dir: base name of project directory relative to Data/Intensities/BaseCalls
     samples: list of samples
     """
-    def __init__(self, name, proj_dir, samples, is_undetermined=False, is_default=False):
+    def __init__(self, name, proj_dir, samples, is_undetermined=False):
         self.name = name
         self.proj_dir = proj_dir
         self.samples = samples
         self.is_undetermined = is_undetermined
-        self.is_default = is_default
 
 
 class Sample(object):
@@ -126,17 +125,12 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
             file_lanes &= only_process_lanes_set
 
         project_name = entry.get('project') or entry.get('sampleproject')
-        default_project = False
         if not project_name:
-            if experiment_name:
-                project_name = experiment_name
-                default_project = True
-            else:
-                raise RuntimeError("Project name not found in sample sheet")
+            raise ValueError("Project name missing in sample sheet, but is required by the QC scripts")
         project = projects.get(project_name)
         if not project:
             project_dir = get_project_dir(run_id, project_name) # fn defined in bottom of this file
-            project = Project(project_name, project_dir, [], is_default=default_project)
+            project = Project(project_name, project_dir, [])
             if file_lanes:
                 projects[project_name] = project # Don't add project if in ignored lane
 

@@ -46,8 +46,7 @@ def move_files(bc_dir, projects):
                             )
 
                     path_components = [bc_dir]
-                    if not project.is_default:
-                        path_components.append(project.name)
+                    path_components.append(project.name)
                     if not no_sample_id_dir:
                         path_components.append(sample.sample_id)
                     path_components.append(orig_fname)
@@ -74,14 +73,13 @@ def move_files(bc_dir, projects):
                         print "Failed to remove directory ", path
 
             # Remove project dir
-            if not project.is_default:
-                try:
-                    os.rmdir("{base}/{project}".format(
-                        base=bc_dir,
-                        project=project.name
-                        ))
-                except OSError:
-                    print "Failed to remove directory", project.name
+            try:
+                os.rmdir("{base}/{project}".format(
+                    base=bc_dir,
+                    project=project.name
+                    ))
+            except OSError:
+                print "Failed to remove directory", project.name
 
 
 def main(task):
