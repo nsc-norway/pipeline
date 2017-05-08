@@ -115,6 +115,8 @@ def main(task):
     # Remove index2, as only one index read supported on X
     if instrument == "hiseqx":
         sample_sheet = clear_index2_column(sample_sheet)
+    elif instrument == "hiseq4k":
+        sample_sheet = clear_index2_column_conditional(sample_sheet)
     # NextSeq run will have index2 reversed by sample sheet generator -- unconditionally.
     # However, single-read flow cells read the index2 in forward direction. So we re-reverse
     # it.
@@ -172,6 +174,35 @@ def reverse_complement_index2(original_data):
         return original_data
 
 
+def clear_index2_column_conditional(original_data):
+    lines = original_data.splitlines()
+    output_rows = []
+    data = False
+    header = False
+    index2index = 0
+    project_index = 0
+    for l in lines:
+        line = l.strip("\r\n")
+        if not data and line.lower().startswith("[data]"):
+            data = True
+        elif data:
+            if not header:
+                header = line.strip().lower().split(",")
+                try:
+                    index2index = header.index("index2")
+                    project_index = header.index("sample_project")
+                except ValueError:
+                    return original_data
+            else:
+                parts = line.split(",")
+                if len(parts) > index2index and len(parts) > project_index:
+                    if parts[project_index].startswith("Diag-Trio"):
+                        parts[index2index] = ""
+                line = ",".join(parts)
+        output_rows.append(line)
+    return "\r\n".join(output_rows)
+
+
 def clear_index2_column(original_data):
     lines = original_data.splitlines()
     output_rows = []
@@ -195,7 +226,6 @@ def clear_index2_column(original_data):
                     parts[index2index] = ""
                 line = ",".join(parts)
         output_rows.append(line)
-
     return "\r\n".join(output_rows)
 
 
