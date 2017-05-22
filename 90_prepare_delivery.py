@@ -29,8 +29,8 @@ else:
 
 
 def delivery_diag(task, project, basecalls_dir, project_path):
-    args = [nsc.RSYNC, '-rltW', '--chmod=ug+rwX,o-rwx'] # chmod 660
-    args += [project_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
+    rsync_args = [nsc.RSYNC, '-rltW', '--chmod=ug+rwX,o-rwx'] # chmod 660
+    args = rsync_args + [project_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
     # (If there is trouble, see note in copyfiles.py about SELinux and rsync)
     # Adding a generous time limit in case there is other activity going
     # on, 500 GB / 100MB/s = 1:25:00 . 
@@ -60,7 +60,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     # should only give the relevant lanes.
     for subdir in ["Stats" + task.suffix, "Reports" + task.suffix]:
         source = os.path.join(basecalls_dir, subdir)
-        subprocess.check_call([nsc.RSYNC, "-rlt", source, dest_dir])
+        subprocess.check_call(rsync_args + [source, dest_dir])
 
     # Copy the QualityControl files
     # The locations of the fastqc directories are defined by the get_fastqc_dir() 
@@ -77,12 +77,12 @@ def delivery_diag(task, project, basecalls_dir, project_path):
             os.mkdir(sample_dir)
 
         for f in sample.files:
-            source = os.path.join(source_qc_dir, samples.get_fastqc_dir(project, sample, f))
-            fqc_name = re.sub(r".fastq.gz$", "_fastqc", f.filename)
+            source = os.path.join(source_qc_dir, samples.get_fastqc_dir(project, sample, f), "/")
+            fqc_name = re.sub(r".fastq.gz$", "_fastqc/", f.filename)
             dest = os.path.join(sample_dir, fqc_name)
             if os.path.exists(dest):
                 shutil.rmtree(dest)
-            shutil.copytree(source, dest)
+            subprocess.check_call(rsync_args + [source, dest])
 
     # Get the demultiplex stats for diag. We generate a HTML file in the same 
     # format as that used by the first version of bcl2fastq.
