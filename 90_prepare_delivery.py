@@ -45,7 +45,6 @@ def delivery_diag(task, project, basecalls_dir, project_path):
 
     # Diagnostics wants the QC info in a particular format (file names, etc.). Do not
     # change without consultiing with them. 
-
     source_qc_dir = os.path.join(basecalls_dir, "QualityControl" + task.suffix)
 
     dest_dir = os.path.join(
@@ -79,7 +78,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
             os.mkdir(sample_dir)
 
         for f in sample.files:
-            source = os.path.join(source_qc_dir, samples.get_fastqc_dir(project, sample, f), "/")
+            source = os.path.join(source_qc_dir, samples.get_fastqc_dir(project, sample, f) + "/")
             fqc_name = re.sub(r".fastq.gz$", "_fastqc/", f.filename)
             dest = os.path.join(sample_dir, fqc_name)
             if os.path.exists(dest):
