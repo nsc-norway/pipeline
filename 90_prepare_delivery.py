@@ -29,13 +29,15 @@ else:
 
 
 def delivery_diag(task, project, basecalls_dir, project_path):
+    """Special delivery method for diagnostics at OUS"""
+
     rsync_args = [nsc.RSYNC, '-rltW', '--chmod=ug+rwX,o-rwx'] # chmod 660
     args = rsync_args + [project_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
     # (If there is trouble, see note in copyfiles.py about SELinux and rsync)
     # Adding a generous time limit in case there is other activity going
     # on, 500 GB / 100MB/s = 1:25:00 . 
     log_path = task.logfile("rsync-" + project.name)
-    rcode = remote.run_command(args, task, "delivery_diag", "04:00:00", storage_job=True, logfile=log_path)
+    rcode = remote.run_command(args, task, "delivery_diag", "04:00:00", storage_job=True, srun_user_args=['--nodelist=vali'], logfile=log_path)
     if rcode != 0:
         raise RuntimeError("Copying files to diagnostics failed, rsync returned an error")
 
