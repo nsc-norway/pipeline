@@ -86,11 +86,11 @@ def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, process)
 
 def write_sample_info_table(output_path, runid, project):
     with open(output_path, 'w') as out:
-        out.write('--------------------------------		\n')
-        out.write('Email for ' + project.name + "\n")
-        out.write('--------------------------------		\n\n')
+        out.write('--------------------------------		\r\n')
+        out.write('Email for ' + project.name + "\r\n")
+        out.write('--------------------------------		\r\n\r\n')
         nsamples = len(project.samples)
-        out.write('Sequence ready for download - sequencing run ' + runid + ' - Project_' + project.name + ' (' + str(nsamples) + ' samples)\n\n')
+        out.write('Sequence ready for download - sequencing run ' + runid + ' - Project_' + project.name + ' (' + str(nsamples) + ' samples)\r\n\r\n')
 
         if project.name.startswith("Diag-"):
             files = sorted(
@@ -103,7 +103,7 @@ def write_sample_info_table(output_path, runid, project):
                     out.write("0\t")
                 else:
                     out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
-                out.write("fragments\n")
+                out.write("fragments\r\n")
         else:
             files = sorted(
                     ((s,fi) for s in project.samples for fi in s.files),
@@ -115,7 +115,7 @@ def write_sample_info_table(output_path, runid, project):
                     out.write("0\t")
                 else:
                     out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
-                out.write("fragments\n")
+                out.write("fragments\r\n")
 
 
 def write_lims_info(output_path, runid, project, lims_project):
@@ -190,30 +190,31 @@ def write_internal_sample_table(output_path, runid, projects, lane_stats):
 
 def write_summary_email(output_path, runid, projects, print_lane_number, lane_stats, patterned):
     with open(output_path, 'w') as out:
-        summary_email_head = """\
---------------------------------							
-Summary email to NSC members							
---------------------------------							
-							
-Summary for run {runId}							
-							
-PF = pass illumina filter							
-PF cluster no = number of PF cluster in the lane							
-Undetermined ratio = how much proportion of fragments can not be assigned to a sample in the indexed lane							
-Quality = summary of the overall quality							
+        summary_email_head = """\r
+--------------------------------							\r
+Summary email to NSC members							\r
+--------------------------------							\r
+							\r
+Summary for run {runId}							\r
+							\r
+PF = pass illumina filter							\r
+PF cluster no = number of PF cluster in the lane							\r
+Undetermined ratio = how much proportion of fragments can not be assigned to a sample in the indexed lane							\r
+Quality = summary of the overall quality							\r
+\r
 """.format(runId = runid)
         if print_lane_number:
             if patterned:
                 summary_email_head += """
-Lane\tProject\tPF cluster no\tPF ratio\tDuplicate\tUndetermined ratio\tPhiX\t>=Q30\tQuality
+Lane\tProject\tPF cluster no\tPF ratio\tDuplicate\tUndetermined ratio\tPhiX\t>=Q30\tQuality\r
 """
             else:
                 summary_email_head += """
-Lane\tProject\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\tPhiX\t>=Q30\tQuality
+Lane\tProject\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\tPhiX\t>=Q30\tQuality\r
 """
         else:
             summary_email_head += """
-Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\tPhiX\t>=Q30\tQuality
+Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\tPhiX\t>=Q30\tQuality\r
 """
 
         out.write(summary_email_head)
@@ -286,7 +287,7 @@ Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(
             q30pct = q30sum  / max(norm, 1)
             out.write("%4.2f%%\t" % q30pct)
 
-            out.write("ok\n")
+            out.write("ok\r\n")
 
 
 if __name__ == "__main__":
