@@ -206,15 +206,15 @@ Quality = summary of the overall quality							\r
         if print_lane_number:
             if patterned:
                 summary_email_head += """
-Lane\tProject\tPF cluster no\tPF ratio\tDuplicate\tUndetermined ratio\tPhiX\t>=Q30\tQuality\r
+Lane\tProject\tPF cluster no\tPF ratio\tSeqDuplicates\tUndetermined ratio\tAlignedPhiX\t>=Q30\tQuality\r
 """
             else:
                 summary_email_head += """
-Lane\tProject\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\tPhiX\t>=Q30\tQuality\r
+Lane\tProject\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\tAlignedPhiX\t>=Q30\tQuality\r
 """
         else:
             summary_email_head += """
-Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\tPhiX\t>=Q30\tQuality\r
+Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\tAlignedPhiX\t>=Q30\tQuality\r
 """
 
         out.write(summary_email_head)
