@@ -205,15 +205,15 @@ Quality = summary of the overall quality							\r
 """.format(runId = runid)
         if print_lane_number:
             if patterned:
-                summary_email_head += """
+                summary_email_head += """\r
 Lane\tProject\tPF cluster no\tPF ratio\tSeqDuplicates\tUndetermined ratio\tAlignedPhiX\t>=Q30\tQuality\r
 """
             else:
-                summary_email_head += """
+                summary_email_head += """\r
 Lane\tProject\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\tAlignedPhiX\t>=Q30\tQuality\r
 """
         else:
-            summary_email_head += """
+            summary_email_head += """\r
 Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\tAlignedPhiX\t>=Q30\tQuality\r
 """
 
@@ -272,7 +272,7 @@ Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(
             if lane.phix is None:
                 out.write("-\t")
             else:
-                out.write("%4.2f%%\t" % lane.phix)
+                out.write("%4.2f%%\t" % (lane.phix * 100.0))
 
             q30sum = sum(f.stats['% Bases >=Q30']*f.stats['# Reads PF']
                     for proj in projects
