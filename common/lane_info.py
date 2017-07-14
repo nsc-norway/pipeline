@@ -112,7 +112,7 @@ def get_from_interop(run_dir, merge_lanes=False):
     phix = means[means.code==300].value.values / 100.0
 
     if merge_lanes:
-        lanes = dict([("X", LaneStats(raw[0], pf[0], pf[0] / raw[0], phix[0]))])
+        lanes = dict([("X", LaneStats(raw[0], pf[0], pf[0] / max(raw[0], 1), phix[0]))])
     else:
         lane_id = means[means.code==100]['lane'].values.astype('uint64')
         lanes = dict(zip(lane_id, (LaneStats(*args) for args in zip(raw, pf, pf/raw, phix))))
