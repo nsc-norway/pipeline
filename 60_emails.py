@@ -22,7 +22,7 @@ def main(task):
     
     try:
         lane_stats = lane_info.get_from_interop(task.work_dir, task.no_lane_splitting)
-    except lane_info.NotSupportedException:
+    except: # lane_info.NotSupportedException:
         expand_lanes = instrument == "nextseq" and not task.no_lane_splitting
 
         if task.process: # lims mode
