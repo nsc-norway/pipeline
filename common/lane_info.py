@@ -120,6 +120,21 @@ def get_from_interop(run_dir, merge_lanes=False):
     return lanes
 
 
+def get_r1r2_udf(artifact, udf_base_name, transform=lambda x: x):
+    denominator = 0.0
+    value = 0.0
+    if (udf_base_name + " R1") in  artifact.udf:
+        denominator += 1.0
+        value += artifact.udf.get(udf_base_name + " R1")
+    if (udf_base_name + " R1") in  artifact.udf:
+        denominator += 1.0
+        value += artifact.udf.get(udf_base_name + " R1")
+    if denominator == 0.0:
+        return None
+    else:
+        return transform(value / denominator)
+
+
 def get_from_lims(process, instrument, expand_lanes=None):
     """Get the cluster density and PF ratio from the input analytes of the provided
     process.
@@ -142,16 +157,18 @@ def get_from_lims(process, instrument, expand_lanes=None):
 
         # Get info for this lane (or lanes, for expand_lanes)
         for lane_id in lane_ids:
-            try:
-                density_raw_1000 = lane.udf['Cluster Density (K/mm^2) R1']
-                n_raw = lane.udf['Clusters Raw R1']
-                n_pf = lane.udf['Clusters PF R1']
+            density_raw_1000 = get_r1r2_udf(lane, 'Cluster Density (K/mm^2)')
+            n_raw = get_r1r2_udf(lane, 'Clusters Raw')
+            n_pf = get_r1r2_udf(lane, 'Clusters PF')
+            if not None in [n_raw, n_pf, density_raw_1000] and n_raw != 0.0:
                 density_pf_1000 = int(density_raw_1000 * n_pf * 1.0 / n_raw)
-                pf_ratio = lane.udf['%PF R1'] / 100.0
-                phix = lane.udf['% Aligned R1'] / 100.0
-                lanes[lane_id] = LaneStats(density_raw_1000 * 1000.0, density_pf_1000 * 1000.0, pf_ratio, phix)
-            except KeyError: # Missing data in LIMS, proceed anyway
-                lanes[lane_id] = LaneStats(None, None, None, None)
+            else:
+                density_pf_1000 = None
+            # The following UDFs are divided by 100 only if a value is found (otherwise: None)
+            pf_ratio = get_r1r2_udf(lane, '%PF', lambda x: x/100)
+            phix = get_r1r2_udf(lane, '% Aligned', lambda x: x/100)
+            
+            lanes[lane_id] = LaneStats(density_raw_1000 * 1000.0, density_pf_1000 * 1000.0, pf_ratio, phix)
 
     return lanes
 
