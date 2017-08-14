@@ -15,7 +15,7 @@ TASK_ARGS = ['work_dir', 'lanes']
 udf_list = [
         '# Reads', '# Reads PF', 'Yield PF (Gb)', '% of Raw Clusters Per Lane',
         '% of PF Clusters Per Lane',
-        '% Perfect Index Read', 'One Mismatch Reads (Index)',
+        '% Perfect Index Read', '% One Mismatch Reads (Index)',
         '% Bases >=Q30', 'Ave Q Score', '%PF'
         ]
 # Note: see main(), adding stats for Hi4k/X
@@ -89,6 +89,7 @@ def post_stats(process, projects, demultiplex_stats, lane_metrics):
                         resultfile.udf[statname] = stats[statname]
                     except KeyError:
                         pass
+                resultfile.udf['Sample sheet position'] = projects_map[project][sample_name].sample_index
                 update_artifacts.append(resultfile)
             
 

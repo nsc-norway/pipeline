@@ -470,6 +470,7 @@ class Task(object):
                     break
                 except Exception, e:
                     force = True
+                    print("Error while updating LIMS: '", str(e), "'. Will retry in 5 minutes...")
                     time.sleep(300) # Try every 5 minutes
             else:
                 # If we didn't break out, we timed out
