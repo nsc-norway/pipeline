@@ -29,6 +29,7 @@ def srun_command(
     if bandwidth != 0:
         sbatch_other_args.append('--gres=rsc:' + str(bandwidth))
     elif storage_job:
+	# TODO this is no longer true with 10Gbps net, should always specify bandwidth
         sbatch_other_args.append('--gres=rsc:1G')
     if logfile:
         logpath = os.path.realpath(logfile)
