@@ -31,17 +31,19 @@ else:
 def delivery_diag(task, project, basecalls_dir, project_path):
     """Special delivery method for diagnostics at OUS"""
 
-    rsync_args = [nsc.RSYNC, '-rltW', '--chmod=ug+rwX,o-rwx'] # chmod 660
-    args = rsync_args + [project_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
-    # (If there is trouble, see note in copyfiles.py about SELinux and rsync)
-    # Adding a generous time limit in case there is other activity going
-    # on, 500 GB / 100MB/s = 1:25:00 . 
-    log_path = task.logfile("rsync-" + project.name)
+    # This was changed from rsync to cp for performance reasons. cp is about 3 times as fast.
+    if os.path.exists(os.path.join(nsc.DIAGNOSITCS_DELIVERY, project_path)):
+        raise RuntimeError("Destination directory already exists in vali")
+    args = ["/bin/cp", "-r", project_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
+    log_path = task.logfile("cp-" + project.name)
     rcode = remote.run_command(args, task, "delivery_diag", "04:00:00", storage_job=True, srun_user_args=['--nodelist=vali'], logfile=log_path)
     if rcode != 0:
-        raise RuntimeError("Copying files to diagnostics failed, rsync returned an error")
+        raise RuntimeError("Copying files to diagnostics failed, cp returned an error")
 
     # Now copy quality control data
+
+    # General args for rsync to automatically set correct permissions
+    rsync_args = [nsc.RSYNC, '-rltW', '--chmod=ug+rwX,o-rwx'] # chmod 770/660
 
     # Diagnostics wants the QC info in a particular format (file names, etc.). Do not
     # change without consultiing with them. 
@@ -102,6 +104,8 @@ def delivery_diag(task, project, basecalls_dir, project_path):
             )
     with open(os.path.join(dest_dir, "Demultiplex_Stats.htm"), 'w') as f:
         f.write(demultiplex_stats_content)
+
+    subprocess.check_call(["/bin/chmod", "-R", "ug+rwX,o-rwx", os.path.join(nsc.DIAGNOSITCS_DELIVERY, project_path)])
 
 
 def delivery_harddrive(project_name, source_path):
