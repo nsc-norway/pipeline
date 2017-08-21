@@ -74,7 +74,8 @@ def get_thread_args(n_threads):
     loading = max(4, int(ceil(n_threads*0.20)))
     writing = max(4, int(ceil(n_threads*0.20)))
     processing = int(ceil(n_threads * 1.0))     #  100 %
-    return ['-r', str(loading), '-p', str(processing), '-w', str(writing)]
+    demultiplexing = int(ceil(n_threads * 0.7))     #  70 %
+    return ['-r', str(loading), '-p', str(processing), '-w', str(writing), '-d', str(demultiplexing)]
 
 
 def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
