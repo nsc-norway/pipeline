@@ -335,8 +335,8 @@ def add_duplication_results(qc_dir, projects):
                         path = os.path.join(qc_dir, samples.get_fastdup_path(project, sample, f))
                         with open(path) as metrics_file:
                             lines = [line.strip().split("\t") for line in metrics_file.readlines()]
-                            assert lines[0] == ["NUM_READS", "READS_WITH_DUP", "DUPLICATES_DEDUP"]
-                            num_reads, reads_with_dup, num_dupes_dedup = [int(v) for v in lines[1]]
+                            assert lines[0][0:2] == ["NUM_READS", "READS_WITH_DUP"]
+                            num_reads, reads_with_dup = [int(v) for v in lines[1][0:2]]
                             stats = f.stats or dict()
                             stats['% Sequencing Duplicates'] = reads_with_dup * 100.0 / num_reads
                             stats['fastdup reads with duplicate'] = reads_with_dup
