@@ -32,7 +32,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     """Special delivery method for diagnostics at OUS"""
 
     # This was changed from rsync to cp for performance reasons. cp is about 3 times as fast.
-    if os.path.exists(os.path.join(nsc.DIAGNOSITCS_DELIVERY, project_path)):
+    if os.path.exists(os.path.join(nsc.DIAGNOSTICS_DELIVERY, project_path)):
         raise RuntimeError("Destination directory already exists in vali")
     args = ["/bin/cp", "-r", project_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
     log_path = task.logfile("cp-" + project.name)
