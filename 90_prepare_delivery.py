@@ -31,9 +31,14 @@ else:
 def delivery_diag(task, project, basecalls_dir, project_path):
     """Special delivery method for diagnostics at OUS"""
 
+    dest_dir = os.path.join(
+            nsc.DIAGNOSTICS_DELIVERY,
+            os.path.basename(project_path)
+            )
+
     # This was changed from rsync to cp for performance reasons. cp is about 3 times as fast.
-    if os.path.exists(os.path.join(nsc.DIAGNOSTICS_DELIVERY, project_path)):
-        raise RuntimeError("Destination directory '" + project_path + "' already exists in vali")
+    if os.path.exists(dest_dir):
+        raise RuntimeError("Destination directory '" + dest_dir + "' already exists in vali")
     args = ["/bin/cp", "-r", project_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
     log_path = task.logfile("cp-" + project.name)
     rcode = remote.run_command(args, task, "delivery_diag", "04:00:00", storage_job=True, srun_user_args=['--nodelist=vali'], logfile=log_path)
@@ -49,10 +54,6 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     # change without consultiing with them. 
     source_qc_dir = os.path.join(basecalls_dir, "QualityControl" + task.suffix)
 
-    dest_dir = os.path.join(
-            nsc.DIAGNOSTICS_DELIVERY,
-            os.path.basename(project_path)
-            )
     qc_dir = os.path.join(dest_dir, "QualityControl")
 
     if not os.path.exists(qc_dir):
@@ -105,7 +106,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     with open(os.path.join(dest_dir, "Demultiplex_Stats.htm"), 'w') as f:
         f.write(demultiplex_stats_content)
 
-    subprocess.check_call(["/bin/chmod", "-R", "ug+rwX,o-rwx", os.path.join(nsc.DIAGNOSITCS_DELIVERY, project_path)])
+    subprocess.check_call(["/bin/chmod", "-R", "ug+rwX,o-rwx", os.path.join(nsc.DIAGNOSITCS_DELIVERY, dest_dir)])
 
 
 def delivery_harddrive(project_name, source_path):
