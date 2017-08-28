@@ -106,7 +106,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     with open(os.path.join(dest_dir, "Demultiplex_Stats.htm"), 'w') as f:
         f.write(demultiplex_stats_content)
 
-    subprocess.check_call(["/bin/chmod", "-R", "ug+rwX,o-rwx", os.path.join(nsc.DIAGNOSITCS_DELIVERY, dest_dir)])
+    subprocess.check_call(["/bin/chmod", "-R", "ug+rwX,o-rwx", os.path.join(nsc.DIAGNOSTICS_DELIVERY, dest_dir)])
 
 
 def delivery_harddrive(project_name, source_path):
