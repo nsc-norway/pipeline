@@ -33,7 +33,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
 
     # This was changed from rsync to cp for performance reasons. cp is about 3 times as fast.
     if os.path.exists(os.path.join(nsc.DIAGNOSTICS_DELIVERY, project_path)):
-        raise RuntimeError("Destination directory already exists in vali")
+        raise RuntimeError("Destination directory '" + project_path + "' already exists in vali")
     args = ["/bin/cp", "-r", project_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
     log_path = task.logfile("cp-" + project.name)
     rcode = remote.run_command(args, task, "delivery_diag", "04:00:00", storage_job=True, srun_user_args=['--nodelist=vali'], logfile=log_path)
