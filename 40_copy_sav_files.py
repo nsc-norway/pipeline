@@ -15,8 +15,6 @@ SAV_INCLUDE_PATHS = [
         "runParameters.xml",
         "RunParameters.xml",
         "InterOp",
-        "Thumbnail_Images",
-        "Images",
         "Data/Intensities/BaseCalls/reports"
         ]
 
@@ -27,15 +25,13 @@ def main(task):
     work_dir = task.work_dir
     projects = task.projects
 
-    if any(project.name.startswith("Diag-") for project in task.projects):
+    if any(project.name.startswith("Diag-") for project in task.projects if project.name):
         rsync_cmd = [nsc.RSYNC, '-rlt']
         rsync_cmd += ['--chmod=a+rX,ug+w']
         rsync_cmd += SAV_INCLUDE_PATHS
-        rsync_cmd += [SAV_REPOSITORY_DIR + task.run_id]
+        rsync_cmd += [os.path.join(SAV_REPOSITORY_DIR, task.run_id)]
         rcode = remote.run_command(rsync_cmd, task, "rsync", time="01:00", storage_job=True, cwd=task.work_dir)
-        if rcode != 0:
-            task.error("Failed to copy SAV files", "rsync returned an error status")
-
+        # Note: Rsync error code is ignored. It will return an error if not all input files exist.
 
     task.success_finish()
 
