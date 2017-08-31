@@ -1,5 +1,5 @@
 import os
-from common import taskmgr, samples, nsc
+from common import taskmgr, samples, nsc, remote
 
 TASK_NAME = "40. Copy SAV files"
 TASK_DESCRIPTION = """Copy SAV files for diagnostics group."""
@@ -15,7 +15,9 @@ SAV_INCLUDE_PATHS = [
         "runParameters.xml",
         "RunParameters.xml",
         "InterOp",
-        "Thumbnail_Images"
+        "Thumbnail_Images",
+        "Images",
+        "Data/Intensities/BaseCalls/reports"
         ]
 
 
@@ -26,9 +28,13 @@ def main(task):
     projects = task.projects
 
     if any(project.name.startswith("Diag-") for project in task.projects):
-        rsync_cmd = [nsc.RSYNC]
+        rsync_cmd = [nsc.RSYNC, '-rlt']
         rsync_cmd += ['--chmod=a+rX,ug+w']
-        rsync_cmd += ['']
+        rsync_cmd += SAV_INCLUDE_PATHS
+        rsync_cmd += [SAV_REPOSITORY_DIR + task.run_id]
+        rcode = remote.run_command(rsync_cmd, task, "rsync", time="01:00", storage_job=True, cwd=task.work_dir)
+        if rcode != 0:
+            task.error("Failed to copy SAV files", "rsync returned an error status")
 
 
     task.success_finish()
