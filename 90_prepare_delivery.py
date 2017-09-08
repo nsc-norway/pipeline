@@ -48,6 +48,24 @@ def delivery_diag(task, project, basecalls_dir, project_path):
 
     # Now copy quality control data
 
+
+    # Copy "SAV" files, so Diagnostics can manage them as they see fit
+    SAV_INCLUDE_PATHS = [
+        "RunInfo.xml",
+        "runParameters.xml",
+        "RunParameters.xml",
+        "InterOp",
+        "Data/Intensities/BaseCalls/reports"
+        ]
+    rsync_cmd = [nsc.RSYNC, '-r']
+    rsync_cmd += SAV_INCLUDE_PATHS
+    rsync_cmd += [os.path.join(dest_dir, task.run_id) + "/"]
+    rcode = remote.run_command(rsync_cmd, task, "rsync_sav_files", time="01:00", storage_job=True,
+            srun_user_args=['--nodelist=vali'], cwd=task.work_dir)
+    # Note: Rsync error code is ignored. It will return an error if not all input files exist (and we'll never have
+    # both runParameters.xml and RunParameters.xml).
+
+
     # General args for rsync to automatically set correct permissions
     rsync_args = [nsc.RSYNC, '-rltW', '--chmod=ug+rwX,o-rwx'] # chmod 770/660
 
