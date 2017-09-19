@@ -63,6 +63,7 @@ class Task(object):
         self.finished = False
         self.success = False
         self.message = ""
+        self.lims = None
 
 
     def get_arg(self, arg_name):
@@ -341,7 +342,12 @@ class Task(object):
 
         if self.args.pid:
             # LIMS operation
-            self.process = Process(nsc.lims, id=self.args.pid)
+            if ':' in self.args.pid:
+                server_id, pid = self.args.pid.split(":")[0:2]
+            else:
+                server_id, pid = None, self.args.pid
+            self.lims = nsc.get_lims(server_id)
+            self.process = Process(self.lims, id=self.args.pid)
             self.process.get()
             self.process.udf[nsc.JOB_STATUS_UDF] = "Running"
             self.process.udf[nsc.JOB_STATE_CODE_UDF] = 'RUNNING'

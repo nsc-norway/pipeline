@@ -100,7 +100,11 @@ def get_sample_sheet_data(cluster_proc, fcid):
 
 
 def main(process_id, sample_sheet_file):
-    process = Process(nsc.lims, id=process_id)
+    if ':' in process_id:
+        server_id, process_id = process_id.split(":")[0:2]
+    else:
+        server_id, process_id = None, process_id
+    process = Process(nsc.get_lims(server_id), id=process_id)
 
     fcids = set()
     wells = set()

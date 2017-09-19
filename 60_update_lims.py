@@ -50,17 +50,17 @@ def main(task):
         lane_metrics = get_lane_metrics(projects)
     else:
         lane_metrics = {}
-    post_stats(task.process, projects, run_stats, lane_metrics)
+    post_stats(task.lims, task.process, projects, run_stats, lane_metrics)
     task.success_finish()
 
 
-def post_stats(process, projects, demultiplex_stats, lane_metrics):
+def post_stats(lims, process, projects, demultiplex_stats, lane_metrics):
     """Find the resultfiles in the LIMS and post the demultiplexing
     stats.
     """ 
     #print "Loading samples"
-    nsc.lims.get_batch(process.all_inputs(unique=True) + process.all_outputs(unique=True))
-    nsc.lims.get_batch(sum((a.samples for a in process.all_inputs()), []))
+    lims.get_batch(process.all_inputs(unique=True) + process.all_outputs(unique=True))
+    lims.get_batch(sum((a.samples for a in process.all_inputs()), []))
     #print "Done loading"
 
     projects_map = {}
@@ -82,7 +82,7 @@ def post_stats(process, projects, demultiplex_stats, lane_metrics):
                 limsid = projects_map[project][sample_name].sample_id
             except KeyError:
                 continue # Skip unknown samples / project
-            resultfile = get_resultfile(process, lane, limsid, 1)
+            resultfile = get_resultfile(lims, process, lane, limsid, 1)
             if resultfile:
                 for statname in udf_list:
                     try:
@@ -103,7 +103,7 @@ def post_stats(process, projects, demultiplex_stats, lane_metrics):
                 update_artifacts.append(lane_analyte)
 
     #print "Updating"
-    nsc.lims.put_batch(update_artifacts)
+    lims.put_batch(update_artifacts)
 
 
 def get_lane_metrics(projects):
@@ -121,7 +121,7 @@ def get_lane_metrics(projects):
     return metrics
 
 
-def get_resultfile(process, lane, input_limsid, read):
+def get_resultfile(lims, process, lane, input_limsid, read):
     """Find a result file artifact which is an output of process and
     which corresponds to input_limsid. This is used to find the output of
     the demultiplexing process.
@@ -144,14 +144,14 @@ def get_resultfile(process, lane, input_limsid, read):
     """
 
     try:
-        input_sample = Artifact(nsc.lims, id=input_limsid).samples[0]
+        input_sample = Artifact(lims, id=input_limsid).samples[0]
     except requests.exceptions.HTTPError as e:
         # If the sample is not pooled, we may get the Sample LIMSID in the 
         # sample sheet, not the Analyte LIMSID. So we request the sample 
         # with this ID.
         # Would only do this for 404, but there is no e.response.status_code
         # (that is, e.response is None)
-        input_sample = Sample(nsc.lims, id=input_limsid)
+        input_sample = Sample(lims, id=input_limsid)
         try:
             input_sample.get()
         except requests.exceptions.HTTPError:

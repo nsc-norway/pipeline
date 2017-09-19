@@ -85,10 +85,13 @@ MD5DEEP="/usr/bin/md5deep"
 PDFLATEX="/usr/bin/pdflatex"
 
 
-# Some programs don't have to be put here, because they are standard on all 
-# machines: tar.
+# Some programs aren't put here, because they are standard on all 
+# machines: tar, cp.
 
 
+# Tag to identify LIMS server -- Default depends on TAG and SITE, used in get_lims() at the 
+# bottom of this file.
+LIMS_SERVER=None
 
 ### Site specific configuration ###
 
@@ -144,6 +147,7 @@ if SITE == "cees":
         SECONDARY_STORAGE="/storage/nscdata/runsIllumina"
         DELIVERY_DIR="/storage/nscdata/runsIllumina/delivery" 
         TRIGGER_DIR="/opt/nsc/trigger"
+        LIMS_SERVER="cees-lims"
 
     elif TAG == "dev":
         PRIMARY_STORAGE = "/var/pipeline-test/runsIllumina"
@@ -159,6 +163,7 @@ elif SITE == "ous":
         DIAGNOSTICS_DELIVERY = "/data/diag/nscDelivery"
         LOG_DIR = "/data/nsc.loki/automation/logs" # logs for copy job (10_... script used at OUS)
         TRIGGER_DIR="/data/nsc.loki/automation/trigger"
+        LIMS_SERVER="ous-lims"
 
     elif TAG == "dev":
         SECONDARY_STORAGE="/data/nsc.loki/test"    # location of demultiplexed files
@@ -168,23 +173,38 @@ elif SITE == "ous":
         TRIGGER_DIR="/data/nsc.loki/automation/dev/trigger"
 
 
-# Configure LIMS access (should be cleaned up)
-if TAG == "dev":
-    from genologics.config import *
-    lims = Lims(BASEURI,USERNAME,PASSWORD)
-elif TAG == "prod":
-    if getpass.getuser() == "seq-user":
-        pw_file = "/data/nsc.loki/automation/etc/seq-user/apiuser-password.txt"
+# Configure LIMS access:
+def get_lims(server_id=None):
 
-    elif getpass.getuser() == "glsai":
-        pw_file = "/opt/gls/clarity/users/glsai/apiuser-password.txt"
-        if not os.path.exists(pw_file):
-            pw_file = "/opt/nsc/conf/apiuser-password.txt"
+    server_id = server_id or LIMS_SERVER
+
+    if not server_id:
+        # For DEV use the LIMS configured in the ~/.genologicsrc file
+        from genologics.config import BASEURI, USERNAME, PASSWORD
+        lims = Lims(BASEURI,USERNAME,PASSWORD)
 
     else:
-        pw_file = None
-    
-    if pw_file: # make sure this can load w/o pw file, for non-lims tasks
+        if server_id == "ous-lims":
+            url = "https://ous-lims.sequencing.uio.no"
+            pw_file = "/data/nsc.loki/automation/etc/seq-user/apiuser-password.txt"
+
+        elif server_id == "cees-lims":
+            url = "https://cees-lims.sequencing.uio.no"
+            # This could be cleaned up. Only need one file, I don't know which one.
+            pw_file = "/opt/gls/clarity/users/glsai/apiuser-password.txt"
+            if not os.path.exists(pw_file):
+                pw_file = "/opt/nsc/conf/apiuser-password.txt"
+
+        elif server_id == "x-lims":
+            url = "https://x-lims.sequencing.uio.no"
+            pw_file = "/data/nsc.loki/automation/etc/seq-user/x-apiuser-password.txt"
+
+        else:
+            pw_file = None
+        
+        if not pw_file:
+            raise RuntimeException("LIMS server ID '{0}' does not exist.".format(server_id))
+
         lims = Lims(
                 BASEURI,
                 "apiuser",

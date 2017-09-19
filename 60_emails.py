@@ -46,12 +46,12 @@ def main(task):
     samples.flag_empty_files(projects, work_dir)
 
     qc_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls", "QualityControl" + task.suffix)
-    make_reports(instrument, qc_dir, run_id, projects, lane_stats, task.process)
+    make_reports(instrument, qc_dir, run_id, projects, lane_stats, task.lims, task.process)
 
     task.success_finish()
 
 
-def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, process):
+def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, lims, process):
     if not os.path.exists(qc_dir):
         os.mkdir(qc_dir)
     delivery_dir = os.path.join(qc_dir, "Delivery")
@@ -69,7 +69,7 @@ def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, process)
 
     if process:
         inputs = process.all_inputs(unique=True, resolve=True)
-        samples = nsc.lims.get_batch((sample for i in inputs for sample in i.samples))
+        samples = lims.get_batch((sample for i in inputs for sample in i.samples))
         lims_projects = dict(
                 (utilities.get_sample_sheet_proj_name(sample.project.name), sample.project)
                 for sample in samples
@@ -79,7 +79,7 @@ def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, process)
             lims_project = lims_projects.get(project.name)
             if lims_project:
                 fname = delivery_dir + "/LIMS_for_" + project.name + ".txt"
-                write_lims_info(fname, run_id, project, lims_project)
+                write_lims_info(fname, run_id, project, lims, lims_project)
 
     fname = delivery_dir + "/Table_for_GA_runs_" + run_id + ".xls"
     write_internal_sample_table(fname, run_id, projects, lane_stats)
@@ -118,7 +118,7 @@ def write_sample_info_table(output_path, runid, project):
                 out.write("fragments\r\n")
 
 
-def write_lims_info(output_path, runid, project, lims_project):
+def write_lims_info(output_path, runid, project, lims, lims_project):
     with open(output_path, 'w') as out:
         out.write('--------------------------------		\n')
         out.write('LIMS info for ' + project.name + "\n")
@@ -132,7 +132,7 @@ def write_lims_info(output_path, runid, project, lims_project):
                 out.write(key + ":\t" + str(val) + "\n")
 
         out.write("Completed lanes:\t")
-        completed_runs = nsc.lims.get_processes(
+        completed_runs = lims.get_processes(
                 type=(t[1] for t in nsc.SEQ_PROCESSES),
                 projectname=lims_project.name
                 )
@@ -142,8 +142,8 @@ def write_lims_info(output_path, runid, project, lims_project):
                 []
                 )
         completed_lanes = set(lane.stateless for lane in completed_lanes_all)
-        nsc.lims.get_batch(completed_lanes)
-        nsc.lims.get_batch(lane.samples[0] for lane in completed_lanes)
+        lims.get_batch(completed_lanes)
+        lims.get_batch(lane.samples[0] for lane in completed_lanes)
         state_count = defaultdict(int)
         for lane in completed_lanes:
             if lane.samples[0].project == lims_project:
