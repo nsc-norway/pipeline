@@ -206,7 +206,7 @@ def get_lims(server_id=None):
             raise RuntimeException("LIMS server ID '{0}' does not exist.".format(server_id))
 
         lims = Lims(
-                BASEURI,
+                url,
                 "apiuser",
                 open(pw_file).read().strip()
                 )
