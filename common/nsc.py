@@ -181,7 +181,7 @@ def get_lims(server_id=None):
     if not server_id:
         # For DEV use the LIMS configured in the ~/.genologicsrc file
         from genologics.config import BASEURI, USERNAME, PASSWORD
-        lims = Lims(BASEURI,USERNAME,PASSWORD)
+        return Lims(BASEURI,USERNAME,PASSWORD)
 
     else:
         if server_id == "ous-lims":
@@ -205,7 +205,7 @@ def get_lims(server_id=None):
         if not pw_file:
             raise RuntimeException("LIMS server ID '{0}' does not exist.".format(server_id))
 
-        lims = Lims(
+        return Lims(
                 url,
                 "apiuser",
                 open(pw_file).read().strip()
