@@ -75,12 +75,11 @@ def delivery_diag(task, project, basecalls_dir, project_path):
 
     qc_dir = os.path.join(dest_dir, "QualityControl")
 
-    if not os.path.exists(qc_dir):
+    while not os.path.exists(qc_dir):
         try:
             os.mkdir(qc_dir)
         except OSError:
             time.sleep(30) # Try again after a delay. Seems to be a timing issue related to running on different nodes.
-            os.mkdir(qc_dir)
 
     # When moving to bcl2fastq2 diag. have to decide how they extract the QC metrics.
     # For now we give them the full Reports and Stats for the whole run. Later we
