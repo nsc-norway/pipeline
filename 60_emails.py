@@ -81,8 +81,6 @@ def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, lims, pr
                 fname = delivery_dir + "/LIMS_for_" + project.name + ".txt"
                 write_lims_info(fname, run_id, project, lims, lims_project)
 
-    fname = delivery_dir + "/Table_for_GA_runs_" + run_id + ".xls"
-    write_internal_sample_table(fname, run_id, projects, lane_stats)
 
 def write_sample_info_table(output_path, runid, project):
     with open(output_path, 'w') as out:
@@ -150,42 +148,6 @@ def write_lims_info(output_path, runid, project, lims, lims_project):
                 state_count[lane.qc_flag]+=1
         out.write(", ".join(state + ": " + str(count) for state, count in state_count.items()) + "\n")
         out.write("Lanes in this run:\t" + str(len(set(f.lane for sample in project.samples for f in sample.files))) + "\n")
-
-
-
-def write_internal_sample_table(output_path, runid, projects, lane_stats):
-    with open(output_path, 'w') as out:
-        out.write("--------------------------------\n")
-        out.write("Table for GA_runs.xlsx\n")
-        out.write("--------------------------------\n\n")
-        out.write("Summary for run " + runid + "\n\n")
-        out.write("Need not copy column A\n\n")
-        samples = sorted(
-                (s
-                for proj in projects
-                for s in proj.samples
-                if not proj.is_undetermined),
-                key=lambda s: (s.files[0].lane, s.sample_index)
-                )
-        for s in samples:
-            for f in s.files:
-                if f.i_read == 1:
-                    out.write(s.name + "\t")
-                    lane = lane_stats[f.lane]
-                    out.write(utilities.display_int(lane.cluster_den_raw) + "\t")
-                    out.write(utilities.display_int(lane.cluster_den_pf) + "\t")
-                    if f.empty:
-                        out.write("%4.2f" % (0,) + "%\t")
-                        out.write("0\t")
-                    else:
-                        # For the HiSeq it has always been PF clusters here, so let's continue
-                        # with that
-                        try:
-                            out.write("%4.2f" % (f.stats['% of PF Clusters Per Lane']) + "%\t")
-                        except KeyError:
-                            out.write("%4s" % ('?') + "%\t")
-                        out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
-                    out.write("ok\t\tok\n")
 
 
 def write_summary_email(output_path, runid, projects, print_lane_number, lane_stats, patterned):
