@@ -72,13 +72,10 @@ def srun_command(
         return 1
 
 
-def local_command(args, task, logfile=None, cwd=None, stdout=None):
+def local_command(args, logfile, cwd=None, stdout=None):
     if not cwd:
         cwd = os.getcwd()
-    if logfile:
-        stderrfile = open(logfile, "w")
-    else:
-        stderrfile = task.logfile(jobname)
+    stderrfile = open(logfile, "w")
     if stdout:
         stdoutfile = open(stdout, "w")
     else:
