@@ -15,7 +15,7 @@ import utilities
 local_job_id = 1
 
 def srun_command(
-        args, task, jobname, jobtime, logfile=None,
+        args, task, jobname, jobtime, logfile,
         cpus_per_task=1, mem=1024, bandwidth=0, cwd=None,
         stdout=None, srun_user_args=[],
         storage_job=False, comment=None
@@ -31,10 +31,7 @@ def srun_command(
     elif storage_job:
 	# TODO this is no longer true with 10Gbps net, should always specify bandwidth
         sbatch_other_args.append('--gres=rsc:1G')
-    if logfile:
-        logpath = os.path.realpath(logfile)
-    else:
-        logpath = task.logfile(jobname)
+    logpath = os.path.realpath(logfile)
     if stdout:
         stdoutpath = os.path.realpath(stdout)
         sbatch_other_args += ['--output=' + stdoutpath, '--error=' + logpath]
@@ -79,14 +76,13 @@ def local_command(args, task, logfile=None, cwd=None, stdout=None):
     if not cwd:
         cwd = os.getcwd()
     if logfile:
-        stdoutfile = open(logfile, "w")
-        stderrfile = stdoutfile
-    elif stdout:
-        stdoutfile = open(stdout, "w")
-        stderrfile = None
+        stderrfile = open(logfile, "w")
     else:
-        stdoutfile = None
-        stderrfile = None
+        stderrfile = task.logfile(jobname)
+    if stdout:
+        stdoutfile = open(stdout, "w")
+    else:
+        stdoutfile = stderrfile
 
     return subprocess.call(args, stdout=stdoutfile, stderr=stderrfile, cwd=cwd)
 
@@ -97,6 +93,8 @@ def run_command(
         stdout=None, srun_user_args=[],
         storage_job=False, comment=None
         ):
+    if not logfile:
+        logfile = task.logfile(jobname)
     if nsc.REMOTE_MODE == "srun":
         return srun_command(
             args, task, jobname, time, logfile, cpus, mem, bandwidth, cwd,
@@ -232,6 +230,7 @@ class LocalArrayJob(object):
         self.mem_per_task = 1024
         self.cpus_per_task = 1
         self.bandwidth_per_task = 0
+        self.jobname = jobname
         self.comment = None
 
     @staticmethod
