@@ -50,7 +50,7 @@ def main(task):
                     [nsc.MD5DEEP, '-rl', '-j' + str(n_threads)] + paths, task, "md5deep",
                     time="08:00:00", cpus=n_threads, mem="2048M", bandwidth=str(n_threads*1200) + "M",
                     storage_job=True, cwd=os.path.join(bc_dir, project.proj_dir),
-                    stdout = stdout
+                    stdout = stdout, stderr = task.logfile("rsync-" + (project.name or "UNKNOWN_PROJECT"))
                     )
 
             if rcode != 0:
