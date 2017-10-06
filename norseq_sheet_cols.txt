@@ -1,0 +1,14 @@
+HISEQ 2500:
+Date	RUN ID	Run Status	Comments	Library	Run Mode	FC Position	SBS Lot #	Cluster Kit Lot #	Load Concentration (pM)	Primary User	Cluster Density (K/mm2)	Cluster PF (%)	Phas/prephas (%)	Reads (M)	%>=Q30	Yield (G)	Aligned (%)	Error rate (%)	Case Number	Case Owner	Investigation Status	Replacement Service Order #	Replacements
+
+HISEQ 4000:
+Date	RUN ID	Run Status	Comments	Library	Cluster instrument	SBS Lot #	Cluster Kit Lot #	qPCR (manuell/robot)	qPCR Pool (mM)	Library size (ca bp)	Duplication 	Load Concentration (pM)	Primary user	Cluster Density (K/mm2)	Cluster PF (%)	Phas/prephas (%)	Reads (M)	%>=Q30	Yield (G)	Aligned (%)	Error rate (%)	Case Number	Case Owner	Investigation Status	Replacement Service Order #	Replacements
+
+HISEQ X:
+Date	RUN ID	Run Status	Comments	Library	FC Position	Cluster instrument	SBS Lot #	Cluster Kit Lot #	qPCR (manuell/robot)	qPCR Pool (mM)	Library size (ca bp)	Duplication 	Load Concentration (pM)	Primary user	Cluster Density (K/mm2)	Cluster PF (%)	Phas/prephas (%)	Reads (M)	%>=Q30	Yield (G)	Aligned (%)	Error rate (%)	Case Number	Case Owner	Investigation Status	Replacement Service Order #	Replacements
+
+MISEQ:
+Date	RUN ID	Run Status	Comments	Library	Run Mode	Flow Cell Lot #	Reagent Lot #	qPCR (manuell/robot)	qPCR Pool (mM)	Library size (ca bp)	Duplication 	Load Concentration (pM)	Primary User	Cluster Density (K/mm2)	Cluster PF (%)	Phas/prephas (%)	Reads (M)	%>=Q30	Yield (G)	Aligned (%)	Error rate (%)	Case Number	Case Owner	Investigation Status	Replacement Service Order #	Replacements
+
+NEXTSEQ:
+Date	RUN ID	Run Status	Comments	Library	Run Mode	Flow Cell Lot #	Reagent Lot #	qPCR (manuell/robot)	qPCR Pool (mM)	Library size (ca bp)	Duplication 	Load Concentration (pM)	Primary User	Cluster Density (K/mm2)	Cluster PF (%)	Phas/prephas (%)	Reads (M)	%>=Q30	Yield (G)	Aligned (%)	Error rate (%)	Case Number	Case Owner	Investigation Status	Replacement Service Order #	Replacements
