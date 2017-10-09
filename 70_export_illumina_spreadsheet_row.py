@@ -58,7 +58,12 @@ def main(task):
     run_id = task.run_id
     fc_position = seq_process.udf.get('Flow Cell Position', '')
     cluster_instrument = clustering_process.udf.get('cBot2 machine', '')
-    run_mode = seq_process.udf.get('Run Mode', '') # TODO
+    
+    if instrument == "nextseq":
+        # High / Mid output chemistry
+        run_mode = seq_process.udf.get('Chemistry', '?').replace("NextSeq ", "") + " output"
+    else:
+        run_mode = seq_process.udf.get('Run Mode', '')
     
     primary_user = u"{0} {1}".format(
             seq_process.technician.first_name,
@@ -163,7 +168,7 @@ def main(task):
             output(library)
 
             # Run Mode
-            if instrument in ['hiseq', 'nextseq', 'miseq']:
+            if instrument in ['hiseq', 'nextseq']:
                output(run_mode)
             # Flow cell position
             if instrument in ['hiseq', 'hiseqx']:
