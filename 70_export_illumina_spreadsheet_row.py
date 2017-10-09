@@ -56,7 +56,6 @@ def main(task):
     instrument_name_clean = "".join(c for c in seq_process.udf.get('Instrument Name', "UNKNOWN") if c.isalnum())
     date = "{0}.{1}.20{2}".format(day, month, year)
     run_id = task.run_id
-    comments = seq_process.udf.get('Comments', '')
     fc_position = seq_process.udf.get('Flow Cell Position', '')
     cluster_instrument = clustering_process.udf.get('cBot2 machine', '')
     run_mode = seq_process.udf.get('Run Mode', '') # TODO
@@ -158,7 +157,7 @@ def main(task):
             else:
                 run_status = "Finished"
             output(run_status)
-            output(comments)
+            output(lims_lane.name)
 
             # Library
             library = "TODO!"
