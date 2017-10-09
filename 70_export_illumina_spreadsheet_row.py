@@ -98,11 +98,6 @@ def main(task):
             for f in s.files
             if proj.is_undetermined)
 
-    output_file = os.path.join(
-            delivery_dir,
-            "Illumina_Table_{0}.txt".format(instrument_name_clean)
-            )
-
     # Preload lane artifacts
     lims_lanes = seq_process.all_inputs(unique=True, resolve=True)
 
@@ -119,6 +114,10 @@ def main(task):
     else:
         reads = [1]
 
+    output_file = os.path.join(
+            delivery_dir,
+            "Illumina_Table_{0}.txt".format(instrument_name_clean)
+            )
     with open(output_file, "w") as out:
 
         def output(data):
