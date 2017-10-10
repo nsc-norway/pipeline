@@ -72,7 +72,7 @@ def main(task):
 
     if 'hiseq' in instrument:
         sbs_lot_1 = next(lot.lot_number for lot in step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith("SBS Reagents 1/2"))
-        sbs_lot_2 = next(lot.lot_number for lot in step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith("SBS Reagents 1/2"))
+        sbs_lot_2 = next(lot.lot_number for lot in step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith("SBS Reagents 2/2"))
         sbs_lots = ", ".join([sbs_lot_1, sbs_lot_2])
 
         fc_lot = next(lot.lot_number for lot in step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith("FC"))
