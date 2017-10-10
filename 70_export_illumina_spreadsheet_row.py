@@ -119,10 +119,16 @@ def main(task):
     else:
         reads = [1]
 
-    output_file = os.path.join(
-            delivery_dir,
-            "Illumina_Table_{0}.txt".format(instrument_name_clean)
-            )
+    if instrument.startswith("hiseq"):
+        output_file = os.path.join(
+                delivery_dir,
+                "Illumina_Table_{0}_{1}.txt".format(instrument_name_clean, fc_position)
+                )
+    else:
+        output_file = os.path.join(
+                delivery_dir,
+                "Illumina_Table_{0}.txt".format(instrument_name_clean)
+                )
     with open(output_file, "w") as out:
 
         def output(data):
@@ -164,7 +170,7 @@ def main(task):
             output(lims_lane.name)
 
             # Library
-            library = "TODO!"
+            library = lims_lane.samples[0].project.udf.get('loltest', '')
             output(library)
 
             # Run Mode
@@ -187,9 +193,13 @@ def main(task):
 
             if instrument != "hiseq":
                 # qPCR
-                output("")
+                output("Robot")
                 # qPCR pool mM
-                output(lims_input_pool.udf.get('Molarity', 0) / 1000.0)
+                molarity = lims_input_pool.udf.get('Molarity')
+                if molarity:
+                    output(molarity / 1000.0)
+                else:
+                    output("")
                 output(lims_input_pool.udf.get('Average Fragment Size', ''))
 
             # Duplication
