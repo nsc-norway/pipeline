@@ -130,6 +130,8 @@ def main(task):
         def output(data):
             if isinstance(data, unicode):
                 out.write(data.encode('utf-8'))
+            elif isinstance(data, float):
+                out.write(str(data).replace(".", ","))
             else:
                 out.write(str(data))
             out.write("\t")
