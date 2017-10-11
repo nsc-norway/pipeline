@@ -83,7 +83,7 @@ def main(task):
     elif instrument == 'miseq':
         fc_lot  = next(lot.lot_number for lot in clustering_step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith(" Kit 2/2"))
         rc_lot  = next(lot.lot_number for lot in clustering_step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith(" Kit 1/2"))
-    elif instrument == 'miseq':
+    elif instrument == 'nextseq':
         fc_lot = next(lot.lot_number for lot in clustering_step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith(" FC"))
         rc_lot = next(lot.lot_number for lot in clustering_step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith(" RC"))
 
@@ -108,11 +108,7 @@ def main(task):
 
     process_lanes = task.lanes
     if not process_lanes:
-        # Would like to do this in a better way
-        if instrument.startswith("hiseq"):
-            process_lanes = range(1, 9)
-        else:
-            process_lanes = [1]
+        process_lanes = lane_stats.keys()
 
     if seq_process.udf.get('Read 2 Cycles', 0) > 0:
         reads = [1,2]
@@ -140,7 +136,7 @@ def main(task):
 
 
         # Make a table entry for each lane
-        for l in process_lanes:
+        for l in sorted(process_lanes):
 
             lane = lane_stats[l]
 
