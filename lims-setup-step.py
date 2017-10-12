@@ -143,7 +143,7 @@ def main(process_id, sample_sheet_file):
         try:
             run_id = seq_proc.udf['Run ID']
         except KeyError:
-            run_id = None
+            run_id = seq_proc.udf.get('RunID')
 
         if run_id:
             process.udf[nsc.RUN_ID_UDF] = run_id
