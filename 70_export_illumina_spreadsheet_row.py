@@ -24,6 +24,11 @@ def main(task):
     process = task.process
     if not process:
         task.fail("Can't do this without LIMS")
+
+    if nsc.SITE != "ous":
+        # Hack for now, this is only needed on NSC-OUS
+        task.success_finish()
+        return
     
     try:
         lane_stats = lane_info.get_from_interop(task.work_dir, task.no_lane_splitting)
