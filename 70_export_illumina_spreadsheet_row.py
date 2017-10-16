@@ -200,7 +200,7 @@ def main(task):
                 # qPCR pool mM
                 molarity = lims_input_pool.udf.get('Molarity')
                 if molarity:
-                    output(molarity / 1000.0)
+                    output(molarity)
                 else:
                     output("")
                 output(lims_input_pool.udf.get('Average Fragment Size', ''))
