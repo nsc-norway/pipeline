@@ -126,7 +126,7 @@ def main(task):
     if not process_lanes:
         process_lanes = lane_stats.keys()
 
-    if seq_process.udf.get('Read 2 Cycles', 0) > 0 or seq_process.type_name == "AUTOMATED - Sequence":
+    if seq_process.udf.get('Read 2 Cycles', 0) > 0 or seq_process.type_name == "AUTOMATED - Sequence":
         reads = [1,2]
     else:
         reads = [1]
