@@ -132,10 +132,16 @@ def main(task):
         reads = [1]
 
     if instrument.startswith("hiseq"):
-        output_file = os.path.join(
-                delivery_dir,
-                "Illumina_Table_{0}_{1}.txt".format(instrument_name_clean, fc_position)
-                )
+        if task.lanes:
+            output_file = os.path.join(
+                    delivery_dir,
+                    "Illumina_Table_{0}_{1}_{2}.txt".format(instrument_name_clean, fc_position, task.lanes)
+                    )
+        else:
+            output_file = os.path.join(
+                    delivery_dir,
+                    "Illumina_Table_{0}_{1}.txt".format(instrument_name_clean, fc_position)
+                    )
     else:
         output_file = os.path.join(
                 delivery_dir,
