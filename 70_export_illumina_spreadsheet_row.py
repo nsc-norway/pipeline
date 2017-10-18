@@ -58,7 +58,6 @@ def main(task):
     # Gather per-run information for the table, data which are the same for all lanes
     year, month, day = re.match(r"(\d\d)(\d\d)(\d\d)_", task.run_id).groups()
 
-    instrument_name_clean = "".join(c for c in seq_process.udf.get('Instrument Name', "UNKNOWN") if c.isalnum())
     date = "{0}.{1}.20{2}".format(day, month, year)
     run_id = task.run_id
     try:
@@ -131,21 +130,24 @@ def main(task):
     else:
         reads = [1]
 
+    instrument_name = seq_process.udf.get('Instrument Name', "UNKNOWN")
     if instrument.startswith("hiseq"):
         if task.lanes:
             output_file = os.path.join(
                     delivery_dir,
-                    "Illumina_Table_{0}_{1}_{2}.txt".format(instrument_name_clean, fc_position, task.lanes)
+                    "Illumina_Table_{0}_{1}_{2}.txt".format(
+				*cleanup(instrument_name, fc_position, "".join(str(l) for l in task.lanes))
+				)
                     )
         else:
             output_file = os.path.join(
                     delivery_dir,
-                    "Illumina_Table_{0}_{1}.txt".format(instrument_name_clean, fc_position)
+                    "Illumina_Table_{0}_{1}.txt".format(*cleanup(instrument_name, fc_position))
                     )
     else:
         output_file = os.path.join(
                 delivery_dir,
-                "Illumina_Table_{0}.txt".format(instrument_name_clean)
+                "Illumina_Table_{0}.txt".format(*cleanup(instrument_name_clean))
                 )
     with open(output_file, "w") as out:
 
@@ -245,6 +247,9 @@ def main(task):
             out.write('\n')
 
     task.success_finish()
+
+def cleanup(*args):
+    return ["".join(c for c in arg if c.isalnum()) for arg in args]
 
 def get_avg_reads(analyte, field, reads):
     return sum(analyte.udf.get(field + str(r)) for r in reads) / len(reads)
