@@ -61,7 +61,10 @@ def main(task):
     instrument_name_clean = "".join(c for c in seq_process.udf.get('Instrument Name', "UNKNOWN") if c.isalnum())
     date = "{0}.{1}.20{2}".format(day, month, year)
     run_id = task.run_id
-    fc_position = seq_process.udf.get('Flow Cell Position', '')
+    try:
+        fc_position = seq_process.udf['Flow Cell Position']
+    except KeyError:
+        fc_position = seq_process.udf.get('Flowcell Side', '')
     cluster_instrument = clustering_process.udf.get('cBot2 machine', '')
     
     if instrument == "nextseq":
@@ -76,15 +79,23 @@ def main(task):
             )
 
     if 'hiseq' in instrument:
-        sbs_lot_1 = next(lot.lot_number for lot in step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith("SBS Reagents 1/2"))
-        sbs_lot_2 = next(lot.lot_number for lot in step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith("SBS Reagents 2/2"))
-        sbs_lots = ", ".join([sbs_lot_1, sbs_lot_2])
+        try:
+            sbs_lot_1 = next(lot.lot_number for lot in step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith("SBS Reagents 1/2"))
+            sbs_lot_2 = next(lot.lot_number for lot in step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith("SBS Reagents 2/2"))
+            sbs_lots = ", ".join([sbs_lot_1, sbs_lot_2])
 
-        fc_lot = next(lot.lot_number for lot in step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith("FC"))
+            fc_lot = next(lot.lot_number for lot in step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith("FC"))
+        except StopIteration:
+            sbs_lots = ""
+            fc_lot = ""
 
-        cluster_kit_lot_1 = next(lot.lot_number for lot in clustering_step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith("Cluster Kit 1/2"))
-        cluster_kit_lot_2 = next(lot.lot_number for lot in clustering_step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith("Cluster Kit 2/2"))
-        cluster_kit_lots = ", ".join([cluster_kit_lot_1, cluster_kit_lot_2])
+        try:
+            cluster_kit_lot_1 = next(lot.lot_number for lot in clustering_step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith("Cluster Kit 1/2"))
+            cluster_kit_lot_2 = next(lot.lot_number for lot in clustering_step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith("Cluster Kit 2/2"))
+            cluster_kit_lots = ", ".join([cluster_kit_lot_1, cluster_kit_lot_2])
+        except StopIteration:
+            cluster_kit_lots = ""
+
     elif instrument == 'miseq':
         fc_lot  = next(lot.lot_number for lot in clustering_step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith(" Kit 2/2"))
         rc_lot  = next(lot.lot_number for lot in clustering_step.reagentlots.reagent_lots if lot.reagent_kit_name.endswith(" Kit 1/2"))
@@ -115,7 +126,7 @@ def main(task):
     if not process_lanes:
         process_lanes = lane_stats.keys()
 
-    if seq_process.udf.get('Read 2 Cycles', 0) > 0:
+    if seq_process.udf.get('Read 2 Cycles', 0) > 0 or seq_process.type_name == "AUTOMATED - Sequence":
         reads = [1,2]
     else:
         reads = [1]
