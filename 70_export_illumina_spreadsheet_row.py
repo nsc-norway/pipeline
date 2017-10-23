@@ -147,7 +147,7 @@ def main(task):
     else:
         output_file = os.path.join(
                 delivery_dir,
-                "Illumina_Table_{0}.txt".format(*cleanup(instrument_name_clean))
+                "Illumina_Table_{0}.txt".format(*cleanup(instrument_name))
                 )
     with open(output_file, "w") as out:
 
