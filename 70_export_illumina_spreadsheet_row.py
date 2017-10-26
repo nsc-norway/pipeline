@@ -192,7 +192,7 @@ def main(task):
             output(lims_lane.name)
 
             # Library
-            library = lims_lane.samples[0].project.udf.get('loltest', '')
+            library = lims_lane.samples[0].project.udf.get('Sample type', '')
             output(library)
 
             # Run Mode
