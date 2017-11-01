@@ -243,7 +243,7 @@ def main(task):
         if project_type == "Diagnostics":
             task.info("Copying " + project.name + " to diagnostics...")
             delivery_diag(task, project, task.bc_dir, project_path)
-        elif delivery_type == "User HDD" or delivery_type == "New HDD":
+        elif delivery_type == "User HDD" or delivery_type == "New HDD" or delivery_type == "NeLS project":
             task.info("Hard-linking " + project.name + " to delivery area...")
             delivery_harddrive(project.name, project_path)
         elif delivery_type == "Norstore":
