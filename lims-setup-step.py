@@ -70,7 +70,7 @@ else:
                 ],
             }
     THREADS_OVERRIDE = {
-            "hiseq": 32,
+            "hiseq": 64,
             "hiseqx": 64,
             "hiseq4k": 32,
             "miseq": 32,
