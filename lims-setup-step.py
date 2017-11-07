@@ -72,7 +72,7 @@ else:
     THREADS_OVERRIDE = {
             "hiseq": 64,
             "hiseqx": 64,
-            "hiseq4k": 32,
+            "hiseq4k": 64,
             "miseq": 32,
             "nextseq": 32
             }
