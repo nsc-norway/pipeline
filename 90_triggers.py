@@ -106,7 +106,7 @@ def main(task):
     projects = (project for project in task.projects if not project.is_undetermined)
 
     project_triggers = glob.glob(os.path.join(nsc.TRIGGER_DIR, "project.*.*"))
-    project_match_strings = [re.match(r"project.(.*?).*", pt).group(1) for pt in project_triggers]
+    project_match_strings = [re.match(r"project\.(.*?)\.", os.path.basename(pt)).group(1) for pt in project_triggers]
     run_triggers = glob.glob(os.path.join(nsc.TRIGGER_DIR, "run.*.*"))
 
     run_id = task.run_id
@@ -121,7 +121,7 @@ def main(task):
         sample_sheet_path = task.sample_sheet_path
 
 
-    match_run_triggers = [rt for rt in run_triggers if run_id.startswith(re.match(r"run.(.*?).*", rt).group(1))]
+    match_run_triggers = [rt for rt in run_triggers if run_id.startswith(re.match(r"run\.(.*?)\.", os.path.basename(rt)).group(1))]
     if match_run_triggers:
 
         task.info("Running global triggers...")
