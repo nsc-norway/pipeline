@@ -127,6 +127,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
         project_name = entry.get('project') or entry.get('sampleproject')
         if not project_name:
             raise ValueError("Project name missing in sample sheet, but is required by the QC scripts")
+        project_name = utilities.strip_chars(project_name)
         project = projects.get(project_name)
         if not project:
             project_dir = get_project_dir(run_id, project_name) # fn defined in bottom of this file
@@ -140,6 +141,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
             if sample_name == "":
                 # MiSeq only uses Sample ID (at least for non-LIMS sample sheet)
                 sample_name = entry['sampleid']
+            sample_name = utilities.strip_chars(sample_name)
             sample_dir = get_sample_dir(instrument, sample_name)
             sample = Sample(sample_index, entry['sampleid'], sample_name, sample_dir, [])
             sample_index += 1
@@ -365,7 +367,7 @@ def get_fastq_name(instrument, sample_name, sample_index,
         else:
             name = "{sample_name}_S{sample_index}_L{lane_id:03}_R{i_read}_001.fastq.gz".format(**parameters)
 
-    return name
+    return utilities.strip_chars(name)
 
 
 def bcl2fastq2_file_name(sample_name, sample_index, lane_id, i_read, merged_lanes):
@@ -379,7 +381,7 @@ def bcl2fastq2_file_name(sample_name, sample_index, lane_id, i_read, merged_lane
                 sample_name,
                 sample_index, str(lane_id).zfill(3),
                 i_read)
-    return name
+    return utilities.strip_chars(name)
 
 
 def get_sample_qc_dir(project, sample):
