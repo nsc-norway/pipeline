@@ -1,0 +1,26 @@
+<!doctype html>
+
+<html>
+<head>
+<title>Run {{ runId }} summary</title>
+</head>
+
+<body>
+<h3>Summary for NSC members</h3>
+<p>Run: {{ runID }}</p>
+<table>
+<tr>
+{% for cell in header %}
+    <th>{{ cell }}</th>
+{% endfor %}
+</tr>
+{% for row in data %}
+<tr>
+{% for cell in row %}
+    <td>{{ cell }}</td>
+{% endfor %}
+</tr>
+{% endfor %}
+
+</body>
+</html>
