@@ -80,7 +80,7 @@ class Task(object):
     @property
     def run_id(self):
         if self.process:
-            return self.get_arg("run_id")
+            return utilities.strip_chars(self.get_arg("run_id"))
         elif "work_dir" in self.arg_names:
             return os.path.basename(os.path.realpath(self.args.work_dir))
         elif "src_dir" in self.arg_names:

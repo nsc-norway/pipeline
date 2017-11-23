@@ -180,6 +180,11 @@ def get_udf(process, udf, default):
             process.put()
         return default
 
+def strip_chars(string):
+    """Strips special characters to prevent unexpected behaviour or security issues when 
+    user input is used as file names, or similar."""
+    return "".join(c for c in string if c.isalnum() or c in '-_.')
+
 
 
 # *** Compatibility support functions ***
