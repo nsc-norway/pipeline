@@ -251,92 +251,92 @@ Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(
 
             out.write("ok\r\n")
 
-def write_summary_email_html(output_path, runid, projects, print_lane_number, lane_stats, patterned):
+def write_summary_email_html(jinja_env, output_path, runid, projects, print_lane_number, lane_stats, patterned):
     """Version 2 of the summary email, with HTML."""
 
-    with open(output_path, 'w') as out:
-        if print_lane_number:
-            if patterned:
-                headers = ["Lane", "Project", "PF cluster no", "PF ratio", "SeqDuplicates", "Undetermined ratio", "AlignedPhiX", ">=Q30", "Quality"]
-            else:
-                headers = "Lane", "Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)", "PF cluster density(/mm2)", "Undetermined ratio", "AlignedPhiX", ">=Q30", "Quality"]
+    if print_lane_number:
+        if patterned:
+            header = ["Lane", "Project", "PF cluster no", "PF ratio", "SeqDuplicates", "Undetermined ratio", "AlignedPhiX", ">=Q30", "Quality"]
         else:
-            headers = ["Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)", "PF cluster density(/mm2)", "Undetermined ratio", "AlignedPhiX", ">=Q30", "Quality"]
+            header = ["Lane", "Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)", "PF cluster density(/mm2)", "Undetermined ratio", "AlignedPhiX", ">=Q30", "Quality"]
+    else:
+        header = ["Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)", "PF cluster density(/mm2)", "Undetermined ratio", "AlignedPhiX", ">=Q30", "Quality"]
 
-        # assumes 1 project per lane, and undetermined
-        # Dict: lane ID => (lane object, project object)
-        lane_proj = dict((f.lane, proj) for proj in projects
-                for s in proj.samples for f in s.files if not proj.is_undetermined)
-        # lane ID => file object (will be the last one)
-        lane_undetermined = dict(
-                (f.lane, f)
+    # assumes 1 project per lane, and undetermined
+    # Dict: lane ID => (lane object, project object)
+    lane_proj = dict((f.lane, proj) for proj in projects
+            for s in proj.samples for f in s.files if not proj.is_undetermined)
+    # lane ID => file object (will be the last one)
+    lane_undetermined = dict(
+            (f.lane, f)
+            for proj in projects
+            for s in proj.samples
+            for f in s.files
+            if proj.is_undetermined)
+
+    data = []
+    for l in sorted(lane_proj.keys()):
+        row = []
+        proj = lane_proj[l]
+        undetermined_file = lane_undetermined.get(l)
+
+        if print_lane_number:
+            row.append(l)
+        row.append(proj.name)
+
+        cluster_no = sum(f.stats['# Reads PF']
                 for proj in projects
                 for s in proj.samples
                 for f in s.files
-                if proj.is_undetermined)
+                if f.lane == l and f.i_read == 1 and not f.empty)
+        row.append(utilities.display_int(cluster_no))
+        lane = lane_stats[l]
+        row.append("%4.2f" % (lane.pf_ratio if lane.pf_ratio is not None else 0.0))
+        if not patterned:
+            row.append(utilities.display_int(lane.cluster_den_raw))
+            row.append(utilities.display_int(lane.cluster_den_pf))
 
-        data = []
-        for l in sorted(lane_proj.keys()):
-            row = []
-            proj = lane_proj[l]
-            undetermined_file = lane_undetermined.get(l)
-
-            if print_lane_number:
-                row.append(l)
-            row.append(proj.name)
-
-            cluster_no = sum(f.stats['# Reads PF']
+        if patterned:
+            dupsum = sum(f.stats['fastdup reads with duplicate']
                     for proj in projects
                     for s in proj.samples
                     for f in s.files
                     if f.lane == l and f.i_read == 1 and not f.empty)
-            row.append(utilities.display_int(cluster_no))
-            lane = lane_stats[l]
-            row.append("%4.2f" % (lane.pf_ratio if lane.pf_ratio is not None else 0.0))
-            if not patterned:
-                row.append(utilities.display_int(lane.cluster_den_raw))
-                row.append(utilities.display_int(lane.cluster_den_pf))
-
-            if patterned:
-                dupsum = sum(f.stats['fastdup reads with duplicate']
-                        for proj in projects
-                        for s in proj.samples
-                        for f in s.files
-                        if f.lane == l and f.i_read == 1 and not f.empty)
-                try:
-                    duppct = dupsum * 100.0 / cluster_no
-                    row.append("%4.2f %%" % duppct)
-                except ZeroDivisionError:
-                    row.append("-")
-
-            if undetermined_file and not undetermined_file.empty:
-                try:
-                    row.append("%4.2f %%" % (undetermined_file.stats['% of PF Clusters Per Lane'],))
-                except KeyError:
-                    row.append("? %")
-            else:
+            try:
+                duppct = dupsum * 100.0 / cluster_no
+                row.append("%4.2f %%" % duppct)
+            except ZeroDivisionError:
                 row.append("-")
 
-            if lane.phix is None:
-                row.append("-")
-            else:
-                row.append("%4.2f%%" % (lane.phix * 100.0))
+        if undetermined_file and not undetermined_file.empty:
+            try:
+                row.append("%4.2f %%" % (undetermined_file.stats['% of PF Clusters Per Lane'],))
+            except KeyError:
+                row.append("? %")
+        else:
+            row.append("-")
 
-            q30sum = sum(f.stats['% Bases >=Q30']*f.stats['# Reads PF']
-                    for proj in projects
-                    for s in proj.samples
-                    for f in s.files
-                    if f.lane == l and not f.empty)
-            norm = sum(f.stats['# Reads PF']
-                    for proj in projects
-                    for s in proj.samples
-                    for f in s.files
-                    if f.lane == l and not f.empty)
-            q30pct = q30sum  / max(norm, 1)
-            row.append("%4.2f%%" % q30pct)
-            row.append("ok")
+        if lane.phix is None:
+            row.append("-")
+        else:
+            row.append("%4.2f%%" % (lane.phix * 100.0))
+
+        q30sum = sum(f.stats['% Bases >=Q30']*f.stats['# Reads PF']
+                for proj in projects
+                for s in proj.samples
+                for f in s.files
+                if f.lane == l and not f.empty)
+        norm = sum(f.stats['# Reads PF']
+                for proj in projects
+                for s in proj.samples
+                for f in s.files
+                if f.lane == l and not f.empty)
+        q30pct = q30sum  / max(norm, 1)
+        row.append("%4.2f%%" % q30pct)
+        row.append("ok")
         
-        jinja.
+    with open(output_path, 'w') as out:
+        f.write(jinja_env.get_template().render(runId=runid, data=data, heades=header))
 
 if __name__ == "__main__":
     with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
