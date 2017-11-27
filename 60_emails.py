@@ -2,6 +2,7 @@ import sys
 import os
 import operator
 from collections import defaultdict
+from jinja2 import Environment, select_autoescape, FileSystemLoader
 
 from common import nsc, stats, utilities, lane_info, samples, taskmgr
 
@@ -67,6 +68,12 @@ def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, lims, pr
     patterned = instrument_type in ["hiseqx", "hiseq4k"]
     write_summary_email(fname, run_id, projects, instrument_type.startswith('hiseq'), lane_stats, patterned)
 
+
+    fname_html = delivery_dir + "/Summary_email_for_NSC_" + run_id + ".html"
+    template_dir = os.path.join(os.path.dirname(__file__), "template")
+    jinja_env = Environment(loader=FileSystemLoader(template_dir), autoescape=select_autoescape(['html','xml']))
+    write_summary_email_html(jinja_env, fname_html, run_id, projects, instrument_type.startswith('hiseq'), lane_stats, patterned)
+
     if process:
         inputs = process.all_inputs(unique=True, resolve=True)
         samples = lims.get_batch((sample for i in inputs for sample in i.samples))
@@ -83,7 +90,7 @@ def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, lims, pr
 
 
 def write_sample_info_table(output_path, runid, project):
-    with open(utilities.strip_chars(output_path), 'w') as out:
+    with open(output_path, 'w') as out:
         out.write('--------------------------------		\r\n')
         out.write('Email for ' + project.name + "\r\n")
         out.write('--------------------------------		\r\n\r\n')
@@ -252,15 +259,17 @@ Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(
             out.write("ok\r\n")
 
 def write_summary_email_html(jinja_env, output_path, runid, projects, print_lane_number, lane_stats, patterned):
-    """Version 2 of the summary email, with HTML."""
+    """Summary email with HTML tables."""
 
     if print_lane_number:
         if patterned:
-            header = ["Lane", "Project", "PF cluster no", "PF ratio", "SeqDuplicates", "Undetermined ratio", "AlignedPhiX", ">=Q30", "Quality"]
+            header = ["Lane", "Project", "PF cluster no", "PF ratio", "SeqDuplicates", "Undetermined", "AlignedPhiX", ">=Q30", "Quality"]
         else:
-            header = ["Lane", "Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)", "PF cluster density(/mm2)", "Undetermined ratio", "AlignedPhiX", ">=Q30", "Quality"]
+            header = ["Lane", "Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)", "PF cluster density(/mm2)", "Undetermined",
+                    "AlignedPhiX", ">=Q30", "Quality"]
     else:
-        header = ["Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)", "PF cluster density(/mm2)", "Undetermined ratio", "AlignedPhiX", ">=Q30", "Quality"]
+        header = ["Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)", "PF cluster density(/mm2)", "Undetermined", "AlignedPhiX",
+                ">=Q30", "Quality"]
 
     # assumes 1 project per lane, and undetermined
     # Dict: lane ID => (lane object, project object)
@@ -275,26 +284,27 @@ def write_summary_email_html(jinja_env, output_path, runid, projects, print_lane
             if proj.is_undetermined)
 
     data = []
+
     for l in sorted(lane_proj.keys()):
         row = []
         proj = lane_proj[l]
         undetermined_file = lane_undetermined.get(l)
 
         if print_lane_number:
-            row.append(l)
-        row.append(proj.name)
+            row.append((l, "center"))
+        row.append((proj.name, "text"))
 
         cluster_no = sum(f.stats['# Reads PF']
                 for proj in projects
                 for s in proj.samples
                 for f in s.files
                 if f.lane == l and f.i_read == 1 and not f.empty)
-        row.append(utilities.display_int(cluster_no))
+        row.append((utilities.display_int(cluster_no), "number"))
         lane = lane_stats[l]
-        row.append("%4.2f" % (lane.pf_ratio if lane.pf_ratio is not None else 0.0))
+        row.append(("%4.2f" % (lane.pf_ratio if lane.pf_ratio is not None else 0.0), "number"))
         if not patterned:
-            row.append(utilities.display_int(lane.cluster_den_raw))
-            row.append(utilities.display_int(lane.cluster_den_pf))
+            row.append((utilities.display_int(lane.cluster_den_raw), "number"))
+            row.append((utilities.display_int(lane.cluster_den_pf), "number"))
 
         if patterned:
             dupsum = sum(f.stats['fastdup reads with duplicate']
@@ -304,22 +314,22 @@ def write_summary_email_html(jinja_env, output_path, runid, projects, print_lane
                     if f.lane == l and f.i_read == 1 and not f.empty)
             try:
                 duppct = dupsum * 100.0 / cluster_no
-                row.append("%4.2f %%" % duppct)
+                row.append(("%4.2f %%" % duppct, "number"))
             except ZeroDivisionError:
                 row.append("-")
 
         if undetermined_file and not undetermined_file.empty:
             try:
-                row.append("%4.2f %%" % (undetermined_file.stats['% of PF Clusters Per Lane'],))
+                row.append(("%4.2f %%" % (undetermined_file.stats['% of PF Clusters Per Lane'],), "number"))
             except KeyError:
-                row.append("? %")
+                row.append(("? %", "number"))
         else:
-            row.append("-")
+            row.append(("-", "center"))
 
         if lane.phix is None:
-            row.append("-")
+            row.append(("-", "center"))
         else:
-            row.append("%4.2f%%" % (lane.phix * 100.0))
+            row.append(("%4.2f%%" % (lane.phix * 100.0), "number"))
 
         q30sum = sum(f.stats['% Bases >=Q30']*f.stats['# Reads PF']
                 for proj in projects
@@ -332,11 +342,12 @@ def write_summary_email_html(jinja_env, output_path, runid, projects, print_lane
                 for f in s.files
                 if f.lane == l and not f.empty)
         q30pct = q30sum  / max(norm, 1)
-        row.append("%4.2f%%" % q30pct)
-        row.append("ok")
+        row.append(("%4.2f%%" % q30pct, "number"))
+        row.append(("ok", "text"))
+        data.append(row)
         
     with open(output_path, 'w') as out:
-        f.write(jinja_env.get_template().render(runId=runid, data=data, heades=header))
+        out.write(jinja_env.get_template('summary_email.html').render(runId=runid, data=data, header=header).encode('utf-8'))
 
 if __name__ == "__main__":
     with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
