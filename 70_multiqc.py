@@ -24,15 +24,17 @@ def main(task):
     bc_dir = task.bc_dir
     projects = task.projects
 
+    # Create for bcl2fastq stats only
+    subprocess.call([nsc.MULTIQC, "-q", "-f", "Stats/"], cwd=bc_dir)
+
+    # Per-project fastqc multiqc reports
+    output_dir = os.path.join(bc_dir, "QualityControl" + task.suffix)
+
     for project in projects:
-        remote.run_command()
+        project_qc_dir = os.path.join(output_dir, project.name or "Undetermined")
+        subprocess.call([nsc.MULTIQC, "-q", "-f", "."], cwd=project_qc_dir)
 
     task.success_finish()
-
-
-def run_multiqc(bc_dir, project):
-    pass
-
 
 
 if __name__ == "__main__":

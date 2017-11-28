@@ -94,6 +94,9 @@ PDFLATEX="/usr/bin/pdflatex"
 # bottom of this file.
 LIMS_SERVER=None
 
+### Common / default program paths ###
+MULTIQC = "/usr/bin/multiqc"
+
 ### Site specific configuration ###
 
 if SITE == "cees":
