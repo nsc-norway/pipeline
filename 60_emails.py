@@ -1,5 +1,6 @@
 import sys
 import os
+import re
 import operator
 from collections import defaultdict
 from jinja2 import Environment, select_autoescape, FileSystemLoader
@@ -69,24 +70,11 @@ def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, lims, pr
     write_summary_email(fname, run_id, projects, instrument_type.startswith('hiseq'), lane_stats, patterned)
 
 
-    fname_html = delivery_dir + "/Summary_email_for_NSC_" + run_id + ".html"
+    fname_html = delivery_dir + "/Emails_for_" + run_id + ".html"
     template_dir = os.path.join(os.path.dirname(__file__), "template")
     jinja_env = Environment(loader=FileSystemLoader(template_dir), autoescape=select_autoescape(['html','xml']))
-    write_summary_email_html(jinja_env, fname_html, run_id, projects, instrument_type.startswith('hiseq'), lane_stats, patterned)
+    write_html_file(jinja_env, process, fname_html, run_id, projects, instrument_type.startswith('hiseq'), lane_stats, patterned)
 
-    if process:
-        inputs = process.all_inputs(unique=True, resolve=True)
-        samples = lims.get_batch((sample for i in inputs for sample in i.samples))
-        lims_projects = dict(
-                (utilities.get_sample_sheet_proj_name(sample.project.name), sample.project)
-                for sample in samples
-                if sample.project
-                )
-        for project in task.projects:
-            lims_project = lims_projects.get(project.name)
-            if lims_project:
-                fname = delivery_dir + "/LIMS_for_" + project.name + ".txt"
-                write_lims_info(fname, run_id, project, lims, lims_project)
 
 
 def write_sample_info_table(output_path, runid, project):
@@ -121,40 +109,6 @@ def write_sample_info_table(output_path, runid, project):
                 else:
                     out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
                 out.write("fragments\r\n")
-
-
-def write_lims_info(output_path, runid, project, lims, lims_project):
-    with open(output_path, 'w') as out:
-        out.write('--------------------------------		\n')
-        out.write('LIMS info for ' + project.name + "\n")
-        out.write('--------------------------------		\n\n')
-
-        for key in ["Contact person", "Contact email", "Number of lanes"]:
-            val = lims_project.udf.get(key, "")
-            if isinstance(val, type(u"")):
-                out.write(key + ":\t" + val.encode('utf-8') + "\n")
-            else:
-                out.write(key + ":\t" + str(val) + "\n")
-
-        out.write("Completed lanes:\t")
-        completed_runs = lims.get_processes(
-                type=(t[1] for t in nsc.SEQ_PROCESSES),
-                projectname=lims_project.name
-                )
-        completed_lanes_all = sum(
-                (run_process.all_inputs(unique=True)
-                for run_process in completed_runs),
-                []
-                )
-        completed_lanes = set(lane.stateless for lane in completed_lanes_all)
-        lims.get_batch(completed_lanes)
-        lims.get_batch(lane.samples[0] for lane in completed_lanes)
-        state_count = defaultdict(int)
-        for lane in completed_lanes:
-            if lane.samples[0].project == lims_project:
-                state_count[lane.qc_flag]+=1
-        out.write(", ".join(state + ": " + str(count) for state, count in state_count.items()) + "\n")
-        out.write("Lanes in this run:\t" + str(len(set(f.lane for sample in project.samples for f in sample.files))) + "\n")
 
 
 def write_summary_email(output_path, runid, projects, print_lane_number, lane_stats, patterned):
@@ -258,9 +212,8 @@ Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(
 
             out.write("ok\r\n")
 
-def write_summary_email_html(jinja_env, output_path, runid, projects, print_lane_number, lane_stats, patterned):
-    """Summary email with HTML tables."""
 
+def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned):
     if print_lane_number:
         if patterned:
             header = ["Lane", "Project", "PF cluster no", "PF ratio", "SeqDuplicates", "Undetermined", "AlignedPhiX", ">=Q30", "Quality"]
@@ -345,9 +298,133 @@ def write_summary_email_html(jinja_env, output_path, runid, projects, print_lane
         row.append(("%4.2f%%" % q30pct, "number"))
         row.append(("ok", "text"))
         data.append(row)
-        
+    return header, data
+
+
+class ProjectData(object):
+    def __init__(self, project, lims_project, seq_process):
+        self.nsamples = len(project.samples)
+        self.name = project.name
+        self.file_fragments_table = []
+        self.dir = project.proj_dir
+        if project.name.startswith("Diag-"):
+            files = sorted(
+                    ((s,fi) for s in project.samples for fi in s.files if fi.i_read == 1),
+                    key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
+                    )
+            for i, (s,f) in enumerate(files, 1):
+                sample = "Sample {0}".format(i)
+                if f.empty:
+                    self.file_fragments_table.append((sample, "0"))
+                else:
+                    self.file_fragments_table.append((sample, utilities.display_int(f.stats['# Reads PF'])))
+        else:
+            files = sorted(
+                    ((s,fi) for s in project.samples for fi in s.files),
+                    key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
+                    )
+            for s,f in files:
+                filename = os.path.basename(f.path)
+                if f.empty:
+                    self.file_fragments_table.append((filename, "0"))
+                else:
+                    self.file_fragments_table.append((filename, utilities.display_int(f.stats['# Reads PF'])))
+        if lims_project:
+            self.lims = LimsInfo(lims_project, seq_process)
+
+
+class RunParameters(object):
+    def __init__(self, run_id, process):
+        """Get run parameters (LIMS based)"""
+        self.instrument_type = utilities.get_instrument_by_runid(run_id)
+        self.instrument_name = process.udf.get('Instrument name')
+        id_part = re.match(r"\d{6}_(^_)_", run_id)
+        if id_part:
+            self.instrument_id = id_part.group(1)
+        else:
+            self.instrument_id = None
+        self.cycles = [("R1", process.udf.get('Read 1 Cycles'))]
+        cys = process.udf.get('Index 1 Read Cycles')
+        if cys:
+            self.cycles.append(("I1", cys))
+        cys = process.udf.get('Index 2 Read Cycles')
+        if cys:
+            self.cycles.append(("I2", cys))
+        cys = process.udf.get('Read 2 Cycles')
+        if cys:
+            self.cycles.append(("R2", cys))
+        pars = ["Chemistry", "Run Mode", "Chemistry Version"]
+        self.run_mode_field = None
+        for par in pars:
+            p = process.get(par)
+            if p:
+                self.run_mode_field = par
+                self.run_mode_value = p
+
+
+class LimsInfo(object):
+    def __init__(self, lims_project, seq_process):
+        self.contact_person = lims_project.udf.get('Contact person')
+        self.contact_email = lims_project.udf.get('Contact email')
+        self.total_number_of_lanes = lims_project.udf.get('Number of lanes')
+        completed_runs = lims_project.lims.get_processes(
+                type=(t[1] for t in nsc.SEQ_PROCESSES),
+                projectname=lims_project.name
+                )
+        completed_lanes_all = sum(
+                (run_process.all_inputs(unique=True)
+                for run_process in completed_runs),
+                []
+                )
+        completed_lanes = set(lane.stateless for lane in completed_lanes_all)
+        lims_project.lims.get_batch(completed_lanes)
+        lims_project.lims.get_batch(lane.samples[0] for lane in completed_lanes)
+        state_count = defaultdict(int)
+        this_run_lanes = set(seq_process.all_inputs())
+        for lane in completed_lanes:
+            if lane in this_run_lanes:
+                state = "THIS_RUN"
+            else:
+                state = lane.qc_flag
+            if lane.samples[0].project == lims_project:
+                state_count[state]+=1
+        self.sequencing_status = ", ".join(str(k) + ": " + str(v) for k, v in state_count.items())
+
+
+def write_html_file(jinja_env, process, output_path, runid, projects, print_lane_number, lane_stats, patterned):
+    """Stats summary file for emails, etc."""
+
+    project_datas = []
+    if process:
+        seq_process = utilities.get_sequencing_process(process)
+        inputs = process.all_inputs(unique=True, resolve=True)
+        samples = process.lims.get_batch((sample for i in inputs for sample in i.samples))
+        lims_projects = dict(
+                (utilities.get_sample_sheet_proj_name(sample.project.name), sample.project)
+                for sample in samples
+                if sample.project
+                )
+    else:
+        lims_projects = {}
+        seq_process = None
+    for project in projects:
+        if not project.is_undetermined:
+            lims_project = lims_projects.get(project.name)
+            project_datas.append(ProjectData(project, lims_project, seq_process))
+
+    lane_header, lane_data = get_lane_summary_data(projects, print_lane_number, lane_stats, patterned)
+    if process:
+        run_parameters = RunParameters(runid, seq_process)
+    else:
+        run_parameters = None
+
     with open(output_path, 'w') as out:
-        out.write(jinja_env.get_template('summary_email.html').render(runId=runid, data=data, header=header).encode('utf-8'))
+        out.write(jinja_env.get_template('run_emails.html').render(
+            run_id=runid, lane_data=lane_data, lane_header=lane_header,
+            run_parameters=run_parameters,
+            project_datas=project_datas
+            ).encode('utf-8'))
+
 
 if __name__ == "__main__":
     with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
