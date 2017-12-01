@@ -356,7 +356,7 @@ class RunParameters(object):
         pars = ["Chemistry", "Run Mode", "Chemistry Version"]
         self.run_mode_field = None
         for par in pars:
-            p = process.get(par)
+            p = process.udf.get(par)
             if p:
                 self.run_mode_field = par
                 self.run_mode_value = p
