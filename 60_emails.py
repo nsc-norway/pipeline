@@ -338,7 +338,7 @@ class RunParameters(object):
         """Get run parameters (LIMS based)"""
         self.instrument_type = utilities.get_instrument_by_runid(run_id)
         self.instrument_name = process.udf.get('Instrument Name')
-        id_part = re.match(r"\d\d\d\d\d\d_(^_)_", run_id)
+        id_part = re.match(r"\d\d\d\d\d\d_([^_]+)_", run_id)
         if id_part:
             self.instrument_id = id_part.group(1)
         else:
