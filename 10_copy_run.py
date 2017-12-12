@@ -103,8 +103,9 @@ work_dir argument.""")
         else:
             raise
 
+    logfile = task.logfile("rsync")
     rc = remote.run_command(
-            args, task, "rsync", "02:00:00", storage_job=True
+            args, task, "rsync", "02:00:00", storage_job=True, logfile=logfile
             )
     
     if rc == 0:
