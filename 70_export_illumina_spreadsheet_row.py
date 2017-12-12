@@ -252,7 +252,7 @@ def cleanup(*args):
     return ["".join(c for c in arg if c.isalnum()) for arg in args]
 
 def get_avg_reads(analyte, field, reads):
-    return sum(analyte.udf.get(field + str(r)) for r in reads) / len(reads)
+    return sum(analyte.udf.get(field + str(r), 0) for r in reads) / len(reads)
 
 if __name__ == "__main__":
     with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
