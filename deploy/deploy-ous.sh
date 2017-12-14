@@ -10,7 +10,7 @@ umask 002
 echo $1
 
 REPOS="pipeline genologics"
-INSTALLATIONS="/data/nsc.loki/automation"
+INSTALLATIONS="/data/runScratch.boston/scripts"
 
 # Deploy to installations from dev area
 for installation in $INSTALLATIONS
@@ -20,7 +20,7 @@ do
 		deploy_dir=$installation/$repo
 		mv $deploy_dir $deploy_dir.2 || true
 		mkdir $deploy_dir
-		source_dir=/data/nsc.loki/automation/dev/$repo
+		source_dir=/data/runScratch.boston/scripts/dev/$repo
 		pushd $source_dir > /dev/null
 		git archive $1 | (pushd $deploy_dir; tar x ; popd)
 		popd > /dev/null
@@ -38,5 +38,5 @@ do
 	rm $TEMP
 done
 
-ln -s /data/nsc.loki/automation/secure.py /data/nsc.loki/automation/pipeline/common/secure.py
+ln -s /data/runScratch.boston/scripts/etc/secure.py /data/runScratch.boston/scripts/pipeline/common/secure.py
 

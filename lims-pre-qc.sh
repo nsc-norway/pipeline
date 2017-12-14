@@ -1,4 +1,4 @@
 #!/bin/sh
 
-/usr/bin/python /data/nsc.loki/automation/pipeline/40_move_results.py --pid=$1
+/usr/bin/python $(dirname $0)/40_move_results.py --pid=$1
 

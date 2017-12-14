@@ -132,7 +132,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
 
 
 def delivery_harddrive(project_name, source_path):
-    # Copy to nsc.loki
+    # Copy to delivery area
     subprocess.check_call(["/bin/cp", "-rl", source_path, nsc.DELIVERY_DIR])
     #log_path = task.logfile("rsync-" + project_name)
     #args = [nsc.RSYNC, '-rlt', '--chmod=ug+rwX,o-rwx'] # chmod 660

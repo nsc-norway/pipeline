@@ -156,7 +156,6 @@ if SITE == "cees":
     elif TAG == "dev":
         PRIMARY_STORAGE = "/var/pipeline-test/runsIllumina"
         SECONDARY_STORAGE="/var/pipeline-test/runsIllumina"
-        LOG_DIR = "/data/nsc.loki/automation/dev/logs"
         #TRIGGER_DIR="/opt/nsc/trigger"
 
 elif SITE == "ous":
@@ -165,16 +164,14 @@ elif SITE == "ous":
         SECONDARY_STORAGE="/data/runScratch.boston/demultiplexed"         # location of demultiplexed files
         DELIVERY_DIR="/data/runScratch.boston/demultiplexed/delivery"     # used by prepare-delivery after QC
         DIAGNOSTICS_DELIVERY = "/data/diag/nscDelivery"
-        LOG_DIR = "/data/nsc.loki/automation/logs" # logs for copy job (10_... script used at OUS)
-        TRIGGER_DIR="/data/nsc.loki/automation/trigger"
+        TRIGGER_DIR="/data/runScratch.boston/scripts/trigger"
         LIMS_SERVER="ous-lims"
 
     elif TAG == "dev":
-        SECONDARY_STORAGE="/data/nsc.loki/test"    # location of demultiplexed files
-        DELIVERY_DIR="/data/nsc.loki/test/delivery"# used by prepare-delivery after QC
-        DIAGNOSTICS_DELIVERY = "/data/nsc.loki/test/diag"
-        LOG_DIR = "/data/nsc.loki/automation/dev/logs"
-        TRIGGER_DIR="/data/nsc.loki/automation/dev/trigger"
+        SECONDARY_STORAGE="/data/runScratch.boston/test"    # location of demultiplexed files
+        DELIVERY_DIR="/data/runScratch.boston/test/delivery"# used by prepare-delivery after QC
+        DIAGNOSTICS_DELIVERY = "/data/runScratch.boston/test/diag"
+        TRIGGER_DIR="/data/runScratch.boston/scripts/dev/trigger"
 
 
 # Configure LIMS access:
@@ -190,7 +187,7 @@ def get_lims(server_id=None):
     else:
         if server_id == "ous-lims":
             url = "https://ous-lims.sequencing.uio.no"
-            pw_file = "/data/nsc.loki/automation/etc/seq-user/apiuser-password.txt"
+            pw_file = "/data/runScratch.boston/scripts/etc/seq-user/apiuser-password.txt"
 
         elif server_id == "cees-lims":
             url = "https://cees-lims.sequencing.uio.no"
@@ -201,7 +198,7 @@ def get_lims(server_id=None):
 
         elif server_id == "x-lims":
             url = "https://x-lims.sequencing.uio.no"
-            pw_file = "/data/nsc.loki/automation/etc/seq-user/x-apiuser-password.txt"
+            pw_file = "/data/runScratch.boston/scripts/etc/seq-user/x-apiuser-password.txt"
 
         else:
             pw_file = None
