@@ -97,6 +97,10 @@ LIMS_SERVER=None
 ### Common / default program paths ###
 MULTIQC = "/usr/bin/multiqc"
 
+### Default configuration parameters ###
+# The -d option is required for bcl2fastq versions < 2.19
+BCL2FASTQ_USE_D_OPTION = False
+
 ### Site specific configuration ###
 
 if SITE == "cees":
@@ -113,6 +117,7 @@ elif SITE == "ous":
     # Data processing/analysis programs
     #BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
     BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.18.0.12/nscinstallbin/bin/bcl2fastq"
+    BCL2FASTQ_USE_D_OPTION = True
     FASTQC="/data/common/tools/nscbin/fastqc"
     FASTDUP="/data/common/tools/nscbin/fastdup"
     BASEURI="https://ous-lims.sequencing.uio.no"
