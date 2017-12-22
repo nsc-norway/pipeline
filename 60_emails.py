@@ -3,7 +3,11 @@ import os
 import re
 import operator
 from collections import defaultdict
-from jinja2 import Environment, select_autoescape, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader
+try:
+    from jinja2 import select_autoescape
+except ImportError:
+    select_autoescape = None
 
 from common import nsc, stats, utilities, lane_info, samples, taskmgr
 
@@ -72,7 +76,10 @@ def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, lims, pr
 
     fname_html = delivery_dir + "/Emails_for_" + run_id + ".html"
     template_dir = os.path.join(os.path.dirname(__file__), "template")
-    jinja_env = Environment(loader=FileSystemLoader(template_dir), autoescape=select_autoescape(['html','xml']))
+    if select_autoescape is None:
+        jinja_env = Environment(loader=FileSystemLoader(template_dir))
+    else:
+        jinja_env = Environment(loader=FileSystemLoader(template_dir), autoescape=select_autoescape(['html','xml']))
     write_html_file(jinja_env, process, fname_html, run_id, projects, instrument_type.startswith('hiseq'), lane_stats, patterned)
 
 

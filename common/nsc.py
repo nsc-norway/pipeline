@@ -103,7 +103,7 @@ BCL2FASTQ_USE_D_OPTION = False
 
 ### Site specific configuration ###
 
-if SITE == "cees":
+if SITE.startswith("cees"):
     # Data processing/analysis programs
     BCL2FASTQ2="/usr/local/bin/bcl2fastq"
     FASTQC="/opt/FastQC/fastqc"
@@ -150,11 +150,14 @@ FASTDUP_ARGLIST=[FASTDUP, "-s", "10", "-e", "60"]
 ### Site and phase (TAG) dependent configuration ###
 
 # Paths
-if SITE == "cees":
+if SITE.startswith("cees"):
     if TAG == "prod":
         PRIMARY_STORAGE = "/storage/nscdata/runsIllumina"
         SECONDARY_STORAGE="/storage/nscdata/runsIllumina"
-        DELIVERY_DIR="/storage/nscdata/runsIllumina/delivery" 
+        if SITE == "cees":
+            DELIVERY_DIR="/storage/nscdata/runsIllumina/delivery" 
+        elif SITE == "cees-sensitive":
+            DELIVERY_DIR="/storage/nscdata_s/runsIllumina/delivery" 
         TRIGGER_DIR="/opt/nsc/trigger"
         LIMS_SERVER="cees-lims"
 
