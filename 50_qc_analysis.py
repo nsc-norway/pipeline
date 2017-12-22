@@ -64,17 +64,15 @@ def main(task):
                 os.mkdir(sample_dir)
             for f in sample.files:
                 if not f.empty:
-                    fqc_basedir = os.path.join(
-                            output_dir,
-                            os.path.dirname(samples.get_fastqc_dir(project, sample, f))
-                            )
+                    file_fastqc_dir = samples.get_fastqc_dir(project, sample, f)
+                    fqc_basedir = os.path.join( output_dir, os.path.dirname(file_fastqc_dir))
                     fq_path = os.path.join(bc_dir, f.path)
                     fqc_commands.append([nsc.FASTQC, "--extract",
                             "--outdir=" + fqc_basedir,
                             fq_path
                             ])
                     file_sizes.append(os.path.getsize(fq_path))
-                    fastqc_zipfiles.append(fqc_basedir + ".zip")
+                    fastqc_zipfiles.append(os.path.join(output_dir, file_fastqc_dir + ".zip"))
                     if f.i_read == 1:
                         output_path = os.path.join(
                                 output_dir,
