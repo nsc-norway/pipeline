@@ -108,6 +108,8 @@ if SITE.startswith("cees"):
     BCL2FASTQ2="/usr/local/bin/bcl2fastq"
     FASTQC="/opt/FastQC/fastqc"
     FASTDUP="/opt/nsc/bin/fastdup"
+    if SITE == "cees-sensitive":
+        MULTIQC = "/opt/rh/python27/root/usr/bin/multiqc"
     BASEURI="https://cees-lims.sequencing.uio.no"
 
     REMOTE_MODE = "local"
