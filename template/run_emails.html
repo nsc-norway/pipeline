@@ -86,6 +86,16 @@ td.text {
 {% for project_data in project_datas %}
 <h3>{{ project_data.name }}</h3>
 <p>Sequence ready for download - sequencing run {{ run_id }} - {{ project_data.name }} ({{ project_data.nsamples }} samples)</p>
+{% if project_data.lims %}
+<table class="lims_info">
+    <tr><td>Contact person</td><td>{{ project_data.lims.contact_person }}</td></tr>
+    <tr><td>Contact email</td><td>{{ project_data.lims.contact_email }}</td></tr>
+    <tr><td>Delivery method</td><td>{{ project_data.lims.delivery_method }}</td></tr>
+    <tr><td>Directory name</td><td>{{ project_data.dir }}</td></tr>
+    <tr><td>Total lanes requested</td><td>{{ project_data.lims.total_number_of_lanes }}</td></tr>
+    <tr><td>Sequencing status</td><td>{{ project_data.lims.sequencing_status }}</td></tr>
+</table>
+{% endif %}
 <table>
 {% for (file, frags) in project_data.file_fragments_table %}
 <tr>
@@ -94,16 +104,6 @@ td.text {
 </tr>
 {% endfor %}
 </table>
-
-{% if project_data.lims %}
-<table class="lims_info">
-    <tr><td>Contact person</td><td>{{ project_data.lims.contact_person }}</td></tr>
-    <tr><td>Contact email</td><td>{{ project_data.lims.contact_email }}</td></tr>
-    <tr><td>Directory name</td><td>{{ project_data.dir }}</td></tr>
-    <tr><td>Total lanes requested</td><td>{{ project_data.lims.total_number_of_lanes }}</td></tr>
-    <tr><td>Sequencing status</td><td>{{ project_data.lims.sequencing_status }}</td></tr>
-</table>
-{% endif %}
 {% endfor %}
 
 </body>
