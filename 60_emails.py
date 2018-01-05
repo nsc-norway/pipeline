@@ -373,7 +373,7 @@ class LimsInfo(object):
     def __init__(self, lims_project, seq_process):
         self.contact_person = lims_project.udf.get('Contact person')
         self.contact_email = lims_project.udf.get('Contact email')
-        self.delivery_method = process.udf.get('Delivery method')
+        self.delivery_method = lims_project.udf.get('Delivery method')
         self.total_number_of_lanes = lims_project.udf.get('Number of lanes')
         completed_runs = lims_project.lims.get_processes(
                 type=(t[1] for t in nsc.SEQ_PROCESSES),
