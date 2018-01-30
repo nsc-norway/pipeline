@@ -243,7 +243,7 @@ def main(task):
         if project_type == "Diagnostics":
             task.info("Copying " + project.name + " to diagnostics...")
             delivery_diag(task, project, task.bc_dir, project_path)
-        elif delivery_type == "User HDD" or delivery_type == "New HDD" or delivery_type == "NeLS project":
+        elif delivery_type in ["User HDD", "New HDD", "NeLS project", "TSD project"]:
             task.info("Hard-linking " + project.name + " to delivery area...")
             delivery_harddrive(project.name, project_path)
         elif delivery_type == "Norstore":
@@ -253,7 +253,7 @@ def main(task):
             task.info("Tar'ing and copying " + project.name + " to delivery area, for Norstore...")
             delivery_norstore(task.process, project.name, project_path, task)
         else:
-            print "No delivery prep done for project", project_name
+            print "No delivery prep done for project", project.name
 
     if sensitive_fail:
         task.fail("Selected Norstore delivery for sensitive data, nothing done for: " + ",".join(sensitive_fail))

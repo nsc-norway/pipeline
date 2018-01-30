@@ -23,11 +23,11 @@ def main(task):
             ):
         task.info("Run " + task.run_id + " is already in processed directory")
     else:
-        task.info("Moving " + task.src_dir + " to processed directory")
-        os.rename(
-                task.src_dir,
-                os.path.join(nsc.PRIMARY_STORAGE, "processed", task.run_id)
-                )
+        task.info("Will not move " + task.src_dir + " to processed directory, this has been disabled")
+        #os.rename(
+        #        task.src_dir,
+        #        os.path.join(nsc.PRIMARY_STORAGE, "processed", task.run_id)
+        #        )
 
     task.success_finish()
 
