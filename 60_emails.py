@@ -64,15 +64,8 @@ def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, lims, pr
     if not os.path.exists(delivery_dir):
         os.mkdir(delivery_dir)
 
-    for project in projects:
-        if not project.is_undetermined:
-            fname = delivery_dir + "/Email_for_" + project.name + ".xls"
-            write_sample_info_table(fname, run_id, project)
-
     fname = delivery_dir + "/Summary_email_for_NSC_" + run_id + ".xls"
     patterned = instrument_type in ["hiseqx", "hiseq4k"]
-    write_summary_email(fname, run_id, projects, instrument_type.startswith('hiseq'), lane_stats, patterned)
-
 
     fname_html = delivery_dir + "/Emails_for_" + run_id + ".html"
     template_dir = os.path.join(os.path.dirname(__file__), "template")
@@ -80,155 +73,29 @@ def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, lims, pr
         jinja_env = Environment(loader=FileSystemLoader(template_dir))
     else:
         jinja_env = Environment(loader=FileSystemLoader(template_dir), autoescape=select_autoescape(['html','xml']))
-    write_html_file(jinja_env, process, fname_html, run_id, projects, instrument_type.startswith('hiseq'), lane_stats, patterned)
-
-
-
-def write_sample_info_table(output_path, runid, project):
-    with open(output_path, 'w') as out:
-        out.write('--------------------------------		\r\n')
-        out.write('Email for ' + project.name + "\r\n")
-        out.write('--------------------------------		\r\n\r\n')
-        nsamples = len(project.samples)
-        out.write('Sequence ready for download - sequencing run ' + runid + ' - Project_' + project.name + ' (' + str(nsamples) + ' samples)\r\n\r\n')
-
-        if project.name.startswith("Diag-"):
-            files = sorted(
-                    ((s,fi) for s in project.samples for fi in s.files if fi.i_read == 1),
-                    key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
-                    )
-            for i, (s,f) in enumerate(files, 1):
-                out.write("Sample\t" + str(i) + "\t")
-                if f.empty:
-                    out.write("0\t")
-                else:
-                    out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
-                out.write("fragments\r\n")
-        else:
-            files = sorted(
-                    ((s,fi) for s in project.samples for fi in s.files),
-                    key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
-                    )
-            for s,f in files:
-                out.write(os.path.basename(f.path) + "\t")
-                if f.empty:
-                    out.write("0\t")
-                else:
-                    out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
-                out.write("fragments\r\n")
-
-
-def write_summary_email(output_path, runid, projects, print_lane_number, lane_stats, patterned):
-    with open(output_path, 'w') as out:
-        summary_email_head = """\r
---------------------------------							\r
-Summary email to NSC members							\r
---------------------------------							\r
-							\r
-Summary for run {runId}							\r
-							\r
-PF = pass illumina filter							\r
-PF cluster no = number of PF cluster in the lane							\r
-Undetermined ratio = how much proportion of fragments can not be assigned to a sample in the indexed lane							\r
-Quality = summary of the overall quality							\r
-\r
-""".format(runId = runid)
-        if print_lane_number:
-            if patterned:
-                summary_email_head += """\r
-Lane\tProject\tPF cluster no\tPF ratio\tSeqDuplicates\tUndetermined ratio\tAlignedPhiX\t>=Q30\tQuality\r
-"""
-            else:
-                summary_email_head += """\r
-Lane\tProject\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\tAlignedPhiX\t>=Q30\tQuality\r
-"""
-        else:
-            summary_email_head += """\r
-Project\tPF cluster no\tPF ratio\tRaw cluster density(/mm2)\tPF cluster density(/mm2)\tUndetermined ratio\tAlignedPhiX\t>=Q30\tQuality\r
-"""
-
-        out.write(summary_email_head)
-        # assumes 1 project per lane, and undetermined
-        # Dict: lane ID => (lane object, project object)
-        lane_proj = dict((f.lane, proj) for proj in projects
-                for s in proj.samples for f in s.files if not proj.is_undetermined)
-        # lane ID => file object (will be the last one)
-        lane_undetermined = dict(
-                (f.lane, f)
-                for proj in projects
-                for s in proj.samples
-                for f in s.files
-                if proj.is_undetermined)
-
-        for l in sorted(lane_proj.keys()):
-            proj = lane_proj[l]
-            undetermined_file = lane_undetermined.get(l)
-
-            if print_lane_number:
-                out.write(str(l) + "\t")
-            out.write(proj.name + "\t")
-            cluster_no = sum(f.stats['# Reads PF']
-                    for proj in projects
-                    for s in proj.samples
-                    for f in s.files
-                    if f.lane == l and f.i_read == 1 and not f.empty)
-            out.write(utilities.display_int(cluster_no) + '\t')
-            lane = lane_stats[l]
-            out.write("%4.2f" % (lane.pf_ratio if lane.pf_ratio is not None else 0.0) + "\t")
-            if not patterned:
-                out.write(utilities.display_int(lane.cluster_den_raw) + '\t')
-                out.write(utilities.display_int(lane.cluster_den_pf) + '\t')
-
-            if patterned:
-                dupsum = sum(f.stats['fastdup reads with duplicate']
-                        for proj in projects
-                        for s in proj.samples
-                        for f in s.files
-                        if f.lane == l and f.i_read == 1 and not f.empty)
-                try:
-                    duppct = dupsum * 100.0 / cluster_no
-                    out.write("%4.2f%%\t" % duppct)
-                except ZeroDivisionError:
-                    out.write("-\t")
-
-            if undetermined_file and not undetermined_file.empty:
-                try:
-                    out.write("%4.2f" % (undetermined_file.stats['% of PF Clusters Per Lane'],) + "%\t")
-                except KeyError:
-                    out.write("%4s" % ('?') + "%\t")
-            else:
-                out.write("-\t")
-
-            if lane.phix is None:
-                out.write("-\t")
-            else:
-                out.write("%4.2f%%\t" % (lane.phix * 100.0))
-
-            q30sum = sum(f.stats['% Bases >=Q30']*f.stats['# Reads PF']
-                    for proj in projects
-                    for s in proj.samples
-                    for f in s.files
-                    if f.lane == l and not f.empty)
-            norm = sum(f.stats['# Reads PF']
-                    for proj in projects
-                    for s in proj.samples
-                    for f in s.files
-                    if f.lane == l and not f.empty)
-            q30pct = q30sum  / max(norm, 1)
-            out.write("%4.2f%%\t" % q30pct)
-
-            out.write("ok\r\n")
+    write_html_file(jinja_env, process, fname_html, run_id, projects, instrument_type.startswith('hiseq'),
+            lane_stats, patterned)
 
 
 def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned):
+    """This function gets per-lane statistics based on a provided lane_stats object and 
+    projects. projects is the normal project list, with each project containing a list
+    of samples, then files. This function will reconstruct some stats, like Q30, from the file-based
+    stats. While this is not the most direct way, it is very portable since it only relies
+    on bcl2fastq output (portable in the sense that it doesn't need LIMS, special handling
+    of different sequencers, or other libraries)."""
+
+    # A different table is used depending on the sequencer type: Does it have lanes? Does it have patterned FC?
     if print_lane_number:
         if patterned:
-            header = ["Lane", "Project", "PF cluster no", "PF ratio", "SeqDuplicates", "Undetermined", "AlignedPhiX", ">=Q30", "Quality"]
-        else:
-            header = ["Lane", "Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)", "PF cluster density(/mm2)", "Undetermined",
+            header = ["Lane", "Project", "PF cluster no", "PF ratio", "SeqDuplicates", "Undetermined",
                     "AlignedPhiX", ">=Q30", "Quality"]
+        else:
+            header = ["Lane", "Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)",
+                    "PF cluster density(/mm2)", "Undetermined", "AlignedPhiX", ">=Q30", "Quality"]
     else:
-        header = ["Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)", "PF cluster density(/mm2)", "Undetermined", "AlignedPhiX",
+        header = ["Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)",
+                "PF cluster density(/mm2)", "Undetermined", "AlignedPhiX",
                 ">=Q30", "Quality"]
 
     # assumes 1 project per lane, and undetermined
@@ -309,40 +176,51 @@ def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned):
 
 
 class ProjectData(object):
+    """This class gets and holds information about a project. It will query the LIMS for 
+    contact information etc. if the lims_project argument is provided (not None). Its primary
+    purpose is to gather the number of fragments in each of the files, and output it in a 
+    list:
+    file_fragment_table = [("Filename1", "100,000"), ("Filename2", "120,000"), ...]
+
+    For diagnostics project it will "censor" the sample names, and only output one line
+    per pair of reads (if paired end sequencing).
+    """
     def __init__(self, project, lims_project, seq_process):
         self.nsamples = len(project.samples)
         self.name = project.name
         self.file_fragments_table = []
         self.dir = project.proj_dir
-        if project.name.startswith("Diag-"):
-            files = sorted(
-                    ((s,fi) for s in project.samples for fi in s.files if fi.i_read == 1),
-                    key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
-                    )
-            for i, (s,f) in enumerate(files, 1):
-                sample = "Sample {0}".format(i)
-                if f.empty:
-                    self.file_fragments_table.append((sample, "0"))
+        diag_project= project.name.startswith("Diag-") or (
+                lims_project and
+                lims_project.udf.get('Project type') == "Diagnostics"
+                )
+        files = sorted(
+                ((s,fi) for s in project.samples for fi in s.files),
+                key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
+                )
+        diag_sample_counter = 1
+        for s,f in files:
+            if diag_project:
+                if f.i_read == 1:
+                    sample = "Sample {0}".format(diag_sample_counter)
+                    diag_sample_counter += 1
                 else:
-                    self.file_fragments_table.append((sample, utilities.display_int(f.stats['# Reads PF'])))
-        else:
-            files = sorted(
-                    ((s,fi) for s in project.samples for fi in s.files),
-                    key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
-                    )
-            for s,f in files:
-                filename = os.path.basename(f.path)
-                if f.empty:
-                    self.file_fragments_table.append((filename, "0"))
-                else:
-                    self.file_fragments_table.append((filename, utilities.display_int(f.stats['# Reads PF'])))
+                    continue # Don't output for read 2
+            else:
+                sample = os.path.basename(f.path)
+            if f.empty:
+                self.file_fragments_table.append((sample, "0"))
+            else:
+                self.file_fragments_table.append((sample, utilities.display_int(f.stats['# Reads PF'])))
         if lims_project:
             self.lims = LimsInfo(lims_project, seq_process)
 
 
 class RunParameters(object):
+    """Get run parameters (LIMS based). Gets the information from the sequencing
+    step."""
+
     def __init__(self, run_id, process):
-        """Get run parameters (LIMS based)"""
         self.instrument_type = utilities.get_instrument_by_runid(run_id)
         self.instrument_name = process.udf.get('Instrument Name')
         id_part = re.match(r"\d\d\d\d\d\d_([^_]+)_", run_id)
@@ -370,6 +248,9 @@ class RunParameters(object):
 
 
 class LimsInfo(object):
+    """Gets project information: contact person, etc., from UDFs in LIMS.
+    Also identifies previous sequencing runs, and counts the number of lanes
+    which are either PASSED, FAILED, or unknown."""
     def __init__(self, lims_project, seq_process):
         self.contact_person = lims_project.udf.get('Contact person')
         self.contact_email = lims_project.udf.get('Contact email')
