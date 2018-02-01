@@ -93,14 +93,15 @@ td.text {
     <tr><td>Delivery method</td><td>{{ project_data.lims.delivery_method }}</td></tr>
     <tr><td>Directory name</td><td>{{ project_data.dir }}</td></tr>
     <tr><td>Total lanes requested</td><td>{{ project_data.lims.total_number_of_lanes }}</td></tr>
-    <tr><td>Sequencing status</td><td>{{ project_data.lims.sequencing_status }}</td></tr>
+    <tr><td>Project lanes sequenced</td><td>{{ project_data.lims.sequencing_status }}</td></tr>
 </table>
 {% endif %}
 <table>
-{% for (file, frags) in project_data.file_fragments_table %}
+{% for (file, frags, rel_frags) in project_data.file_fragments_table %}
 <tr>
     <td>{{ file }}</td>
-    <td>{{ frags }} fragments</td>
+    <td>{{ "{0:,}".format(frags) }} fragments</td>
+    <td>{{ "{0:+.01f}".format(rel_frags*100) }} %</td>
 </tr>
 {% endfor %}
 </table>
