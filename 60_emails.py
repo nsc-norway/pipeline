@@ -64,9 +64,7 @@ def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, lims, pr
     if not os.path.exists(delivery_dir):
         os.mkdir(delivery_dir)
 
-    fname = delivery_dir + "/Summary_email_for_NSC_" + run_id + ".xls"
     patterned = instrument_type in ["hiseqx", "hiseq4k"]
-
     fname_html = delivery_dir + "/Emails_for_" + run_id + ".html"
     template_dir = os.path.join(os.path.dirname(__file__), "template")
     if select_autoescape is None:
@@ -83,20 +81,24 @@ def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned):
     of samples, then files. This function will reconstruct some stats, like Q30, from the file-based
     stats. While this is not the most direct way, it is very portable since it only relies
     on bcl2fastq output (portable in the sense that it doesn't need LIMS, special handling
-    of different sequencers, or other libraries)."""
+    of different sequencers, or other libraries).
+    
+    For now it returns formatted strings for numeric values. This makes the logic in the
+    template very simple, but we should consider moving the formatting to the template."""
 
     # A different table is used depending on the sequencer type: Does it have lanes? Does it have patterned FC?
     if print_lane_number:
         if patterned:
             header = ["Lane", "Project", "PF cluster no", "PF ratio", "SeqDuplicates", "Undetermined",
-                    "AlignedPhiX", ">=Q30", "Quality"]
+                    "AlignedPhiX", ">=Q30", "MaxReadsSam", "MinReadsSam", "Quality"]
         else:
             header = ["Lane", "Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)",
-                    "PF cluster density(/mm2)", "Undetermined", "AlignedPhiX", ">=Q30", "Quality"]
+                    "PF cluster density(/mm2)", "Undetermined", "AlignedPhiX", ">=Q30", 
+                    "MaxReadsSam", "MinReadsSam", "Quality"]
     else:
         header = ["Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)",
                 "PF cluster density(/mm2)", "Undetermined", "AlignedPhiX",
-                ">=Q30", "Quality"]
+                ">=Q30", "MaxReadsSam", "MinReadsSam", "Quality"]
 
     # assumes 1 project per lane, and undetermined
     # Dict: lane ID => (lane object, project object)
@@ -113,6 +115,14 @@ def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned):
     data = []
 
     for l in sorted(lane_proj.keys()):
+
+        all_lane_files = [f
+                for proj in projects
+                for s in proj.samples
+                for f in s.files
+                if f.lane == l]
+        all_nonempty_files = [f for f in all_lane_files if not f.empty]
+
         row = []
         proj = lane_proj[l]
         undetermined_file = lane_undetermined.get(l)
@@ -121,11 +131,7 @@ def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned):
             row.append((l, "center"))
         row.append((proj.name, "text"))
 
-        cluster_no = sum(f.stats['# Reads PF']
-                for proj in projects
-                for s in proj.samples
-                for f in s.files
-                if f.lane == l and f.i_read == 1 and not f.empty)
+        cluster_no = sum(f.stats['# Reads PF'] for f in all_nonempty_files if f.i_read == 1)
         row.append((utilities.display_int(cluster_no), "number"))
         lane = lane_stats[l]
         row.append(("%4.2f" % (lane.pf_ratio if lane.pf_ratio is not None else 0.0), "number"))
@@ -135,15 +141,12 @@ def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned):
 
         if patterned:
             dupsum = sum(f.stats['fastdup reads with duplicate']
-                    for proj in projects
-                    for s in proj.samples
-                    for f in s.files
-                    if f.lane == l and f.i_read == 1 and not f.empty)
+                    for f in all_nonempty_files if f.i_read == 1)
             try:
                 duppct = dupsum * 100.0 / cluster_no
                 row.append(("%4.2f %%" % duppct, "number"))
             except ZeroDivisionError:
-                row.append("-")
+                row.append(("-", "center"))
 
         if undetermined_file and not undetermined_file.empty:
             try:
@@ -158,18 +161,30 @@ def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned):
         else:
             row.append(("%4.2f%%" % (lane.phix * 100.0), "number"))
 
-        q30sum = sum(f.stats['% Bases >=Q30']*f.stats['# Reads PF']
-                for proj in projects
-                for s in proj.samples
-                for f in s.files
-                if f.lane == l and not f.empty)
-        norm = sum(f.stats['# Reads PF']
-                for proj in projects
-                for s in proj.samples
-                for f in s.files
-                if f.lane == l and not f.empty)
-        q30pct = q30sum  / max(norm, 1)
+        norm = sum(f.stats['# Reads PF'] for f in all_lane_files if not f.empty)
+        q30sum = sum(f.stats['% Bases >=Q30']*f.stats['# Reads PF'] for f in all_nonempty_files)
+        q30pct = q30sum * 1.0 / max(norm, 1)
         row.append(("%4.2f%%" % q30pct, "number"))
+
+        all_sample_reads = [
+                f.stats['# Reads PF'] if not f.empty else 0
+                for proj in projects
+                for s in proj.samples
+                for f in s.files
+                if f.lane == l and not proj.is_undetermined
+                ]
+        sample_norm = sum(all_sample_reads)
+        if sample_norm > 0:
+            min_reads = min(all_sample_reads)
+            max_reads = max(all_sample_reads)
+            mean_reads = sample_norm * 1.0 / len(all_sample_reads)
+
+            row.append(("%+3.1f%%" % ((max_reads - mean_reads) * 100.0 / mean_reads), "number"))
+            row.append(("%+3.1f%%" % ((min_reads - mean_reads) * 100.0 / mean_reads), "number"))
+        else:
+            row.append(("-", "number"))
+            row.append(("-", "number"))
+
         row.append(("ok", "text"))
         data.append(row)
     return header, data
@@ -179,10 +194,14 @@ class ProjectData(object):
     """This class gets and holds information about a project. It will query the LIMS for 
     contact information etc. if the lims_project argument is provided (not None). Its primary
     purpose is to gather the number of fragments in each of the files, and output it in a 
-    list:
-    file_fragment_table = [("Filename1", "100,000"), ("Filename2", "120,000"), ...]
+    list. For each file, it writes a tuple of the file name, the number of fragments, and the
+    relative difference from the mean number of reads (see below).
 
-    For diagnostics project it will "censor" the sample names, and only output one line
+    file_fragment_table = [("Filename1", 100000, -0.09), ("Filename2", 120000, 0.09), ...]
+
+    The relative difference is: (frags - mean_frags) / mean_frags
+
+    For diagnostics projects it will censor the sample names, and only output one line
     per pair of reads (if paired end sequencing).
     """
     def __init__(self, project, lims_project, seq_process):
@@ -198,6 +217,18 @@ class ProjectData(object):
                 ((s,fi) for s in project.samples for fi in s.files),
                 key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
                 )
+
+        mean_frags = {}
+        for lane in set(f.lane for s, f in files):
+            num_frags = [
+                    f.stats['# Reads PF'] if not f.empty else 0
+                    for s,f in files
+                    if f.lane == lane
+                    ]
+            sum_frags = sum(num_frags)
+            if sum_frags > 0: # Mean fragments over files. Only used if there are any samples.
+                mean_frags[lane] = sum_frags / len(num_frags)
+
         diag_sample_counter = 1
         for s,f in files:
             if diag_project:
@@ -209,9 +240,12 @@ class ProjectData(object):
             else:
                 sample = os.path.basename(f.path)
             if f.empty:
-                self.file_fragments_table.append((sample, "0"))
+                self.file_fragments_table.append((sample, 0, -1.0 if mean_frags > 0 else 0.0))
             else:
-                self.file_fragments_table.append((sample, utilities.display_int(f.stats['# Reads PF'])))
+                self.file_fragments_table.append(
+                        (sample, f.stats['# Reads PF'],
+                            (f.stats['# Reads PF'] - mean_frags[f.lane]) * 1.0 / mean_frags[f.lane])
+                        )
         if lims_project:
             self.lims = LimsInfo(lims_project, seq_process)
 
