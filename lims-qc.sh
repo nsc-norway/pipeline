@@ -12,6 +12,6 @@ fi
 
 for script in $SCRIPTS
 do
-	/usr/bin/python $(dirname $0)/$script --pid=$1
+	nsc-python27 $(dirname $0)/$script --pid=$1
 done
 

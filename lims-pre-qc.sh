@@ -1,4 +1,4 @@
 #!/bin/sh
 
-/usr/bin/python $(dirname $0)/40_move_results.py --pid=$1
+nsc-python27 $(dirname $0)/40_move_results.py --pid=$1
 
