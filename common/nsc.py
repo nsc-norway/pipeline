@@ -95,7 +95,8 @@ PDFLATEX="/usr/bin/pdflatex"
 LIMS_SERVER=None
 
 ### Common / default program paths ###
-MULTIQC = "/usr/bin/multiqc"
+# MultiQC: Use default path
+MULTIQC = "multiqc"
 
 ### Default configuration parameters ###
 # The -d option is required for bcl2fastq versions < 2.19
