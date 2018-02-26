@@ -227,7 +227,7 @@ class ProjectData(object):
                     ]
             sum_frags = sum(num_frags)
             if sum_frags > 0: # Mean fragments over files. Only used if there are any samples.
-                mean_frags[lane] = sum_frags / len(num_frags)
+                mean_frags[lane] = sum_frags * 1.0 / len(num_frags)
 
         diag_sample_counter = 1
         for s,f in files:
