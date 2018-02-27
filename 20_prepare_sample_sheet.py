@@ -112,11 +112,6 @@ def main(task):
     instrument = utilities.get_instrument_by_runid(task.run_id)
     if instrument.startswith("hiseq") and not re.search(r"\[Data\]", sample_sheet):
         sample_sheet = convert_from_bcl2fastqv1(sample_sheet)
-    # Remove index2, as only one index read supported on X
-    if instrument == "hiseqx":
-        sample_sheet = clear_index2_column(sample_sheet)
-    elif instrument == "hiseq4k":
-        sample_sheet = clear_index2_column_conditional(sample_sheet)
     # NextSeq run will have index2 reversed by sample sheet generator -- unconditionally.
     # However, single-read flow cells read the index2 in forward direction. So we re-reverse
     # it.
@@ -172,61 +167,6 @@ def reverse_complement_index2(original_data):
                 )
     except StopIteration: # index2 column not found
         return original_data
-
-
-def clear_index2_column_conditional(original_data):
-    lines = original_data.splitlines()
-    output_rows = []
-    data = False
-    header = False
-    index2index = 0
-    project_index = 0
-    for l in lines:
-        line = l.strip("\r\n")
-        if not data and line.lower().startswith("[data]"):
-            data = True
-        elif data:
-            if not header:
-                header = line.strip().lower().split(",")
-                try:
-                    index2index = header.index("index2")
-                    project_index = header.index("sample_project")
-                except ValueError:
-                    return original_data
-            else:
-                parts = line.split(",")
-                if len(parts) > index2index and len(parts) > project_index:
-                    if parts[project_index].startswith("Diag-Trio"):
-                        parts[index2index] = ""
-                line = ",".join(parts)
-        output_rows.append(line)
-    return "\r\n".join(output_rows)
-
-
-def clear_index2_column(original_data):
-    lines = original_data.splitlines()
-    output_rows = []
-    data = False
-    header = False
-    index2index = 0
-    for l in lines:
-        line = l.strip("\r\n")
-        if not data and line.lower().startswith("[data]"):
-            data = True
-        elif data:
-            if not header:
-                header = line.strip().lower().split(",")
-                try:
-                    index2index = header.index("index2")
-                except ValueError:
-                    return original_data
-            else:
-                parts = line.split(",")
-                if len(parts) > index2index:
-                    parts[index2index] = ""
-                line = ",".join(parts)
-        output_rows.append(line)
-    return "\r\n".join(output_rows)
 
 
 def convert_from_bcl2fastqv1(original_data):
