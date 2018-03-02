@@ -51,6 +51,8 @@ def get_instrument_by_runid(run_id):
         return 'miseq'
     elif re.match(r"\d{6}_N", run_id):
         return 'nextseq'
+    elif re.match(r"\d{6}_E00401", run_id): # This machine was changed to a HiSeq 4000
+        return 'hiseq4k'
     elif re.match(r"\d{6}_E", run_id):
         return 'hiseqx'
     elif re.match(r"\d{6}_[JK]", run_id):
