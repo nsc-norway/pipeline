@@ -64,6 +64,11 @@ def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, lims, pr
     if not os.path.exists(delivery_dir):
         os.mkdir(delivery_dir)
 
+    for project in projects:
+        if not project.is_undetermined:
+            fname = delivery_dir + "/Email_for_" + project.name + ".xls"
+            write_sample_info_table(fname, run_id, project)
+
     patterned = instrument_type in ["hiseqx", "hiseq4k"]
     fname_html = delivery_dir + "/Emails_for_" + run_id + ".html"
     template_dir = os.path.join(os.path.dirname(__file__), "template")
@@ -347,6 +352,41 @@ def write_html_file(jinja_env, process, output_path, runid, projects, print_lane
             run_parameters=run_parameters,
             project_datas=project_datas
             ).encode('utf-8'))
+
+
+def write_sample_info_table(output_path, runid, project):
+    """Legacy "email" file for project read numbers"""
+    with open(output_path, 'w') as out:
+        out.write('--------------------------------		\r\n')
+        out.write('Email for ' + project.name + "\r\n")
+        out.write('--------------------------------		\r\n\r\n')
+        nsamples = len(project.samples)
+        out.write('Sequence ready for download - sequencing run ' + runid + ' - Project_' + project.name + ' (' + str(nsamples) + ' samples)\r\n\r\n')
+
+        if project.name.startswith("Diag-"):
+            files = sorted(
+                    ((s,fi) for s in project.samples for fi in s.files if fi.i_read == 1),
+                    key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
+                    )
+            for i, (s,f) in enumerate(files, 1):
+                out.write("Sample\t" + str(i) + "\t")
+                if f.empty:
+                    out.write("0\t")
+                else:
+                    out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
+                out.write("fragments\r\n")
+        else:
+            files = sorted(
+                    ((s,fi) for s in project.samples for fi in s.files),
+                    key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
+                    )
+            for s,f in files:
+                out.write(os.path.basename(f.path) + "\t")
+                if f.empty:
+                    out.write("0\t")
+                else:
+                    out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
+                out.write("fragments\r\n")
 
 
 if __name__ == "__main__":
