@@ -76,13 +76,8 @@ def get_from_files(run_dir, instrument, expand_lanes=False):
                 for lane_id in lane_ids
                 )
     else:
-        # HiSeq 3000/4000/X Lane statistics is not implemented here. Could use
-        # illuminate library to parse interop files, but maybe it is sufficient to
-        # use LIMS.
-        lanes = dict(
-                (lane_id, LaneStats(None, None, None, None))
-                for lane_id in [1,2,3,4,5,6,7,8]
-                )
+        # HiSeq 3000/4000/X Lane statistics is not implemented here. 
+        raise NotSupportedException("Cannot get lane statistics from files, for {0}.".format(instrument))
 
     return lanes
 
