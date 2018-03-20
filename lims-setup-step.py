@@ -73,8 +73,8 @@ else:
             "hiseq": 64,
             "hiseqx": 64,
             "hiseq4k": 64,
-            "miseq": 32,
-            "nextseq": 32
+            "miseq": 16,
+            "nextseq": 16
             }
 
 

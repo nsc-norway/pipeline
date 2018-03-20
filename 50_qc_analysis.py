@@ -98,9 +98,12 @@ def main(task):
     # For small jobs (< about 500k reads), this may be a problem, and we reduce the max
     # simultaneous jobs to be safe. Use median size 50MB as cut-off; parameters may need
     # tuning.
-    median_size = list(sorted(file_sizes))[len(file_sizes)/2]
-    if median_size < 50 * 1024**2:
-        fqc.max_simultaneous = 10
+    try:
+        median_size = list(sorted(file_sizes))[len(file_sizes)/2]
+        if median_size < 50 * 1024**2:
+            fqc.max_simultaneous = 10
+    except IndexError:
+        pass
 
     if task.instrument in ["hiseqx", "hiseq4k"] and nsc.FASTDUP != None:
         dup = remote.ArrayJob(dup_commands, dup_jobname, "6:00:00", 
