@@ -41,17 +41,28 @@ def main(task):
     for project in projects:
         if not project.is_undetermined:
 
-            paths = paths_for_project(run_id, project)
+            pathses = [paths_for_project(run_id, project)]
             task.info(project.name)
-            if not paths:
-                continue # No files to check
             stdout = os.path.join(bc_dir, project.proj_dir, "md5sum.txt")
-            rcode = remote.run_command(
-                    [nsc.MD5DEEP, '-rl', '-j' + str(n_threads)] + paths, task, "md5deep",
-                    time="08:00:00", cpus=n_threads, mem="2048M", bandwidth=str(n_threads*1200) + "M",
-                    storage_job=True, cwd=os.path.join(bc_dir, project.proj_dir),
-                    stdout = stdout
-                    )
+            while pathses: 
+                try:
+                    for paths in pathses:
+                        rcode = remote.run_command(
+                                [nsc.MD5DEEP, '-rl', '-j' + str(n_threads)] + paths, task, "md5deep",
+                                time="08:00:00", cpus=n_threads, mem="2048M", bandwidth=str(n_threads*1200) + "M",
+                                storage_job=True, cwd=os.path.join(bc_dir, project.proj_dir),
+                                stdout = stdout
+                                )
+                    pathses = None
+                except OSError as e:
+                    if e.args[0] == 7: #Argument list too long!
+                        pathss2 = []
+                        for paths in pathses:
+                            pathss2.append(paths[:len(paths)//2])
+                            pathss2.append(paths[len(paths)//2:])
+                        pathses = pathss2
+                    else:
+                        raise
 
             if rcode != 0:
                 task.fail(
