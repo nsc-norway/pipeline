@@ -26,13 +26,6 @@ def main(task):
     except OSError:
         pass
 
-    if task.process:
-        fqc_jobname = "fastqc." + task.process.id
-        dup_jobname = "fastdup." + task.process.id
-    else:
-        fqc_jobname = "fastqc"
-        dup_jobname = "fastdup"
-
     fqc_log_path = task.logfile("fastqc")
     dup_log_path = task.logfile("fastdup")
 
@@ -86,7 +79,7 @@ def main(task):
                                 )
     
 
-    fqc = remote.ArrayJob(fqc_commands, fqc_jobname, "1-0",
+    fqc = remote.ArrayJob(fqc_commands, "fastqc", "1-0",
             fqc_log_path.replace(".txt", ".%a.txt"))
     fqc.mem_per_task = 1900
     fqc.cpus_per_task = 1
@@ -106,7 +99,7 @@ def main(task):
         pass
 
     if task.instrument in ["hiseqx", "hiseq4k"] and nsc.FASTDUP != None:
-        dup = remote.ArrayJob(dup_commands, dup_jobname, "6:00:00", 
+        dup = remote.ArrayJob(dup_commands, "fastdup", "6:00:00", 
                 dup_log_path.replace(".txt", ".%a.txt"))
         dup.mem_per_task = 500
         dup.cpus_per_task = 1
