@@ -71,8 +71,8 @@ work_dir argument.""")
     logfile=task.logfile("rsync-2")
 
     rc = remote.run_command(
-            args, task, "rsync", "00:05:00", logfile=logfile, 
-            storage_job=True
+            args, task, "copy_run_again", "00:05:00", logfile=logfile, 
+            storage_job=True, comment=runid
             )
     
     if rc == 0:
