@@ -69,14 +69,14 @@ def rsync_arglist(source_path, destination_path, exclude):
 def main(task):
     
     task.running()
-    runid = task.run_id
+    run_id = task.run_id
 
 
     source = task.src_dir
     destination = task.work_dir    
     # Check destination
-    print runid
-    instrument = utilities.get_instrument_by_runid(runid)
+    print run_id
+    instrument = utilities.get_instrument_by_runid(run_id)
     if not instrument:
         task.fail("Destination does not look like an Illumina run folder", 
                 """Remember to include the name of the destination directory in the 
@@ -105,7 +105,8 @@ work_dir argument.""")
 
     logfile = task.logfile("rsync")
     rc = remote.run_command(
-            args, task, "rsync", "02:00:00", storage_job=True, logfile=logfile
+            args, task, "rsync", "02:00:00", storage_job=True, logfile=logfile,
+            comment=run_id
             )
     
     if rc == 0:
