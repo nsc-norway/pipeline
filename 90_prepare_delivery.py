@@ -50,13 +50,18 @@ def delivery_diag(task, project, basecalls_dir, project_path):
 
 
     # Copy "SAV" files, so Diagnostics can manage them as they see fit
-    SAV_INCLUDE_PATHS = [
-        "RunInfo.xml",
-        "runParameters.xml",
-        "RunParameters.xml",
-        "InterOp",
-        "Data/Intensities/BaseCalls/reports"
-        ]
+    if task.instrument == "nextseq":
+        SAV_INCLUDE_PATHS = [
+            "RunInfo.xml",
+            "RunParameters.xml",
+            "InterOp",
+            ]
+    else:
+        SAV_INCLUDE_PATHS = [
+            "RunInfo.xml",
+            "runParameters.xml",
+            "InterOp",
+            ]
     rsync_cmd = [nsc.RSYNC, '-r']
     rsync_cmd += SAV_INCLUDE_PATHS
     rsync_cmd += [os.path.join(dest_dir, task.run_id) + "/"]
