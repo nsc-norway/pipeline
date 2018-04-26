@@ -12,6 +12,7 @@ import shutil
 import crypt
 import time
 import subprocess
+import datetime
 import demultiplex_stats
 from genologics.lims import *
 from common import nsc, utilities, taskmgr, remote, samples
@@ -25,8 +26,6 @@ if nsc.TAG == "prod":
 else:
     print "Using dummy security module"
     from common import secure_dummy as secure
-
-
 
 
 def delivery_diag(task, project, basecalls_dir, project_path):
@@ -47,30 +46,6 @@ def delivery_diag(task, project, basecalls_dir, project_path):
         raise RuntimeError("Copying files to diagnostics failed, cp returned an error")
 
     # Now copy quality control data
-
-
-    # Copy "SAV" files, so Diagnostics can manage them as they see fit
-    if task.instrument == "nextseq":
-        SAV_INCLUDE_PATHS = [
-            "RunInfo.xml",
-            "RunParameters.xml",
-            "InterOp",
-            ]
-    else:
-        SAV_INCLUDE_PATHS = [
-            "RunInfo.xml",
-            "runParameters.xml",
-            "InterOp",
-            ]
-    rsync_cmd = [nsc.RSYNC, '-r']
-    rsync_cmd += SAV_INCLUDE_PATHS
-    rsync_cmd += [os.path.join(dest_dir, task.run_id) + "/"]
-    rcode = remote.run_command(rsync_cmd, task, "rsync_sav_files", time="01:00", storage_job=True,
-            srun_user_args=['--nodelist=vali'], cwd=task.work_dir, comment=task.run_id)
-    # Note: Rsync error code is ignored. It will return an error if not all input files exist (and we'll never have
-    # both runParameters.xml and RunParameters.xml).
-
-
     # General args for rsync to automatically set correct permissions
     rsync_args = [nsc.RSYNC, '-rltW', '--chmod=ug+rwX,o-rwx'] # chmod 770/660
 
@@ -94,6 +69,8 @@ def delivery_diag(task, project, basecalls_dir, project_path):
         subprocess.check_call(rsync_args + [source, dest_dir])
 
     # Copy the QualityControl files
+    copy_sav_files(task, dest_dir, ['--nodelist=vali'])
+
     # The locations of the fastqc directories are defined by the get_fastqc_dir() 
     # function in the samples module. These directories will then be moved to a 
     # fixed hierarchy by the following code, so the diag delivery structure is
@@ -106,6 +83,14 @@ def delivery_diag(task, project, basecalls_dir, project_path):
         sample_dir = os.path.join(qc_dir, "Sample_" + sample.name)
         if not os.path.exists(sample_dir):
             os.mkdir(sample_dir)
+
+        if instrument in ['hiseqx', 'hiseq4k']:
+            source = os.path.join(source_qc_dir, samples.get_fastdup_path(project, sample, sample.files[0]))
+            fdp_name = re.sub(r".fastq.gz$", "_fastdup.txt", f.filename)
+            dest = os.path.join(sample_dir, fdp_name)
+            if os.path.exists(dest):
+                shutil.rmtree(dest)
+            subprocess.check_call(rsync_args + [source, dest])
 
         for f in sample.files:
             source = os.path.join(source_qc_dir, samples.get_fastqc_dir(project, sample, f) + "/")
@@ -134,6 +119,44 @@ def delivery_diag(task, project, basecalls_dir, project_path):
         f.write(demultiplex_stats_content)
 
     subprocess.check_call(["/bin/chmod", "-R", "ug+rwX,o-rwx", os.path.join(nsc.DIAGNOSTICS_DELIVERY, dest_dir)])
+
+
+def copy_sav_files(task, dest_dir, srun_user_args=[]):
+    # Copy "SAV" files for advanced users
+    if task.instrument == "nextseq":
+        SAV_INCLUDE_PATHS = [
+            "RunInfo.xml",
+            "RunParameters.xml",
+            "InterOp",
+            ]
+    else:
+        SAV_INCLUDE_PATHS = [
+            "RunInfo.xml",
+            "runParameters.xml",
+            "InterOp",
+            ]
+    rsync_cmd = [nsc.RSYNC, '-r']
+    rsync_cmd += SAV_INCLUDE_PATHS
+    rsync_cmd += [os.path.join(dest_dir, task.run_id) + "/"]
+    rcode = remote.run_command(rsync_cmd, task, "rsync_sav_files", time="01:00", storage_job=True,
+            srun_user_args=srun_user_args, cwd=task.work_dir, comment=task.run_id)
+    # Rsync error code is ignored, failure here is not fatal.
+
+
+def delivery_mik(task, lims_project, project_path):
+    dest_dir = os.path.join("/data/runScratch.boston/mik_data", os.path.basename(project_path))
+    subprocess.check_call(["/bin/cp", "-rl", project_path, dest_dir])
+    lims_project.close_date = datetime.date.today()
+    lims_project.put()
+    copy_sav_files(task, dest_dir)
+
+
+def delivery_imm(task, lims_project, project_path):
+    dest_dir = os.path.join("/data/runScratch.boston/imm_data", os.path.basename(project_path))
+    subprocess.check_call(["/bin/cp", "-rl", project_path, dest_dir])
+    lims_project.close_date = datetime.date.today()
+    lims_project.put()
+    #copy_sav_files(task, dest_dir)
 
 
 def delivery_harddrive(project_name, source_path):
@@ -248,6 +271,10 @@ def main(task):
         if project_type == "Diagnostics":
             task.info("Copying " + project.name + " to diagnostics...")
             delivery_diag(task, project, task.bc_dir, project_path)
+        elif project_type == "Immunology":
+            delivery_imm(task, lims_project, project_path)
+        elif project_type == "Microbiology":
+            delivery_mik(task, lims_project, project_path)
         elif delivery_type in ["User HDD", "New HDD", "NeLS project", "TSD project"]:
             task.info("Hard-linking " + project.name + " to delivery area...")
             delivery_harddrive(project.name, project_path)
