@@ -143,20 +143,14 @@ def copy_sav_files(task, dest_dir, srun_user_args=[]):
     # Rsync error code is ignored, failure here is not fatal.
 
 
-def delivery_mik(task, lims_project, project_path):
-    dest_dir = os.path.join("/data/runScratch.boston/mik_data", os.path.basename(project_path))
+def delivery_external_user(task, lims_project, project_path, delivery_path):
+    """Link the fastq files, close LIMS project, and copy SAV data if specified"""
+
+    dest_dir = os.path.join(delivery_path, os.path.basename(project_path))
     subprocess.check_call(["/bin/cp", "-rl", project_path, dest_dir])
     lims_project.close_date = datetime.date.today()
     lims_project.put()
     copy_sav_files(task, dest_dir)
-
-
-def delivery_imm(task, lims_project, project_path):
-    dest_dir = os.path.join("/data/runScratch.boston/imm_data", os.path.basename(project_path))
-    subprocess.check_call(["/bin/cp", "-rl", project_path, dest_dir])
-    lims_project.close_date = datetime.date.today()
-    lims_project.put()
-    #copy_sav_files(task, dest_dir)
 
 
 def delivery_harddrive(project_name, source_path):
@@ -271,9 +265,9 @@ def main(task):
             task.info("Copying " + project.name + " to diagnostics...")
             delivery_diag(task, project, task.bc_dir, project_path)
         elif project_type == "Immunology":
-            delivery_imm(task, lims_project, project_path)
+            delivery_external_user(task, lims_project, project_path, "/data/runScratch.boston/imm_data")
         elif project_type == "Microbiology":
-            delivery_mik(task, lims_project, project_path)
+            delivery_external_user(task, lims_project, project_path, "/data/runScratch.boston/mik_data")
         elif delivery_type in ["User HDD", "New HDD", "NeLS project", "TSD project"]:
             task.info("Hard-linking " + project.name + " to delivery area...")
             delivery_harddrive(project.name, project_path)
