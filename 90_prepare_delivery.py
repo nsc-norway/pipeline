@@ -84,7 +84,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
         if not os.path.exists(sample_dir):
             os.mkdir(sample_dir)
 
-        if instrument in ['hiseqx', 'hiseq4k']:
+        if task.instrument in ['hiseqx', 'hiseq4k']:
             source = os.path.join(source_qc_dir, samples.get_fastdup_path(project, sample, sample.files[0]))
             fdp_name = re.sub(r".fastq.gz$", "_fastdup.txt", f.filename)
             dest = os.path.join(sample_dir, fdp_name)
@@ -103,8 +103,6 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     # Get the demultiplex stats for diag. We generate a HTML file in the same 
     # format as that used by the first version of bcl2fastq.
 
-    # Need to get the instrument and fcid
-    instrument = utilities.get_instrument_by_runid(task.run_id)
     fcid = utilities.get_fcid_by_runid(task.run_id)
     if task.process:
         bcl2fastq_version = utilities.get_udf(task.process, nsc.BCL2FASTQ_VERSION_UDF, None)
@@ -112,7 +110,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
         bcl2fastq_version = utilities.get_bcl2fastq2_version(task.work_dir)
     undetermined_project = next(p for p in task.projects if p.is_undetermined)
     demultiplex_stats_content = demultiplex_stats.demultiplex_stats(
-            project, undetermined_project, task.work_dir, basecalls_dir, instrument,
+            project, undetermined_project, task.work_dir, basecalls_dir, task.instrument,
             task.no_lane_splitting, fcid, bcl2fastq_version, task.suffix
             )
     with open(os.path.join(dest_dir, "Demultiplex_Stats.htm"), 'w') as f:
