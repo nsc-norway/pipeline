@@ -170,7 +170,6 @@ def delivery_harddrive(project_name, source_path):
     #    raise RuntimeError("Copying files to loki failed, rsync returned an error")
 
 
-
 def delivery_norstore(process, project_name, source_path, task):
     """Create a tar file"""
 
