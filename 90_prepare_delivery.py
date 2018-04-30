@@ -86,7 +86,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
 
         if task.instrument in ['hiseqx', 'hiseq4k']:
             source = os.path.join(source_qc_dir, samples.get_fastdup_path(project, sample, sample.files[0]))
-            fdp_name = re.sub(r".fastq.gz$", "_fastdup.txt", f.filename)
+            fdp_name = re.sub(r".fastq.gz$", "_fastdup.txt", sample.files[0].filename)
             dest = os.path.join(sample_dir, fdp_name)
             if os.path.exists(dest):
                 shutil.rmtree(dest)
