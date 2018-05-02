@@ -7,6 +7,7 @@ sys.path.append('..')
 from common import taskmgr, nsc
 from genologics.lims import *
 
+
 class DummyTestCase(unittest.TestCase):
     def test_dummy(self):
         self.assertEquals("moo", "moo")
@@ -56,7 +57,7 @@ class TestTaskFramework(unittest.TestCase):
         with open("files/samples/no-index.json") as jsonfile:
             correct_projects = json.load(jsonfile)
         task = taskmgr.Task("TEST_NAME", "TEST_DESCRIPTION", ["work_dir", "sample_sheet"]) 
-        testargs = ["script", "files/run/180502_E00401_001_ANOINDEX", "--sample-sheet=files/samplesheet/no-index.csv"]
+        testargs = ["script", "files/run/180502_NS500336_001_ANOINDEX", "--sample-sheet=files/samplesheet/no-index.csv"]
         with patch.object(sys, 'argv', testargs):
             task.__enter__()
             task.running()
