@@ -104,7 +104,7 @@ BCL2FASTQ_USE_D_OPTION = False
 
 ### Site specific configuration ###
 
-if SITE.startswith("cees"):
+if SITE and SITE.startswith("cees"):
     # Data processing/analysis programs
     BCL2FASTQ2="/usr/local/bin/bcl2fastq"
     FASTQC="/opt/FastQC/fastqc"
@@ -153,7 +153,7 @@ FASTDUP_ARGLIST=[FASTDUP, "-s", "10", "-e", "60"]
 ### Site and phase (TAG) dependent configuration ###
 
 # Paths
-if SITE.startswith("cees"):
+if SITE and SITE.startswith("cees"):
     if TAG == "prod":
         PRIMARY_STORAGE = "/storage/nscdata/runsIllumina"
         SECONDARY_STORAGE="/storage/nscdata/runsIllumina"
