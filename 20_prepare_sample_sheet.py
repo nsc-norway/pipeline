@@ -231,6 +231,6 @@ def convert_from_bcl2fastqv1(original_data):
             )
     
 
-
-with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
-    main(task)
+if __name__ == "__main__":
+    with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
+        main(task)

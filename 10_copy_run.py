@@ -121,6 +121,7 @@ work_dir argument.""")
         task.fail("rsync failed", detail)
 
 
-with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
-    main(task)
+if __name__ == "__main__":
+    with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
+        main(task)
 
