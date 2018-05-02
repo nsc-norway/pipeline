@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<RunInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="4">
+  <Run Id="180405_NS500336_0223_AHMKJTBGX5" Number="223">
+    <Reads>
+      <Read Number="1" NumCycles="37" IsIndexedRead="N" />
+      <Read Number="2" NumCycles="8" IsIndexedRead="Y" />
+      <Read Number="3" NumCycles="8" IsIndexedRead="Y" />
+      <Read Number="4" NumCycles="37" IsIndexedRead="N" />
+    </Reads>
+  </Run>
+</RunInfo>

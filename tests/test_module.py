@@ -108,6 +108,16 @@ class TestTaskFramework(unittest.TestCase):
             task.running()
             self.assertEquals(projects_to_dicts(task.projects), correct_projects)
 
+    def test_sample_sheet_parsing_with_index_merged_lanes(self):
+        with open("files/samples/indexed-merged.json") as jsonfile:
+            correct_projects = json.load(jsonfile)
+        task = taskmgr.Task("TEST_NAME", "TEST_DESCRIPTION", ["work_dir", "sample_sheet"]) 
+        testargs = ["script", "files/run/180502_NS500336_001_AINDEXMERGED",
+                "--sample-sheet=files/samplesheet/ns-indexed.csv"]
+        with patch.object(sys, 'argv', testargs):
+            task.__enter__()
+            task.running()
+            self.assertEquals(projects_to_dicts(task.projects), correct_projects)
 
 class TestSampleSheetParsing(TaskTestCase):
     pass

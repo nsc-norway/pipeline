@@ -1,0 +1,17 @@
+[Header]
+Investigator Name,test user
+Project Name,Test-DNA1-2018-04-27
+Experiment Name,MIK-Stmalt.48.1-2018-04-27
+Date,2018-04-27
+Workflow,GenerateFASTQ
+Assay,null
+Chemistry,Amplicon
+[Reads]
+301
+301
+[Settings]
+VariantCaller,None
+[Data]
+Sample_ID,Sample_Name,Sample_Plate,Sample_Well,Sample_Project,Control,index,I7_Index_ID,index2,I5_Index_ID,Description
+SHA2004A1PA1,11,27-53884,1:1,Test-DNA1-2018-04-27,,TAAGGCGA,N701,GCGTAAGA,S517,
+SHA2004A2PA1,19,27-53885,1:1,Test-DNA1-2018-04-27,,CGTACTAG,N702,GCGTAAGA,S517,
