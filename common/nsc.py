@@ -183,6 +183,10 @@ elif SITE == "ous":
         DELIVERY_DIR="/data/runScratch.boston/test/delivery"# used by prepare-delivery after QC
         DIAGNOSTICS_DELIVERY = "/data/runScratch.boston/test/diag"
         TRIGGER_DIR="/data/runScratch.boston/scripts/dev/trigger"
+        
+else:
+    PRIMARY_STORAGE = "/tmp"
+    SECONDARY_STORAGE = "/tmp"
 
 
 # Configure LIMS access:
