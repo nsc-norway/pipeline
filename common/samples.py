@@ -213,8 +213,8 @@ def check_files_merged_lanes(run_dir):
     if not unmerged_exists and not merged_exists:
         unmerged_exists = (len(glob.glob(basecalls_dir + "/*/*_S1_L*_R1_001.fastq.gz")) > 0 or
                            len(glob.glob(basecalls_dir + "/*/*/*_S1_L*_R1_001.fastq.gz")) > 0)
-        merged_exists = (os.path.exists(basecalls_dir + "/*/*_S1_R1_001.fastq.gz") or
-                        os.path.exists(basecalls_dir + "/*/*/*_S1_R1_001.fastq.gz"))
+        merged_exists = (len(glob.glob(basecalls_dir + "/*/*_S1_R1_001.fastq.gz")) > 0 or
+                        len(glob.glob(basecalls_dir + "/*/*/*_S1_R1_001.fastq.gz")) > 0)
     if merged_exists and not unmerged_exists:
         return True
     elif unmerged_exists and not merged_exists:
