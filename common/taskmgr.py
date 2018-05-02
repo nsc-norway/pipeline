@@ -307,7 +307,7 @@ class Task(object):
         internal state."""
 
         # Initialization code common to all tasks:
-        os.umask(007)
+        os.umask(7)
 
         # Argument setup
         for name in self.arg_names:
@@ -474,7 +474,7 @@ class Task(object):
                         self.process.udf[nsc.ERROR_DETAILS_UDF] = error_details
                     self.process.put()
                     break
-                except Exception, e:
+                except Exception as e:
                     force = True
                     print("Error while updating LIMS: '", str(e), "'. Will retry in 5 minutes...")
                     time.sleep(300) # Try every 5 minutes
