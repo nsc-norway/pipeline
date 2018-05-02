@@ -1,0 +1,16 @@
+[Header]
+Investigator Name,test user
+Project Name,Test-DNA1-2018-04-27
+Experiment Name,TEST
+Date,2018-04-27
+Workflow,GenerateFASTQ
+Assay,null
+Chemistry,Amplicon
+[Reads]
+301
+301
+[Settings]
+VariantCaller,None
+[Data]
+Sample_ID,Sample_Name,Sample_Plate,Sample_Well,Sample_Project,Control,index,I7_Index_ID,index2,I5_Index_ID,Description
+SampleTest,TestSample,27-53884,1:1,Test-DNA1-2018-04-27,,,,,,

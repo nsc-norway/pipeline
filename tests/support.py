@@ -1,5 +1,10 @@
 
+from common import taskmgr
 
-with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
-    main(task)
+def get_fake_lims_task():
+    pass
+
+
+def get_fake_non_lims_task():
+    pass
 
