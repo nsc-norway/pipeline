@@ -4,6 +4,7 @@ import sys
 import json
 import tempfile
 import os
+import subprocess
 import string
 import random
 import shutil
@@ -11,6 +12,8 @@ import shutil
 sys.path.append('..')
 from common import taskmgr, nsc, samples, remote
 nsc.SITE = None # Note: this isn't quite effective, how to set it up?
+nsc.REMOTE_MODE = "local"
+nsc.BCL2FASTQ_USE_D_OPTION = False
 from genologics.lims import *
 
 
@@ -55,16 +58,6 @@ class TaskTestCase(unittest.TestCase):
             shutil.rmtree(self.tempparent)
 
 
-
-def deep_equals(a, b):
-    try:
-        a_keys = set(a.__dict__)
-        b_keys = set(b.__dict__)
-    except AttributeError:
-        return a == b
-    if a_keys == b_keys:
-        return all(deep_equals(a.__dict__[key], b.__dict__[key]) for key in a_keys)
-
 def convert_strings_to_unicode(dic):
     res = {}
     for k, v in dic.items():
@@ -73,6 +66,7 @@ def convert_strings_to_unicode(dic):
         else:
             res[unicode(k)] = v
     return res
+
 
 def projects_to_dicts(projects):
     """Convert a list of project objects to dicts with items
@@ -182,21 +176,23 @@ class Test10CopyRun(TaskTestCase):
 
         RUN_ID = "180502_NS500336_001_ANOINDEX"
         SOURCE_DIR = "files/run/{}".format(RUN_ID)
-        output_dir = os.path.join(self.random_dir(), RUN_ID)
-        testargs = ["script", SOURCE_DIR, output_dir]
-        with patch.object(sys, 'argv', testargs):
-            with patch('common.remote.run_command') as run_command, patch('os.mkdir') as mkdir:
-                run_command.return_value = 0
+        parent_dir = self.random_dir()
+        os.mkdir(parent_dir)
+        output_dir = os.path.join(parent_dir, RUN_ID)
+        try:
+            testargs = ["script", SOURCE_DIR, output_dir]
+            with patch.object(sys, 'argv', testargs):
                 self.module.main(self.task)
 
                 self.task.success_finish.assert_called_once()
-                mkdir.assert_any_call(output_dir)
-                mkdir.assert_any_call(os.path.join(output_dir, 'DemultiplexLogs'))
-                remote.run_command.assert_called_once_with(['/usr/bin/rsync', '-rLt', '--chmod=ug+rwX',
-                    '--exclude=/Thumbnail_Images', '--exclude=/Images', '--exclude=/Data/Intensities/L00*',
-                    '--exclude=/Data/Intensities/BaseCalls/L00*', SOURCE_DIR + "/", output_dir], self.task, 'rsync',
-                    '02:00:00', comment=RUN_ID, logfile='{}/DemultiplexLogs/10._copy_run.rsync.txt'.format(output_dir),
-                    storage_job=True)
+                self.assertTrue(os.path.isfile(os.path.join(output_dir, "Logs", "Test.log")))
+                self.assertTrue(os.path.isfile(os.path.join(output_dir, "InterOp", "Test.bin")))
+                self.assertTrue(os.path.isfile(os.path.join(output_dir, "RunInfo.xml")))
+                self.assertTrue(os.path.isdir(os.path.join(output_dir, "Data", "Intensities", "BaseCalls")))
+                self.assertFalse(os.path.exists(os.path.join(output_dir, "Data", "Intensities", "BaseCalls",
+                    "L001", "C1.1", "s_1_1101.bcl.gz")))
+        finally:
+            shutil.rmtree(parent_dir)
 
 
 class Test20PrepareSampleSheet(TaskTestCase):
@@ -234,17 +230,18 @@ class Test30Demultiplexing(TaskTestCase):
             pass
 
         testargs = ["script", SOURCE_DIR, self.tempdir]
-        with patch.object(sys, 'argv', testargs), patch('common.remote.run_command') as run_command:
-            run_command.return_value = 0
+        with patch.object(sys, 'argv', testargs), patch('subprocess.call') as call:
+            call.return_value = 0
             self.module.main(self.task)
 
             self.task.success_finish.assert_called_once()
-            remote.run_command.assert_called_once_with(['bcl2fastq', '--runfolder-dir', SOURCE_DIR, '--sample-sheet',
-                    os.path.join(self.tempdir, 'DemultiplexingSampleSheet.csv'), '--no-lane-splitting', '--output-dir',
-                    os.path.join(self.tempdir, 'Data/Intensities/BaseCalls'), '-r', '4', '-p', '16', '-w', '4'],
-                    self.task, 'bcl2fastq2', bandwidth='448M', comment=RUN_ID, cpus=16,
-                    logfile=os.path.join(self.tempdir, 'DemultiplexLogs/30._demultiplexing.bcl2fastq2.txt'), mem='15G',
-                    time='1-0')
+            expected_args = ['--runfolder-dir', SOURCE_DIR, '--sample-sheet',
+                                os.path.join(self.tempdir, 'DemultiplexingSampleSheet.csv'),
+                                '--no-lane-splitting', '--output-dir',
+                                os.path.join(self.tempdir, 'Data/Intensities/BaseCalls'),
+                                '-r', '4', '-p', '16', '-w', '4']
+            print subprocess.call.call_args[0][0][1:]
+            self.assertTrue(subprocess.call.call_args[0][0][1:] == expected_args)
 
 
 class Test40MoveResults(TaskTestCase):
