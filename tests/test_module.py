@@ -240,7 +240,6 @@ class Test30Demultiplexing(TaskTestCase):
                                 '--no-lane-splitting', '--output-dir',
                                 os.path.join(self.tempdir, 'Data/Intensities/BaseCalls'),
                                 '-r', '4', '-p', '16', '-w', '4']
-            print subprocess.call.call_args[0][0][1:]
             self.assertTrue(subprocess.call.call_args[0][0][1:] == expected_args)
 
 
@@ -251,17 +250,44 @@ class Test40MoveResults(TaskTestCase):
     def test_move_results(self):
         """Test moving files in a temp directory."""
 
-        RUN_ID = "180502_NS500336_001_ANOINDEX"
-        SOURCE_DIR = "files/run/{}".format(RUN_ID)
+        RUN_ID = "180502_NS500336_001_AINDEXMERGED"
+        INPUT_SAMPLE_SHEET = "files/samplesheet/ns-indexed.csv"
+        tempparent = tempfile.mkdtemp()
+        local_tempdir = os.path.join(tempparent, RUN_ID)
+        try:
+            shutil.copytree("files/run/{}".format(RUN_ID), local_tempdir)
+            shutil.copy(INPUT_SAMPLE_SHEET, os.path.join(local_tempdir, "DemultiplexingSampleSheet.csv"))
+            os.mkdir(os.path.join(local_tempdir, "DemultiplexLogs"))
+            testargs = ["script", local_tempdir]
 
+            with patch.object(sys, 'argv', testargs):
+                self.module.main(self.task)
+                projects = self.task.projects
+                samples.flag_empty_files(projects, local_tempdir)
+                self.assertTrue(all(not f.empty for p in projects for s in p.samples for f in s.files))
+                self.task.success_finish.assert_called_once()
+        finally:
+            shutil.rmtree(tempparent)
+
+
+
+class Test50QcAnalysis(TaskTestCase):
+
+    module = __import__("50_qc_analysis")
+
+    def test_qc_analysis(self):
+        """Test that QC analysis script starts jobs for all the files"""
+
+        RUN_ID = "180502_E00401_001_AQCTEST"
         self.make_tempdir(RUN_ID)
-
-        testargs = ["script", self.tempdir]
-        with patch.object(sys, 'argv', testargs):
+        testargs = ["script", local_tempdir]
+        with patch.object(sys, 'argv', testargs), patch('subprocess.call') as call:
+            call.return_value = 0
             self.module.main(self.task)
-            # TODO incomplete test fails
+            for call.call_args:
+                pass
+            self.assertTrue(all(not f.empty for p in projects for s in p.samples for f in s.files))
             self.task.success_finish.assert_called_once()
-
 
 
 if __name__ == "__main__":
