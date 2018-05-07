@@ -159,12 +159,6 @@ class TestTaskFramework(unittest.TestCase):
             self.assertEquals(projects_to_dicts(task.projects), correct_projects)
 
 
-
-class TestRemote(unittest.TestCase):
-    pass # TODO: Test remote slurm / local calls
-
-
-
 # 2. Test of the individual "Task" scipts
 
 class Test10CopyRun(TaskTestCase):
