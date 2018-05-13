@@ -36,17 +36,17 @@ class TaskTestCase(unittest.TestCase):
         self.task.__enter__()
         self.tempparent = None
 
-    def random_dir(self):
-        return os.path.join("/tmp", 
-                "".join(random.choice(string.ascii_uppercase + string.digits) for i in range(10))
-                )
-
     def make_tempdir(self, run_id):
         self.tempparent = tempfile.mkdtemp()
         self.tempdir = os.path.join(self.tempparent, run_id)
         logdir = os.path.join(self.tempdir, "DemultiplexLogs")
         os.mkdir(self.tempdir)
         os.mkdir(logdir)
+
+    def make_qc_dir(self, run_id="180502_E00401_001_BQCTEST"):
+        self.tempparent = tempfile.mkdtemp()
+        self.tempdir = os.path.join(self.tempparent, run_id)
+        shutil.copytree(os.path.join("files/run", run_id), self.tempdir)
 
     def tearDown(self):
         self.patcher.stop()
@@ -159,10 +159,13 @@ class TestTaskFramework(unittest.TestCase):
             self.assertEquals(projects_to_dicts(task.projects), correct_projects)
 
 
+    # TODO add test sample sheet parsnip for QC test run (complex HiSeq run with different
+    # indexing strategies)
+
+
 # 2. Test of the individual "Task" scipts
 
 class Test10CopyRun(TaskTestCase):
-
     module = __import__("10_copy_run")
 
     def test_copy_run(self):
@@ -170,8 +173,7 @@ class Test10CopyRun(TaskTestCase):
 
         RUN_ID = "180502_NS500336_001_ANOINDEX"
         SOURCE_DIR = "files/run/{}".format(RUN_ID)
-        parent_dir = self.random_dir()
-        os.mkdir(parent_dir)
+        parent_dir = tempfile.mkdtemp()
         output_dir = os.path.join(parent_dir, RUN_ID)
         try:
             testargs = ["script", SOURCE_DIR, output_dir]
@@ -190,7 +192,6 @@ class Test10CopyRun(TaskTestCase):
 
 
 class Test20PrepareSampleSheet(TaskTestCase):
-
     module = __import__("20_prepare_sample_sheet")
 
     def test_prepare_sample_sheet(self):
@@ -210,7 +211,6 @@ class Test20PrepareSampleSheet(TaskTestCase):
 
 
 class Test30Demultiplexing(TaskTestCase):
-
     module = __import__("30_demultiplexing")
 
     def test_demultiplexing(self):
@@ -238,7 +238,6 @@ class Test30Demultiplexing(TaskTestCase):
 
 
 class Test40MoveResults(TaskTestCase):
-
     module = __import__("40_move_results")
 
     def test_move_results(self):
@@ -263,25 +262,28 @@ class Test40MoveResults(TaskTestCase):
         finally:
             shutil.rmtree(tempparent)
 
-
-
+i
 class Test50QcAnalysis(TaskTestCase):
-
     module = __import__("50_qc_analysis")
 
     def test_qc_analysis(self):
         """Test that QC analysis script starts jobs for all the files"""
 
-        RUN_ID = "180502_E00401_001_AQCTEST"
-        self.make_tempdir(RUN_ID)
-        testargs = ["script", local_tempdir]
+        self.make_qc_dir()
+        testargs = ["script", self.tempdir]
         with patch.object(sys, 'argv', testargs), patch('subprocess.call') as call:
             call.return_value = 0
             self.module.main(self.task)
-            for call.call_args:
-                pass
+            program_args = set()
+            for args in call.call_args:
+                print args
             self.assertTrue(all(not f.empty for p in projects for s in p.samples for f in s.files))
             self.task.success_finish.assert_called_once()
+
+
+class Test60PPP(TaskTestCase):
+    pass
+
 
 
 if __name__ == "__main__":

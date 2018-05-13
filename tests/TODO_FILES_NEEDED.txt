@@ -1,0 +1,14 @@
+Plan for QC test directory (TODO)
+
+ - Find an ordinary Hi X / 4000 run with paired-end and dual indexing.
+ - Edit sample sheet and anonymise all projects and sample names
+ - Re-demultiplex and QC.
+ - Anonymise run-ID, experiment name, lot numbers.
+ - Copy relevant metadata files into test directory structure Stats/ Reports/ RunInfo.xml etc etc
+ - Create dummy fastq files (just replace all fq. files with gzipped 1-byte files)
+
+
+Consider also testing a NSeq run
+
+
+
