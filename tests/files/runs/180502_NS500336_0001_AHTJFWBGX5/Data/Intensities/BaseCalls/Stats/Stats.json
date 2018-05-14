@@ -1,0 +1,7075 @@
+{
+ "Flowcell" : "HTJFWBGX5",
+ "RunNumber" : 230,
+ "RunId" : "180502_NS500336_0230_AHTJFWBGX5",
+ "ReadInfosForLanes" : [
+  {
+   "LaneNumber" : 1,
+   "ReadInfos" : [
+    {
+     "Number" : 1,
+     "NumCycles" : 76,
+     "IsIndexedRead" : false
+    },
+    {
+     "Number" : 1,
+     "NumCycles" : 8,
+     "IsIndexedRead" : true
+    },
+    {
+     "Number" : 2,
+     "NumCycles" : 8,
+     "IsIndexedRead" : true
+    }
+   ]
+  },
+  {
+   "LaneNumber" : 2,
+   "ReadInfos" : [
+    {
+     "Number" : 1,
+     "NumCycles" : 76,
+     "IsIndexedRead" : false
+    },
+    {
+     "Number" : 1,
+     "NumCycles" : 8,
+     "IsIndexedRead" : true
+    },
+    {
+     "Number" : 2,
+     "NumCycles" : 8,
+     "IsIndexedRead" : true
+    }
+   ]
+  },
+  {
+   "LaneNumber" : 3,
+   "ReadInfos" : [
+    {
+     "Number" : 1,
+     "NumCycles" : 76,
+     "IsIndexedRead" : false
+    },
+    {
+     "Number" : 1,
+     "NumCycles" : 8,
+     "IsIndexedRead" : true
+    },
+    {
+     "Number" : 2,
+     "NumCycles" : 8,
+     "IsIndexedRead" : true
+    }
+   ]
+  },
+  {
+   "LaneNumber" : 4,
+   "ReadInfos" : [
+    {
+     "Number" : 1,
+     "NumCycles" : 76,
+     "IsIndexedRead" : false
+    },
+    {
+     "Number" : 1,
+     "NumCycles" : 8,
+     "IsIndexedRead" : true
+    },
+    {
+     "Number" : 2,
+     "NumCycles" : 8,
+     "IsIndexedRead" : true
+    }
+   ]
+  }
+ ],
+ "ConversionResults" : [
+  {
+   "LaneNumber" : 1,
+   "TotalClustersRaw" : 126496733,
+   "TotalClustersPF" : 113093833,
+   "Yield" : 1032797235940,
+   "DemuxResults" : [
+    {
+     "SampleId" : "2-682773",
+     "SampleName" : "1-IP62-HHJ-R",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGCTCGCT+GATTCTGC",
+       "MismatchCounts" : {
+        "0" : 2677017,
+        "1" : 128049
+       }
+      }
+     ],
+     "NumberReads" : 2805066,
+     "Yield" : 213185016,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 213185016,
+       "YieldQ30" : 196667152,
+       "QualityScoreSum" : 7241706635,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682774",
+     "SampleName" : "2-S576-5FS-V",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CGGAACTG+TCGTAGTG",
+       "MismatchCounts" : {
+        "0" : 4300527,
+        "1" : 170953
+       }
+      }
+     ],
+     "NumberReads" : 4471480,
+     "Yield" : 339832480,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 339832480,
+       "YieldQ30" : 314091793,
+       "QualityScoreSum" : 11556864814,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682775",
+     "SampleName" : "3-G6DZ-YY6-1",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TAAGGTCA+CTACGACA",
+       "MismatchCounts" : {
+        "0" : 4032324,
+        "1" : 181396
+       }
+      }
+     ],
+     "NumberReads" : 4213720,
+     "Yield" : 320242720,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 320242720,
+       "YieldQ30" : 295662717,
+       "QualityScoreSum" : 10883725128,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682776",
+     "SampleName" : "4-OGFA-XGC-Y",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TTGCCTAG+TAAGTGGT",
+       "MismatchCounts" : {
+        "0" : 3965114,
+        "1" : 140811
+       }
+      }
+     ],
+     "NumberReads" : 4105925,
+     "Yield" : 312050300,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 312050300,
+       "YieldQ30" : 288677616,
+       "QualityScoreSum" : 10617821869,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682777",
+     "SampleName" : "5-02AA-IVA-C",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCATTCGA+CGGACAAC",
+       "MismatchCounts" : {
+        "0" : 3649550,
+        "1" : 210661
+       }
+      }
+     ],
+     "NumberReads" : 3860211,
+     "Yield" : 293376036,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 293376036,
+       "YieldQ30" : 269072155,
+       "QualityScoreSum" : 9931242466,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682778",
+     "SampleName" : "6-WEAP-4OX-4",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACACTAAG+ATATGGAT",
+       "MismatchCounts" : {
+        "0" : 2979431,
+        "1" : 104230
+       }
+      }
+     ],
+     "NumberReads" : 3083661,
+     "Yield" : 234358236,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 234358236,
+       "YieldQ30" : 216941027,
+       "QualityScoreSum" : 7977346459,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682779",
+     "SampleName" : "7-XEGN-3DZ-1",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GTGTCGGA+GCGCAAGC",
+       "MismatchCounts" : {
+        "0" : 2425718,
+        "1" : 124488
+       }
+      }
+     ],
+     "NumberReads" : 2550206,
+     "Yield" : 193815656,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 193815656,
+       "YieldQ30" : 178101106,
+       "QualityScoreSum" : 6568333767,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682780",
+     "SampleName" : "8-XIUZ-QGC-9",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TTCCTGTT+AAGATACT",
+       "MismatchCounts" : {
+        "0" : 2821295,
+        "1" : 106183
+       }
+      }
+     ],
+     "NumberReads" : 2927478,
+     "Yield" : 222488328,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 222488328,
+       "YieldQ30" : 205112864,
+       "QualityScoreSum" : 7555499921,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682781",
+     "SampleName" : "9-TZFB-86B-0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCTTCACC+GGAGCGTC",
+       "MismatchCounts" : {
+        "0" : 3848495,
+        "1" : 318223
+       }
+      }
+     ],
+     "NumberReads" : 4166718,
+     "Yield" : 316670568,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 316670568,
+       "YieldQ30" : 290762361,
+       "QualityScoreSum" : 10726788630,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682782",
+     "SampleName" : "10-0V57-RW2-HO",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GCCACAGG+ATGGCATG",
+       "MismatchCounts" : {
+        "0" : 3447522,
+        "1" : 153102
+       }
+      }
+     ],
+     "NumberReads" : 3600624,
+     "Yield" : 273647424,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 273647424,
+       "YieldQ30" : 252332932,
+       "QualityScoreSum" : 9292944905,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682783",
+     "SampleName" : "11-C6GU-28B-2G",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ATTGTGAA+GCAATGCA",
+       "MismatchCounts" : {
+        "0" : 3607619,
+        "1" : 127197
+       }
+      }
+     ],
+     "NumberReads" : 3734816,
+     "Yield" : 283846016,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 283846016,
+       "YieldQ30" : 262039662,
+       "QualityScoreSum" : 9646270972,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682784",
+     "SampleName" : "12-VOKD-EF7-4B",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACTCGTGT+GTTCCAAT",
+       "MismatchCounts" : {
+        "0" : 4188914,
+        "1" : 173718
+       }
+      }
+     ],
+     "NumberReads" : 4362632,
+     "Yield" : 331560032,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 331560032,
+       "YieldQ30" : 306855940,
+       "QualityScoreSum" : 11284599046,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682785",
+     "SampleName" : "13-1JWP-NV1-YY",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GTCTACAC+ACCTTGGC",
+       "MismatchCounts" : {
+        "0" : 3731938,
+        "1" : 159023
+       }
+      }
+     ],
+     "NumberReads" : 3890961,
+     "Yield" : 295713036,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 295713036,
+       "YieldQ30" : 273164267,
+       "QualityScoreSum" : 10051993854,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682786",
+     "SampleName" : "14-4HJZ-1XS-9A",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CAATTAAC+ATATCTCG",
+       "MismatchCounts" : {
+        "0" : 3097323,
+        "1" : 103947
+       }
+      }
+     ],
+     "NumberReads" : 3201270,
+     "Yield" : 243296520,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 243296520,
+       "YieldQ30" : 225043447,
+       "QualityScoreSum" : 8277796511,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682787",
+     "SampleName" : "15-QYNF-G5E-88",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TGGCCGGT+GCGCTCTA",
+       "MismatchCounts" : {
+        "0" : 3064108,
+        "1" : 142319
+       }
+      }
+     ],
+     "NumberReads" : 3206427,
+     "Yield" : 243688452,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 243688452,
+       "YieldQ30" : 223554131,
+       "QualityScoreSum" : 8250649944,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682788",
+     "SampleName" : "16-795G-SHL-02",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGTACTCC+AACAGGTT",
+       "MismatchCounts" : {
+        "0" : 3714246,
+        "1" : 152236
+       }
+      }
+     ],
+     "NumberReads" : 3866482,
+     "Yield" : 293852632,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 293852632,
+       "YieldQ30" : 271208971,
+       "QualityScoreSum" : 9984567427,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682789",
+     "SampleName" : "17-08ID-R8Y-M0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GACGTCTT+GGTGAACC",
+       "MismatchCounts" : {
+        "0" : 3618470,
+        "1" : 197176
+       }
+      }
+     ],
+     "NumberReads" : 3815646,
+     "Yield" : 289989096,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 289989096,
+       "YieldQ30" : 268348954,
+       "QualityScoreSum" : 9868546086,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682790",
+     "SampleName" : "18-I0SQ-1UY-HM",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TGCGAGAC+CAACAATG",
+       "MismatchCounts" : {
+        "0" : 3479028,
+        "1" : 155860
+       }
+      }
+     ],
+     "NumberReads" : 3634888,
+     "Yield" : 276251488,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 276251488,
+       "YieldQ30" : 255015298,
+       "QualityScoreSum" : 9387855915,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682791",
+     "SampleName" : "19-UZ60-U85-NW",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CATAGAGT+TGGTGGCA",
+       "MismatchCounts" : {
+        "0" : 3494147,
+        "1" : 142563
+       }
+      }
+     ],
+     "NumberReads" : 3636710,
+     "Yield" : 276389960,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 276389960,
+       "YieldQ30" : 255021856,
+       "QualityScoreSum" : 9389607822,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682792",
+     "SampleName" : "20-RKIR-LCQ-XZ",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACAGGCGC+AGGCAGAG",
+       "MismatchCounts" : {
+        "0" : 3276976,
+        "1" : 160203
+       }
+      }
+     ],
+     "NumberReads" : 3437179,
+     "Yield" : 261225604,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 261225604,
+       "YieldQ30" : 238533268,
+       "QualityScoreSum" : 8820365527,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682793",
+     "SampleName" : "21-5H0X-5R5-OF",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GTGAATAT+GAATGAGA",
+       "MismatchCounts" : {
+        "0" : 3820281,
+        "1" : 133154
+       }
+      }
+     ],
+     "NumberReads" : 3953435,
+     "Yield" : 300461060,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 300461060,
+       "YieldQ30" : 277343650,
+       "QualityScoreSum" : 10209941472,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682794",
+     "SampleName" : "22-GSBI-B0C-QK",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AACTGTAG+TGCGGCGT",
+       "MismatchCounts" : {
+        "0" : 2716313,
+        "1" : 111106
+       }
+      }
+     ],
+     "NumberReads" : 2827419,
+     "Yield" : 214883844,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 214883844,
+       "YieldQ30" : 198379805,
+       "QualityScoreSum" : 7302225045,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682795",
+     "SampleName" : "23-DN12-IIZ-6J",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GGTCACGA+CATAATAC",
+       "MismatchCounts" : {
+        "0" : 2493737,
+        "1" : 104461
+       }
+      }
+     ],
+     "NumberReads" : 2598198,
+     "Yield" : 197463048,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 197463048,
+       "YieldQ30" : 182117814,
+       "QualityScoreSum" : 6706686140,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682796",
+     "SampleName" : "24-GII9-WAZ-D7",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CTGCTTCC+GATCTATC",
+       "MismatchCounts" : {
+        "0" : 3550387,
+        "1" : 152317
+       }
+      }
+     ],
+     "NumberReads" : 3702704,
+     "Yield" : 281405504,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 281405504,
+       "YieldQ30" : 259853809,
+       "QualityScoreSum" : 9564560575,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682797",
+     "SampleName" : "25-PVV2-99O-0K",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TCATCCTT+AGCTCGCT",
+       "MismatchCounts" : {
+        "0" : 3126401,
+        "1" : 137075
+       }
+      }
+     ],
+     "NumberReads" : 3263476,
+     "Yield" : 248024176,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 248024176,
+       "YieldQ30" : 228229108,
+       "QualityScoreSum" : 8413298058,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682798",
+     "SampleName" : "26-EHOT-DG5-XB",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGGTTATA+CGGAACTG",
+       "MismatchCounts" : {
+        "0" : 3252278,
+        "1" : 118649
+       }
+      }
+     ],
+     "NumberReads" : 3370927,
+     "Yield" : 256190452,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 256190452,
+       "YieldQ30" : 237228257,
+       "QualityScoreSum" : 8722150304,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682799",
+     "SampleName" : "27-5F3T-F33-QU",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GAACCGCG+TAAGGTCA",
+       "MismatchCounts" : {
+        "0" : 3836966,
+        "1" : 200614
+       }
+      }
+     ],
+     "NumberReads" : 4037580,
+     "Yield" : 306856080,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 306856080,
+       "YieldQ30" : 282888793,
+       "QualityScoreSum" : 10419203892,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682800",
+     "SampleName" : "28-TMXC-UOH-PD",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CTCACCAA+TTGCCTAG",
+       "MismatchCounts" : {
+        "0" : 3606793,
+        "1" : 168228
+       }
+      }
+     ],
+     "NumberReads" : 3775021,
+     "Yield" : 286901596,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 286901596,
+       "YieldQ30" : 265523248,
+       "QualityScoreSum" : 9764025314,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682851",
+     "SampleName" : "29-IKSB-E1J-MI",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TCTGTTGG+CCATTCGA",
+       "MismatchCounts" : {
+        "0" : 4349581,
+        "1" : 172357
+       }
+      }
+     ],
+     "NumberReads" : 4521938,
+     "Yield" : 343667288,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 343667288,
+       "YieldQ30" : 317678073,
+       "QualityScoreSum" : 11688489726,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682852",
+     "SampleName" : "30-XWPM-MQ8-YV",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TATCGCAC+ACACTAAG",
+       "MismatchCounts" : {
+        "0" : 2704291,
+        "1" : 119235
+       }
+      }
+     ],
+     "NumberReads" : 2823526,
+     "Yield" : 214587976,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 214587976,
+       "YieldQ30" : 198367859,
+       "QualityScoreSum" : 7298450670,
+       "TrimmedBases" : 0
+      }
+     ]
+    }
+   ],
+   "Undetermined" : {
+    "NumberReads" : 5647509,
+    "Yield" : 429210684,
+    "ReadMetrics" : [
+     {
+      "ReadNumber" : 1,
+      "Yield" : 429210684,
+      "YieldQ30" : 364374771,
+      "QualityScoreSum" : 13909412598,
+      "TrimmedBases" : 0
+     }
+    ]
+   }
+  },
+  {
+   "LaneNumber" : 2,
+   "TotalClustersRaw" : 126156050,
+   "TotalClustersPF" : 111245774,
+   "Yield" : 1028325777232,
+   "DemuxResults" : [
+    {
+     "SampleId" : "2-682773",
+     "SampleName" : "1-IP62-HHJ-R",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGCTCGCT+GATTCTGC",
+       "MismatchCounts" : {
+        "0" : 2677017,
+        "1" : 128049
+       }
+      }
+     ],
+     "NumberReads" : 2735727,
+     "Yield" : 207915252,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 207915252,
+       "YieldQ30" : 190623878,
+       "QualityScoreSum" : 7035350570,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682774",
+     "SampleName" : "2-S576-5FS-V",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CGGAACTG+TCGTAGTG",
+       "MismatchCounts" : {
+        "0" : 4300527,
+        "1" : 170953
+       }
+      }
+     ],
+     "NumberReads" : 4353295,
+     "Yield" : 330850420,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 330850420,
+       "YieldQ30" : 304051282,
+       "QualityScoreSum" : 11210855402,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682775",
+     "SampleName" : "3-G6DZ-YY6-1",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TAAGGTCA+CTACGACA",
+       "MismatchCounts" : {
+        "0" : 4032324,
+        "1" : 181396
+       }
+      }
+     ],
+     "NumberReads" : 4100287,
+     "Yield" : 311621812,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 311621812,
+       "YieldQ30" : 285795288,
+       "QualityScoreSum" : 10546760567,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682776",
+     "SampleName" : "4-OGFA-XGC-Y",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TTGCCTAG+TAAGTGGT",
+       "MismatchCounts" : {
+        "0" : 3965114,
+        "1" : 140811
+       }
+      }
+     ],
+     "NumberReads" : 4005438,
+     "Yield" : 304413288,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 304413288,
+       "YieldQ30" : 279897856,
+       "QualityScoreSum" : 10318245643,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682777",
+     "SampleName" : "5-02AA-IVA-C",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCATTCGA+CGGACAAC",
+       "MismatchCounts" : {
+        "0" : 3649550,
+        "1" : 210661
+       }
+      }
+     ],
+     "NumberReads" : 3742416,
+     "Yield" : 284423616,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 284423616,
+       "YieldQ30" : 259080841,
+       "QualityScoreSum" : 9587236984,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682778",
+     "SampleName" : "6-WEAP-4OX-4",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACACTAAG+ATATGGAT",
+       "MismatchCounts" : {
+        "0" : 2979431,
+        "1" : 104230
+       }
+      }
+     ],
+     "NumberReads" : 3010747,
+     "Yield" : 228816772,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 228816772,
+       "YieldQ30" : 210513178,
+       "QualityScoreSum" : 7758759759,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682779",
+     "SampleName" : "7-XEGN-3DZ-1",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GTGTCGGA+GCGCAAGC",
+       "MismatchCounts" : {
+        "0" : 2425718,
+        "1" : 124488
+       }
+      }
+     ],
+     "NumberReads" : 2470787,
+     "Yield" : 187779812,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 187779812,
+       "YieldQ30" : 171332040,
+       "QualityScoreSum" : 6335684210,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682780",
+     "SampleName" : "8-XIUZ-QGC-9",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TTCCTGTT+AAGATACT",
+       "MismatchCounts" : {
+        "0" : 2821295,
+        "1" : 106183
+       }
+      }
+     ],
+     "NumberReads" : 2869247,
+     "Yield" : 218062772,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 218062772,
+       "YieldQ30" : 199723073,
+       "QualityScoreSum" : 7375054133,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682781",
+     "SampleName" : "9-TZFB-86B-0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCTTCACC+GGAGCGTC",
+       "MismatchCounts" : {
+        "0" : 3848495,
+        "1" : 318223
+       }
+      }
+     ],
+     "NumberReads" : 4048067,
+     "Yield" : 307653092,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 307653092,
+       "YieldQ30" : 280641947,
+       "QualityScoreSum" : 10378795595,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682782",
+     "SampleName" : "10-0V57-RW2-HO",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GCCACAGG+ATGGCATG",
+       "MismatchCounts" : {
+        "0" : 3447522,
+        "1" : 153102
+       }
+      }
+     ],
+     "NumberReads" : 3515005,
+     "Yield" : 267140380,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 267140380,
+       "YieldQ30" : 244746496,
+       "QualityScoreSum" : 9035266402,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682783",
+     "SampleName" : "11-C6GU-28B-2G",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ATTGTGAA+GCAATGCA",
+       "MismatchCounts" : {
+        "0" : 3607619,
+        "1" : 127197
+       }
+      }
+     ],
+     "NumberReads" : 3644867,
+     "Yield" : 277009892,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 277009892,
+       "YieldQ30" : 254303568,
+       "QualityScoreSum" : 9380803466,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682784",
+     "SampleName" : "12-VOKD-EF7-4B",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACTCGTGT+GTTCCAAT",
+       "MismatchCounts" : {
+        "0" : 4188914,
+        "1" : 173718
+       }
+      }
+     ],
+     "NumberReads" : 4266183,
+     "Yield" : 324229908,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 324229908,
+       "YieldQ30" : 298240865,
+       "QualityScoreSum" : 10992853295,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682785",
+     "SampleName" : "13-1JWP-NV1-YY",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GTCTACAC+ACCTTGGC",
+       "MismatchCounts" : {
+        "0" : 3731938,
+        "1" : 159023
+       }
+      }
+     ],
+     "NumberReads" : 3812542,
+     "Yield" : 289753192,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 289753192,
+       "YieldQ30" : 266224132,
+       "QualityScoreSum" : 9815735271,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682786",
+     "SampleName" : "14-4HJZ-1XS-9A",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CAATTAAC+ATATCTCG",
+       "MismatchCounts" : {
+        "0" : 3097323,
+        "1" : 103947
+       }
+      }
+     ],
+     "NumberReads" : 3135787,
+     "Yield" : 238319812,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 238319812,
+       "YieldQ30" : 219067305,
+       "QualityScoreSum" : 8076783784,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682787",
+     "SampleName" : "15-QYNF-G5E-88",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TGGCCGGT+GCGCTCTA",
+       "MismatchCounts" : {
+        "0" : 3064108,
+        "1" : 142319
+       }
+      }
+     ],
+     "NumberReads" : 3127545,
+     "Yield" : 237693420,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 237693420,
+       "YieldQ30" : 216655080,
+       "QualityScoreSum" : 8015363990,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682788",
+     "SampleName" : "16-795G-SHL-02",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGTACTCC+AACAGGTT",
+       "MismatchCounts" : {
+        "0" : 3714246,
+        "1" : 152236
+       }
+      }
+     ],
+     "NumberReads" : 3759348,
+     "Yield" : 285710448,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 285710448,
+       "YieldQ30" : 262079012,
+       "QualityScoreSum" : 9670645317,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682789",
+     "SampleName" : "17-08ID-R8Y-M0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GACGTCTT+GGTGAACC",
+       "MismatchCounts" : {
+        "0" : 3618470,
+        "1" : 197176
+       }
+      }
+     ],
+     "NumberReads" : 3718435,
+     "Yield" : 282601060,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 282601060,
+       "YieldQ30" : 260070850,
+       "QualityScoreSum" : 9583512273,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682790",
+     "SampleName" : "18-I0SQ-1UY-HM",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TGCGAGAC+CAACAATG",
+       "MismatchCounts" : {
+        "0" : 3479028,
+        "1" : 155860
+       }
+      }
+     ],
+     "NumberReads" : 3540378,
+     "Yield" : 269068728,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 269068728,
+       "YieldQ30" : 246837360,
+       "QualityScoreSum" : 9107982651,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682791",
+     "SampleName" : "19-UZ60-U85-NW",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CATAGAGT+TGGTGGCA",
+       "MismatchCounts" : {
+        "0" : 3494147,
+        "1" : 142563
+       }
+      }
+     ],
+     "NumberReads" : 3542072,
+     "Yield" : 269197472,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 269197472,
+       "YieldQ30" : 246780076,
+       "QualityScoreSum" : 9108273113,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682792",
+     "SampleName" : "20-RKIR-LCQ-XZ",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACAGGCGC+AGGCAGAG",
+       "MismatchCounts" : {
+        "0" : 3276976,
+        "1" : 160203
+       }
+      }
+     ],
+     "NumberReads" : 3331572,
+     "Yield" : 253199472,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 253199472,
+       "YieldQ30" : 229589176,
+       "QualityScoreSum" : 8512293400,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682793",
+     "SampleName" : "21-5H0X-5R5-OF",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GTGAATAT+GAATGAGA",
+       "MismatchCounts" : {
+        "0" : 3820281,
+        "1" : 133154
+       }
+      }
+     ],
+     "NumberReads" : 3857927,
+     "Yield" : 293202452,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 293202452,
+       "YieldQ30" : 268991518,
+       "QualityScoreSum" : 9925106717,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682794",
+     "SampleName" : "22-GSBI-B0C-QK",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AACTGTAG+TGCGGCGT",
+       "MismatchCounts" : {
+        "0" : 2716313,
+        "1" : 111106
+       }
+      }
+     ],
+     "NumberReads" : 2743692,
+     "Yield" : 208520592,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 208520592,
+       "YieldQ30" : 191231956,
+       "QualityScoreSum" : 7056548420,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682795",
+     "SampleName" : "23-DN12-IIZ-6J",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GGTCACGA+CATAATAC",
+       "MismatchCounts" : {
+        "0" : 2493737,
+        "1" : 104461
+       }
+      }
+     ],
+     "NumberReads" : 2524495,
+     "Yield" : 191861620,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 191861620,
+       "YieldQ30" : 175828281,
+       "QualityScoreSum" : 6490470603,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682796",
+     "SampleName" : "24-GII9-WAZ-D7",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CTGCTTCC+GATCTATC",
+       "MismatchCounts" : {
+        "0" : 3550387,
+        "1" : 152317
+       }
+      }
+     ],
+     "NumberReads" : 3612058,
+     "Yield" : 274516408,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 274516408,
+       "YieldQ30" : 251992600,
+       "QualityScoreSum" : 9295569528,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682797",
+     "SampleName" : "25-PVV2-99O-0K",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TCATCCTT+AGCTCGCT",
+       "MismatchCounts" : {
+        "0" : 3126401,
+        "1" : 137075
+       }
+      }
+     ],
+     "NumberReads" : 3204081,
+     "Yield" : 243510156,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 243510156,
+       "YieldQ30" : 222521589,
+       "QualityScoreSum" : 8224578298,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682798",
+     "SampleName" : "26-EHOT-DG5-XB",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGGTTATA+CGGAACTG",
+       "MismatchCounts" : {
+        "0" : 3252278,
+        "1" : 118649
+       }
+      }
+     ],
+     "NumberReads" : 3278136,
+     "Yield" : 249138336,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 249138336,
+       "YieldQ30" : 229382911,
+       "QualityScoreSum" : 8451440408,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682799",
+     "SampleName" : "27-5F3T-F33-QU",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GAACCGCG+TAAGGTCA",
+       "MismatchCounts" : {
+        "0" : 3836966,
+        "1" : 200614
+       }
+      }
+     ],
+     "NumberReads" : 3920026,
+     "Yield" : 297921976,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 297921976,
+       "YieldQ30" : 272837544,
+       "QualityScoreSum" : 10074027113,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682800",
+     "SampleName" : "28-TMXC-UOH-PD",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CTCACCAA+TTGCCTAG",
+       "MismatchCounts" : {
+        "0" : 3606793,
+        "1" : 168228
+       }
+      }
+     ],
+     "NumberReads" : 3679007,
+     "Yield" : 279604532,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 279604532,
+       "YieldQ30" : 257165691,
+       "QualityScoreSum" : 9478440251,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682851",
+     "SampleName" : "29-IKSB-E1J-MI",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TCTGTTGG+CCATTCGA",
+       "MismatchCounts" : {
+        "0" : 4349581,
+        "1" : 172357
+       }
+      }
+     ],
+     "NumberReads" : 4389722,
+     "Yield" : 333618872,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 333618872,
+       "YieldQ30" : 306663954,
+       "QualityScoreSum" : 11306563210,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682852",
+     "SampleName" : "30-XWPM-MQ8-YV",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TATCGCAC+ACACTAAG",
+       "MismatchCounts" : {
+        "0" : 2704291,
+        "1" : 119235
+       }
+      }
+     ],
+     "NumberReads" : 2745455,
+     "Yield" : 208654580,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 208654580,
+       "YieldQ30" : 191707448,
+       "QualityScoreSum" : 7069408656,
+       "TrimmedBases" : 0
+      }
+     ]
+    }
+   ],
+   "Undetermined" : {
+    "NumberReads" : 6561430,
+    "Yield" : 498668680,
+    "ReadMetrics" : [
+     {
+      "ReadNumber" : 1,
+      "Yield" : 498668680,
+      "YieldQ30" : 421726343,
+      "QualityScoreSum" : 16119622617,
+      "TrimmedBases" : 0
+     }
+    ]
+   }
+  },
+  {
+   "LaneNumber" : 3,
+   "TotalClustersRaw" : 127692714,
+   "TotalClustersPF" : 109878053,
+   "Yield" : 1015816472872,
+   "DemuxResults" : [
+    {
+     "SampleId" : "2-682773",
+     "SampleName" : "1-IP62-HHJ-R",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGCTCGCT+GATTCTGC",
+       "MismatchCounts" : {
+        "0" : 2677017,
+        "1" : 128049
+       }
+      }
+     ],
+     "NumberReads" : 2709792,
+     "Yield" : 205944192,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 205944192,
+       "YieldQ30" : 187864681,
+       "QualityScoreSum" : 6947998941,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682774",
+     "SampleName" : "2-S576-5FS-V",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CGGAACTG+TCGTAGTG",
+       "MismatchCounts" : {
+        "0" : 4300527,
+        "1" : 170953
+       }
+      }
+     ],
+     "NumberReads" : 4356301,
+     "Yield" : 331078876,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 331078876,
+       "YieldQ30" : 302377409,
+       "QualityScoreSum" : 11177682353,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682775",
+     "SampleName" : "3-G6DZ-YY6-1",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TAAGGTCA+CTACGACA",
+       "MismatchCounts" : {
+        "0" : 4032324,
+        "1" : 181396
+       }
+      }
+     ],
+     "NumberReads" : 4053874,
+     "Yield" : 308094424,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 308094424,
+       "YieldQ30" : 281339646,
+       "QualityScoreSum" : 10400858468,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682776",
+     "SampleName" : "4-OGFA-XGC-Y",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TTGCCTAG+TAAGTGGT",
+       "MismatchCounts" : {
+        "0" : 3965114,
+        "1" : 140811
+       }
+      }
+     ],
+     "NumberReads" : 3988800,
+     "Yield" : 303148800,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 303148800,
+       "YieldQ30" : 277385566,
+       "QualityScoreSum" : 10246119238,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682777",
+     "SampleName" : "5-02AA-IVA-C",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCATTCGA+CGGACAAC",
+       "MismatchCounts" : {
+        "0" : 3649550,
+        "1" : 210661
+       }
+      }
+     ],
+     "NumberReads" : 3670950,
+     "Yield" : 278992200,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 278992200,
+       "YieldQ30" : 253159339,
+       "QualityScoreSum" : 9383008825,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682778",
+     "SampleName" : "6-WEAP-4OX-4",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACACTAAG+ATATGGAT",
+       "MismatchCounts" : {
+        "0" : 2979431,
+        "1" : 104230
+       }
+      }
+     ],
+     "NumberReads" : 2991628,
+     "Yield" : 227363728,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 227363728,
+       "YieldQ30" : 208088160,
+       "QualityScoreSum" : 7685765266,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682779",
+     "SampleName" : "7-XEGN-3DZ-1",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GTGTCGGA+GCGCAAGC",
+       "MismatchCounts" : {
+        "0" : 2425718,
+        "1" : 124488
+       }
+      }
+     ],
+     "NumberReads" : 2436184,
+     "Yield" : 185149984,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 185149984,
+       "YieldQ30" : 168276892,
+       "QualityScoreSum" : 6232754051,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682780",
+     "SampleName" : "8-XIUZ-QGC-9",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TTCCTGTT+AAGATACT",
+       "MismatchCounts" : {
+        "0" : 2821295,
+        "1" : 106183
+       }
+      }
+     ],
+     "NumberReads" : 2807934,
+     "Yield" : 213402984,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 213402984,
+       "YieldQ30" : 194673731,
+       "QualityScoreSum" : 7200426042,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682781",
+     "SampleName" : "9-TZFB-86B-0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCTTCACC+GGAGCGTC",
+       "MismatchCounts" : {
+        "0" : 3848495,
+        "1" : 318223
+       }
+      }
+     ],
+     "NumberReads" : 3985024,
+     "Yield" : 302861824,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 302861824,
+       "YieldQ30" : 274780231,
+       "QualityScoreSum" : 10185093904,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682782",
+     "SampleName" : "10-0V57-RW2-HO",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GCCACAGG+ATGGCATG",
+       "MismatchCounts" : {
+        "0" : 3447522,
+        "1" : 153102
+       }
+      }
+     ],
+     "NumberReads" : 3473337,
+     "Yield" : 263973612,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 263973612,
+       "YieldQ30" : 240670375,
+       "QualityScoreSum" : 8902798349,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682783",
+     "SampleName" : "11-C6GU-28B-2G",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ATTGTGAA+GCAATGCA",
+       "MismatchCounts" : {
+        "0" : 3607619,
+        "1" : 127197
+       }
+      }
+     ],
+     "NumberReads" : 3620447,
+     "Yield" : 275153972,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 275153972,
+       "YieldQ30" : 251069846,
+       "QualityScoreSum" : 9284696344,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682784",
+     "SampleName" : "12-VOKD-EF7-4B",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACTCGTGT+GTTCCAAT",
+       "MismatchCounts" : {
+        "0" : 4188914,
+        "1" : 173718
+       }
+      }
+     ],
+     "NumberReads" : 4221384,
+     "Yield" : 320825184,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 320825184,
+       "YieldQ30" : 293716466,
+       "QualityScoreSum" : 10847010131,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682785",
+     "SampleName" : "13-1JWP-NV1-YY",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GTCTACAC+ACCTTGGC",
+       "MismatchCounts" : {
+        "0" : 3731938,
+        "1" : 159023
+       }
+      }
+     ],
+     "NumberReads" : 3778707,
+     "Yield" : 287181732,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 287181732,
+       "YieldQ30" : 261853032,
+       "QualityScoreSum" : 9685786869,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682786",
+     "SampleName" : "14-4HJZ-1XS-9A",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CAATTAAC+ATATCTCG",
+       "MismatchCounts" : {
+        "0" : 3097323,
+        "1" : 103947
+       }
+      }
+     ],
+     "NumberReads" : 3099734,
+     "Yield" : 235579784,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 235579784,
+       "YieldQ30" : 215427779,
+       "QualityScoreSum" : 7959548939,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682787",
+     "SampleName" : "15-QYNF-G5E-88",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TGGCCGGT+GCGCTCTA",
+       "MismatchCounts" : {
+        "0" : 3064108,
+        "1" : 142319
+       }
+      }
+     ],
+     "NumberReads" : 3070823,
+     "Yield" : 233382548,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 233382548,
+       "YieldQ30" : 211716083,
+       "QualityScoreSum" : 7848170480,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682788",
+     "SampleName" : "16-795G-SHL-02",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGTACTCC+AACAGGTT",
+       "MismatchCounts" : {
+        "0" : 3714246,
+        "1" : 152236
+       }
+      }
+     ],
+     "NumberReads" : 3724823,
+     "Yield" : 283086548,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 283086548,
+       "YieldQ30" : 258387229,
+       "QualityScoreSum" : 9553927455,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682789",
+     "SampleName" : "17-08ID-R8Y-M0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GACGTCTT+GGTGAACC",
+       "MismatchCounts" : {
+        "0" : 3618470,
+        "1" : 197176
+       }
+      }
+     ],
+     "NumberReads" : 3714426,
+     "Yield" : 282296376,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 282296376,
+       "YieldQ30" : 258207312,
+       "QualityScoreSum" : 9538858744,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682790",
+     "SampleName" : "18-I0SQ-1UY-HM",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TGCGAGAC+CAACAATG",
+       "MismatchCounts" : {
+        "0" : 3479028,
+        "1" : 155860
+       }
+      }
+     ],
+     "NumberReads" : 3509618,
+     "Yield" : 266730968,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 266730968,
+       "YieldQ30" : 243539470,
+       "QualityScoreSum" : 9003816089,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682791",
+     "SampleName" : "19-UZ60-U85-NW",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CATAGAGT+TGGTGGCA",
+       "MismatchCounts" : {
+        "0" : 3494147,
+        "1" : 142563
+       }
+      }
+     ],
+     "NumberReads" : 3505607,
+     "Yield" : 266426132,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 266426132,
+       "YieldQ30" : 243102461,
+       "QualityScoreSum" : 8989864449,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682792",
+     "SampleName" : "20-RKIR-LCQ-XZ",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACAGGCGC+AGGCAGAG",
+       "MismatchCounts" : {
+        "0" : 3276976,
+        "1" : 160203
+       }
+      }
+     ],
+     "NumberReads" : 3274396,
+     "Yield" : 248854096,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 248854096,
+       "YieldQ30" : 224682984,
+       "QualityScoreSum" : 8345191163,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682793",
+     "SampleName" : "21-5H0X-5R5-OF",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GTGAATAT+GAATGAGA",
+       "MismatchCounts" : {
+        "0" : 3820281,
+        "1" : 133154
+       }
+      }
+     ],
+     "NumberReads" : 3812566,
+     "Yield" : 289755016,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 289755016,
+       "YieldQ30" : 264531074,
+       "QualityScoreSum" : 9780117375,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682794",
+     "SampleName" : "22-GSBI-B0C-QK",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AACTGTAG+TGCGGCGT",
+       "MismatchCounts" : {
+        "0" : 2716313,
+        "1" : 111106
+       }
+      }
+     ],
+     "NumberReads" : 2728705,
+     "Yield" : 207381580,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 207381580,
+       "YieldQ30" : 189363477,
+       "QualityScoreSum" : 7000244014,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682795",
+     "SampleName" : "23-DN12-IIZ-6J",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GGTCACGA+CATAATAC",
+       "MismatchCounts" : {
+        "0" : 2493737,
+        "1" : 104461
+       }
+      }
+     ],
+     "NumberReads" : 2498061,
+     "Yield" : 189852636,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 189852636,
+       "YieldQ30" : 173177266,
+       "QualityScoreSum" : 6404872613,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682796",
+     "SampleName" : "24-GII9-WAZ-D7",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CTGCTTCC+GATCTATC",
+       "MismatchCounts" : {
+        "0" : 3550387,
+        "1" : 152317
+       }
+      }
+     ],
+     "NumberReads" : 3580969,
+     "Yield" : 272153644,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 272153644,
+       "YieldQ30" : 248424433,
+       "QualityScoreSum" : 9185261830,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682797",
+     "SampleName" : "25-PVV2-99O-0K",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TCATCCTT+AGCTCGCT",
+       "MismatchCounts" : {
+        "0" : 3126401,
+        "1" : 137075
+       }
+      }
+     ],
+     "NumberReads" : 3125971,
+     "Yield" : 237573796,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 237573796,
+       "YieldQ30" : 216345907,
+       "QualityScoreSum" : 8007601455,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682798",
+     "SampleName" : "26-EHOT-DG5-XB",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGGTTATA+CGGAACTG",
+       "MismatchCounts" : {
+        "0" : 3252278,
+        "1" : 118649
+       }
+      }
+     ],
+     "NumberReads" : 3286479,
+     "Yield" : 249772404,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 249772404,
+       "YieldQ30" : 228646342,
+       "QualityScoreSum" : 8444234837,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682799",
+     "SampleName" : "27-5F3T-F33-QU",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GAACCGCG+TAAGGTCA",
+       "MismatchCounts" : {
+        "0" : 3836966,
+        "1" : 200614
+       }
+      }
+     ],
+     "NumberReads" : 3895945,
+     "Yield" : 296091820,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 296091820,
+       "YieldQ30" : 269930506,
+       "QualityScoreSum" : 9985382121,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682800",
+     "SampleName" : "28-TMXC-UOH-PD",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CTCACCAA+TTGCCTAG",
+       "MismatchCounts" : {
+        "0" : 3606793,
+        "1" : 168228
+       }
+      }
+     ],
+     "NumberReads" : 3655522,
+     "Yield" : 277819672,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 277819672,
+       "YieldQ30" : 254190419,
+       "QualityScoreSum" : 9389020740,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682851",
+     "SampleName" : "29-IKSB-E1J-MI",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TCTGTTGG+CCATTCGA",
+       "MismatchCounts" : {
+        "0" : 4349581,
+        "1" : 172357
+       }
+      }
+     ],
+     "NumberReads" : 4412146,
+     "Yield" : 335323096,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 335323096,
+       "YieldQ30" : 306419264,
+       "QualityScoreSum" : 11324750055,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682852",
+     "SampleName" : "30-XWPM-MQ8-YV",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TATCGCAC+ACACTAAG",
+       "MismatchCounts" : {
+        "0" : 2704291,
+        "1" : 119235
+       }
+      }
+     ],
+     "NumberReads" : 2737716,
+     "Yield" : 208066416,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 208066416,
+       "YieldQ30" : 190210706,
+       "QualityScoreSum" : 7028558812,
+       "TrimmedBases" : 0
+      }
+     ]
+    }
+   ],
+   "Undetermined" : {
+    "NumberReads" : 6150184,
+    "Yield" : 467413984,
+    "ReadMetrics" : [
+     {
+      "ReadNumber" : 1,
+      "Yield" : 467413984,
+      "YieldQ30" : 387637487,
+      "QualityScoreSum" : 14949070546,
+      "TrimmedBases" : 0
+     }
+    ]
+   }
+  },
+  {
+   "LaneNumber" : 4,
+   "TotalClustersRaw" : 126861964,
+   "TotalClustersPF" : 106494593,
+   "Yield" : 1015637892404,
+   "DemuxResults" : [
+    {
+     "SampleId" : "2-682773",
+     "SampleName" : "1-IP62-HHJ-R",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGCTCGCT+GATTCTGC",
+       "MismatchCounts" : {
+        "0" : 2677017,
+        "1" : 128049
+       }
+      }
+     ],
+     "NumberReads" : 2583803,
+     "Yield" : 196369028,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 196369028,
+       "YieldQ30" : 178324958,
+       "QualityScoreSum" : 6604150663,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682774",
+     "SampleName" : "2-S576-5FS-V",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CGGAACTG+TCGTAGTG",
+       "MismatchCounts" : {
+        "0" : 4300527,
+        "1" : 170953
+       }
+      }
+     ],
+     "NumberReads" : 4141149,
+     "Yield" : 314727324,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 314727324,
+       "YieldQ30" : 286412957,
+       "QualityScoreSum" : 10597885137,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682775",
+     "SampleName" : "3-G6DZ-YY6-1",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TAAGGTCA+CTACGACA",
+       "MismatchCounts" : {
+        "0" : 4032324,
+        "1" : 181396
+       }
+      }
+     ],
+     "NumberReads" : 3860964,
+     "Yield" : 293433264,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 293433264,
+       "YieldQ30" : 266574851,
+       "QualityScoreSum" : 9870979654,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682776",
+     "SampleName" : "4-OGFA-XGC-Y",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TTGCCTAG+TAAGTGGT",
+       "MismatchCounts" : {
+        "0" : 3965114,
+        "1" : 140811
+       }
+      }
+     ],
+     "NumberReads" : 3813281,
+     "Yield" : 289809356,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 289809356,
+       "YieldQ30" : 263822505,
+       "QualityScoreSum" : 9760890518,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682777",
+     "SampleName" : "5-02AA-IVA-C",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCATTCGA+CGGACAAC",
+       "MismatchCounts" : {
+        "0" : 3649550,
+        "1" : 210661
+       }
+      }
+     ],
+     "NumberReads" : 3471599,
+     "Yield" : 263841524,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 263841524,
+       "YieldQ30" : 238231074,
+       "QualityScoreSum" : 8843234906,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682778",
+     "SampleName" : "6-WEAP-4OX-4",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACACTAAG+ATATGGAT",
+       "MismatchCounts" : {
+        "0" : 2979431,
+        "1" : 104230
+       }
+      }
+     ],
+     "NumberReads" : 2866601,
+     "Yield" : 217861676,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 217861676,
+       "YieldQ30" : 198371665,
+       "QualityScoreSum" : 7338805355,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682779",
+     "SampleName" : "7-XEGN-3DZ-1",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GTGTCGGA+GCGCAAGC",
+       "MismatchCounts" : {
+        "0" : 2425718,
+        "1" : 124488
+       }
+      }
+     ],
+     "NumberReads" : 2302040,
+     "Yield" : 174955040,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 174955040,
+       "YieldQ30" : 158189557,
+       "QualityScoreSum" : 5868692117,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682780",
+     "SampleName" : "8-XIUZ-QGC-9",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TTCCTGTT+AAGATACT",
+       "MismatchCounts" : {
+        "0" : 2821295,
+        "1" : 106183
+       }
+      }
+     ],
+     "NumberReads" : 2704892,
+     "Yield" : 205571792,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 205571792,
+       "YieldQ30" : 186518504,
+       "QualityScoreSum" : 6910977865,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682781",
+     "SampleName" : "9-TZFB-86B-0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCTTCACC+GGAGCGTC",
+       "MismatchCounts" : {
+        "0" : 3848495,
+        "1" : 318223
+       }
+      }
+     ],
+     "NumberReads" : 3780538,
+     "Yield" : 287320888,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 287320888,
+       "YieldQ30" : 259664055,
+       "QualityScoreSum" : 9635296537,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682782",
+     "SampleName" : "10-0V57-RW2-HO",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GCCACAGG+ATGGCATG",
+       "MismatchCounts" : {
+        "0" : 3447522,
+        "1" : 153102
+       }
+      }
+     ],
+     "NumberReads" : 3315261,
+     "Yield" : 251959836,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 251959836,
+       "YieldQ30" : 228639580,
+       "QualityScoreSum" : 8469919722,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682783",
+     "SampleName" : "11-C6GU-28B-2G",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ATTGTGAA+GCAATGCA",
+       "MismatchCounts" : {
+        "0" : 3607619,
+        "1" : 127197
+       }
+      }
+     ],
+     "NumberReads" : 3447073,
+     "Yield" : 261977548,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 261977548,
+       "YieldQ30" : 238167665,
+       "QualityScoreSum" : 8816522378,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682784",
+     "SampleName" : "12-VOKD-EF7-4B",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACTCGTGT+GTTCCAAT",
+       "MismatchCounts" : {
+        "0" : 4188914,
+        "1" : 173718
+       }
+      }
+     ],
+     "NumberReads" : 4027912,
+     "Yield" : 306121312,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 306121312,
+       "YieldQ30" : 279064781,
+       "QualityScoreSum" : 10318968637,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682785",
+     "SampleName" : "13-1JWP-NV1-YY",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GTCTACAC+ACCTTGGC",
+       "MismatchCounts" : {
+        "0" : 3731938,
+        "1" : 159023
+       }
+      }
+     ],
+     "NumberReads" : 3627311,
+     "Yield" : 275675636,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 275675636,
+       "YieldQ30" : 250325687,
+       "QualityScoreSum" : 9270060592,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682786",
+     "SampleName" : "14-4HJZ-1XS-9A",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CAATTAAC+ATATCTCG",
+       "MismatchCounts" : {
+        "0" : 3097323,
+        "1" : 103947
+       }
+      }
+     ],
+     "NumberReads" : 2973223,
+     "Yield" : 225964948,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 225964948,
+       "YieldQ30" : 205634932,
+       "QualityScoreSum" : 7609256051,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682787",
+     "SampleName" : "15-QYNF-G5E-88",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TGGCCGGT+GCGCTCTA",
+       "MismatchCounts" : {
+        "0" : 3064108,
+        "1" : 142319
+       }
+      }
+     ],
+     "NumberReads" : 2917774,
+     "Yield" : 221750824,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 221750824,
+       "YieldQ30" : 200198846,
+       "QualityScoreSum" : 7432211502,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682788",
+     "SampleName" : "16-795G-SHL-02",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGTACTCC+AACAGGTT",
+       "MismatchCounts" : {
+        "0" : 3714246,
+        "1" : 152236
+       }
+      }
+     ],
+     "NumberReads" : 3555193,
+     "Yield" : 270194668,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 270194668,
+       "YieldQ30" : 245429876,
+       "QualityScoreSum" : 9088411194,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682789",
+     "SampleName" : "17-08ID-R8Y-M0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GACGTCTT+GGTGAACC",
+       "MismatchCounts" : {
+        "0" : 3618470,
+        "1" : 197176
+       }
+      }
+     ],
+     "NumberReads" : 3524102,
+     "Yield" : 267831752,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 267831752,
+       "YieldQ30" : 244069283,
+       "QualityScoreSum" : 9025757318,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682790",
+     "SampleName" : "18-I0SQ-1UY-HM",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TGCGAGAC+CAACAATG",
+       "MismatchCounts" : {
+        "0" : 3479028,
+        "1" : 155860
+       }
+      }
+     ],
+     "NumberReads" : 3346335,
+     "Yield" : 254321460,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 254321460,
+       "YieldQ30" : 231106175,
+       "QualityScoreSum" : 8556648147,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682791",
+     "SampleName" : "19-UZ60-U85-NW",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CATAGAGT+TGGTGGCA",
+       "MismatchCounts" : {
+        "0" : 3494147,
+        "1" : 142563
+       }
+      }
+     ],
+     "NumberReads" : 3330803,
+     "Yield" : 253141028,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 253141028,
+       "YieldQ30" : 229946200,
+       "QualityScoreSum" : 8514816816,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682792",
+     "SampleName" : "20-RKIR-LCQ-XZ",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACAGGCGC+AGGCAGAG",
+       "MismatchCounts" : {
+        "0" : 3276976,
+        "1" : 160203
+       }
+      }
+     ],
+     "NumberReads" : 3116159,
+     "Yield" : 236828084,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 236828084,
+       "YieldQ30" : 212722793,
+       "QualityScoreSum" : 7913992282,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682793",
+     "SampleName" : "21-5H0X-5R5-OF",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GTGAATAT+GAATGAGA",
+       "MismatchCounts" : {
+        "0" : 3820281,
+        "1" : 133154
+       }
+      }
+     ],
+     "NumberReads" : 3647634,
+     "Yield" : 277220184,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 277220184,
+       "YieldQ30" : 251841959,
+       "QualityScoreSum" : 9325377711,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682794",
+     "SampleName" : "22-GSBI-B0C-QK",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AACTGTAG+TGCGGCGT",
+       "MismatchCounts" : {
+        "0" : 2716313,
+        "1" : 111106
+       }
+      }
+     ],
+     "NumberReads" : 2586890,
+     "Yield" : 196603640,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 196603640,
+       "YieldQ30" : 178621749,
+       "QualityScoreSum" : 6613465047,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682795",
+     "SampleName" : "23-DN12-IIZ-6J",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GGTCACGA+CATAATAC",
+       "MismatchCounts" : {
+        "0" : 2493737,
+        "1" : 104461
+       }
+      }
+     ],
+     "NumberReads" : 2384152,
+     "Yield" : 181195552,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 181195552,
+       "YieldQ30" : 164438575,
+       "QualityScoreSum" : 6091482376,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682796",
+     "SampleName" : "24-GII9-WAZ-D7",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CTGCTTCC+GATCTATC",
+       "MismatchCounts" : {
+        "0" : 3550387,
+        "1" : 152317
+       }
+      }
+     ],
+     "NumberReads" : 3416931,
+     "Yield" : 259686756,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 259686756,
+       "YieldQ30" : 236008735,
+       "QualityScoreSum" : 8737582560,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682797",
+     "SampleName" : "25-PVV2-99O-0K",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TCATCCTT+AGCTCGCT",
+       "MismatchCounts" : {
+        "0" : 3126401,
+        "1" : 137075
+       }
+      }
+     ],
+     "NumberReads" : 3006585,
+     "Yield" : 228500460,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 228500460,
+       "YieldQ30" : 207020764,
+       "QualityScoreSum" : 7674979016,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682798",
+     "SampleName" : "26-EHOT-DG5-XB",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGGTTATA+CGGAACTG",
+       "MismatchCounts" : {
+        "0" : 3252278,
+        "1" : 118649
+       }
+      }
+     ],
+     "NumberReads" : 3115804,
+     "Yield" : 236801104,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 236801104,
+       "YieldQ30" : 215905104,
+       "QualityScoreSum" : 7982790102,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682799",
+     "SampleName" : "27-5F3T-F33-QU",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GAACCGCG+TAAGGTCA",
+       "MismatchCounts" : {
+        "0" : 3836966,
+        "1" : 200614
+       }
+      }
+     ],
+     "NumberReads" : 3705642,
+     "Yield" : 281628792,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 281628792,
+       "YieldQ30" : 255459086,
+       "QualityScoreSum" : 9464921927,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682800",
+     "SampleName" : "28-TMXC-UOH-PD",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CTCACCAA+TTGCCTAG",
+       "MismatchCounts" : {
+        "0" : 3606793,
+        "1" : 168228
+       }
+      }
+     ],
+     "NumberReads" : 3492212,
+     "Yield" : 265408112,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 265408112,
+       "YieldQ30" : 241744544,
+       "QualityScoreSum" : 8941373561,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682851",
+     "SampleName" : "29-IKSB-E1J-MI",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TCTGTTGG+CCATTCGA",
+       "MismatchCounts" : {
+        "0" : 4349581,
+        "1" : 172357
+       }
+      }
+     ],
+     "NumberReads" : 4178619,
+     "Yield" : 317575044,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 317575044,
+       "YieldQ30" : 289076875,
+       "QualityScoreSum" : 10695486369,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "2-682852",
+     "SampleName" : "30-XWPM-MQ8-YV",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TATCGCAC+ACACTAAG",
+       "MismatchCounts" : {
+        "0" : 2704291,
+        "1" : 119235
+       }
+      }
+     ],
+     "NumberReads" : 2615663,
+     "Yield" : 198790388,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 198790388,
+       "YieldQ30" : 180744722,
+       "QualityScoreSum" : 6690556280,
+       "TrimmedBases" : 0
+      }
+     ]
+    }
+   ],
+   "Undetermined" : {
+    "NumberReads" : 7638448,
+    "Yield" : 580522048,
+    "ReadMetrics" : [
+     {
+      "ReadNumber" : 1,
+      "Yield" : 580522048,
+      "YieldQ30" : 478045175,
+      "QualityScoreSum" : 18477770805,
+      "TrimmedBases" : 0
+     }
+    ]
+   }
+  }
+ ],
+ "UnknownBarcodes" : [
+  {
+   "Lane" : 1,
+   "Barcodes" : {
+    "GGGGGGGG+AGATCTCG" : 1263512,
+    "GGGGGGGG+GGGGGGGG" : 248222,
+    "GGGGGGGG+CCATTCGA" : 33687,
+    "GGGGGGGG+AGCTCGCT" : 27674,
+    "GGGGGGGG+GGTGAACC" : 25090,
+    "GGGGGGGG+CAACAATG" : 24703,
+    "GGGGGGGG+GCGCTCTA" : 24449,
+    "GGGGGGGG+GAATGAGA" : 23237,
+    "GGGGGGGG+TAAGGTCA" : 21468,
+    "GGGGGGGG+TAAGTGGT" : 21008,
+    "GGGGGGGG+CTACGACA" : 20979,
+    "GGGGGGGG+TCGTAGTG" : 20830,
+    "GGGGGGGG+AACAGGTT" : 18513,
+    "GGGGGGGG+GTTCCAAT" : 17619,
+    "GGGGGGGG+GATCTATC" : 17291,
+    "GGGGGGGG+AAGATACT" : 17250,
+    "GGGGGGGG+ATGGCATG" : 15776,
+    "GGGGGGGG+ACCTTGGC" : 15446,
+    "TGGGGGGG+GGGGGGGG" : 14933,
+    "GGGGGGGG+GCAATGCA" : 14513,
+    "GGGGGGGG+ATATCTCG" : 14508,
+    "GGGGGGGG+CATAATAC" : 14220,
+    "GGGGGGGG+GATTCTGC" : 14142,
+    "GGGGGGGG+CGGAACTG" : 13800,
+    "CTGCTTCC+GGGGGGGG" : 13484,
+    "GGGGGGGG+CGGACAAC" : 13397,
+    "GGGGGGGG+GGAGCGTC" : 13317,
+    "GGGGGGGG+TGGTGGCA" : 12979,
+    "GGGGGGGG+TGCGGCGT" : 12743,
+    "GGGGGGGG+GCGCAAGC" : 12710,
+    "GACGTCTT+GGGGGGGG" : 12307,
+    "GGGGGGGG+AGGCAGAG" : 12210,
+    "CCTTCACC+GGGGGGGG" : 11812,
+    "GGGGGGGG+ACACTAAG" : 11332,
+    "GGGGGGGG+TTGCCTAG" : 10763,
+    "TGGCCGGT+GGGGGGGG" : 10219,
+    "CATAGAGT+GGGGGGGG" : 10182,
+    "CGGAACTG+GGGGGGGG" : 10074,
+    "GTGAATAT+GGGGGGGG" : 10071,
+    "CTCACCAA+GGGGGGGG" : 10044,
+    "GTGATATA+GAATGAGA" : 9816,
+    "TCATCCTT+GGGGGGGG" : 9669,
+    "AGTACTCC+GGGGGGGG" : 9574,
+    "TCTGTTGG+GGGGGGGG" : 9124,
+    "CAATTAAC+GGGGGGGG" : 9118,
+    "ACTCGTGT+GGGGGGGG" : 8667,
+    "CAATTACA+ATATCTCG" : 8312,
+    "AGGTTATA+GGGGGGGG" : 8269,
+    "CATTAACA+ATATCTCG" : 8230,
+    "AATTAACA+ATATCTCG" : 8216,
+    "TCTGTGGA+CCATTCGA" : 8192,
+    "TTGCCTAG+GGGGGGGG" : 7978,
+    "TCATCTTA+AGCTCGCT" : 7679,
+    "AACTGTAG+GGGGGGGG" : 7460,
+    "GAACCGCG+GGGGGGGG" : 7391,
+    "GGGGGGGG+ATATGGAT" : 7167,
+    "GCCACAGG+GGGGGGGG" : 7150,
+    "AGCTCGCT+GGGGGGGG" : 7105,
+    "CTCACCAA+TGCCTAGG" : 6818,
+    "GAACGCGA+TAAGGTCA" : 6791,
+    "CCATTCGA+GGGGGGGG" : 6634,
+    "TAAGGTCA+GGGGGGGG" : 6586,
+    "TCTGTTGG+CATTCGAG" : 6422,
+    "GTCTACAC+GGGGGGGG" : 6201,
+    "ACAGGCGC+GGGGGGGG" : 6178,
+    "ACACTAAG+GGGGGGGG" : 5799,
+    "AGGTTTAA+CGGAACTG" : 5786,
+    "TTCCTGTT+GGGGGGGG" : 5645,
+    "AGGTATAA+CGGAACTG" : 5628,
+    "TTGTTGGA+CCATTCGA" : 5592,
+    "TCTGTTGG+CCATCGAG" : 5579,
+    "CATAGGTA+TGGTGGCA" : 5566,
+    "GGGGGGGG+AGCTCTCG" : 5511,
+    "ATTGTGAA+GGGGGGGG" : 5488,
+    "TGCTTCCA+GATCTATC" : 5358,
+    "GACCGCGA+TAAGGTCA" : 5357,
+    "TCACCAAA+TTGCCTAG" : 5244,
+    "TGCGAGCA+CAACAATG" : 5218,
+    "CTGCTCCA+GATCTATC" : 5052,
+    "TGCGAGAC+GGGGGGGG" : 4942,
+    "TGCGGACA+CAACAATG" : 4934,
+    "GGTCACGA+GGGGGGGG" : 4923,
+    "TCTTTGGA+CCATTCGA" : 4791,
+    "ACTGTAGA+TGCGGCGT" : 4762,
+    "ATAGAGTA+TGGTGGCA" : 4676,
+    "GAACCGCG+AAGGTCAG" : 4577,
+    "GCGTCTTA+GGTGAACC" : 4521,
+    "CGGGGGGG+GGGGGGGG" : 4451,
+    "GTGAATTA+GAATGAGA" : 4427,
+    "GTGTCGGA+GGGGGGGG" : 4385,
+    "GGTTATAA+CGGAACTG" : 4366,
+    "GACGTCTT+GTGAACCG" : 4350,
+    "GTGGGGGG+GGGGGGGG" : 4278,
+    "CATTCGAA+CGGACAAC" : 4260,
+    "CATGAGTA+TGGTGGCA" : 4233,
+    "CATAGAGT+GGTGGCAG" : 4202,
+    "ACTCGTGT+GTTCCATG" : 4069,
+    "AGTATCCA+AACAGGTT" : 4064,
+    "TCGTTGGA+CCATTCGA" : 4059,
+    "CAATAACA+ATATCTCG" : 3988,
+    "CTGTTGGA+CCATTCGA" : 3985,
+    "CGGAACTG+CGTAGTGG" : 3961,
+    "AGTACTCC+ACAGGTTG" : 3960,
+    "GGGGGGGG+ACATCTCG" : 3951,
+    "GGGGGGGG+AGATATCG" : 3915,
+    "CTTCACCA+GGAGCGTC" : 3896,
+    "AGTCTCCA+AACAGGTT" : 3885,
+    "GCGGGGGG+GGGGGGGG" : 3874,
+    "GTGAAATA+GAATGAGA" : 3852,
+    "AGTACTCC+AACAGTTG" : 3780,
+    "TCTGTTGG+AAATTCGA" : 3768,
+    "CGAACTGA+TCGTAGTG" : 3753,
+    "ACAGCGCA+AGGCAGAG" : 3726,
+    "GGAACTGA+TCGTAGTG" : 3703,
+    "GACGTTTA+GGTGAACC" : 3695,
+    "ACTCGTGT+GTCCAATG" : 3655,
+    "GAACCGGA+TAAGGTCA" : 3573,
+    "GTACTCCA+AACAGGTT" : 3564,
+    "AACTGTAG+GCGGCGTG" : 3505,
+    "AGGTTATA+GGAACTGG" : 3479,
+    "TAGGTCAA+CTACGACA" : 3474,
+    "TGCGAGAC+AACAATGG" : 3457,
+    "TATCGCAC+GGGGGGGG" : 3393,
+    "ACGGCGCA+AGGCAGAG" : 3377,
+    "GGGGGGGG+TGGGGGGG" : 3359,
+    "GCGAGACA+CAACAATG" : 3200,
+    "CTGTTCCA+GATCTATC" : 3189,
+    "GACGTCTT+GGTGACCG" : 3178,
+    "TATCGCCA+ACACTAAG" : 3170,
+    "AACTGTAG+TGCGCGTG" : 3161,
+    "ACTCGTGT+GTTCAATG" : 3147,
+    "ACACTAGA+ATATGGAT" : 3142,
+    "AGTACCCA+AACAGGTT" : 3101,
+    "GTCTACAC+ACCTTTGG" : 3084,
+    "CTCCCAAA+TTGCCTAG" : 3084,
+    "TGCAGACA+CAACAATG" : 3067,
+    "ACTGTGTA+GTTCCAAT" : 3050,
+    "GGTCACGA+ATAATACG" : 3045,
+    "AGGTTATA+CGAACTGG" : 3040,
+    "TTGCCTAG+AAGTGGTG" : 3032,
+    "CATAGAGT+TGTGGCAG" : 3030,
+    "CCATTCGA+GGACAACG" : 3021,
+    "CAGGCGCA+AGGCAGAG" : 3021,
+    "TGGCGGTA+GCGCTCTA" : 3017,
+    "TGGCCGTA+GCGCTCTA" : 3010,
+    "TGCGAGAC+CACAATGG" : 3008,
+    "TTGCTAGA+TAAGTGGT" : 3000,
+    "TGCGCGCC+CAACAATG" : 2991,
+    "TGGCCGGT+TAGCTCTA" : 2980,
+    "CCTTCACC+GAGCGTCG" : 2972,
+    "AGTTATAA+CGGAACTG" : 2941,
+    "GTCTACAC+ACCTGGCG" : 2936,
+    "TTGCCTAG+TAAGTGTG" : 2922,
+    "ACAGGCGC+AGCAGAGG" : 2917,
+    "TCTCCTTA+AGCTCGCT" : 2909,
+    "GCCCCGCG+TAAGGTCA" : 2889,
+    "GGCCGGTA+GCGCTCTA" : 2887,
+    "TAAGGTCA+AAACGACA" : 2886,
+    "GCACAGGA+ATGGCATG" : 2882,
+    "AGGTTATA+CGGACTGG" : 2874,
+    "TGCGAGAC+CAACATGG" : 2853,
+    "CTACCAAA+TTGCCTAG" : 2850,
+    "CCATTCGA+CGACAACG" : 2838,
+    "CTCACCAA+TTTGCCTA" : 2833,
+    "ATTGTGAA+TAAATGCA" : 2826,
+    "TGCCTAGA+TAAGTGGT" : 2824,
+    "CCATTCGA+CGGACACG" : 2823,
+    "TATCCTTA+AGCTCGCT" : 2793,
+    "GGGGGGGG+AGATCACG" : 2793,
+    "GGTCACGA+CATATACG" : 2791,
+    "TGCGAACA+CAACAATG" : 2789,
+    "CCTCACCA+GGAGCGTC" : 2756,
+    "GTGAATAT+GATGAGAG" : 2705,
+    "CCATTCGA+CGGCCACC" : 2702,
+    "CGGAACTG+AAGTAGTG" : 2682,
+    "AATGTAGA+TGCGGCGT" : 2657,
+    "GAACCGCG+TAAGTCAG" : 2656,
+    "GGGGCGGG+GGGGGGGG" : 2647,
+    "GACGCTTA+GGTGAACC" : 2636,
+    "GAGTCTTA+GGTGAACC" : 2613,
+    "CATAGAGT+TGGTGCAG" : 2605,
+    "AACCGCGA+TAAGGTCA" : 2596,
+    "TAAGGTCA+TACGACAG" : 2593,
+    "AAAAAAAA+AAAAAAAA" : 2532,
+    "GGGGGGGG+GTGGGGGG" : 2524,
+    "TAAAGGTC+CTACGACA" : 2522,
+    "GCCACAGG+ATGCATGG" : 2515,
+    "TTGCCTAG+TAGTGGTG" : 2514,
+    "TATCGCAC+TAATACAG" : 2453,
+    "TGGCCGGT+GCGCTCAG" : 2429,
+    "GTAATATA+GAATGAGA" : 2417,
+    "TTGCCTAG+TTAAGTGG" : 2393,
+    "GGGGGGGG+AGATCTCC" : 2386,
+    "GAACCGCG+TAGGTCAG" : 2381,
+    "AGCTCGCT+GATCTGCG" : 2370,
+    "CGCTTCCA+GATCTATC" : 2369,
+    "GGGCGGGG+GGGGGGGG" : 2356,
+    "ACACTAAG+ATATGATG" : 2352,
+    "GACGTCTT+GGGAACCG" : 2334,
+    "GTGAATAT+GAATGAAG" : 2297,
+    "CCTTCACC+TTAGCGTC" : 2285,
+    "ATATGGAT+ACACTAAG" : 2279,
+    "AGGGTTAT+CGGAACTG" : 2255,
+    "CAATTAAC+ATACTCGG" : 2254,
+    "ACTCGTGT+GTTTCCAA" : 2251,
+    "CTGCTTCC+GACTATCG" : 2250,
+    "AACGTAGA+TGCGGCGT" : 2241,
+    "GTGTCGGA+GCGCAGCG" : 2232,
+    "TCGAGACA+CAACAATG" : 2231,
+    "TTCCTGTT+AGATACTG" : 2219,
+    "GGTCCGAA+CATAATAC" : 2196,
+    "GGAATATA+GAATGAGA" : 2172,
+    "CCATTCGA+ATGACAAC" : 2162,
+    "GAACCGCG+TAAGGCAG" : 2150,
+    "GTCTACAC+ACCTTGCG" : 2132,
+    "ATTGTGAA+GCATGCAG" : 2128,
+    "AGGGGGGG+GGGGGGGG" : 2117,
+    "GGCGGGGG+GGGGGGGG" : 2114,
+    "GAACCGCG+TTAAGGTC" : 2104,
+    "ATACTCCA+AACAGGTT" : 2089,
+    "TCACCTTA+AGCTCGCT" : 2083,
+    "GTCACGAA+CATAATAC" : 2083,
+    "ATCGTGTA+GTTCCAAT" : 2082,
+    "CGGAACTG+TCGTGTGG" : 2053,
+    "TGGGGGGG+GCGCTCTA" : 2049,
+    "CTCACCAA+TTGCCAGG" : 2049,
+    "GGTACGAA+CATAATAC" : 2046,
+    "ACACTAAG+ATATGGTG" : 2041,
+    "CTAGAGTA+TGGTGGCA" : 2039,
+    "CTGCTTCC+GATCATCG" : 2032,
+    "GGGGGTGG+CCATTCGA" : 2029,
+    "ACGTCTTA+GGTGAACC" : 2025,
+    "GTGAATAT+GAATGGAG" : 2021,
+    "GTCTACAC+AAATTGGC" : 2019,
+    "CCACCAAA+TTGCCTAG" : 2014,
+    "CATAGAGT+TTGGTGGC" : 2014,
+    "GCCCCCGG+ATGGCATG" : 1999,
+    "CAATTAAC+AATCTCGG" : 1998,
+    "CGGAACTG+TCGAGTGG" : 1995,
+    "TATGCACA+ACACTAAG" : 1983,
+    "CCATCGAA+CGGACAAC" : 1977,
+    "GGGGGGGC+CAACAATG" : 1972,
+    "TCTGTTGG+CCATTTCG" : 1961,
+    "CGGAACTG+TCGTATGG" : 1959,
+    "CGGAAACT+TCGTAGTG" : 1956,
+    "TTCGCACA+ACACTAAG" : 1955,
+    "GGCGGGGT+GGTGAACC" : 1947,
+    "CAATTAAC+ATATCCGG" : 1946,
+    "TCATCCTT+AGCCGCTG" : 1940,
+    "CGGACTGA+TCGTAGTG" : 1939,
+    "GGTCACGA+CAAATACG" : 1927,
+    "CGGAACTG+TTCGTAGT" : 1923,
+    "ATTGTGAA+AAAATGCA" : 1922,
+    "GAAACCGC+TAAGGTCA" : 1921,
+    "GGTCAGAA+CATAATAC" : 1909,
+    "ACTAAGAT+ATATGGAT" : 1907,
+    "CCTTCCCA+GGAGCGTC" : 1903,
+    "ACTCGTGT+TCCAATGT" : 1891,
+    "GGGGGGGT+GGGGGGGG" : 1869,
+    "AAGGTCAA+CTACGACA" : 1864,
+    "CTCACCAA+AAGCCTAG" : 1863,
+    "TAAGTCAA+CTACGACA" : 1861,
+    "GGCACGAA+CATAATAC" : 1852,
+    "AGGCGCAT+AGGCAGAG" : 1851,
+    "CTGCTTCC+GATCTACG" : 1837,
+    "CCTTCACC+GGAGCGCG" : 1837,
+    "GCCACGGA+ATGGCATG" : 1833,
+    "TATCGACA+ACACTAAG" : 1820,
+    "AACTGTAG+TGGGGGGG" : 1811,
+    "TCATCCTT+ACTCGCTG" : 1810,
+    "CATCCTTA+AGCTCGCT" : 1804,
+    "CATAGAGT+ATGTGGCA" : 1786,
+    "CCGTCCCC+GGAGCGTC" : 1784,
+    "ACAGGCGC+AAAAAAAA" : 1774,
+    "TGGCCGGT+GCGCCTAG" : 1760,
+    "CCTTCACC+GGACGTCG" : 1751,
+    "AGTACTCC+AACGGTTG" : 1746,
+    "CTGCTTCC+ATCTATCG" : 1727,
+    "TTGCCAGA+TAAGTGGT" : 1725,
+    "GACGTCTT+TTTGAACC" : 1725,
+    "GAACCCGA+TAAGGTCA" : 1722,
+    "TGCCGGTA+GCGCTCTA" : 1717,
+    "TCTGTTGG+CCATTCAG" : 1713,
+    "GAACGTCT+GGTGAACC" : 1713,
+    "CCTTCACC+GGGCGTCG" : 1707,
+    "TCATCCTT+AGCTCGTG" : 1701,
+    "CTCACCAA+TTGCTAGG" : 1701,
+    "CTCACCAA+TTGCCCTA" : 1698,
+    "ACCGTGTA+GTTCCAAT" : 1692,
+    "GGGGGGGG+AGATCTCT" : 1688,
+    "TCATCCTT+ATATCGCT" : 1687,
+    "GTCTAACA+ACCTTGGC" : 1685,
+    "GTCTACAC+ACTTGGCG" : 1684,
+    "TAAGGGTC+CTACGACA" : 1670,
+    "TAAGGCAA+CTACGACA" : 1664,
+    "CGGAATGA+TCGTAGTG" : 1664,
+    "CTCGTGTA+GTTCCAAT" : 1654,
+    "TAAGGTCA+ACGACAGT" : 1651,
+    "GTGAATAT+GAAGAGAG" : 1644,
+    "ACTCGGTA+GTTCCAAT" : 1642,
+    "TATCGCAC+ACACAAGG" : 1639,
+    "GGGTGGGG+GGGGGGGG" : 1639,
+    "TGGGGGGG+CAACAATG" : 1637,
+    "TCCTGTTA+AAGATACT" : 1637,
+    "GTCTACCA+ACCTTGGC" : 1625,
+    "CCATTCGA+AAAAAAAA" : 1624,
+    "GGTCACGA+CATAAACG" : 1622,
+    "GGGGGTGC+GATCTATC" : 1622,
+    "AACTGTGA+TGCGGCGT" : 1616,
+    "GGGGGCGG+GGGGGGGG" : 1612,
+    "ACAGGCGC+AGGCAAGG" : 1607,
+    "AAACTGTA+TGCGGCGT" : 1589,
+    "AGGTTATA+ATGAACTG" : 1582,
+    "GACGTCTT+GGTAACCG" : 1580,
+    "ACAGGGCG+AGGCAGAG" : 1576,
+    "TGCGAGAC+CAACAAAT" : 1562,
+    "GGGGGTGG+GGGGGGGG" : 1562,
+    "TCTGTTGG+CCCATTCG" : 1559,
+    "GACGTCTT+GGTGCCCC" : 1550,
+    "CTGCTTCC+GTCTATCG" : 1547,
+    "AAGGCGCA+AGGCAGAG" : 1544,
+    "ACAGGCGC+ATTCAGAG" : 1537,
+    "TACGCACA+ACACTAAG" : 1532,
+    "TGGGCCGG+GCGCTCTA" : 1531,
+    "GGGGGGGG+AGATCTAG" : 1528,
+    "CGGAACGA+TCGTAGTG" : 1520,
+    "TGGCCGGT+GCGTCTAG" : 1511,
+    "AACTGTAG+TTGCGGCG" : 1510,
+    "TTGGGGGG+GGGGGGGG" : 1504,
+    "GTTACACA+ACCTTGGC" : 1501,
+    "CTCTTCCA+GATCTATC" : 1493,
+    "TGGCCGGT+GCGCTTAG" : 1490,
+    "CGGAACTG+TGTAGTGG" : 1483,
+    "TTCCTAGA+TAAGTGGT" : 1478,
+    "GGTCCCGC+CATAATAC" : 1475,
+    "CTGCTTCC+GATCTTCG" : 1475,
+    "ACAGGCGC+GGCAGAGG" : 1475,
+    "GCCCAGGA+ATGGCATG" : 1471,
+    "ACTCGTGT+TATCCAAT" : 1467,
+    "TAAGGTCA+CTACGCAG" : 1463,
+    "CATAGAGT+TGGGGCAG" : 1456,
+    "GGGGGGGG+AGAACTCG" : 1449,
+    "GTGAATAT+AATGAGAG" : 1448,
+    "AGACTCCA+AACAGGTT" : 1446,
+    "CCTTACCA+GGAGCGTC" : 1444,
+    "TCTGTTGG+CCTTCGAG" : 1439,
+    "CATAGAGT+TGGGGGGG" : 1435,
+    "GGGGGGGC+GGGGGGGG" : 1433,
+    "ATCGCACA+ACACTAAG" : 1425,
+    "TCTGTTGG+CAATTAGA" : 1420,
+    "GGGGGGGT+GGTGAACC" : 1419,
+    "TTGCCTGA+TAAGTGGT" : 1416,
+    "AGGTTAAT+CGGAACTG" : 1416,
+    "CTGCTTCC+GATTATCG" : 1412,
+    "CGGAACTG+TCGTTAGT" : 1412,
+    "CGGGAACT+TCGTAGTG" : 1406,
+    "GTCTCACA+ACCTTGGC" : 1395,
+    "TGAATATA+GAATGAGA" : 1378,
+    "GGGGGTTT+GAATGAGA" : 1373,
+    "TGGCCGGT+AAAAAAAA" : 1370,
+    "CATAAGTA+TGGTGGCA" : 1359,
+    "GTCACACA+ACCTTGGC" : 1355,
+    "GGTCACGA+CTAATACG" : 1353,
+    "GGTGAATA+GAATGAGA" : 1348,
+    "GCTACACA+ACCTTGGC" : 1337,
+    "ACAGGCGC+AGGCGAGG" : 1337,
+    "ACAGGCCA+AGGCAGAG" : 1336,
+    "TTGCCTAG+TAAGGGTG" : 1335,
+    "GCCACAGG+ATGGCTGG" : 1334,
+    "GCCACAGG+AGGCATGG" : 1332,
+    "CTCACCAA+TTGCCTTA" : 1332,
+    "CAAATTAA+ATATCTCG" : 1330,
+    "GACTCTTA+GGTGAACC" : 1309,
+    "GTCTCCCC+ACCTTGGC" : 1303,
+    "GGGGGGTG+GGGGGGGG" : 1301,
+    "TGGCCGGT+AAGCTCTA" : 1283,
+    "CCATAGAG+TGGTGGCA" : 1280,
+    "ACTCGTGT+TTCCAATG" : 1276,
+    "TGGCCGGT+GCCTCTAG" : 1275,
+    "GTGTGGAA+GCGCAAGC" : 1274,
+    "GGTGGGGG+GGGGGGGG" : 1271,
+    "ACTCGTTA+GTTCCAAT" : 1268,
+    "TTGCCTAG+TAAGTTGG" : 1259,
+    "TGGCCGGT+CGCTCTAG" : 1250,
+    "TTGCCTAG+TAATGGTG" : 1245,
+    "GGGGTGGG+GGGGGGGG" : 1242,
+    "ACACAAGA+ATATGGAT" : 1241,
+    "CATAGAGT+TGGTGGGC" : 1239,
+    "GACGTCTT+GGGTGAAC" : 1237,
+    "TAAGGTCA+CTCGACAG" : 1236,
+    "AGCTCGCT+GTTCTGCG" : 1236,
+    "GGGGGGGT+GAATGAGA" : 1226,
+    "GGGGGGGG+GCGGGGGG" : 1223,
+    "CGGAACTG+TCGTAGGT" : 1219,
+    "TGCGAAGA+CAACAATG" : 1217,
+    "AGCTCGCT+GATTTCTG" : 1217,
+    "CATAGATA+TGGTGGCA" : 1211,
+    "ACACTAAG+AATGGATG" : 1210,
+    "TTCTGTTA+AAGATACT" : 1207,
+    "ACAGGGCA+AGGCAGAG" : 1200,
+    "TGGCCGGT+GGCTCTAG" : 1197,
+    "CAATTAAC+AAATATCG" : 1197,
+    "TCATCCTT+GCTCGCTG" : 1196,
+    "CTGCTTCC+GATCTTAT" : 1191,
+    "GTGAATAT+GAATAGAG" : 1190,
+    "CCGGAACT+TCGTAGTG" : 1190,
+    "CCATTCGA+CGGCAACG" : 1190,
+    "GTCTACAC+ACCCTTGG" : 1179,
+    "CCTTCACC+GGAGCTCG" : 1170,
+    "TGCGAGAC+CAAACAAT" : 1169,
+    "GAACCGCG+TAAGGGTC" : 1167,
+    "TCATCCTT+AGCTCCTG" : 1165,
+    "AACTGTAG+TCGGCGTG" : 1162,
+    "TGGGGGGG+CCATTCGA" : 1158,
+    "TAAGGTCA+CAACTACA" : 1158,
+    "ACTCGTGT+TGTTCCAA" : 1158,
+    "TAAGGTCA+CTACACAG" : 1154,
+    "AATTGTGA+GCAATGCA" : 1153,
+    "CCTTCACC+TGGAGCGT" : 1152,
+    "CACTAAGA+ATATGGAT" : 1151,
+    "GTGTCGGA+TAGCAAGC" : 1150,
+    "AAGGTTAT+CGGAACTG" : 1147,
+    "AGCTCGCT+GATTCGCG" : 1140,
+    "GGGGCGGG+GCGCTCTA" : 1136,
+    "TCTGTTGG+CCATTGAG" : 1135,
+    "CCATTCGA+CGGAAACG" : 1134,
+    "ACTCGTGT+AATCCAAT" : 1132,
+    "GGGGTTTT+GAATGAGA" : 1126,
+    "TGGCCGGT+GCGCTTCT" : 1121,
+    "AGCTCGCT+ATTCTGCG" : 1121,
+    "AACTGTAG+ATCGGCGT" : 1116,
+    "GAACCGCG+AAATGTCA" : 1114,
+    "CATAGAAG+TGGTGGCA" : 1113,
+    "GGGGGGCG+GGGGGGGG" : 1112,
+    "TATCGCAC+AAACTAAT" : 1108,
+    "ACAAGGCG+AGGCAGAG" : 1108,
+    "TGGGCGGG+GGGGGGGG" : 1105,
+    "CGGAACTG+TCTAGTGG" : 1101,
+    "TGGCCCGG+GCGCTCTA" : 1100,
+    "TTGCCTAG+TAAGGGGG" : 1099,
+    "TAAGGTCA+CTTACGAC" : 1092,
+    "ACTCTGTA+GTTCCAAT" : 1091,
+    "TGGGCGGG+GCGCTCTA" : 1081,
+    "CCCTTCAC+GGAGCGTC" : 1081,
+    "TGCGGAGA+CAACAATG" : 1075,
+    "TCATCCTT+AGCTCCGC" : 1071,
+    "GTGTCGGA+GCGCAACG" : 1070,
+    "GCCAACAG+ATGGCATG" : 1068,
+    "ACTCGTGT+TTTACAAT" : 1066,
+    "CTCACCAA+TTCCTAGG" : 1064,
+    "GAACCGCG+TAAAGGTC" : 1063,
+    "TCTGTTGG+AAATTATA" : 1061,
+    "CCCATTCG+CGGACAAC" : 1060,
+    "ACACTAAG+ATAGGATG" : 1060,
+    "TCATCCTT+AGTCGCTG" : 1056,
+    "CATAGGAG+TGGTGGCA" : 1050,
+    "AGCTCGCT+GATTTGCG" : 1050,
+    "ACACTAAG+ATGGATGT" : 1050,
+    "AACTGTAG+TGCGGGCG" : 1050,
+    "TCATCCTT+AGGGGGGG" : 1048,
+    "AAGTACTC+AACAGGTT" : 1045,
+    "TGGAGACA+CAACAATG" : 1040,
+    "GTGTCGGA+GCGAAGCG" : 1040,
+    "CAATTAAC+ATATCTTC" : 1040,
+    "GGGGGGTT+GAATGAGA" : 1037,
+    "TTCCTGTT+AAGATCTG" : 1036,
+    "TTCCTGTT+AAGAACTG" : 1030,
+    "CCTTCACC+GGAGCCGT" : 1027,
+    "CATAAGAG+TGGTGGCA" : 1024,
+    "TTGCCTAG+AAATTGGT" : 1020,
+    "TGGCGAGA+CAACAATG" : 1020,
+    "TCATCCTT+AGCTGCTG" : 1015,
+    "GCCACAGG+ATGGGGGG" : 1014,
+    "GTCTACAC+TACCTTGG" : 1013,
+    "GAACCGCG+TAAGGTTC" : 1007,
+    "CATAGAGT+TGGTTGGC" : 1006,
+    "GCTCGCTA+GATTCTGC" : 995,
+    "GACGTCTT+GGTTGAAC" : 995,
+    "ACACTAAG+AAATTGAT" : 993,
+    "AGCTCGTA+GATTCTGC" : 991,
+    "GTGAATAT+TGAATGAG" : 990,
+    "GAACCCGC+TAAGGTCA" : 988,
+    "CCTTCACC+AAAAAAAA" : 988,
+    "GCCACAGG+TATGGCAT" : 987,
+    "TGGCCGGT+GAGCTATA" : 984,
+    "AGTACTCC+AAAGGTTG" : 983,
+    "CATAGAGT+TGGGTGGC" : 979,
+    "CTGCTTCC+TGATCTAT" : 978,
+    "TTCCTGTT+AAGTACTG" : 977,
+    "GTGAATAT+GAATTATA" : 976,
+    "AGGTTTAT+CGGAACTG" : 971,
+    "CCTTCGAA+CGGACAAC" : 970,
+    "CAAGAGTA+TGGTGGCA" : 969,
+    "ATTGTGAA+AATGCAGT" : 968,
+    "AGTACTCC+TAACAGGT" : 966,
+    "AGCTCGCT+GATTCTCG" : 960,
+    "TCTGTTGG+AAATTAGA" : 959,
+    "CTGCTTCC+GATTCTAT" : 959,
+    "CAATTAAC+TATCTCGG" : 951,
+    "TAAGGTCA+TCTACGAC" : 948,
+    "CATAGAGT+TTTTGGCA" : 947,
+    "CCTTCACC+GGGAGCGT" : 945,
+    "ACAGGCGC+ATGCATAG" : 943,
+    "GGGGGGGG+CGGGGGGG" : 940,
+    "GCCACAGG+TGGCATGG" : 939,
+    "GGGTCACG+CATAATAC" : 938,
+    "ACATAAGA+ATATGGAT" : 938,
+    "TTCCTGTT+AAGATATG" : 937,
+    "CCTCACCA+TTGCCTAG" : 936,
+    "ACCTAAGA+ATATGGAT" : 936,
+    "AACTCGTG+GTTCCAAT" : 935,
+    "AGGTTATA+CGGGAACT" : 933,
+    "TTTGCCTA+TAAGTGGT" : 932,
+    "GGACGTCT+GGTGAACC" : 931,
+    "GCCACAGG+ATTGGCAT" : 931,
+    "TGGCCGGT+GCTCTAGT" : 928,
+    "TCGGGGGG+GGGGGGGG" : 925,
+    "GAACCGCG+AAACGTCA" : 924,
+    "TGCGAGAC+TCAACAAT" : 923,
+    "CCTGCTTC+GATCTATC" : 923,
+    "CTGCTTCC+GATCCTAT" : 922,
+    "GGTCACGA+CATAATCG" : 920,
+    "TATCGCAC+AAAATAAG" : 915,
+    "ACAGGCGC+ATGCAGAT" : 913,
+    "TCATCCTT+AGCCTCGC" : 912,
+    "AACTGTAG+TTAGGCGT" : 907,
+    "TGGGGGGT+GGGGGGGG" : 904,
+    "CGGAACTG+TATTAGTG" : 904,
+    "GGTCACGA+AAAAATAC" : 899,
+    "GACGTCTT+TGGTGAAC" : 898,
+    "TCTGTTGG+TCCATTCG" : 893,
+    "CCATTCGA+CTTACAAC" : 893,
+    "CCATTCGA+CGGCCCAC" : 893,
+    "CCATTCGA+TCGGACAA" : 888,
+    "CTCAACCA+TTGCCTAG" : 886,
+    "ACACTAAG+ATTGGATG" : 879,
+    "GACGGTCT+GGTGAACC" : 877,
+    "TAAGGTCA+AAAAAAAA" : 876,
+    "GGTCACGA+CATTAATA" : 875,
+    "CGGGGGGG+TCGTAGTG" : 872,
+    "CCATTGAA+CGGACAAC" : 872,
+    "TAAGGTCA+CAAAGACA" : 870,
+    "TAAGGTCA+AAAATAAA" : 869,
+    "CATAGAGT+ACGTGGCA" : 868,
+    "TATCCACA+ACACTAAG" : 866,
+    "CCTTCACC+GGCGCGGC" : 865,
+    "CCATTCGA+AAGACAAC" : 865,
+    "ACAGGCGC+TAGGCAGA" : 865,
+    "GCCGTCGT+GGTGAACC" : 860,
+    "GTGAATAT+GAATTGAG" : 859,
+    "AGGTTATA+TCGGAACT" : 858,
+    "ACTCGTGT+GTTCCCAA" : 855,
+    "TTCCTGTT+AAATACTG" : 853,
+    "TGGCCGGT+GGGGGGGT" : 851,
+    "GTGTCGGA+GCAAGCGT" : 851,
+    "TGGCCGGT+TGCGCTCT" : 850,
+    "AACAGGCG+AGGCAGAG" : 846,
+    "ACACTAAG+TATGGATG" : 844,
+    "TGGCGGGG+GGGGGGGG" : 843,
+    "CGGCCCTG+TCGTAGTG" : 842,
+    "TGCGAGAC+CAAAATGG" : 840,
+    "TTGCCTAG+AAACTGGT" : 839,
+    "AGCCGCTA+GATTCTGC" : 839,
+    "GGCCCCCG+ATGGCATG" : 838,
+    "TCGTGTAT+GTTCCAAT" : 837,
+    "CCTTCACC+GGAGCGGT" : 830,
+    "GCGGGGGG+AGATCTCG" : 829,
+    "ACTCGGTG+GTTCCAAT" : 827,
+    "CAATTAAC+ATTCTCGG" : 826,
+    "TGCGAGAC+CAACCAAT" : 823,
+    "CAATTAAC+ATATTCGG" : 822,
+    "TCTGGTTG+CCATTCGA" : 821,
+    "TCATCCTT+AGCTTCGC" : 821,
+    "TATCGCAC+ACCTAAGG" : 818,
+    "GGGGGCGG+AGATCTCG" : 815,
+    "CCATTTCG+CGGACAAC" : 813,
+    "AAGCTCGC+GATTCTGC" : 812,
+    "CCATTCGA+CGGGACAA" : 811,
+    "TTCCTGTT+TAAGATAC" : 809,
+    "ATTGTGAA+GCAAATGC" : 804,
+    "GTGAATAT+TAATGATA" : 799,
+    "GCCACAGG+ATGGGCAT" : 797,
+    "CATTAGAG+TGGTGGCA" : 794,
+    "ATGTGAAA+GCAATGCA" : 792,
+    "GTGGAATA+GAATGAGA" : 790,
+    "AGCTCGCT+GATTCTTG" : 790,
+    "TGGGGGGG+TAAGTGGT" : 788,
+    "GGCCCCGG+ATGGCATG" : 788,
+    "CAATTAAC+TATATCTC" : 787,
+    "AGCTGCTA+GATTCTGC" : 786,
+    "CAATTAAC+ATCTCGGT" : 783,
+    "CCTTCACC+ATAGCGTC" : 780,
+    "GGGGGGGC+ACCTTGGC" : 778,
+    "TCATCCTT+AAATCGCT" : 777,
+    "AACTGTAG+TGCGGCCG" : 777,
+    "GGGGTCCC+ACCTTGGC" : 776,
+    "ACAGGCGC+AGGCTGCG" : 776,
+    "GACGTCTT+GGGGGGGC" : 772,
+    "GCCAAGGA+ATGGCATG" : 771,
+    "GTGAATAT+GAAATGAG" : 769,
+    "GGGGCGGG+AGATCTCG" : 768,
+    "GCCCACAG+ATGGCATG" : 768,
+    "AGTAACTC+AACAGGTT" : 768,
+    "GTGAATAT+TAATTAGA" : 765,
+    "CAATAGAG+TGGTGGCA" : 764,
+    "GCCACAGG+ATGGATGG" : 763,
+    "TGCGAGAC+AAAAAATG" : 760,
+    "TTGCCTAG+TAAAGTGG" : 759,
+    "TAAGGTCA+ATAAGACA" : 757,
+    "GTGTCGGA+GGCAAGCG" : 757,
+    "AACTTAGA+TGCGGCGT" : 756,
+    "GTGTCGGA+GCGCCCGC" : 753,
+    "TCTGTTGG+CCATTATA" : 752,
+    "ATTGTGAA+GCCAATGC" : 752,
+    "TGCGAGAC+CCAACAAT" : 751,
+    "AGGTTATA+CGGAATGG" : 749,
+    "CGGAACTG+GTAGTGGT" : 747,
+    "TTGCCCTA+TAAGTGGT" : 745,
+    "NCTCGTGT+NNTCCAAT" : 744,
+    "AGTCGCTA+GATTCTGC" : 744,
+    "AACTGTAG+TGCGGCTG" : 740,
+    "GTGTCGGA+GCCAAGCG" : 738,
+    "GTGCGGAA+GCGCAAGC" : 738,
+    "CATAGAGT+AAGTGGCA" : 738,
+    "CAATTAAC+ATTATCTC" : 738,
+    "TCATCCTT+TAGCTCGC" : 737,
+    "CCTTCACC+GGAGGTCG" : 736,
+    "ATTGTGAA+GAATGCAG" : 736,
+    "GGTCACGA+CATAAAAA" : 733,
+    "CGTGAATA+GAATGAGA" : 733,
+    "GGGGGGGC+AGATCTCG" : 732,
+    "CCATTCGA+CGGACCCC" : 731,
+    "GCCACAGG+AATGCATG" : 729,
+    "GGTCAACG+CATAATAC" : 728,
+    "CTGCTTCC+TATATATC" : 728,
+    "TTCCTGTT+AAGATTAC" : 723,
+    "TTCCCTGT+AAGATACT" : 723,
+    "ACACTAAG+ATTATGGA" : 721,
+    "GGCGGGGG+AGATCTCG" : 720,
+    "AACTGTAG+ACCGGCGT" : 720,
+    "TGGCCGGG+GGGGGGGG" : 719,
+    "CCTTCCCC+GGGGGGGG" : 719,
+    "ACAGGCGC+ATGAAGAG" : 718,
+    "GGGGGGCC+ACCTTGGC" : 717,
+    "GACCGTCT+GGTGAACC" : 717,
+    "AACTGTAG+TGCCGGCG" : 717,
+    "TGGGGTGG+CCATTCGA" : 715,
+    "TCTGTTGG+ACATTAGA" : 715,
+    "ATTGTGAA+TGCAATGC" : 715,
+    "ACAGGCGC+AGGGCAGA" : 715,
+    "TTGGCCTA+TAAGTGGT" : 714,
+    "TATCGCAC+ACACTTAA" : 713,
+    "TCTGTTGG+CCATTCCG" : 712,
+    "CAATTAAC+ATATTCTC" : 712,
+    "NGGAACTG+NNGTAGTG" : 711,
+    "TGGCCGGT+GATCTCTA" : 709,
+    "GGGGGGCC+CAACAATG" : 708,
+    "CCAATTAA+ATATCTCG" : 708,
+    "ACTCGTGT+GATCCAAA" : 706,
+    "NCTGTTGG+NNATTCGA" : 704,
+    "CCTTCACC+GGGGCGGG" : 704,
+    "TAAGGTCA+CACGACAG" : 701,
+    "TAAGGTCA+CTACGAAC" : 700,
+    "CCTTCACC+AAAGCGTC" : 698,
+    "AGGTTATA+CGGAAACT" : 698,
+    "GGGCGGGG+AGATCTCG" : 695,
+    "TCCTGTTG+CCATTCGA" : 694,
+    "CTCCCCAC+TTGCCTAG" : 694,
+    "TCTGTTGG+CCAATTCG" : 693,
+    "ATTGTGAA+GCAAGCAG" : 691,
+    "CAGGTTAT+CGGAACTG" : 690,
+    "CCAATTCG+CGGACAAC" : 689,
+    "CCCTTCGC+CGGACAAC" : 688,
+    "ACACTAAG+TATATGGA" : 688,
+    "CCTTCACC+TCAGCGTC" : 687,
+    "AGTACTCC+AAACAGGT" : 682,
+    "CCTTCACC+GGCGTCGT" : 681,
+    "ACACTAAG+AAATGGAA" : 681,
+    "NTGCCTAG+NNAGTGGT" : 679,
+    "GGGGCCGC+CATAATAC" : 679,
+    "GGGGCCCC+CATAATAC" : 678,
+    "GGGGGGCG+AGATCTCG" : 677,
+    "AACTGTAG+TGCGGGGG" : 676,
+    "TGCGGGGG+GGGGGGGG" : 675,
+    "GCCGGGGG+GGGGGGGG" : 675,
+    "AGGTTATA+AAGAACTG" : 675,
+    "TCATCCTT+AAAAAAAA" : 671,
+    "TATCGCAC+AAAATAAT" : 669,
+    "GCGGGGGG+GGAGCGTC" : 669,
+    "CGGAACTG+TCCGTAGT" : 668,
+    "GTCTACAC+CCTTGGCG" : 664,
+    "GGGCCCCA+TTGCCTAG" : 660,
+    "CTGCTTCC+GATCTAAT" : 660,
+    "TCATCCTT+TGGGGGGG" : 658,
+    "ACAGGCGC+AATCAGAG" : 657,
+    "ACACTAAG+ATATTGGA" : 657,
+    "CCTTTCAC+GGAGCGTC" : 653,
+    "CGGAACTG+ACCTAGTG" : 652,
+    "ACAGGCGC+AGGGGGGG" : 651,
+    "TGGCCGGT+TCGCTATA" : 650,
+    "GGGCCGGG+GGGGGGGG" : 650,
+    "TAATCGCA+ACACTAAG" : 649,
+    "AGGTACTC+AACAGGTT" : 649,
+    "AAGATACT+GCGCAAGC" : 645,
+    "GACGTCTT+GGTGGAAC" : 644,
+    "TCAATCCT+AGCTCGCT" : 643,
+    "TATCGCAC+CACTAAGG" : 640,
+    "GGGGGGGG+AAATCTCG" : 640,
+    "ATTGTGAA+GCAATTGC" : 640,
+    "NGTACTCC+NNCAGGTT" : 639,
+    "NAAGGTCA+NNACGACA" : 639,
+    "GGTCTACA+ACCTTGGC" : 639,
+    "ACTCGTGT+GAACCAAT" : 639,
+    "AACTAAGA+ATATGGAT" : 639,
+    "CAATTAAC+AAATCTCC" : 638,
+    "ATTGTGAA+CAAATGCA" : 638,
+    "TCATCCTT+AGATCTCG" : 637,
+    "CAATTTAA+ATATCTCG" : 637,
+    "GGGGGGGG+AGGGGGGG" : 636,
+    "AGGTTATA+ACGAACTG" : 636,
+    "TGCGAGAC+AAACAATT" : 635,
+    "TATCGCAC+AAAAAAAA" : 635,
+    "AGGTTATA+CTGAAATG" : 632,
+    "NAACCGCG+NNAGGTCA" : 630,
+    "GGTCACGA+CATAAATA" : 630,
+    "CGACGTCT+GGTGAACC" : 630,
+    "GAACCGCG+AAAGCTCA" : 629,
+    "TCATCCTT+AAATAAAA" : 628,
+    "CTCACCAA+ATGCCAAG" : 628,
+    "NTTGTGAA+NNAATGCA" : 625,
+    "NATAGAGT+NNGTGGCA" : 625,
+    "CTGCTTCC+TAACTATC" : 625,
+    "CCACAGGA+ATGGCATG" : 625,
+    "NTGAATAT+NNATGAGA" : 623,
+    "GAACCGCG+TAAGGTAG" : 622,
+    "TTCCGTTA+AAGATACT" : 619,
+    "TATCGCAC+ACATAAGG" : 619,
+    "ACTCGTGT+CATCCAAT" : 619,
+    "TCGGGTGG+CCATTCGA" : 618,
+    "TAAGGTCA+CTCCGCCA" : 618,
+    "GGCGGGGG+GGTGAACC" : 618,
+    "CCATTCGA+ACGACAAC" : 612,
+    "TGGCCGGT+GCGCCTCT" : 611,
+    "TGCCGAGA+CAACAATG" : 609,
+    "GTTGAATA+GAATGAGA" : 609,
+    "GGGGGGGC+AACAGGTT" : 609,
+    "CCATTCGA+CCGAAAAC" : 608,
+    "TATCGCAC+ACACCTAA" : 607,
+    "GGTCACGA+CCATAATA" : 607,
+    "CCTTCACC+TGGGGGGG" : 607,
+    "TGGGGGGC+CAACAATG" : 605,
+    "CCTTCACC+AGATCTCG" : 605,
+    "ACTTAACC+CCATACTA" : 605,
+    "NTCTACAC+NNCTTGGC" : 604,
+    "AGGTTATA+CGGGGGGG" : 603,
+    "GTGAATAT+AAAAAAAA" : 602,
+    "GCCACAGG+AAGCCATG" : 601,
+    "GGGGTTTT+CGGAACTG" : 600,
+    "GGGGGTGG+AGATCTCG" : 600,
+    "GACGTCTT+GGGGGGCC" : 600,
+    "AACCTGTA+TGCGGCGT" : 599,
+    "TTGCGAGA+CAACAATG" : 597,
+    "GAACCGCG+AAAGGACA" : 597,
+    "ACAGGCGC+AGGCCAGA" : 597,
+    "TGGCCGGT+GCGCTAGT" : 596,
+    "GGTCACGA+AAAAAAAA" : 596,
+    "GGGGGGGG+GGGGGGGT" : 596,
+    "AGGGGGGG+AACAGGTT" : 596,
+    "AACACTAA+ATATGGAT" : 596,
+    "CCTTCACC+AAATAAAA" : 595,
+    "TATCGCAC+TACACTAA" : 594,
+    "CTGGCTTC+GATCTATC" : 594,
+    "CTCACCAA+GCCTAGGT" : 594,
+    "NTGCTTCC+NNTCTATC" : 593,
+    "GTGTCGGA+ATGTAAGT" : 591,
+    "CAGTACTC+AACAGGTT" : 589,
+    "CCGGGGGG+GGGGGGGG" : 588,
+    "AGTACTCC+AACCAGGT" : 587,
+    "AGCTCGCT+TGATTCTG" : 585,
+    "TATCGCAC+AAAATAAA" : 584,
+    "GGGGGTTG+CCATTCGA" : 583,
+    "ACACTAAG+ATATGGGA" : 583,
+    "TGCGAGAC+AAACAAAG" : 582,
+    "GGTCACGA+TCATAATA" : 582,
+    "GGGGGTTC+GATCTATC" : 580,
+    "TCTTGTTG+CCATTCGA" : 578,
+    "TCATCCTT+AGCTCGGC" : 576,
+    "CTCCCCCA+TTGCCTAG" : 576,
+    "GGACCCCG+TAAGGTCA" : 575,
+    "AGCTCGCT+TAATCTGC" : 575,
+    "ACAACTAA+ATATGGAT" : 575,
+    "TCATCCTT+ACATCGCT" : 574,
+    "TATCGCAC+AAACTAAC" : 574,
+    "TGGCCGGT+TCGATCTA" : 573,
+    "GACGTCTT+GGGGCACC" : 572,
+    "NCTTCACC+NNAGCGTC" : 571,
+    "NACGTCTT+NNTGAACC" : 571,
+    "GGTCACGA+CATAATTA" : 571,
+    "NCATTCGA+NNGACAAC" : 568,
+    "CCTTCACC+TAAGCGTC" : 567,
+    "NGGTTATA+NNGAACTG" : 566,
+    "CCCGGCGC+AGGCAGAG" : 566,
+    "ACTTCGTG+GTTCCAAT" : 565,
+    "GTGTCGGA+TGCGCAAG" : 564,
+    "GCGGGGGG+GGTGAACC" : 564,
+    "GCCGGCTT+GGTGAACC" : 564,
+    "TAAGGTCA+CTACGAAG" : 563,
+    "GTGAATAT+TAATGACA" : 562,
+    "GGGGGCGG+CATAATAC" : 562,
+    "ATTGTGAA+CAATGCAG" : 561,
+    "GGGGGGGT+TGGTGGCA" : 560,
+    "TCTGTTGG+CCATTACA" : 554,
+    "TAAGGTCA+AAAAGACA" : 554,
+    "AGGTTATA+CGGCCCTG" : 554,
+    "CTGCTTCC+CAACTATC" : 553,
+    "ATTGTGAA+AAAAAAAA" : 553,
+    "AGGAAATA+ACGAACTG" : 553,
+    "ACAGGCGC+AGGCAGGA" : 553,
+    "TTTCCTGT+AAGATACT" : 552,
+    "NTCACCAA+NNGCCTAG" : 552,
+    "GTCTACAC+AAATAAAA" : 551,
+    "GAACCGCG+AAAAAAAA" : 550,
+    "GGGGGGGG+GGGGTGGG" : 549,
+    "AGGCTCGC+GATTCTGC" : 547,
+    "GACGTCTT+ATTGAACC" : 545,
+    "TCTGTTGG+CCAATAGA" : 544,
+    "CGGAACCT+TCGTAGTG" : 544,
+    "TCATCCTT+AGCTCGGG" : 543,
+    "AGTACTAA+AACAGGTT" : 543,
+    "GTGTCGGA+CGCAAGCG" : 542,
+    "ACTCCGTG+GTTCCAAT" : 542,
+    "GTGAATAT+GAATCATA" : 541,
+    "GGGGGTTT+CGGAACTG" : 541,
+    "TTCTGTTG+CCATTCGA" : 540,
+    "GTGAATAT+TAATTATA" : 540,
+    "CCTTCACC+GGCGCGTG" : 540,
+    "CAATTAAC+ATATCCTC" : 540,
+    "TAAGTTCA+CAAATACA" : 539,
+    "CTCACCAA+ATGACTAG" : 538,
+    "CGGAACTG+TAGTAGTT" : 538,
+    "TGGGGGGG+AAGATACT" : 536,
+    "CTGCGAGA+CAACAATG" : 536,
+    "TCTGTTGG+AAAAAAAA" : 535,
+    "TATCGCAC+ACCACTAA" : 533,
+    "GGGGGGGG+TTGGGGGG" : 533,
+    "GCCACAGG+GGCATGGT" : 533,
+    "GAACCGCG+AAAGTTCA" : 533,
+    "TAAGGTCA+CTACCAAA" : 532,
+    "CCTTCACC+GGGGGGGC" : 532,
+    "GGGGGGGT+AGCTCGCT" : 531,
+    "GCCACAGG+ATGGCAAT" : 530,
+    "CTCACCAA+TTGCCGTG" : 530,
+    "TGGCCGGT+AATAAAAA" : 527,
+    "CTCTGTTG+CCATTCGA" : 527,
+    "AGTACTCC+AAAATGTT" : 527,
+    "TGGCCGGT+GCGCTCGT" : 526,
+    "ACAGGCGC+ACGCAGAC" : 526,
+    "TGGGTTGG+CCATTCGA" : 525,
+    "CGGAACTG+TAGTATTG" : 525,
+    "ACAGGCGC+TGGGGGGG" : 524,
+    "NAATTAAC+NNATCTCG" : 523,
+    "GGGGGGGT+AGATCTCG" : 523,
+    "GGACCCCC+TAAGGTCA" : 523,
+    "TGCGACAT+CAACAATG" : 522,
+    "TGGCCGGT+GCGCTCCT" : 521,
+    "NGCGAGAC+NNACAATG" : 521,
+    "GGGGGCCC+ACCTTGGC" : 521,
+    "TGGCCGGT+TAGCTATA" : 520,
+    "GGCCACAG+ATGGCATG" : 520,
+    "TAAGGTCA+CTACGGAC" : 518,
+    "GGGGGGGC+TTGCCTAG" : 518,
+    "CGGGGGGG+AGATCTCG" : 517,
+    "TATCGCAC+AACTAAGG" : 516,
+    "GGGGGGGT+GTTCCAAT" : 515,
+    "AGCTCGCT+TATTCTTC" : 515,
+    "CGGAACTG+TGGGGGGG" : 514,
+    "TCATCCTT+ACCTAGCT" : 510,
+    "CTCACCAA+TAGCCTAC" : 510,
+    "AATGTTAA+CCAATCCA" : 510,
+    "GTGTCGGA+GCGCAAAG" : 509,
+    "ACAGGCCG+AGGCAGAG" : 509,
+    "GTGTCGGA+GCCGCAAG" : 508,
+    "CTCACCAA+TTGGCCTA" : 508,
+    "ACTAAATG+ACATACTA" : 508,
+    "TGGGGGGG+TGGGGGGG" : 507,
+    "TGGGGGGG+AACAGGTT" : 507,
+    "CTCACCAA+TAGCATAG" : 507,
+    "NCCACAGG+NNGGCATG" : 506,
+    "GAACCGCG+TAACGACA" : 506,
+    "AGGGTTTA+CGGAACTG" : 506,
+    "ACTCGTTG+GTTCCAAT" : 506,
+    "ACCAGGCG+AGGCAGAG" : 506,
+    "TGTGGGGG+GGGGGGGG" : 505,
+    "NGGCCGGT+NNGCTCTA" : 505,
+    "CTGCTTCC+GATCTAGT" : 505,
+    "ATTGTGAA+GCAATGGC" : 504,
+    "ACAGGCGC+AGGAGAGG" : 504,
+    "ACACTAAG+AAATTCAA" : 502,
+    "AACTGTAG+TGGGCGTG" : 501,
+    "GGTCACGA+CAAAAAAC" : 500,
+    "CTCAACAC+ACCTAGTC" : 500,
+    "TGGCCGGT+TATCTCTA" : 499,
+    "ATTGTGAA+GAAATTCA" : 498,
+    "TGTTGGAT+CCATTCGA" : 497,
+    "TAAGGTCA+AAAATACA" : 497,
+    "NCATCCTT+NNCTCGCT" : 497,
+    "ACTCGTGT+GATCAAAT" : 497,
+    "NCAGGCGC+NNGCAGAG" : 495,
+    "CGGAACTG+TCGGTAGT" : 494,
+    "ACAGGCGC+AGGCCGCG" : 494,
+    "GACGTCTT+TCTGAACC" : 493,
+    "GGTCACGA+AATAATAA" : 492,
+    "GGGGCCGG+CATAATAC" : 492,
+    "TGGCCGGT+GCGCAATA" : 491,
+    "GCCACAGG+AAGGAATG" : 491,
+    "CATAGAGT+TGGGGGCT" : 490,
+    "AGCTCGCT+GATTGCGT" : 490,
+    "TTCCTGTT+AAAAAAAA" : 489,
+    "GAACCGCG+TAATTTCA" : 489,
+    "ACTCGTGT+TTACCAAT" : 489,
+    "ACTCGTGT+GATACAAT" : 489,
+    "TATTCGCA+ACACTAAG" : 487,
+    "GGCCCGCG+TAAGGTCA" : 486,
+    "CATAGAGT+TGGTGGGT" : 486,
+    "GTGGGGGG+AGATCTCG" : 485,
+    "CAATTAAC+AAATCACG" : 485,
+    "AGGTTATA+CCGGAACT" : 485,
+    "AGGTTATA+CCGAACTC" : 485,
+    "NCACTAAG+NNATGGAT" : 484,
+    "GGGGGGGG+GGGGCGGG" : 484,
+    "CTCACCAA+TTGGGGGG" : 484,
+    "TTGCCTAG+TAAGTTTT" : 483,
+    "GGTGTCGG+GCGCAAGC" : 483,
+    "TCATCCTT+AAATAAAT" : 482,
+    "TGCGAGAC+AAAAAAAA" : 479,
+    "GCGGGGGG+GTTCCAAT" : 479,
+    "AGTACTCC+AAAAGTTT" : 479,
+    "ACTCGCTA+GATTCTGC" : 479,
+    "TGGGCGCC+CAACAATG" : 478,
+    "GCCACAGG+AACGCATG" : 478,
+    "CTGAAAAT+TAATAATA" : 478,
+    "GTGAATAT+GAAAGATA" : 476,
+    "TTCCTGTT+AATATAAT" : 475,
+    "TAAGGTCA+CAACCACA" : 475,
+    "GTGTCGGA+AAGCAAGC" : 475,
+    "CTGCTTCC+AAACTATC" : 475,
+    "ACTCTTGT+CAAAAAAA" : 475,
+    "GTGAATAT+GGAATGAG" : 474,
+    "AGGTTATA+CTTAACTG" : 471,
+    "GCCACCAG+ATGGCATG" : 470,
+    "AGCTCGCT+AAATCTGC" : 470,
+    "GGGGGGGG+GGGGGGTG" : 469,
+    "CAATTAAC+ATATATAG" : 469,
+    "AGTGGGGG+GGGGGGGG" : 467,
+    "ACTCGTGT+CTACCAAT" : 467,
+    "TTGCCTAG+AAAGTGTT" : 466,
+    "GGGGGGGG+NGATCTCG" : 466,
+    "CTCACCAA+GTGGGGGG" : 466,
+    "GCGGGCGG+GGGGGGGG" : 465,
+    "CTGCTTCC+TATCTATA" : 464,
+    "TTGCCTAG+TAACTGTT" : 463,
+    "NATCGCAC+NNACTAAG" : 463,
+    "CATAGCGG+TGGTGGCA" : 463,
+    "AGCTCGGC+GATTCTGC" : 463,
+    "GGGGCGGG+TAAGGTCA" : 461,
+    "GGGGTTGG+CCATTCGA" : 460,
+    "CGGACCGG+TCGTAGTG" : 460,
+    "ACTCGTGT+AAAAAAAA" : 460,
+    "TATCATAG+AAATTCGA" : 459,
+    "GCCACAGG+ATGGCCAT" : 459,
+    "GTGTCGGA+GCGCCAAG" : 458,
+    "CCTTCCAC+GGAGCGTC" : 458,
+    "TAAGGTCA+AAACTACA" : 457,
+    "CTCACCAA+TATCCTAG" : 457,
+    "CATAGAGT+TCGTTGCA" : 457,
+    "TTGCCTTA+TAAGTGGT" : 456,
+    "GGGGCGGG+TCGTAGTG" : 456,
+    "GCCACAGG+AAGGCATC" : 456,
+    "AGTACTCC+AAAAGGTA" : 456,
+    "GGTCACGA+AATAAAAA" : 455,
+    "AGGTTATA+CGGAACCT" : 455,
+    "AACTGTAG+AACGGCGT" : 455,
+    "TATCGGCA+ACACTAAG" : 454,
+    "NTCCTGTT+NNGATACT" : 454,
+    "GTGGCGGC+GCGCAAGC" : 454,
+    "CTCACCAA+TTGCCAAC" : 454,
+    "GTGGGGGG+TAAGTGGT" : 453,
+    "GGGGGGTG+AGATCTCG" : 453,
+    "CCTTCACC+CCAGCGTC" : 453,
+    "CCTTAACA+GGAGCGTC" : 453,
+    "CTGCTTCC+GATCGTGT" : 452,
+    "CGAACCGC+TAAGGTCA" : 452,
+    "CCTTCCAT+GGAGCGTC" : 452,
+    "CATAGTAT+TGGTGGCA" : 452,
+    "GTTTTAAA+ATATCTCG" : 450,
+    "GTAGGGGC+CTACGACA" : 450,
+    "CTGCTTCC+GATATCGT" : 450,
+    "CATAGAGT+TGGTGGAG" : 449,
+    "CATAGAGT+TGGGGGGT" : 449,
+    "TTCCTGTT+AAAGATAC" : 448
+   }
+  },
+  {
+   "Lane" : 2,
+   "Barcodes" : {
+    "GGGGGGGG+AGATCTCG" : 1222726,
+    "GGGGGGGG+GGGGGGGG" : 560874,
+    "GGGGGGGG+CCATTCGA" : 49206,
+    "GGGGGGGG+GGTGAACC" : 39871,
+    "GGGGGGGG+CAACAATG" : 35924,
+    "GGGGGGGG+AGCTCGCT" : 35597,
+    "GGGGGGGG+TCGTAGTG" : 34789,
+    "GGGGGGGG+GCGCTCTA" : 34124,
+    "GGGGGGGG+GAATGAGA" : 33629,
+    "GGGGGGGG+TAAGGTCA" : 32858,
+    "GGGGGGGG+AACAGGTT" : 31631,
+    "GGGGGGGG+TAAGTGGT" : 31190,
+    "GGGGGGGG+CTACGACA" : 30508,
+    "GGGGGGGG+GTTCCAAT" : 28972,
+    "GGGGGGGG+GATCTATC" : 28032,
+    "GGGGGGGG+GCAATGCA" : 25699,
+    "GGGGGGGG+TGGTGGCA" : 25358,
+    "GGGGGGGG+ATGGCATG" : 25164,
+    "GGGGGGGG+ACCTTGGC" : 24922,
+    "GGGGGGGG+AAGATACT" : 24193,
+    "GGGGGGGG+GGAGCGTC" : 23367,
+    "GGGGGGGG+CGGAACTG" : 22691,
+    "GGGGGGGG+GATTCTGC" : 22469,
+    "GGGGGGGG+AGGCAGAG" : 22379,
+    "GGGGGGGG+CGGACAAC" : 21735,
+    "GGGGGGGG+CATAATAC" : 21645,
+    "GGGGGGGG+ATATCTCG" : 20974,
+    "GGGGGGGG+TGCGGCGT" : 19233,
+    "GGGGGGGG+GCGCAAGC" : 19030,
+    "GGGGGGGG+TTGCCTAG" : 18261,
+    "GGGGGGGG+ACACTAAG" : 16801,
+    "GGGGGGGG+ATATGGAT" : 14748,
+    "CTGCTTCC+GGGGGGGG" : 10744,
+    "GACGTCTT+GGGGGGGG" : 10229,
+    "TGGGGGGG+GGGGGGGG" : 9977,
+    "GTGATATA+GAATGAGA" : 9406,
+    "CCTTCACC+GGGGGGGG" : 9057,
+    "GTGAATAT+GGGGGGGG" : 8521,
+    "CGGAACTG+GGGGGGGG" : 8255,
+    "CAATTACA+ATATCTCG" : 8154,
+    "TGGCCGGT+GGGGGGGG" : 8144,
+    "GGGGGGGG+TGGGGGGG" : 8053,
+    "ACTCGTGT+GGGGGGGG" : 7973,
+    "CATAGAGT+GGGGGGGG" : 7942,
+    "CATTAACA+ATATCTCG" : 7922,
+    "TCATCCTT+GGGGGGGG" : 7836,
+    "AATTAACA+ATATCTCG" : 7805,
+    "TCTGTGGA+CCATTCGA" : 7791,
+    "TCATCTTA+AGCTCGCT" : 7578,
+    "TCTGTTGG+GGGGGGGG" : 7478,
+    "CTCACCAA+GGGGGGGG" : 7326,
+    "CAATTAAC+GGGGGGGG" : 7104,
+    "AGTACTCC+GGGGGGGG" : 7057,
+    "GGGGGGGG+AGCTCTCG" : 7022,
+    "GAACGCGA+TAAGGTCA" : 6682,
+    "TTGCCTAG+GGGGGGGG" : 6560,
+    "CTCACCAA+TGCCTAGG" : 6535,
+    "AGGTTATA+GGGGGGGG" : 6512,
+    "GCCACAGG+GGGGGGGG" : 6377,
+    "TCTGTTGG+CATTCGAG" : 6221,
+    "GGGGGGGG+GTGGGGGG" : 6137,
+    "AACTGTAG+GGGGGGGG" : 5996,
+    "TAAGGTCA+GGGGGGGG" : 5949,
+    "AGCTCGCT+GGGGGGGG" : 5847,
+    "GCCCCGCG+TAAGGTCA" : 5725,
+    "GTCTACAC+GGGGGGGG" : 5659,
+    "AGGTTTAA+CGGAACTG" : 5559,
+    "TCTGTTGG+CCATCGAG" : 5456,
+    "CATAGGTA+TGGTGGCA" : 5439,
+    "GAACCGCG+GGGGGGGG" : 5404,
+    "AGGTATAA+CGGAACTG" : 5357,
+    "TTGTTGGA+CCATTCGA" : 5292,
+    "ATTGTGAA+GGGGGGGG" : 5280,
+    "CCATTCGA+GGGGGGGG" : 5224,
+    "GACCGCGA+TAAGGTCA" : 5196,
+    "GGGGGGGG+AGATATCG" : 5151,
+    "TGCGAGCA+CAACAATG" : 5100,
+    "TGCTTCCA+GATCTATC" : 5070,
+    "TCACCAAA+TTGCCTAG" : 4981,
+    "ACAGGCGC+GGGGGGGG" : 4886,
+    "ACACTAAG+GGGGGGGG" : 4767,
+    "TGCGGACA+CAACAATG" : 4742,
+    "TGCGCGCC+CAACAATG" : 4728,
+    "CTGCTCCA+GATCTATC" : 4717,
+    "ACTGTAGA+TGCGGCGT" : 4713,
+    "ATAGAGTA+TGGTGGCA" : 4642,
+    "TCTTTGGA+CCATTCGA" : 4501,
+    "GTGGGGGG+GGGGGGGG" : 4401,
+    "GCGTCTTA+GGTGAACC" : 4390,
+    "TTCCTGTT+GGGGGGGG" : 4368,
+    "TGCGAGAC+GGGGGGGG" : 4368,
+    "GAACCGCG+AAGGTCAG" : 4341,
+    "GTGAATTA+GAATGAGA" : 4291,
+    "GGTTATAA+CGGAACTG" : 4274,
+    "CATAGAGT+GGTGGCAG" : 4101,
+    "CATTCGAA+CGGACAAC" : 4050,
+    "GACGTCTT+GTGAACCG" : 4046,
+    "ACTCGTGT+GTTCCATG" : 3972,
+    "CATGAGTA+TGGTGGCA" : 3968,
+    "CGGGGGGG+GGGGGGGG" : 3910,
+    "AGTACTCC+ACAGGTTG" : 3847,
+    "CTGTTGGA+CCATTCGA" : 3835,
+    "GTGTCGGA+GGGGGGGG" : 3832,
+    "TCGTTGGA+CCATTCGA" : 3811,
+    "GTGAAATA+GAATGAGA" : 3807,
+    "AGTATCCA+AACAGGTT" : 3795,
+    "CGGAACTG+CGTAGTGG" : 3776,
+    "GCGGGGGG+GGGGGGGG" : 3775,
+    "GGTCACGA+GGGGGGGG" : 3769,
+    "AGTACTCC+AACAGTTG" : 3761,
+    "GACGTTTA+GGTGAACC" : 3722,
+    "CAATAACA+ATATCTCG" : 3705,
+    "CGAACTGA+TCGTAGTG" : 3682,
+    "AGTCTCCA+AACAGGTT" : 3615,
+    "CTTCACCA+GGAGCGTC" : 3601,
+    "ACAGCGCA+AGGCAGAG" : 3547,
+    "ACTCGTGT+GTCCAATG" : 3504,
+    "GGAACTGA+TCGTAGTG" : 3448,
+    "GAACCGGA+TAAGGTCA" : 3446,
+    "AGGTTATA+GGAACTGG" : 3432,
+    "GGGGGGGG+ACATCTCG" : 3396,
+    "AACTGTAG+GCGGCGTG" : 3361,
+    "GTACTCCA+AACAGGTT" : 3349,
+    "TGCGAGAC+AACAATGG" : 3329,
+    "TAGGTCAA+CTACGACA" : 3318,
+    "GCCCCCGG+ATGGCATG" : 3281,
+    "ACGGCGCA+AGGCAGAG" : 3212,
+    "GGGGCGGG+GGGGGGGG" : 3197,
+    "ACTCGTGT+GTTCAATG" : 3144,
+    "TATCGCCA+ACACTAAG" : 3110,
+    "GGGGGGGG+AGATCACG" : 3107,
+    "GCGAGACA+CAACAATG" : 3080,
+    "TTGCCTAG+AAGTGGTG" : 3079,
+    "GACGTCTT+GGTGACCG" : 3068,
+    "GGGGGGGT+GGGGGGGG" : 3037,
+    "ACTGTGTA+GTTCCAAT" : 3016,
+    "CTGTTCCA+GATCTATC" : 3008,
+    "AACTGTAG+TGCGCGTG" : 2994,
+    "GTCTACAC+ACCTTTGG" : 2980,
+    "CTCCCAAA+TTGCCTAG" : 2971,
+    "GGGCGGGG+GGGGGGGG" : 2959,
+    "ACACTAGA+ATATGGAT" : 2954,
+    "CATAGAGT+TGTGGCAG" : 2949,
+    "AGTACCCA+AACAGGTT" : 2937,
+    "TGGCCGTA+GCGCTCTA" : 2921,
+    "TATCGCAC+GGGGGGGG" : 2918,
+    "GGGGGGGG+GCGGGGGG" : 2914,
+    "AGGTTATA+CGAACTGG" : 2912,
+    "CAGGCGCA+AGGCAGAG" : 2904,
+    "TGCGAGAC+CACAATGG" : 2901,
+    "TGGCGGTA+GCGCTCTA" : 2898,
+    "ACAGGCGC+AGCAGAGG" : 2878,
+    "CCGTCCCC+GGAGCGTC" : 2877,
+    "TGCAGACA+CAACAATG" : 2854,
+    "TTGCCTAG+TAAGTGTG" : 2847,
+    "CCATTCGA+GGACAACG" : 2843,
+    "GCACAGGA+ATGGCATG" : 2840,
+    "TTGCTAGA+TAAGTGGT" : 2837,
+    "AGTTATAA+CGGAACTG" : 2826,
+    "AGGTTATA+CGGACTGG" : 2823,
+    "TCTCCTTA+AGCTCGCT" : 2803,
+    "GGGGGTGG+CCATTCGA" : 2800,
+    "CCTTCACC+GAGCGTCG" : 2800,
+    "GTCTACAC+ACCTGGCG" : 2791,
+    "GGGGGGGG+AGATCTCC" : 2783,
+    "GGCCGGTA+GCGCTCTA" : 2780,
+    "GGTCACGA+ATAATACG" : 2775,
+    "CTCACCAA+TTTGCCTA" : 2753,
+    "CCATTCGA+CGGACACG" : 2733,
+    "TATCCTTA+AGCTCGCT" : 2712,
+    "TGCGAGAC+CAACATGG" : 2711,
+    "GGTCACGA+CATATACG" : 2692,
+    "TGCCTAGA+TAAGTGGT" : 2671,
+    "CTACCAAA+TTGCCTAG" : 2671,
+    "TGCGAACA+CAACAATG" : 2651,
+    "GTGAATAT+GATGAGAG" : 2647,
+    "CCATTCGA+CGGCCACC" : 2640,
+    "CCATTCGA+CGACAACG" : 2639,
+    "GACGCTTA+GGTGAACC" : 2636,
+    "GGCGGGGG+GGGGGGGG" : 2609,
+    "TGGCCGGT+TAGCTCTA" : 2580,
+    "CCTCACCA+GGAGCGTC" : 2573,
+    "AATGTAGA+TGCGGCGT" : 2562,
+    "GAACCGCG+TAAGTCAG" : 2524,
+    "GGGGGTGG+GGGGGGGG" : 2514,
+    "GAGTCTTA+GGTGAACC" : 2503,
+    "AACCGCGA+TAAGGTCA" : 2492,
+    "TAAGGTCA+TACGACAG" : 2489,
+    "TATCGCAC+TAATACAG" : 2476,
+    "CATAGAGT+TGGTGCAG" : 2453,
+    "GCCACAGG+ATGCATGG" : 2412,
+    "GGGTGGGG+GGGGGGGG" : 2404,
+    "GGGGGGGG+CGGGGGGG" : 2399,
+    "TAAAGGTC+CTACGACA" : 2398,
+    "GACGTCTT+GGGAACCG" : 2388,
+    "GTAATATA+GAATGAGA" : 2381,
+    "TGGCCGGT+GCGCTCAG" : 2335,
+    "AAAAAAAA+AAAAAAAA" : 2334,
+    "TTCCTGTT+AGATACTG" : 2329,
+    "TTGCCTAG+TTAAGTGG" : 2327,
+    "AGCTCGCT+GATCTGCG" : 2293,
+    "TTGCCTAG+TAGTGGTG" : 2274,
+    "GTGAATAT+GAATGAAG" : 2269,
+    "GAACCGCG+TAGGTCAG" : 2265,
+    "ACACTAAG+ATATGATG" : 2264,
+    "ATTGTGAA+TAAATGCA" : 2253,
+    "GTCTCCCC+ACCTTGGC" : 2251,
+    "TGGGGGGG+GCGCTCTA" : 2247,
+    "GGCGGGGT+GGTGAACC" : 2246,
+    "CGCTTCCA+GATCTATC" : 2236,
+    "GGGGGCGG+GGGGGGGG" : 2235,
+    "TCTGTTGG+AAATTCGA" : 2232,
+    "GGGGGGGC+CAACAATG" : 2232,
+    "ATATGGAT+ACACTAAG" : 2221,
+    "GGTCCGAA+CATAATAC" : 2220,
+    "GGTCCCGC+CATAATAC" : 2197,
+    "GTGTCGGA+GCGCAGCG" : 2189,
+    "GGGGGGGG+AGATCTCT" : 2151,
+    "TCGAGACA+CAACAATG" : 2135,
+    "GGGGGGGC+GGGGGGGG" : 2134,
+    "CTGCTTCC+GACTATCG" : 2134,
+    "ACTCGTGT+GTTTCCAA" : 2127,
+    "GTCTACAC+ACCTTGCG" : 2124,
+    "GAACCGCG+TAAGGCAG" : 2112,
+    "CAATTAAC+ATACTCGG" : 2110,
+    "CTCACCAA+TTGCCAGG" : 2108,
+    "ATTGTGAA+GCATGCAG" : 2096,
+    "ACAGGCGC+AAAAAAAA" : 2091,
+    "AGGGTTAT+CGGAACTG" : 2088,
+    "AACGTAGA+TGCGGCGT" : 2085,
+    "GGTACGAA+CATAATAC" : 2056,
+    "GGAATATA+GAATGAGA" : 2041,
+    "TATGCACA+ACACTAAG" : 2036,
+    "ATACTCCA+AACAGGTT" : 2036,
+    "TGGGGGGG+CCATTCGA" : 2025,
+    "GGTGGGGG+GGGGGGGG" : 1999,
+    "ATCGTGTA+GTTCCAAT" : 1999,
+    "TCACCTTA+AGCTCGCT" : 1996,
+    "GTGAATAT+GAATGGAG" : 1995,
+    "GAACCGCG+TTAAGGTC" : 1991,
+    "CGGAACTG+TCGTATGG" : 1976,
+    "GGGGGGGG+AGATCTAG" : 1964,
+    "CAATTAAC+AATCTCGG" : 1960,
+    "ACACTAAG+ATATGGTG" : 1960,
+    "CATAGAGT+TTGGTGGC" : 1950,
+    "CGGAACTG+TCGAGTGG" : 1942,
+    "CCTTCCCA+GGAGCGTC" : 1941,
+    "CCATCGAA+CGGACAAC" : 1940,
+    "CAATTAAC+ATATCCGG" : 1936,
+    "CGGAACTG+TCGTGTGG" : 1932,
+    "ACGTCTTA+GGTGAACC" : 1931,
+    "GACGTCTT+GGTGCCCC" : 1910,
+    "TCTGTTGG+CCATTTCG" : 1900,
+    "CCACCAAA+TTGCCTAG" : 1900,
+    "GGGGGGTG+GGGGGGGG" : 1898,
+    "CTGCTTCC+GATCATCG" : 1895,
+    "AGGCGCAT+AGGCAGAG" : 1891,
+    "GTCACGAA+CATAATAC" : 1886,
+    "CGGACTGA+TCGTAGTG" : 1884,
+    "TCATCCTT+ATATCGCT" : 1881,
+    "GGGGGGGG+GGGGGGGT" : 1881,
+    "TTCGCACA+ACACTAAG" : 1879,
+    "TCTGTTGG+CAATTAGA" : 1870,
+    "ACTAAGAT+ATATGGAT" : 1868,
+    "TAAGTCAA+CTACGACA" : 1867,
+    "GGTCAGAA+CATAATAC" : 1861,
+    "GAAACCGC+TAAGGTCA" : 1851,
+    "CATCCTTA+AGCTCGCT" : 1844,
+    "CCTTCACC+GGAGCGCG" : 1841,
+    "GGTCACGA+CAAATACG" : 1835,
+    "CCATTCGA+AAAAAAAA" : 1833,
+    "CGGAACTG+TTCGTAGT" : 1832,
+    "GGGGGGGT+GGTGAACC" : 1830,
+    "CCTTCACC+TTAGCGTC" : 1823,
+    "GGGGGGGG+GGGGTGGG" : 1804,
+    "GGCACGAA+CATAATAC" : 1800,
+    "CCATTCGA+ATGACAAC" : 1800,
+    "CTAGAGTA+TGGTGGCA" : 1795,
+    "GGGGTGGG+GGGGGGGG" : 1793,
+    "TGGCCGGT+AAAAAAAA" : 1788,
+    "TCATCCTT+AGCCGCTG" : 1778,
+    "ACAGGCGC+ATTCAGAG" : 1767,
+    "CGGAAACT+TCGTAGTG" : 1766,
+    "TCATCCTT+ACTCGCTG" : 1764,
+    "GGGGGGGG+GGGGGGTG" : 1754,
+    "CTGCTTCC+GATCTACG" : 1744,
+    "AGTACTCC+AACGGTTG" : 1712,
+    "GCCACGGA+ATGGCATG" : 1708,
+    "AAGGTCAA+CTACGACA" : 1707,
+    "TATCGACA+ACACTAAG" : 1705,
+    "TAAGGGTC+CTACGACA" : 1697,
+    "GTCTACAC+AAATTGGC" : 1688,
+    "GGGGGGGG+GGGTGGGG" : 1673,
+    "GGGGGGCG+GGGGGGGG" : 1662,
+    "GGGGGGGG+AGAACTCG" : 1660,
+    "ACCGTGTA+GTTCCAAT" : 1657,
+    "CTCACCAA+TTGCCCTA" : 1655,
+    "GGGGGGGG+GGTGGGGG" : 1651,
+    "TCATCCTT+AGCTCGTG" : 1649,
+    "CTGCTTCC+ATCTATCG" : 1644,
+    "CCTTCACC+GGGCGTCG" : 1643,
+    "GCCGTCGT+GGTGAACC" : 1640,
+    "TGGCCGGT+GCGCCTAG" : 1639,
+    "ACAGGCGC+AGGCAAGG" : 1638,
+    "ACTCGGTA+GTTCCAAT" : 1630,
+    "CTCGTGTA+GTTCCAAT" : 1623,
+    "TGGCCGGT+GAGCTATA" : 1614,
+    "CGGAATGA+TCGTAGTG" : 1602,
+    "TATCGCAC+ACACAAGG" : 1601,
+    "CTGCTTCC+GTCTATCG" : 1599,
+    "GAACCCGA+TAAGGTCA" : 1596,
+    "CTCACCAA+TTGCTAGG" : 1594,
+    "ACAGGCGC+GGCAGAGG" : 1590,
+    "TAAGGTCA+AAACGACA" : 1589,
+    "GTCTAACA+ACCTTGGC" : 1588,
+    "GAACGTCT+GGTGAACC" : 1587,
+    "AACTGTGA+TGCGGCGT" : 1587,
+    "CCTTCACC+GGACGTCG" : 1584,
+    "TAAGGCAA+CTACGACA" : 1581,
+    "TGCCGGTA+GCGCTCTA" : 1579,
+    "TTGCCAGA+TAAGTGGT" : 1574,
+    "TCTGTTGG+CCATTCAG" : 1547,
+    "TCCTGTTA+AAGATACT" : 1542,
+    "GTCTACCA+ACCTTGGC" : 1542,
+    "CGGCCCTG+TCGTAGTG" : 1526,
+    "TGCGAGAC+CAACAAAT" : 1515,
+    "TGGGCGGG+GCGCTCTA" : 1513,
+    "CTCTTCCA+GATCTATC" : 1509,
+    "CGGGGGGG+TCGTAGTG" : 1507,
+    "TAAGGTCA+ACGACAGT" : 1506,
+    "GTGAATAT+GAAGAGAG" : 1500,
+    "ACAGGCGC+ATGCAGAT" : 1499,
+    "GGGGGGGT+GAATGAGA" : 1498,
+    "TGGCCGGT+GCGCTTAG" : 1497,
+    "TATCGCAC+AAACTAAT" : 1495,
+    "AACTGTAG+TTGCGGCG" : 1494,
+    "TACGCACA+ACACTAAG" : 1483,
+    "CTGCTTCC+GATTATCG" : 1481,
+    "CTGCTTCC+GATCTTCG" : 1480,
+    "CGGAACGA+TCGTAGTG" : 1479,
+    "GTCTACAC+ACTTGGCG" : 1475,
+    "TTCCTAGA+TAAGTGGT" : 1471,
+    "GACGTCTT+GGTAACCG" : 1468,
+    "TGGCCGGT+GCGTCTAG" : 1463,
+    "ACAGGGCG+AGGCAGAG" : 1458,
+    "TCTGTTGG+CCTTCGAG" : 1452,
+    "GTTACACA+ACCTTGGC" : 1441,
+    "TTGCCTGA+TAAGTGGT" : 1440,
+    "GGGGGGGG+GGGGCGGG" : 1438,
+    "GGGGGTGC+GATCTATC" : 1435,
+    "TGGGGTGG+CCATTCGA" : 1432,
+    "AAACTGTA+TGCGGCGT" : 1431,
+    "TGGGCCGG+GCGCTCTA" : 1426,
+    "GTGAATAT+AATGAGAG" : 1420,
+    "TGAATATA+GAATGAGA" : 1419,
+    "GTCTCACA+ACCTTGGC" : 1412,
+    "AAGGCGCA+AGGCAGAG" : 1409,
+    "TCTGTTGG+CCCATTCG" : 1408,
+    "AGACTCCA+AACAGGTT" : 1398,
+    "CATAGAGT+TGGGGCAG" : 1390,
+    "GGTCACGA+CATAAACG" : 1389,
+    "TAAGGTCA+CTACGCAG" : 1386,
+    "CGGAACTG+TGTAGTGG" : 1386,
+    "CGGGAACT+TCGTAGTG" : 1382,
+    "CCTTACCA+GGAGCGTC" : 1381,
+    "GGGGGGGG+GGGCGGGG" : 1370,
+    "AGGTTAAT+CGGAACTG" : 1366,
+    "ACAGGCCA+AGGCAGAG" : 1350,
+    "GCCCAGGA+ATGGCATG" : 1330,
+    "CATAAGTA+TGGTGGCA" : 1322,
+    "ATCGCACA+ACACTAAG" : 1321,
+    "GGGGGTTT+GAATGAGA" : 1319,
+    "CAAATTAA+ATATCTCG" : 1318,
+    "ACAGGCGC+ATGCATAG" : 1317,
+    "TCGGGTGG+CCATTCGA" : 1316,
+    "GTCACACA+ACCTTGGC" : 1303,
+    "CGGAACTG+TCGTTAGT" : 1303,
+    "TTGCCTAG+TAAGGGTG" : 1301,
+    "GCCACAGG+ATGGCTGG" : 1301,
+    "TAAGGTCA+CAACTACA" : 1299,
+    "GGGGCGGG+GCGCTCTA" : 1294,
+    "CCTTCACC+GGCGCGGC" : 1293,
+    "GGTCACGA+CTAATACG" : 1287,
+    "GCCACAGG+AGGCATGG" : 1284,
+    "CTCACCAA+TTGCCTTA" : 1278,
+    "ACTCGTGT+TCCAATGT" : 1278,
+    "GGTGAATA+GAATGAGA" : 1274,
+    "ACAGGCGC+AGGCGAGG" : 1271,
+    "ACACAAGA+ATATGGAT" : 1267,
+    "AGCTCGCT+GATTTCTG" : 1264,
+    "CCATTCGA+CGGCAACG" : 1258,
+    "GCTACACA+ACCTTGGC" : 1255,
+    "GGGGTTTT+GAATGAGA" : 1253,
+    "GACTCTTA+GGTGAACC" : 1249,
+    "TCTGTTGG+AAATTATA" : 1238,
+    "TGGCCGGT+GCCTCTAG" : 1228,
+    "TTGCCTAG+TAAGTTGG" : 1222,
+    "ACTCGTGT+TTTACAAT" : 1221,
+    "TCATCCTT+GCTCGCTG" : 1219,
+    "ACTCGTTA+GTTCCAAT" : 1211,
+    "TAAGGTCA+AAAAAAAA" : 1209,
+    "CATAGATA+TGGTGGCA" : 1206,
+    "CATAGAGT+TGGTGGGC" : 1204,
+    "TAAGGTCA+CTCGACAG" : 1199,
+    "CCATAGAG+TGGTGGCA" : 1199,
+    "TTCTGTTA+AAGATACT" : 1198,
+    "TTGCCTAG+TAATGGTG" : 1196,
+    "ACAGGGCA+AGGCAGAG" : 1193,
+    "ACTCGTGT+TTCCAATG" : 1189,
+    "CCGGAACT+TCGTAGTG" : 1188,
+    "TGGCCGGT+CGCTCTAG" : 1183,
+    "TGCGAAGA+CAACAATG" : 1180,
+    "ACTCGTGT+TGTTCCAA" : 1176,
+    "TAAGGTCA+CTACACAG" : 1171,
+    "CGGAACTG+TCGTAGGT" : 1168,
+    "AGCTCGCT+GTTCTGCG" : 1166,
+    "GGGGGGGG+GGGGGGGC" : 1165,
+    "CCTTCACC+AAAAAAAA" : 1159,
+    "GACGTCTT+TTTGAACC" : 1151,
+    "GACGTCTT+GGGTGAAC" : 1151,
+    "TCATCCTT+AGCTCCTG" : 1150,
+    "CACTAAGA+ATATGGAT" : 1150,
+    "CTGCTTCC+GATCTTAT" : 1144,
+    "CCATTCGA+CGGAAACG" : 1143,
+    "GTGAATAT+GAATAGAG" : 1139,
+    "AATTGTGA+GCAATGCA" : 1138,
+    "GTGTGGAA+GCGCAAGC" : 1137,
+    "ACACTAAG+AATGGATG" : 1135,
+    "TGGGTTGG+CCATTCGA" : 1128,
+    "AGGGGGGG+GGGGGGGG" : 1120,
+    "TCTGTTGG+CCATTGAG" : 1119,
+    "AGGTTATA+ATGAACTG" : 1116,
+    "TGGGGGGG+CAACAATG" : 1115,
+    "TGGCCGGT+GGCTCTAG" : 1113,
+    "CAATTAAC+AAATATCG" : 1108,
+    "TGCGAGAC+CAAACAAT" : 1101,
+    "ACACTAAG+ATGGATGT" : 1100,
+    "AGCTCGCT+ATTCTGCG" : 1099,
+    "CTCCCCAC+TTGCCTAG" : 1094,
+    "CCCTTCAC+GGAGCGTC" : 1094,
+    "AGCTCGCT+GATTCGCG" : 1094,
+    "TGGCCCGG+GCGCTCTA" : 1092,
+    "GTCTACAC+ACCCTTGG" : 1092,
+    "GTGTCGGA+GCGCAACG" : 1090,
+    "AAGGTTAT+CGGAACTG" : 1086,
+    "ACAGGCGC+ATGAAGAG" : 1085,
+    "CCTTCACC+TGGAGCGT" : 1080,
+    "CCTTCACC+GGAGCTCG" : 1078,
+    "CCATTCGA+CGGCCCAC" : 1075,
+    "AACTGTAG+TCGGCGTG" : 1075,
+    "GGGGGGCC+CAACAATG" : 1072,
+    "GCCGGCTT+GGTGAACC" : 1062,
+    "ACACTAAG+ATAGGATG" : 1058,
+    "CCCGGCGC+AGGCAGAG" : 1055,
+    "TCATCCTT+AGTCGCTG" : 1054,
+    "CTCCCCCA+TTGCCTAG" : 1052,
+    "GAACCGCG+TAAGGGTC" : 1049,
+    "GGGGGGTT+GAATGAGA" : 1048,
+    "AACTGTAG+TTAGGCGT" : 1044,
+    "CGGAACTG+TCTAGTGG" : 1043,
+    "AGCTCGCT+GATTTGCG" : 1043,
+    "CATAGAGT+TGGTTGGC" : 1040,
+    "TCTGTTGG+CCATTATA" : 1037,
+    "ACTCTGTA+GTTCCAAT" : 1036,
+    "TTCCTGTT+AAGATCTG" : 1035,
+    "TCATCCTT+AGCTGCTG" : 1030,
+    "CATAGGAG+TGGTGGCA" : 1029,
+    "GTGAATAT+TAATGATA" : 1026,
+    "TATCGCAC+AAAATAAG" : 1024,
+    "AGCTCGCT+GATTCTCG" : 1023,
+    "CGGAACTG+AAGTAGTG" : 1022,
+    "TCTGTTGG+AAATTAGA" : 1019,
+    "TCATCCTT+AGCTCCGC" : 1018,
+    "CATAAGAG+TGGTGGCA" : 1018,
+    "GGGGGGGG+AAAAAAAA" : 1015,
+    "GCCAACAG+ATGGCATG" : 1015,
+    "TAAGGTCA+AAAATAAA" : 1013,
+    "GTGAATAT+GAATTATA" : 1011,
+    "CTCACCAA+TTCCTAGG" : 1011,
+    "ACAAGGCG+AGGCAGAG" : 1008,
+    "CAATTAAC+ATATCTTC" : 1004,
+    "GAACCGCG+TAAAGGTC" : 1003,
+    "ACATAAGA+ATATGGAT" : 1003,
+    "TAAGGTCA+CTTACGAC" : 1002,
+    "GGGGGGGT+AGCTCGCT" : 1002,
+    "CCATTCGA+CTTACAAC" : 996,
+    "AGTACTCC+AAAGGTTG" : 993,
+    "TGCGGAGA+CAACAATG" : 990,
+    "TAAGGTCA+ATAAGACA" : 986,
+    "GTCTACAC+TACCTTGG" : 985,
+    "CCTTCACC+GGAGCCGT" : 985,
+    "TGGAGACA+CAACAATG" : 984,
+    "CATAGAAG+TGGTGGCA" : 983,
+    "CCCATTCG+CGGACAAC" : 982,
+    "GAACCCGC+TAAGGTCA" : 981,
+    "GAACCGCG+TAAGGTTC" : 977,
+    "TTCCTGTT+AAGTACTG" : 976,
+    "CGGAACTG+TATTAGTG" : 975,
+    "CTGCTTCC+TGATCTAT" : 972,
+    "AACTGTAG+TGCGGGCG" : 972,
+    "TGGCCGGT+GCGCTTCT" : 971,
+    "AACTGTAG+TGGGGGGG" : 971,
+    "GCTCGCTA+GATTCTGC" : 969,
+    "GCCACAGG+TATGGCAT" : 968,
+    "GGGCCGGG+GCGCTCTA" : 966,
+    "CAAGAGTA+TGGTGGCA" : 964,
+    "TTCCTGTT+AAGAACTG" : 957,
+    "GTGTCGGA+GCGAAGCG" : 957,
+    "CCTTCGAA+CGGACAAC" : 957,
+    "AAGTACTC+AACAGGTT" : 953,
+    "CATAGAGT+TTTTGGCA" : 951,
+    "CCCTTCGC+CGGACAAC" : 950,
+    "ACACTAAG+AAATTGAT" : 950,
+    "AACTCGTG+GTTCCAAT" : 949,
+    "TGGCGAGA+CAACAATG" : 942,
+    "GGCCCGCG+TAAGGTCA" : 938,
+    "AGGTTATA+CGGGAACT" : 934,
+    "GTGAATAT+TAATTAGA" : 933,
+    "GGGGCGGG+TAAGGTCA" : 933,
+    "CTGCTTCC+GATCCTAT" : 932,
+    "CTGCTTCC+GATTCTAT" : 927,
+    "ACCTAAGA+ATATGGAT" : 927,
+    "GACGTCTT+GGTTGAAC" : 923,
+    "GCCACAGG+TGGCATGG" : 920,
+    "GCCACAGG+ATTGGCAT" : 920,
+    "CGGACCGG+TCGTAGTG" : 918,
+    "AGGTTTAT+CGGAACTG" : 917,
+    "TGGCCGGT+GCTCTAGT" : 914,
+    "GGGGGGGC+AGATCTCG" : 913,
+    "CATAGAGT+TGGGTGGC" : 913,
+    "AGCTCGTA+GATTCTGC" : 913,
+    "CCTGCTTC+GATCTATC" : 912,
+    "GTGAATAT+GAATTGAG" : 910,
+    "GGGGTTGG+CCATTCGA" : 909,
+    "GGACGTCT+GGTGAACC" : 909,
+    "GAACCGCG+AAATGTCA" : 909,
+    "GCGGGGGG+AGATCTCG" : 906,
+    "GGTCACGA+CATAATCG" : 905,
+    "GGGGGGGG+GGGGGTGG" : 900,
+    "GGGGGGGT+GTTCCAAT" : 898,
+    "GGGGGGGG+GGGGGGCG" : 898,
+    "GACGGTCT+GGTGAACC" : 896,
+    "CTGCTTCC+TATATATC" : 896,
+    "GGGTCACG+CATAATAC" : 895,
+    "GGGGGGGC+ACCTTGGC" : 894,
+    "GCGGGGGG+CCATTCGA" : 894,
+    "CATAGAGT+ATGTGGCA" : 890,
+    "GGGGCGGG+AGATCTCG" : 889,
+    "TCATCCTT+AGCCTCGC" : 887,
+    "CAATTAAC+TATCTCGG" : 887,
+    "GGGCCGGG+TAAGGTCA" : 884,
+    "GGGGGGGG+AGGGGGGG" : 883,
+    "TGGCCGGT+GATCTCTA" : 880,
+    "TTCCTGTT+AAATACTG" : 876,
+    "CTCAACCA+TTGCCTAG" : 875,
+    "TAAGGTCA+CAAAGACA" : 874,
+    "GACGTCTT+TGGTGAAC" : 872,
+    "AACAGGCG+AGGCAGAG" : 872,
+    "TTCCTGTT+AAGATATG" : 869,
+    "TGCGAGAC+CAAAATGG" : 868,
+    "GGGGGCGG+AGATCTCG" : 866,
+    "TGGCCGGT+TCGCTATA" : 865,
+    "AGTACTCC+TAACAGGT" : 865,
+    "CCATTCGA+CGGACCCC" : 860,
+    "TAAGGTCA+TCTACGAC" : 859,
+    "GGGGTCCC+ACCTTGGC" : 858,
+    "TGCGAGAC+TCAACAAT" : 857,
+    "GGCGGGGG+GGTGAACC" : 856,
+    "TCTGTTGG+ACATTAGA" : 854,
+    "TCTGTTGG+TCCATTCG" : 853,
+    "TATCGCAC+AAAATAAT" : 853,
+    "GGCCCCGG+ATGGCATG" : 852,
+    "GTGGGGGG+CTACGACA" : 851,
+    "AGCTGCTA+GATTCTGC" : 849,
+    "GGTCACGA+CATTAATA" : 848,
+    "GTGTCGGA+GCGCCCGC" : 843,
+    "GTGAATAT+TGAATGAG" : 842,
+    "AGGTTATA+CTGAAATG" : 842,
+    "TTTGCCTA+TAAGTGGT" : 838,
+    "CCTCACCA+TTGCCTAG" : 833,
+    "CCTTCACC+GGAGCGGT" : 832,
+    "GGGGGGGC+AACAGGTT" : 830,
+    "TGCGAGAC+AAACAATT" : 829,
+    "GGGGGGGG+TTGGGGGG" : 829,
+    "TGCGAGAC+AAAAAATG" : 828,
+    "TATCGCAC+ACCTAAGG" : 828,
+    "CCATTGAA+CGGACAAC" : 828,
+    "ACACTAAG+ATTGGATG" : 827,
+    "AGCCGCTA+GATTCTGC" : 826,
+    "ACAGGCGC+TAGGCAGA" : 821,
+    "GGGGCCGC+CATAATAC" : 819,
+    "GCCAAGGA+ATGGCATG" : 819,
+    "TATCCACA+ACACTAAG" : 817,
+    "CAATAGAG+TGGTGGCA" : 816,
+    "CCATTCGA+TCGGACAA" : 815,
+    "TCATCCTT+AGCTTCGC" : 814,
+    "TGGCCGGT+TGCGCTCT" : 813,
+    "GAACCGCG+TAATTTCA" : 813,
+    "GTGAATAT+AAAAAAAA" : 811,
+    "CATAGAGT+TGGGGGGG" : 809,
+    "CAATTAAC+ATTCTCGG" : 809,
+    "CCTTCACC+GGGAGCGT" : 806,
+    "GCGGGGGG+GTTCCAAT" : 801,
+    "TGGCCGGT+TAGCTATA" : 800,
+    "GGGCGGGG+AGATCTCG" : 799,
+    "CATTAGAG+TGGTGGCA" : 799,
+    "AGGTTATA+TCGGAACT" : 799,
+    "TGGCGGGG+GCGCTCTA" : 797,
+    "ACTCGTGT+TATCCAAT" : 789,
+    "ACTCGTGT+GTTAAAAT" : 789,
+    "ACTCGTGT+GTTCCCAA" : 788,
+    "GGGGGGGC+ACACTAAG" : 784,
+    "GGGGCGGG+TCGTAGTG" : 784,
+    "CAATTAAC+ATATTCGG" : 781,
+    "AGTAACTC+AACAGGTT" : 780,
+    "GGCGGGGG+AGATCTCG" : 779,
+    "GCACCGGG+TAAGGTCA" : 779,
+    "ACACTAAG+TATGGATG" : 779,
+    "TTCCTGTT+TAAGATAC" : 778,
+    "TTGCCTAG+TAAGGGGG" : 777,
+    "GTGGGGGG+TAAGTGGT" : 777,
+    "TTGCCTAG+AAATTGGT" : 776,
+    "GGGGGGCC+ACCTTGGC" : 776,
+    "CGGAACTG+GTAGTGGT" : 776,
+    "AGCTCGCT+GATTCTTG" : 775,
+    "ACTCGTGT+GATCCAAA" : 773,
+    "TCTGGTTG+CCATTCGA" : 772,
+    "ACTCGGTG+GTTCCAAT" : 772,
+    "GTGTCGGA+TAGCAAGC" : 771,
+    "GGCCCGGG+TAAGGTCA" : 769,
+    "TCATCCTT+TAGCTCGC" : 768,
+    "CCATTCGA+CGGGACAA" : 768,
+    "TATCGCAC+AAAAAAAA" : 765,
+    "ATGTGAAA+GCAATGCA" : 763,
+    "CCTGCCCC+GGAGCGTC" : 760,
+    "AGTACTAA+AACAGGTT" : 758,
+    "TGCGAGAC+CAACCAAT" : 756,
+    "GCCCCTGG+ATGGCATG" : 756,
+    "ATTGTGAA+GCAAATGC" : 756,
+    "GCCACAGG+ATGGATGG" : 755,
+    "CGGAACTG+TAGTAGTT" : 753,
+    "GGTGGGGG+GCAATGCA" : 752,
+    "TGTGGTGG+CCATTCGA" : 750,
+    "ATTGTGAA+AATGCAGT" : 749,
+    "GGGCGGGG+TAAGGTCA" : 748,
+    "GTGTCGGA+GGCAAGCG" : 746,
+    "GTGAATAT+GAAATGAG" : 746,
+    "CCATTTCG+CGGACAAC" : 746,
+    "GGTCAACG+CATAATAC" : 745,
+    "GGGGGGGG+GGCGGGGG" : 745,
+    "AGTACTCC+AAACAGGT" : 745,
+    "GGGGGGCG+AGATCTCG" : 744,
+    "GCCCACAG+ATGGCATG" : 744,
+    "TATCGCAC+ACACTTAA" : 743,
+    "GTGTCGGA+GCAAGCGT" : 743,
+    "CAATTAAC+TATATCTC" : 743,
+    "ATTGTGAA+AAAAAAAA" : 743,
+    "TGGGGGGC+CAACAATG" : 741,
+    "TAAGGTCA+CTCCGCCA" : 741,
+    "AGGTTATA+CGGCCCTG" : 741,
+    "ATTGTGAA+GAATGCAG" : 740,
+    "GGGGTGGG+CCATTCGA" : 739,
+    "GGTCACGA+AATAATAA" : 738,
+    "CAATTAAC+ATTATCTC" : 738,
+    "ACACTAAG+AAATGGAA" : 736,
+    "TCGTGTAT+GTTCCAAT" : 734,
+    "AACTGTAG+TGCGGCCG" : 734,
+    "GCCCCGGG+TAAGGTCA" : 733,
+    "GGTCACGA+CATAAAAA" : 732,
+    "TCATCCTT+AAAAAAAA" : 728,
+    "GGGGGGGT+CGGAACTG" : 728,
+    "AGGTTATA+CGGAATGG" : 727,
+    "TTCCTGTT+AAGATTAC" : 726,
+    "ATTGTGAA+GCCAATGC" : 726,
+    "AACTGTAG+TGCCGGCG" : 725,
+    "GTGCGGAA+GCGCAAGC" : 724,
+    "CAATTAAC+ATCTCGGT" : 723,
+    "CCTTCCCG+GGAGCGTC" : 721,
+    "GAACCGCG+AAAGGACA" : 720,
+    "TGCGAGAC+CCAACAAT" : 718,
+    "TTGCCTAG+TAAAGTGG" : 717,
+    "GCGGGGGG+GGTGAACC" : 714,
+    "AGTCGCTA+GATTCTGC" : 713,
+    "GGGGGGGT+AGATCTCG" : 710,
+    "AACTTAGA+TGCGGCGT" : 709,
+    "GAACCGCG+AAAAAAAA" : 708,
+    "GCGGGGGG+GGAGCGTC" : 707,
+    "ACTCGGGG+GTTCCAAT" : 704,
+    "TGGCCGGT+GGGGGGGT" : 702,
+    "GCTGGTGG+CCATTCGA" : 701,
+    "GAACCGCG+AAACGTCA" : 701,
+    "ACAGGCGC+AGGCTGCG" : 700,
+    "GCCACAGG+ATGGGCAT" : 699,
+    "CCTTCACC+GGAGGTCG" : 699,
+    "CCCCTAAG+ATATGGAT" : 699,
+    "GTGGCGGC+GCGCAAGC" : 698,
+    "GGGGGTGG+CGGAACTG" : 698,
+    "GGGGGGGC+GATCTATC" : 698,
+    "CGTGAATA+GAATGAGA" : 698,
+    "GTGTCGGA+GCCAAGCG" : 696,
+    "GCCGTGTT+GGTGAACC" : 696,
+    "AGCTCGCT+TATTCTTC" : 696,
+    "ACACTAAG+TATATGGA" : 696,
+    "TCTGGGGG+CCATTCGA" : 695,
+    "ACAGGCGC+AGGGCAGA" : 695,
+    "TAAGGTCA+CACGACAG" : 693,
+    "TTGCCCTA+TAAGTGGT" : 691,
+    "TCCTGTTG+CCATTCGA" : 688,
+    "AAGCTCGC+GATTCTGC" : 688,
+    "GCCACAGG+ATGGCAAT" : 685,
+    "TCATCCTT+AGATCTCG" : 684,
+    "GTGGAATA+GAATGAGA" : 682,
+    "GGTCACGA+AAAAATAC" : 680,
+    "GGGCGGGG+GTTCCAAT" : 677,
+    "TCGGGGGG+CCATTCGA" : 676,
+    "GCGGGGGG+TAAGGTCA" : 676,
+    "TAAGGTCA+CTAATACA" : 675,
+    "TTCCCTGT+AAGATACT" : 674,
+    "GACCGTCT+GGTGAACC" : 674,
+    "GCCGGCGT+GGTGAACC" : 673,
+    "ACACTAAG+ATTATGGA" : 673,
+    "TGGCCGGT+TCGATCTA" : 672,
+    "TATCGCAC+AAAATAAA" : 672,
+    "GGGCCCGC+CATAATAC" : 672,
+    "CGGAACTG+TCCGTAGT" : 671,
+    "CCAATTAA+ATATCTCG" : 671,
+    "CAGGTTAT+CGGAACTG" : 671,
+    "CAATTTAA+ATATCTCG" : 671,
+    "CAATTAAC+AAATCTCC" : 670,
+    "TTCCGTTA+AAGATACT" : 669,
+    "GGGGGTGG+AGATCTCG" : 669,
+    "ATTGTGAA+GCAAGCAG" : 669,
+    "TAAGGTCA+CTACCAAA" : 666,
+    "CGGCACGG+TCGTAGTG" : 666,
+    "AGGTTATA+CGGAAACT" : 666,
+    "TCAATCCT+AGCTCGCT" : 665,
+    "TATCGCAC+AAACTAAC" : 663,
+    "CCATTCGA+CCGAAAAC" : 663,
+    "TGCGAGAC+AAAAAAAA" : 662,
+    "GGCCCCCG+ATGGCATG" : 662,
+    "GGGGGGGC+GGAGCGTC" : 661,
+    "ACACTAAG+ATATTGGA" : 659,
+    "TCTGTTGG+CCATTACA" : 658,
+    "CCAATTCG+CGGACAAC" : 658,
+    "CAATTAAC+ATATTCTC" : 658,
+    "TAAGGTCA+CTACGAAC" : 655,
+    "AACTGTAG+TGCGGCTG" : 655,
+    "GGGGGGGC+GCGCAAGC" : 654,
+    "CCTTTCAC+GGAGCGTC" : 654,
+    "TTGCCTAG+TAAGTTTT" : 653,
+    "TCTGTTGG+CCAATTCG" : 653,
+    "GAACCGCG+TAACGACA" : 651,
+    "TTGGCCTA+TAAGTGGT" : 650,
+    "TCATCCTT+AAATAAAA" : 650,
+    "CTGCTTCC+TATCTATA" : 650,
+    "TCTGTTGG+CCATTCCG" : 647,
+    "TAATCGCA+ACACTAAG" : 646,
+    "CGGGGGGG+AGATCTCG" : 646,
+    "GCGCCGCG+TAAGGTCA" : 645,
+    "GGGGGGTG+TAAGTGGT" : 644,
+    "CGGCCCGG+TCGTAGTG" : 643,
+    "CGCCCCAA+TTGCCTAG" : 643,
+    "CGGAACTG+TAGTATTG" : 642,
+    "CGACGTCT+GGTGAACC" : 642,
+    "TATCGCAC+ACACCTAA" : 641,
+    "GACGTCTT+GGTGGAAC" : 640,
+    "AGGGTTTA+CGGAACTG" : 640,
+    "TGGGCGCC+CAACAATG" : 638,
+    "GGGTCGGC+GCGCAAGC" : 637,
+    "TCATCCTT+AAATAAAT" : 636,
+    "GGTGTTGG+CCATTCGA" : 636,
+    "GGGGGCGG+CATAATAC" : 636,
+    "CCTTCACC+AAATAAAA" : 635,
+    "ATTGTGAA+AAAATGCA" : 635,
+    "ATTGTGAA+GAAATTCA" : 634,
+    "ATTGTGAA+TGCAATGC" : 632,
+    "TGGGGGGT+GGGGGGGG" : 631,
+    "GTTGAATA+GAATGAGA" : 631,
+    "AGTACTCC+AAAAGTTT" : 628,
+    "TGGCCGGT+GCGCTAGT" : 627,
+    "TGGCCGGT+AAAAAATA" : 626,
+    "AGGTACTC+AACAGGTT" : 625,
+    "TAAGGGCC+CTACGACA" : 624,
+    "CCTTCACC+AGATCTCG" : 624,
+    "GTCTACAC+AAATAAAA" : 623,
+    "GGTCACGA+AATAAAAA" : 623,
+    "GGTCACGA+AAAAAAAA" : 623,
+    "GGGGCCGG+CATAATAC" : 623,
+    "GGGCCCGA+CATAATAC" : 618,
+    "GCGGGTGG+CCATTCGA" : 617,
+    "GACGTCTT+GGGGCACC" : 616,
+    "GGGGGGGG+AGATCGCG" : 615,
+    "GGGCCGGG+GGGGGGGG" : 615,
+    "CTGCTTCC+GATCTAAT" : 615,
+    "TGGGGGGT+GCGCTCTA" : 614,
+    "TGGGGGGG+TAAGTGGT" : 612,
+    "TCTGTTGG+AAAAAAAA" : 612,
+    "GGGGGCGG+TCGTAGTG" : 611,
+    "GAACCGCG+TAAGGTAG" : 611,
+    "CTCACCAA+ATGCCAAG" : 611,
+    "GTGGGGGG+AAGATACT" : 610,
+    "TGGCCGGT+GCGCAATA" : 609,
+    "GCGGTTGG+CCATTCGA" : 609,
+    "AAGATACT+GCGCAAGC" : 609,
+    "TGGCCGGT+GCGCTCGT" : 606,
+    "TGGCCGGT+GCGCCTCT" : 606,
+    "TAAGGTCA+ATACGAAA" : 606,
+    "TCATCCTT+AGCTCGGG" : 605,
+    "CCTTCACC+GGCGTCGT" : 604,
+    "AACACTAA+ATATGGAT" : 604,
+    "GGTCACGA+TCATAATA" : 603,
+    "TTGGGGGG+GGGGGGGG" : 602,
+    "GGGTGGGG+TGGTGGCA" : 601,
+    "TTCCTGTT+AAAAAAAA" : 600,
+    "GGGCGGGG+GCGCTCTA" : 600,
+    "ATTGTGAA+GCAATTGC" : 600,
+    "ACTCGTGT+GAACCAAT" : 598,
+    "AACTGTAG+TGCGGGGG" : 598,
+    "GTGAATAT+GAATCATA" : 597,
+    "GTCTACAC+CCTTGGCG" : 596,
+    "CATAGCGG+TGGTGGCA" : 596,
+    "TATCGCAC+CACTAAGG" : 593,
+    "ACTTCGTG+GTTCCAAT" : 592,
+    "GTGAATAT+TAATGACA" : 591,
+    "GGGGGTGG+GATCTATC" : 591,
+    "ACTCGTGT+GATCAAAT" : 591,
+    "AACTAAGA+ATATGGAT" : 591,
+    "TTCCGGGT+AAGATACT" : 590,
+    "GTGGGGGG+AGATCTCG" : 589,
+    "CGGAACCT+TCGTAGTG" : 589,
+    "GTGAATAT+TAATTATA" : 588,
+    "TTGCCTAG+AAACTGGT" : 586,
+    "ACGCGGGT+GTTCCAAT" : 586,
+    "TTCCTGTT+AATATAAT" : 585,
+    "GGTCTACA+ACCTTGGC" : 585,
+    "ACTCGTGT+GATACAAT" : 585,
+    "GGTCACGA+CATAAATA" : 584,
+    "GCCGTCTG+GGTGAACC" : 584,
+    "CCACAGGA+ATGGCATG" : 583,
+    "AGTACTCC+AAAATGTT" : 583,
+    "TGCCGAGA+CAACAATG" : 582,
+    "CTCACCAA+AAGCCTAG" : 582,
+    "ACAACTAA+ATATGGAT" : 582,
+    "AGTACTCC+AACCAGGT" : 581,
+    "GGGGGGGC+TTGCCTAG" : 580,
+    "AGCTCGCT+TGATTCTG" : 579,
+    "TGGGGGGG+AGCTCGCT" : 578,
+    "TGCGAGAC+AAACAAAG" : 578,
+    "GGGCGGGG+TCGTAGTG" : 578,
+    "CCTTCACC+TGGGGGGG" : 578,
+    "CCTTCACC+GGCGCGTG" : 578,
+    "GGTCACGA+CATAATTA" : 577,
+    "CTGCTTCC+GATATATA" : 577,
+    "TGGCCGGT+GCTCTATA" : 576,
+    "GGACCGGG+TAAGGTCA" : 576,
+    "TCTGTTGG+CAATTCTA" : 575,
+    "GGGGGGTG+AGATCTCG" : 575,
+    "TGGGCGGG+GGGGGGGG" : 571,
+    "CTGGCTTC+GATCTATC" : 571,
+    "CATAGAGT+TCGTTGCA" : 570,
+    "GGCTACCC+ACCTTGGC" : 569,
+    "TTGCGAGA+CAACAATG" : 568,
+    "GGGCCGCG+TAAGGTCA" : 568,
+    "TATCGCAC+TACACTAA" : 566,
+    "GGGGGGGG+GGGGGCGG" : 566,
+    "CTCACCAA+GCCTAGGT" : 566,
+    "AACTGTAG+ATCGGCGT" : 566,
+    "CTGCGAGA+CAACAATG" : 563,
+    "CGGGGCGG+TCGTAGTG" : 563,
+    "TATCGCAC+ACATAAGG" : 561,
+    "GTGTCGGA+ATGTAAGT" : 561,
+    "GGGGGGGT+TGGTGGCA" : 561,
+    "GCCGGCGC+AGGCAGAG" : 561,
+    "ATTGTGAA+CAATGCAG" : 561,
+    "TGGCCGGT+AATAAAAA" : 560,
+    "TAAGTTAA+CTACGACA" : 560,
+    "CCTTCACC+GGGGCGGG" : 560,
+    "TAAGGTCA+ATACTACA" : 559,
+    "ACTCGTGT+GTTACAAA" : 559,
+    "CAAAAAAC+ATATCTCG" : 557,
+    "AGTACTCC+AAAAGGTA" : 556,
+    "GGTCACGA+CCATAATA" : 555,
+    "GGGGGGGC+CATAATAC" : 555,
+    "CCTTCAAA+GGAGCGTC" : 555,
+    "GGGGTTTT+CGGAACTG" : 554,
+    "TTTCGCCC+ACACTAAG" : 553,
+    "CCTTAACA+GGAGCGTC" : 553,
+    "ACGCGTGG+GTTCCAAT" : 553,
+    "GTGTCGGA+TGCGCAAG" : 552,
+    "GGGGATTT+GAATGAGA" : 552,
+    "TATCGCAC+ACCACTAA" : 551,
+    "GGGGGGGC+CGGACAAC" : 548,
+    "TTTCCTGT+AAGATACT" : 546,
+    "GGTCACGA+CAAAAAAC" : 546,
+    "GGGGGCCC+ACCTTGGC" : 546,
+    "GCCACAGG+AAGGAATG" : 546,
+    "CGGAACTG+TCGGTAGT" : 546,
+    "TTCCTGTT+AAGAAAAT" : 545,
+    "GGCGCGCC+CAACAATG" : 545,
+    "CAAACCAA+TTGCCTAG" : 545,
+    "ACAGGCGC+ACGCAGAC" : 545,
+    "ACACTAAG+ATATGGGA" : 545,
+    "TCTTGTTG+CCATTCGA" : 542,
+    "CTCACCAA+TAGCATAG" : 542,
+    "ACAGGCGC+AGGCCAGA" : 542,
+    "GGGGGGGT+AAGATACT" : 541,
+    "CCTCGTGG+GTTCCAAT" : 540,
+    "ACAGGCGC+AGGAAGAT" : 540,
+    "AACTGTAG+TTCGGAGT" : 539,
+    "GGGGCGGG+GCGCAAGC" : 538,
+    "AGCTCGCT+TATTATGC" : 537,
+    "GGGGGTGG+ATATGGAT" : 536,
+    "CTCACCAA+TAGCCTAC" : 536,
+    "GTAGGGGC+CTACGACA" : 535,
+    "ACCGGCGG+AGGCAGAG" : 535,
+    "TCTGTTGG+CCAATAGA" : 533,
+    "TTGCCTAG+TAACTGTT" : 532,
+    "CATAGAGT+TGGTGGGT" : 532,
+    "TGGGGGGG+AACAGGTT" : 531,
+    "GTGAATAT+GAAAGATA" : 531,
+    "GAACCGCG+AAAGTTCA" : 531,
+    "GGGGGCGG+ATGGCATG" : 528,
+    "TTCCTGTT+AAAATAAT" : 524,
+    "TGGCCGGT+GCGATATA" : 524,
+    "TCTGTTGG+CCATAAGA" : 524,
+    "GGGGGTTT+CGGAACTG" : 524,
+    "TTGCCTAG+AAAGTGTT" : 523,
+    "TGGCCGGT+GCGCTCCT" : 523,
+    "GCCGGCGG+AGGCAGAG" : 523,
+    "CTCACCAA+TTGCCAAC" : 523,
+    "TGCGACAT+CAACAATG" : 522,
+    "TGGCCGGT+TATCTCTA" : 521,
+    "AACCTGTA+TGCGGCGT" : 521,
+    "CTCACCAA+ATGACTAG" : 520,
+    "TAACCTCA+CTACGACA" : 519,
+    "GCGGGGGG+AGGCAGAG" : 519,
+    "GCCGGGGG+GGGGGGGG" : 518,
+    "CGGAACAC+TCGTAGTG" : 518,
+    "GGTGGTGG+CCATTCGA" : 517,
+    "CTGCTTCC+GATCTAGT" : 517,
+    "GCCACAGG+ATGGCCAT" : 516,
+    "TCATCCTT+ACATCGCT" : 515,
+    "GGGTGGGG+AGATCTCG" : 515,
+    "ACCAGGCG+AGGCAGAG" : 514,
+    "TGTTGGAT+CCATTCGA" : 513,
+    "TGGCCGGT+GCGCTAAA" : 513,
+    "TATCGCAC+AACTAAGG" : 513,
+    "GGGGCGGG+CAACAATG" : 513,
+    "ATTGTGAA+GCAATGGC" : 513,
+    "TGCGAGAC+CAAAAATT" : 512,
+    "TCATCCTT+ACCTAGCT" : 512,
+    "TAAGGTCA+AAAATACA" : 512,
+    "AGGTTATA+CTTAACTG" : 512,
+    "ACTCGTGT+GTACCAAA" : 512,
+    "GAACCGCG+AAAGCTCA" : 511,
+    "CTGCTTCC+GAACTATA" : 511,
+    "TAAGGTCA+CTACGAAG" : 510,
+    "GGCGGGGG+AGGCAGAG" : 510,
+    "CGTTCCCC+GGAGCGTC" : 510,
+    "ACTTAACC+CCATACTA" : 510,
+    "GTGGGGTG+TAAGTGGT" : 509,
+    "GCCACAGG+GGCATGGT" : 509,
+    "TAAGGTCA+CTACGGAC" : 508,
+    "GGGGGCGG+AGGCAGAG" : 508,
+    "ACAGGCGC+AGGAGAGG" : 508,
+    "GGGGGGTG+TGCGGCGT" : 507,
+    "ACTCGTGT+AAAAAAAA" : 507,
+    "ACAGGCCG+AGGCAGAG" : 507,
+    "CAGTACTC+AACAGGTT" : 506,
+    "ACAGGCGC+AGGCAGGA" : 506,
+    "GTCTACAC+GCGGGGGG" : 505,
+    "GCTTCCCC+GGAGCGTC" : 505,
+    "CAATTAAC+ATATATAG" : 504,
+    "TGGGGGGG+TGGGGGGG" : 503,
+    "GGGGCCCC+CATAATAC" : 503,
+    "ACAGGCGC+ACGAAGAG" : 502,
+    "ACTCGCTA+GATTCTGC" : 500,
+    "TCATCCTT+AGCTCGGC" : 499,
+    "TCCTCCGT+AGCTCGCT" : 498,
+    "GGGGGGCG+TAAGGTCA" : 498,
+    "TTCTGTTG+CCATTCGA" : 497,
+    "GCCGGGGT+GGTGAACC" : 497,
+    "AACTGTAG+TGGGCGTG" : 497,
+    "TTGCCTAG+AAAAAAAA" : 496,
+    "TCTGTTGG+ACATTCTA" : 496,
+    "ACTCTTGT+CAAAAAAA" : 496,
+    "TGGGGGGG+GTTCCAAT" : 495,
+    "GTGAATAT+GGAATGAG" : 495,
+    "GAACCCCC+TAAGGTCA" : 495,
+    "CCATTCGA+AGGAAAAC" : 495,
+    "TTGCCTAG+GTGGGGGG" : 494,
+    "TAAGTTCA+CAAATACA" : 494,
+    "GCCACAGG+AATGCATG" : 492,
+    "CTGCTTAA+GATCTATC" : 492,
+    "GAACCGCG+TAAGTTAA" : 491,
+    "CAATTAAC+ATATCACC" : 491,
+    "AGGCTCGC+GATTCTGC" : 491,
+    "ACTCCGTG+GTTCCAAT" : 491,
+    "GACGGCGT+GGTGAACC" : 489,
+    "CATAGTAT+TGGTGGCA" : 489
+   }
+  },
+  {
+   "Lane" : 3,
+   "Barcodes" : {
+    "GGGGGGGG+AGATCTCG" : 1168660,
+    "GGGGGGGG+GGGGGGGG" : 531006,
+    "GGGGGGGG+CCATTCGA" : 32572,
+    "GGGGGGGG+AGCTCGCT" : 26619,
+    "GGGGGGGG+CAACAATG" : 24065,
+    "GGGGGGGG+GGTGAACC" : 23946,
+    "GGGGGGGG+GCGCTCTA" : 23117,
+    "GGGGGGGG+GAATGAGA" : 22640,
+    "GGGGGGGG+TAAGGTCA" : 20692,
+    "GGGGGGGG+TCGTAGTG" : 20624,
+    "TGGGGGGG+GGGGGGGG" : 20443,
+    "GGGGGGGG+TAAGTGGT" : 19838,
+    "GGGGGGGG+CTACGACA" : 19650,
+    "GGGGGGGG+AACAGGTT" : 17285,
+    "GGGGGGGG+GTTCCAAT" : 17160,
+    "GGGGGGGG+GATCTATC" : 16764,
+    "GGGGGGGG+AAGATACT" : 16352,
+    "GGGGGGGG+ATATCTCG" : 15661,
+    "GGGGGGGG+ACCTTGGC" : 15300,
+    "GGGGGGGG+ATGGCATG" : 15037,
+    "GGGGGGGG+GCAATGCA" : 13894,
+    "GGGGGGGG+CATAATAC" : 13804,
+    "GGGGGGGG+GATTCTGC" : 13385,
+    "GGGGGGGG+GGAGCGTC" : 13367,
+    "GGGGGGGG+CGGAACTG" : 13365,
+    "CTGCTTCC+GGGGGGGG" : 13279,
+    "GGGGGGGG+CGGACAAC" : 12961,
+    "GACGTCTT+GGGGGGGG" : 12718,
+    "GGGGGGGG+TGGTGGCA" : 12410,
+    "GGGGGGGG+TGCGGCGT" : 12232,
+    "CCTTCACC+GGGGGGGG" : 12230,
+    "GGGGGGGG+GCGCAAGC" : 11858,
+    "GGGGGGGG+AGGCAGAG" : 11543,
+    "GGGGGGGG+ACACTAAG" : 11207,
+    "GGGGGGGG+TTGCCTAG" : 10951,
+    "CGGAACTG+GGGGGGGG" : 10706,
+    "TGGCCGGT+GGGGGGGG" : 10697,
+    "CATAGAGT+GGGGGGGG" : 10158,
+    "CTCACCAA+GGGGGGGG" : 10090,
+    "GTGAATAT+GGGGGGGG" : 10030,
+    "TCATCCTT+GGGGGGGG" : 9903,
+    "AGTACTCC+GGGGGGGG" : 9783,
+    "TCTGTTGG+GGGGGGGG" : 9561,
+    "ACTCGTGT+GGGGGGGG" : 9485,
+    "GTGATATA+GAATGAGA" : 9417,
+    "CAATTAAC+GGGGGGGG" : 9147,
+    "AGGTTATA+GGGGGGGG" : 8394,
+    "TTGCCTAG+GGGGGGGG" : 8123,
+    "CAATTACA+ATATCTCG" : 8033,
+    "GTGGGGGG+GGGGGGGG" : 7935,
+    "CATTAACA+ATATCTCG" : 7931,
+    "TCTGTGGA+CCATTCGA" : 7796,
+    "GGGGGGGG+AGATATCG" : 7745,
+    "AATTAACA+ATATCTCG" : 7719,
+    "GAACCGCG+GGGGGGGG" : 7565,
+    "TCATCTTA+AGCTCGCT" : 7360,
+    "GCCACAGG+GGGGGGGG" : 7323,
+    "AACTGTAG+GGGGGGGG" : 7273,
+    "AGCTCGCT+GGGGGGGG" : 7047,
+    "CCATTCGA+GGGGGGGG" : 7004,
+    "GGGGGGGG+TGGGGGGG" : 6958,
+    "GGGGGGGG+ATATGGAT" : 6841,
+    "TAAGGTCA+GGGGGGGG" : 6812,
+    "GAACGCGA+TAAGGTCA" : 6642,
+    "GGGGGGGT+GGGGGGGG" : 6489,
+    "CTCACCAA+TGCCTAGG" : 6475,
+    "ACAGGCGC+GGGGGGGG" : 6453,
+    "GTCTACAC+GGGGGGGG" : 6401,
+    "TCTGTTGG+CATTCGAG" : 6039,
+    "ATTGTGAA+GGGGGGGG" : 5987,
+    "GCGGGGGG+GGGGGGGG" : 5981,
+    "GGGGGTGG+GGGGGGGG" : 5873,
+    "GGGGGGGG+AGCTCTCG" : 5805,
+    "TTCCTGTT+GGGGGGGG" : 5773,
+    "ACACTAAG+GGGGGGGG" : 5757,
+    "AGGTTTAA+CGGAACTG" : 5522,
+    "GGGGCGGG+GGGGGGGG" : 5513,
+    "AGGTATAA+CGGAACTG" : 5464,
+    "TCTGTTGG+CCATCGAG" : 5450,
+    "TGCGAGAC+GGGGGGGG" : 5394,
+    "TTGTTGGA+CCATTCGA" : 5389,
+    "CATAGGTA+TGGTGGCA" : 5383,
+    "CGGGGGGG+GGGGGGGG" : 5276,
+    "GGGTGGGG+GGGGGGGG" : 5200,
+    "GACCGCGA+TAAGGTCA" : 5170,
+    "TGCGAGCA+CAACAATG" : 5073,
+    "GGTCACGA+GGGGGGGG" : 5049,
+    "GGGCGGGG+GGGGGGGG" : 5034,
+    "TCACCAAA+TTGCCTAG" : 5030,
+    "TGCTTCCA+GATCTATC" : 5019,
+    "GGTGGGGG+GGGGGGGG" : 4764,
+    "TGCGGACA+CAACAATG" : 4700,
+    "ACTGTAGA+TGCGGCGT" : 4661,
+    "CTGCTCCA+GATCTATC" : 4648,
+    "GTGTCGGA+GGGGGGGG" : 4594,
+    "GGCGGGGG+GGGGGGGG" : 4583,
+    "ATAGAGTA+TGGTGGCA" : 4577,
+    "TCTTTGGA+CCATTCGA" : 4569,
+    "GGGGGGTG+GGGGGGGG" : 4545,
+    "GCGTCTTA+GGTGAACC" : 4358,
+    "TCTGTTGG+AAATTCGA" : 4339,
+    "GAACCGCG+AAGGTCAG" : 4308,
+    "GGTTATAA+CGGAACTG" : 4235,
+    "GTGAATTA+GAATGAGA" : 4187,
+    "GACGTCTT+GTGAACCG" : 4123,
+    "GGGGGGGG+GTGGGGGG" : 4083,
+    "CATAGAGT+GGTGGCAG" : 4065,
+    "GGGGTGGG+GGGGGGGG" : 4057,
+    "CATTCGAA+CGGACAAC" : 3949,
+    "AGTATCCA+AACAGGTT" : 3936,
+    "CATGAGTA+TGGTGGCA" : 3935,
+    "ACTCGTGT+GTTCCATG" : 3935,
+    "TCGTTGGA+CCATTCGA" : 3928,
+    "GGGGGCGG+GGGGGGGG" : 3919,
+    "CGGAACTG+CGTAGTGG" : 3851,
+    "GTGAAATA+GAATGAGA" : 3769,
+    "CTGTTGGA+CCATTCGA" : 3765,
+    "AGTCTCCA+AACAGGTT" : 3738,
+    "CAATAACA+ATATCTCG" : 3727,
+    "AGTACTCC+AACAGTTG" : 3699,
+    "TATCGCAC+GGGGGGGG" : 3698,
+    "AGTACTCC+ACAGGTTG" : 3661,
+    "ACTCGTGT+GTCCAATG" : 3581,
+    "GACGTTTA+GGTGAACC" : 3548,
+    "CTTCACCA+GGAGCGTC" : 3542,
+    "GGAACTGA+TCGTAGTG" : 3523,
+    "GAACCGGA+TAAGGTCA" : 3500,
+    "CGAACTGA+TCGTAGTG" : 3452,
+    "ACAGCGCA+AGGCAGAG" : 3439,
+    "TAGGTCAA+CTACGACA" : 3399,
+    "AACTGTAG+GCGGCGTG" : 3389,
+    "GTACTCCA+AACAGGTT" : 3379,
+    "AGGTTATA+GGAACTGG" : 3301,
+    "TGCGAGAC+AACAATGG" : 3211,
+    "GCCCCGCG+TAAGGTCA" : 3180,
+    "ATTGTGAA+TAAATGCA" : 3138,
+    "TGGCCGGT+TAGCTCTA" : 3129,
+    "TATCGCCA+ACACTAAG" : 3111,
+    "GTCTACAC+ACCTTTGG" : 3082,
+    "GGGGGGGG+GGGGGGGT" : 3069,
+    "GACGTCTT+GGTGACCG" : 3058,
+    "GCGAGACA+CAACAATG" : 3052,
+    "CCATTCGA+CGGCCACC" : 3047,
+    "CTGTTCCA+GATCTATC" : 3038,
+    "GGGGGGGG+AGATCTAG" : 3032,
+    "GGGGGGGC+GGGGGGGG" : 3020,
+    "ACTGTGTA+GTTCCAAT" : 2987,
+    "GGGGGGGG+GGGGGGTG" : 2985,
+    "ACACTAGA+ATATGGAT" : 2981,
+    "ACGGCGCA+AGGCAGAG" : 2980,
+    "CTCCCAAA+TTGCCTAG" : 2973,
+    "TTGCTAGA+TAAGTGGT" : 2966,
+    "ACTCGTGT+GTTCAATG" : 2946,
+    "AGTACCCA+AACAGGTT" : 2932,
+    "TTGCCTAG+AAGTGGTG" : 2928,
+    "AGGTTATA+CGAACTGG" : 2917,
+    "TGGCGGTA+GCGCTCTA" : 2899,
+    "AACTGTAG+TGCGCGTG" : 2888,
+    "TTGCCTAG+TAAGTGTG" : 2882,
+    "GGGGGGGG+ACATCTCG" : 2878,
+    "CAGGCGCA+AGGCAGAG" : 2870,
+    "CCATTCGA+GGACAACG" : 2860,
+    "TGCGAGAC+CACAATGG" : 2839,
+    "GGGGGGGG+AGATCTCT" : 2836,
+    "TGGCCGTA+GCGCTCTA" : 2829,
+    "TGCAGACA+CAACAATG" : 2823,
+    "AGGTTATA+CGGACTGG" : 2817,
+    "ACAGGCGC+AGCAGAGG" : 2792,
+    "GTCTACAC+ACCTGGCG" : 2787,
+    "AGTTATAA+CGGAACTG" : 2786,
+    "CATAGAGT+TGTGGCAG" : 2783,
+    "CCTTCACC+GAGCGTCG" : 2782,
+    "GCACAGGA+ATGGCATG" : 2768,
+    "GGTCACGA+ATAATACG" : 2753,
+    "TAAGGTCA+AAACGACA" : 2747,
+    "TGCGAGAC+CAACATGG" : 2739,
+    "TGCGAACA+CAACAATG" : 2724,
+    "CTACCAAA+TTGCCTAG" : 2710,
+    "TGCGCGCC+CAACAATG" : 2706,
+    "GGTCACGA+CATATACG" : 2689,
+    "CCATTCGA+CGACAACG" : 2682,
+    "TGCCTAGA+TAAGTGGT" : 2680,
+    "TATCCTTA+AGCTCGCT" : 2677,
+    "GGGGGGCG+GGGGGGGG" : 2669,
+    "TCTGTTGG+CAATTAGA" : 2668,
+    "CTCACCAA+TTTGCCTA" : 2664,
+    "GTGAATAT+GATGAGAG" : 2663,
+    "GGGGGGGG+GGGGTGGG" : 2654,
+    "GGCCGGTA+GCGCTCTA" : 2645,
+    "GACGCTTA+GGTGAACC" : 2644,
+    "CCATTCGA+CGGACACG" : 2643,
+    "CCTCACCA+GGAGCGTC" : 2639,
+    "TCTCCTTA+AGCTCGCT" : 2630,
+    "AACCGCGA+TAAGGTCA" : 2610,
+    "CCATTCGA+ATGACAAC" : 2590,
+    "GAGTCTTA+GGTGAACC" : 2548,
+    "CGGAACTG+AAGTAGTG" : 2470,
+    "GTCTACAC+AAATTGGC" : 2462,
+    "GAACCGCG+TAAGTCAG" : 2459,
+    "GGTGAATA+GAATGAGA" : 2433,
+    "CATAGAGT+TGGTGCAG" : 2433,
+    "AATGTAGA+TGCGGCGT" : 2424,
+    "GCCACAGG+ATGCATGG" : 2422,
+    "TAAAGGTC+CTACGACA" : 2419,
+    "TATCGCAC+TAATACAG" : 2406,
+    "CCTTCACC+TTAGCGTC" : 2399,
+    "GGGGGGGG+AGATCACG" : 2382,
+    "TTGCCTAG+TAGTGGTG" : 2366,
+    "TAAGGTCA+TACGACAG" : 2343,
+    "GTGAATAT+GAATGAAG" : 2327,
+    "ACACTAAG+ATATGATG" : 2299,
+    "TGGCCGGT+GCGCTCAG" : 2296,
+    "GACGTCTT+GGGAACCG" : 2289,
+    "AGCTCGCT+GATCTGCG" : 2286,
+    "CGCTTCCA+GATCTATC" : 2265,
+    "GGGGGGGG+GGTGGGGG" : 2237,
+    "ATATGGAT+ACACTAAG" : 2232,
+    "TTGCCTAG+TTAAGTGG" : 2229,
+    "GAACCGCG+TAGGTCAG" : 2219,
+    "GTAATATA+GAATGAGA" : 2217,
+    "AGGGTTAT+CGGAACTG" : 2209,
+    "TTCCTGTT+AGATACTG" : 2198,
+    "AGGGGGGG+GGGGGGGG" : 2190,
+    "CCTTCCCA+GGAGCGTC" : 2186,
+    "GTGTCGGA+GCGCAGCG" : 2182,
+    "CTGCTTCC+GACTATCG" : 2171,
+    "GGTCCGAA+CATAATAC" : 2160,
+    "CTCACCAA+TTGCCAGG" : 2108,
+    "GGGGGGGG+GGGTGGGG" : 2106,
+    "CAATTAAC+ATACTCGG" : 2103,
+    "TCGAGACA+CAACAATG" : 2094,
+    "GTCTACAC+ACCTTGCG" : 2093,
+    "AACGTAGA+TGCGGCGT" : 2092,
+    "TCATCCTT+ATATCGCT" : 2077,
+    "ACTCGTGT+GTTTCCAA" : 2058,
+    "ATTGTGAA+GCATGCAG" : 2055,
+    "GGAATATA+GAATGAGA" : 2054,
+    "CAATTAAC+AATCTCGG" : 2029,
+    "ATCGTGTA+GTTCCAAT" : 2026,
+    "GTCACGAA+CATAATAC" : 2019,
+    "GAACCGCG+TTAAGGTC" : 2008,
+    "CGGAACTG+TCGTGTGG" : 1995,
+    "CGGAACTG+TCGTATGG" : 1991,
+    "GAACCGCG+TAAGGCAG" : 1990,
+    "AGGTTATA+ATGAACTG" : 1986,
+    "TCACCTTA+AGCTCGCT" : 1960,
+    "CATAGAGT+TTGGTGGC" : 1956,
+    "ACACTAAG+ATATGGTG" : 1955,
+    "TATGCACA+ACACTAAG" : 1950,
+    "AACTGTAG+TGGGGGGG" : 1947,
+    "GGTACGAA+CATAATAC" : 1945,
+    "GGGGGGGG+AGATCTCC" : 1930,
+    "GAAACCGC+TAAGGTCA" : 1930,
+    "GTGAATAT+GAATGGAG" : 1925,
+    "CCACCAAA+TTGCCTAG" : 1911,
+    "TCTGTTGG+CCATTTCG" : 1902,
+    "ATACTCCA+AACAGGTT" : 1897,
+    "ACGTCTTA+GGTGAACC" : 1896,
+    "CGGAACTG+TCGAGTGG" : 1894,
+    "CTGCTTCC+GATCATCG" : 1893,
+    "CAATTAAC+ATATCCGG" : 1889,
+    "GGTCAGAA+CATAATAC" : 1874,
+    "CGGACTGA+TCGTAGTG" : 1874,
+    "TTCGCACA+ACACTAAG" : 1872,
+    "CCATCGAA+CGGACAAC" : 1872,
+    "GGGGGTGG+CCATTCGA" : 1863,
+    "CTAGAGTA+TGGTGGCA" : 1862,
+    "ATTGTGAA+AAAATGCA" : 1858,
+    "GCCACGGA+ATGGCATG" : 1842,
+    "TCATCCTT+AGCCGCTG" : 1834,
+    "TGGCCGGT+GAGCTATA" : 1824,
+    "GGTCACGA+CAAATACG" : 1822,
+    "ACTCGTGT+TCCAATGT" : 1817,
+    "CGGAACTG+TTCGTAGT" : 1815,
+    "CGGAAACT+TCGTAGTG" : 1815,
+    "TCATCCTT+ACTCGCTG" : 1812,
+    "GACGTCTT+TTTGAACC" : 1795,
+    "GACGTCTT+GGTGCCCC" : 1791,
+    "AAAAAAAA+AAAAAAAA" : 1785,
+    "CATCCTTA+AGCTCGCT" : 1772,
+    "AAGGTCAA+CTACGACA" : 1767,
+    "GGCACGAA+CATAATAC" : 1764,
+    "CCTTCACC+GGAGCGCG" : 1755,
+    "GGGGGGGG+GCGGGGGG" : 1750,
+    "TAAGTCAA+CTACGACA" : 1748,
+    "TATCGACA+ACACTAAG" : 1734,
+    "TGGGGGGG+GCGCTCTA" : 1728,
+    "GGGGGGGG+CGGGGGGG" : 1726,
+    "GCCCCCGG+ATGGCATG" : 1707,
+    "CTGCTTCC+ATCTATCG" : 1701,
+    "TGGGGGGT+GGGGGGGG" : 1685,
+    "GTCTAACA+ACCTTGGC" : 1679,
+    "AGTACTCC+AACGGTTG" : 1679,
+    "CTGCTTCC+GATCTACG" : 1676,
+    "CTCGTGTA+GTTCCAAT" : 1657,
+    "TGGCCGGT+GCGCCTAG" : 1655,
+    "CATAGAGT+ATGTGGCA" : 1649,
+    "GAACCCGA+TAAGGTCA" : 1648,
+    "TTGGGGGG+GGGGGGGG" : 1646,
+    "CCTTCACC+GGGCGTCG" : 1646,
+    "GGGGGGGC+CAACAATG" : 1645,
+    "ACTAAGAT+ATATGGAT" : 1640,
+    "TAAGGCAA+CTACGACA" : 1636,
+    "TCTGTTGG+CCATTCAG" : 1627,
+    "ACCGTGTA+GTTCCAAT" : 1627,
+    "TGCCGGTA+GCGCTCTA" : 1620,
+    "GTCTACAC+ACTTGGCG" : 1619,
+    "CCTTCACC+GGACGTCG" : 1618,
+    "ACTCGGTA+GTTCCAAT" : 1599,
+    "TAAGGGTC+CTACGACA" : 1596,
+    "GGTCCCGC+CATAATAC" : 1595,
+    "GAACGTCT+GGTGAACC" : 1595,
+    "AACTGTGA+TGCGGCGT" : 1594,
+    "CCGTCCCC+GGAGCGTC" : 1589,
+    "TTGCCAGA+TAAGTGGT" : 1587,
+    "TATCGCAC+ACACAAGG" : 1585,
+    "TGGGCGGG+GGGGGGGG" : 1573,
+    "TCCTGTTA+AAGATACT" : 1565,
+    "CTGCTTCC+GTCTATCG" : 1562,
+    "CTCACCAA+TTGCCCTA" : 1549,
+    "TCATCCTT+AGCTCGTG" : 1545,
+    "CGGAACGA+TCGTAGTG" : 1545,
+    "AACTGTAG+TTGCGGCG" : 1545,
+    "CTCACCAA+TTGCTAGG" : 1543,
+    "ACAGGCGC+ATTCAGAG" : 1538,
+    "GGGGGGGG+GGGGGTGG" : 1529,
+    "CGGAATGA+TCGTAGTG" : 1528,
+    "GTGAATAT+GAAGAGAG" : 1524,
+    "TAAGGTCA+ACGACAGT" : 1523,
+    "TGCGAGAC+CAACAAAT" : 1520,
+    "ACAGGCGC+AGGCAAGG" : 1518,
+    "TCTGTTGG+CCCATTCG" : 1516,
+    "ACAGGGCG+AGGCAGAG" : 1509,
+    "TCTGTTGG+CCTTCGAG" : 1508,
+    "TACGCACA+ACACTAAG" : 1505,
+    "GTCTACCA+ACCTTGGC" : 1498,
+    "TGGGCCGG+GCGCTCTA" : 1483,
+    "CTCTTCCA+GATCTATC" : 1479,
+    "CTGCTTCC+GATCTTCG" : 1477,
+    "TGGCCGGT+AAGCTCTA" : 1470,
+    "TGGCCGGT+GCGTCTAG" : 1468,
+    "CAAATTAA+ATATCTCG" : 1457,
+    "GACGTCTT+GGTAACCG" : 1455,
+    "GTCTCACA+ACCTTGGC" : 1454,
+    "AAACTGTA+TGCGGCGT" : 1453,
+    "ACTCGTGT+TTTACAAT" : 1450,
+    "CGGAACTG+TGTAGTGG" : 1449,
+    "GTTACACA+ACCTTGGC" : 1443,
+    "CAATTAAC+AAATATCG" : 1441,
+    "TGGCCGGT+GCGCTTAG" : 1432,
+    "CATAGAGT+TGGGGCAG" : 1416,
+    "GGGGGGGT+GGTGAACC" : 1415,
+    "CCTTACCA+GGAGCGTC" : 1402,
+    "GGTCACGA+CATAAACG" : 1400,
+    "CATAGAGT+TGGGGGGG" : 1394,
+    "GCCCAGGA+ATGGCATG" : 1387,
+    "TAAGGTCA+ATAAGACA" : 1386,
+    "GGGGGTGC+GATCTATC" : 1383,
+    "ATCGCACA+ACACTAAG" : 1378,
+    "TCTGTTGG+CCATTATA" : 1376,
+    "TATCGCAC+AAAATAAG" : 1376,
+    "CGGGAACT+TCGTAGTG" : 1375,
+    "CGGAACTG+TCGTTAGT" : 1375,
+    "TTGCCTGA+TAAGTGGT" : 1366,
+    "TTCCTAGA+TAAGTGGT" : 1366,
+    "AGGCGCAT+AGGCAGAG" : 1366,
+    "AAGGCGCA+AGGCAGAG" : 1364,
+    "GTGAATAT+AATGAGAG" : 1361,
+    "ACAGGCGC+AGGCGAGG" : 1361,
+    "AGGTTAAT+CGGAACTG" : 1360,
+    "AGACTCCA+AACAGGTT" : 1357,
+    "TAAGGTCA+CTACGCAG" : 1349,
+    "CTGCTTCC+GATTATCG" : 1347,
+    "ACAGGCGC+GGCAGAGG" : 1345,
+    "ACAGGCGC+AAAAAAAA" : 1344,
+    "GCCACAGG+ATGGCTGG" : 1333,
+    "TGCGAGAC+AAAAAATG" : 1322,
+    "GTGAATAT+GAATTATA" : 1321,
+    "TGGCGGGG+GGGGGGGG" : 1317,
+    "GGTCACGA+CTAATACG" : 1313,
+    "TGGGGGGG+CAACAATG" : 1303,
+    "TATCGCAC+AAACTAAT" : 1299,
+    "TCTGTTGG+AAATTAGA" : 1291,
+    "GGGGGGGG+GGGGCGGG" : 1285,
+    "GTCACACA+ACCTTGGC" : 1281,
+    "CATAAGTA+TGGTGGCA" : 1276,
+    "TGAATATA+GAATGAGA" : 1274,
+    "TAAGGTCA+CAACTACA" : 1274,
+    "GGCGGGGT+GGTGAACC" : 1273,
+    "GCCACAGG+AGGCATGG" : 1273,
+    "AACTGTAG+TTAGGCGT" : 1272,
+    "GCTACACA+ACCTTGGC" : 1269,
+    "GGGGGGGG+AGAACTCG" : 1267,
+    "GGGGGGGT+GAATGAGA" : 1263,
+    "TTGCCTAG+TAAGGGTG" : 1259,
+    "ACTCGTGT+TATCCAAT" : 1258,
+    "TCTGTTGG+ACATTAGA" : 1256,
+    "GACTCTTA+GGTGAACC" : 1256,
+    "CGGAACTG+TCGTAGGT" : 1251,
+    "TTGCCTAG+TAAGTTGG" : 1242,
+    "GTGTCGGA+TAGCAAGC" : 1239,
+    "TCATCCTT+AGGGGGGG" : 1237,
+    "CTCACCAA+TTGCCTTA" : 1234,
+    "GGGGGGGG+GGGGGGGC" : 1230,
+    "AGCTCGCT+GATTCGCG" : 1228,
+    "CCATTCGA+AAAAAAAA" : 1226,
+    "CTCACCAA+AAGCCTAG" : 1225,
+    "GGGGGGGG+AGGGGGGG" : 1221,
+    "TAAGGTCA+CTCGACAG" : 1211,
+    "TTCTGTTA+AAGATACT" : 1210,
+    "CATAGAGT+TGGTGGGC" : 1210,
+    "ACAGGCGC+ATGCATAG" : 1209,
+    "ACACAAGA+ATATGGAT" : 1202,
+    "ACAGGCCA+AGGCAGAG" : 1200,
+    "AGGTTATA+CTGAAATG" : 1197,
+    "CCATTCGA+CGGCCCAC" : 1193,
+    "GTCTCCCC+ACCTTGGC" : 1192,
+    "TTGCCTAG+TAATGGTG" : 1187,
+    "CCATAGAG+TGGTGGCA" : 1187,
+    "TGGCCGGT+AAAAAAAA" : 1186,
+    "CCGGAACT+TCGTAGTG" : 1186,
+    "GGTCTACA+ACCTTGGC" : 1181,
+    "CCATTCGA+CGGCAACG" : 1181,
+    "TGCGAAGA+CAACAATG" : 1173,
+    "ACTCGTGT+TTCCAATG" : 1173,
+    "TGGCCGGT+GCCTCTAG" : 1172,
+    "GGGCCGGG+GGGGGGGG" : 1172,
+    "GGGGCGGG+GCGCTCTA" : 1171,
+    "ACAGGGCA+AGGCAGAG" : 1169,
+    "GAACCGCG+AAATGTCA" : 1167,
+    "TCATCCTT+GCTCGCTG" : 1163,
+    "TGGCCGGT+GGCTCTAG" : 1162,
+    "GTGTGGAA+GCGCAAGC" : 1159,
+    "GACGTCTT+GGGTGAAC" : 1158,
+    "TAAGGTCA+CTACACAG" : 1154,
+    "CGGAACTG+TATTAGTG" : 1149,
+    "ACTCGTTA+GTTCCAAT" : 1148,
+    "TGGCCGGT+CGCTCTAG" : 1147,
+    "CTGCTTCC+GATCTTAT" : 1147,
+    "CATAGATA+TGGTGGCA" : 1147,
+    "AGCTCGCT+GATTTCTG" : 1143,
+    "ACACTAAG+AAATTGAT" : 1139,
+    "AGCTCGCT+GTTCTGCG" : 1125,
+    "TCATCCTT+AGCTCCTG" : 1123,
+    "GGGCCCCA+TTGCCTAG" : 1123,
+    "ACACTAAG+AATGGATG" : 1118,
+    "GAACCGCG+TAAGGGTC" : 1116,
+    "CATAGAGT+TTTTGGCA" : 1112,
+    "GGGGGTGG+AGATCTCG" : 1109,
+    "GTGAATAT+GAATAGAG" : 1106,
+    "ACTCGTGT+TGTTCCAA" : 1102,
+    "ACTCGTGT+GTTAAAAT" : 1099,
+    "AACTGTAG+TCGGCGTG" : 1097,
+    "TCTGTTGG+CCATTGAG" : 1096,
+    "CCATTCGA+CGGAAACG" : 1093,
+    "AATTGTGA+GCAATGCA" : 1090,
+    "CTGCTTCC+TATATATC" : 1085,
+    "TTGCCTAG+AAATTGGT" : 1084,
+    "CCCATTCG+CGGACAAC" : 1082,
+    "GTCTACAC+ACCCTTGG" : 1080,
+    "TTGCCTAG+TAAGGGGG" : 1078,
+    "ACTCTGTA+GTTCCAAT" : 1074,
+    "GCCGGGGG+GGGGGGGG" : 1071,
+    "TGGCCGGT+GCGCTTCT" : 1070,
+    "TCATCCTT+AGCTCCGC" : 1070,
+    "CATAGAAG+TGGTGGCA" : 1070,
+    "AAGGTTAT+CGGAACTG" : 1067,
+    "CCTTCACC+GGAGCTCG" : 1064,
+    "GTTCCTGT+AAGATACT" : 1059,
+    "ACAAGGCG+AGGCAGAG" : 1057,
+    "CGGAACTG+TCTAGTGG" : 1056,
+    "GCCAACAG+ATGGCATG" : 1053,
+    "TTTGCCTA+TAAGTGGT" : 1052,
+    "CCCTTCAC+GGAGCGTC" : 1051,
+    "TGCGAGAC+CAAACAAT" : 1050,
+    "ACAGGCGC+ATGAAGAG" : 1050,
+    "CCTTCACC+GGCGCGGC" : 1049,
+    "ACACTAAG+ATAGGATG" : 1045,
+    "GTCTACAC+TACCTTGG" : 1044,
+    "AGTACTAA+AACAGGTT" : 1044,
+    "CGGAACTG+TAGTATTG" : 1041,
+    "GGGGGGGG+GGGCGGGG" : 1040,
+    "GCTGCTTC+GATCTATC" : 1040,
+    "GGACGTCT+GGTGAACC" : 1036,
+    "CACTAAGA+ATATGGAT" : 1035,
+    "TAAGGTCA+CTTACGAC" : 1026,
+    "GTGAATAT+TAATTAGA" : 1021,
+    "AGCTCGCT+ATTCTGCG" : 1018,
+    "TGGCCCGG+GCGCTCTA" : 1016,
+    "CATAGAGT+TGGTTGGC" : 1012,
+    "AGCTCGCT+GATTTGCG" : 1010,
+    "GAACCGCG+TAAAGGTC" : 1009,
+    "AACTGTAG+ATCGGCGT" : 1008,
+    "GAACCCGC+TAAGGTCA" : 998,
+    "CGGGGGGG+TCGTAGTG" : 997,
+    "GTGAATAT+TAATGATA" : 995,
+    "CCTTCACC+TGGAGCGT" : 994,
+    "CATAAGAG+TGGTGGCA" : 992,
+    "GTGTCGGA+GCGCAACG" : 990,
+    "GGGGGGGT+AGATCTCG" : 989,
+    "CTCACCAA+TTCCTAGG" : 989,
+    "AACTGTAG+TGCGGGCG" : 989,
+    "CTGCTTCC+TGATCTAT" : 988,
+    "CCTGCTTC+GATCTATC" : 987,
+    "TGGCCGGG+GGGGGGGG" : 986,
+    "TGGCGAGA+CAACAATG" : 983,
+    "GACGTCTT+GGTTGAAC" : 979,
+    "TGCGGGGG+GGGGGGGG" : 977,
+    "TCATCCTT+AGTCGCTG" : 976,
+    "CCTTCGAA+CGGACAAC" : 975,
+    "GGTGTCGG+GCGCAAGC" : 974,
+    "CCTTCACC+GGAGCCGT" : 974,
+    "AGGTTTAT+CGGAACTG" : 974,
+    "ACACTAAG+ATGGATGT" : 973,
+    "TGCGGAGA+CAACAATG" : 970,
+    "ACAGGCGC+ATGCAGAT" : 970,
+    "AAGTACTC+AACAGGTT" : 969,
+    "TCGGGGGG+GGGGGGGG" : 968,
+    "TCATCCTT+AGCTGCTG" : 968,
+    "CAAGAGTA+TGGTGGCA" : 968,
+    "ACTCGTGT+AATCCAAT" : 965,
+    "TTCCTGTT+AAGTACTG" : 964,
+    "GCTCGCTA+GATTCTGC" : 964,
+    "CATAGGAG+TGGTGGCA" : 962,
+    "GCCACAGG+TATGGCAT" : 959,
+    "GGGTCACG+CATAATAC" : 956,
+    "GAACCGCG+TAAGGTTC" : 954,
+    "ATTGTGAA+GAAATTCA" : 951,
+    "TGGCCGGT+GGGGGGGT" : 950,
+    "CATAGAGT+TGGGTGGC" : 950,
+    "GGGGGTTT+GAATGAGA" : 947,
+    "TGTGGGGG+GGGGGGGG" : 946,
+    "TCTGTTGG+AAATTATA" : 945,
+    "TAAGGTCA+CAAAGACA" : 939,
+    "CTGCTTCC+GATATATA" : 938,
+    "ATTGTGAA+AATGCAGT" : 938,
+    "CAATTAAC+ATATCTTC" : 935,
+    "TGGAGACA+CAACAATG" : 934,
+    "GGCCCCCG+ATGGCATG" : 934,
+    "CAATTAAC+TATCTCGG" : 934,
+    "AGCTCGCT+GATTCTCG" : 933,
+    "TTCCTGTT+AAGATCTG" : 930,
+    "GCCGTCGT+GGTGAACC" : 925,
+    "AGGTTATA+CGGGAACT" : 924,
+    "AGTACTCC+AAAGGTTG" : 923,
+    "ACATAAGA+ATATGGAT" : 922,
+    "CCATTCGA+CTTACAAC" : 921,
+    "GGGGGGTG+AGATCTCG" : 918,
+    "ACCTAAGA+ATATGGAT" : 918,
+    "CCTCACCA+TTGCCTAG" : 917,
+    "AGTACTCC+TAACAGGT" : 916,
+    "GTGAATAT+TGAATGAG" : 915,
+    "CAATTAAC+ATATATAG" : 908,
+    "TTCCTGTT+AAGAACTG" : 906,
+    "GTGTCGGA+GCGAAGCG" : 906,
+    "GCAATTAA+ATATCTCG" : 906,
+    "TGGGGGGG+CCATTCGA" : 905,
+    "GGCCCCGG+ATGGCATG" : 905,
+    "GCCACAGG+ATGGGGGG" : 905,
+    "AGCTCGTA+GATTCTGC" : 903,
+    "AACAGGCG+AGGCAGAG" : 898,
+    "GACGGTCT+GGTGAACC" : 896,
+    "AACTCGTG+GTTCCAAT" : 895,
+    "CGGAACTG+TGGGGGGG" : 894,
+    "CTGCTTCC+GATTCTAT" : 887,
+    "TGCGAGAC+TCAACAAT" : 879,
+    "TCATCCTT+AGCCTCGC" : 871,
+    "TGGCCGGT+GCTCTAGT" : 870,
+    "TAAGGTCA+TCTACGAC" : 870,
+    "TGGGGGTG+GGGGGGGG" : 868,
+    "CCTTCACC+GGGAGCGT" : 867,
+    "GGGGGGTT+GAATGAGA" : 866,
+    "GTGTCGGA+GCGCCCGC" : 865,
+    "GCGGGCGG+GGGGGGGG" : 865,
+    "CTGCTTCC+GATCCTAT" : 865,
+    "TGGCCGGT+GATCTCTA" : 859,
+    "TCTGTTGG+TCCATTCG" : 859,
+    "GGTCACGA+CATAATCG" : 859,
+    "GCCACAGG+TGGCATGG" : 859,
+    "GTCTACAC+ACATTGGA" : 856,
+    "CTCAACCA+TTGCCTAG" : 855,
+    "TTCCTGTT+AAATACTG" : 851,
+    "ACACTAAG+ATTGGATG" : 851,
+    "GCCACAGG+ATTGGCAT" : 848,
+    "CAATAGAG+TGGTGGCA" : 848,
+    "GTGGGGGG+AGATCTCG" : 844,
+    "CCATTCGA+AAGACAAC" : 844,
+    "TATCGCAC+ACCTAAGG" : 842,
+    "CCATTCGA+CGGACCCC" : 840,
+    "GGTCACGA+AAAAATAC" : 839,
+    "TGGCCGGT+TCGCTATA" : 837,
+    "GGGGGGGG+GGGGGGCG" : 837,
+    "GGTCACGA+CATTAATA" : 833,
+    "GGGGGGGG+TTGGGGGG" : 830,
+    "CCTTCCCC+GGGGGGGG" : 829,
+    "GACGTCTT+TGGTGAAC" : 828,
+    "GGTCACGA+CATAAAAA" : 827,
+    "CCAATTAA+ATATCTCG" : 826,
+    "CCATTGAA+CGGACAAC" : 825,
+    "TCATCCTT+AGCTTCGC" : 823,
+    "TGGCCGGT+TGCGCTCT" : 819,
+    "GTGAATAT+GAATTGAG" : 818,
+    "CCTTAACA+GGAGCGTC" : 818,
+    "CCTTCACC+ATAGCGTC" : 817,
+    "TTCCTGTT+AAGATATG" : 815,
+    "GGGTGGGG+AGATCTCG" : 813,
+    "AGCTGCTA+GATTCTGC" : 811,
+    "CCTTCACC+GGAGCGGT" : 810,
+    "AGGTTATA+TCGGAACT" : 808,
+    "TGCGAGAC+AAACAATT" : 806,
+    "ACACTAAG+TATGGATG" : 804,
+    "GGTCACGA+AATAATAA" : 800,
+    "TGGGGGGG+TGGGGGGG" : 796,
+    "CCATTCGA+TCGGACAA" : 796,
+    "AGCCGCTA+GATTCTGC" : 795,
+    "ATTGTGAA+GCAAATGC" : 793,
+    "TGGGCGGG+GCGCTCTA" : 792,
+    "TTCCTGTT+TAAGATAC" : 788,
+    "ACAGGCGC+TAGGCAGA" : 787,
+    "TCGTGTAT+GTTCCAAT" : 782,
+    "GTGTCGGA+GCAAGCGT" : 782,
+    "ACTCGGTG+GTTCCAAT" : 782,
+    "ACTCGTGT+NNTCCAAT" : 779,
+    "AACTGTAG+TTCGGAGT" : 776,
+    "AGTACTCC+AAAAGTTT" : 772,
+    "TCTGGTTG+CCATTCGA" : 771,
+    "TGCGAGAC+CAAAATGG" : 770,
+    "CAATTAAC+ATTCTCGG" : 770,
+    "AGTACTCC+AAAATGTT" : 768,
+    "AGGTTATA+CGGGGGGG" : 766,
+    "GCCACAGG+ATGGATGG" : 765,
+    "CCTTCACC+AAAAAAAA" : 764,
+    "CGGCCCTG+TCGTAGTG" : 763,
+    "ATGTGAAA+GCAATGCA" : 763,
+    "TGGCCGGT+TCGATCTA" : 761,
+    "TCTGTTGG+NNATTCGA" : 760,
+    "CCTTCAAA+GGAGCGTC" : 760,
+    "GCCCACAG+ATGGCATG" : 759,
+    "TATCCACA+ACACTAAG" : 754,
+    "AGCTCGCT+GATTCTTG" : 754,
+    "TCATCCTT+TAGCTCGC" : 752,
+    "TGCGAGAC+CAACCAAT" : 751,
+    "TAAGGTCA+AAAAAAAA" : 751,
+    "AGTAACTC+AACAGGTT" : 751,
+    "AACTTAGA+TGCGGCGT" : 749,
+    "TGGGGGGG+AGATCTCG" : 748,
+    "CAATTAAC+ATATTCGG" : 746,
+    "GGGGGTTC+GATCTATC" : 743,
+    "ACTCGTGT+GTTCCCAA" : 743,
+    "CATTAGAG+TGGTGGCA" : 742,
+    "AACTGTAG+TGCGGCCG" : 742,
+    "GTGTCGGA+GGCAAGCG" : 739,
+    "GACGTCTT+GGGGGGGC" : 739,
+    "CCATTCGA+CGGGACAA" : 736,
+    "CGGAACTG+NNGTAGTG" : 735,
+    "CCATTTCG+CGGACAAC" : 732,
+    "CTCCCCAC+TTGCCTAG" : 731,
+    "GTGAATAT+GAAATGAG" : 730,
+    "GGGGTTTT+CGGAACTG" : 730,
+    "CAATTAAC+TATATCTC" : 730,
+    "AGGTTATA+CGGAATGG" : 729,
+    "CGGAACTG+GTAGTGGT" : 728,
+    "TCATCCTT+TGGGGGGG" : 727,
+    "TATCGCAC+ACACTTAA" : 726,
+    "TGCGAGAC+CCAACAAT" : 724,
+    "AAGCTCGC+GATTCTGC" : 719,
+    "TGGCCGGT+GCGATATA" : 717,
+    "AGTCGCTA+GATTCTGC" : 717,
+    "TAAGGTCA+CTAATACA" : 716,
+    "CAATTAAC+ATCTCGGT" : 716,
+    "CTGCTTCC+TATCTATA" : 715,
+    "CCTTCACC+GGAGGTCG" : 714,
+    "ATTGTGAA+GCCAATGC" : 714,
+    "ACAGGCGC+AGGGGGGG" : 713,
+    "GCCAAGGA+ATGGCATG" : 712,
+    "ACTCGTGT+GATCAAAT" : 711,
+    "ATTGTGAA+GAATGCAG" : 710,
+    "CAATTTAA+ATATCTCG" : 708,
+    "TTGCCCTA+TAAGTGGT" : 707,
+    "GCCACAGG+ATGGGCAT" : 707,
+    "TTGCCTAG+TAAGTTTT" : 706,
+    "GTGGAATA+GAATGAGA" : 706,
+    "GGGGGGGC+ACCTTGGC" : 705,
+    "CCATTCGA+AGGAAAAC" : 705,
+    "GTGCGGAA+GCGCAAGC" : 703,
+    "TGGGGTGG+GGGGGGGG" : 702,
+    "CGGAACTG+TAGTAGTT" : 700,
+    "CAATTAAC+ATATTCTC" : 699,
+    "CGTGAATA+GAATGAGA" : 697,
+    "TTCCCTGT+AAGATACT" : 696,
+    "AGGTTATA+CGGAAACT" : 696,
+    "GTGAATAT+NNATGAGA" : 693,
+    "TTGCCTAG+TAAAGTGG" : 690,
+    "TTCCTGTT+AAGATTAC" : 690,
+    "ATTGTGAA+GCAAGCAG" : 690,
+    "GTCTACAC+NNCTTGGC" : 689,
+    "CAATTAAC+ATTATCTC" : 689,
+    "TTGCCTAG+NNAGTGGT" : 688,
+    "TCATCCTT+AAATCGCT" : 687,
+    "GGTGGGGG+AGATCTCG" : 687,
+    "GCGGGGGG+GGAGCGTC" : 687,
+    "CCATTCGA+ACGACAAC" : 685,
+    "AGGTTATA+ACGAACTG" : 685,
+    "TCTGTTGG+CCAATTCG" : 684,
+    "GGGGGCGG+AGATCTCG" : 684,
+    "TGGCCGGT+GCTCTATA" : 683,
+    "AGGTTATA+CGGCCCTG" : 683,
+    "TAAGGTCA+ATACGAAA" : 682,
+    "AACTGTAG+TGCGGCTG" : 682,
+    "GGTCAACG+CATAATAC" : 681,
+    "GCGGGGGG+GTTCCAAT" : 680,
+    "GTGTCGGA+GCCAAGCG" : 679,
+    "GCTGGGGG+GGGGGGGG" : 679,
+    "TGCGAGAC+CAAAAATT" : 678,
+    "GAACCGCG+AAACGTCA" : 677,
+    "CCTTCACC+GGCGTCGT" : 676,
+    "ACAGGCGC+AGGAAGAT" : 676,
+    "ACAGGCGC+AATCAGAG" : 676,
+    "TCTGTTGG+CCATTACA" : 675,
+    "ACACTAAG+ATTATGGA" : 675,
+    "TAAGGTCA+ATACTACA" : 673,
+    "TTGCCTAG+TGGGGGGG" : 672,
+    "TCATCCTT+AGATCTCG" : 672,
+    "CTGCTTAA+GATCTATC" : 672,
+    "CGGAACTG+TCCGTAGT" : 672,
+    "ACAGGCGC+AGGGCAGA" : 671,
+    "CCATTCGA+CCGAAAAC" : 670,
+    "GGGGTGGG+AGATCTCG" : 668,
+    "GAACCGCG+TAATTTCA" : 668,
+    "GGCGGGGG+GGTGAACC" : 667,
+    "GACCGTCT+GGTGAACC" : 667,
+    "ATTGTGAA+GAAATGAA" : 667,
+    "CTCACCAA+ATGACTAG" : 665,
+    "AGGTTATA+AGGAAATG" : 665,
+    "TAATCGCA+ACACTAAG" : 663,
+    "GAACCGCG+AAAGTTCA" : 663,
+    "ACACTAAG+TATATGGA" : 663,
+    "TATCGCAC+ACACCTAA" : 659,
+    "GACGTCTT+GGTGGAAC" : 659,
+    "CAGGTTAT+CGGAACTG" : 659,
+    "TCTGTTGG+CCATTCCG" : 658,
+    "ACAGGCGC+AGGCTGCG" : 655,
+    "TAAGGTCA+CTACCAAA" : 654,
+    "GGGGTTTT+GAATGAGA" : 654,
+    "CCTTTCAC+GGAGCGTC" : 654,
+    "TTGGCCTA+TAAGTGGT" : 653,
+    "TATCGCAC+AAAATAAT" : 653,
+    "GTCTACAC+ACATTTGC" : 653,
+    "GCATTTAA+ATATCTCG" : 652,
+    "AGCTCGCT+GATTATTC" : 652,
+    "CTCACCAA+TAGCATAG" : 651,
+    "GTTGAATA+GAATGAGA" : 649,
+    "TCTGTTGG+CCAATAGA" : 647,
+    "TCAATCCT+AGCTCGCT" : 647,
+    "GGGGGCGG+CATAATAC" : 646,
+    "GCGGGGGG+AGATCTCG" : 646,
+    "CTCACCAA+NNGCCTAG" : 645,
+    "AACTGTAG+TGCCGGCG" : 645,
+    "GCCACAGG+AAGGAATG" : 644,
+    "AACTGTAG+TGCGGGGG" : 643,
+    "GGTCACGA+CATAATTA" : 642,
+    "GGGGGGGG+AGATCGCG" : 640,
+    "TAAGGTCA+NNACGACA" : 639,
+    "AGGTTATA+AAGAACTG" : 638,
+    "GGGGGTTG+CCATTCGA" : 637,
+    "TAAGGTCA+CACGACAG" : 635,
+    "CTGGCTTC+GATCTATC" : 634,
+    "CGACGTCT+GGTGAACC" : 633,
+    "CCTTCACC+NNAGCGTC" : 633,
+    "AGTACTCC+AAACAGGT" : 633,
+    "CTGCTTCC+GATCTAAT" : 632,
+    "CATAGAGT+ACGTGGCA" : 631,
+    "ATTGTGAA+NNAATGCA" : 631,
+    "TCCTGTTG+CCATTCGA" : 630,
+    "TAAGGTCA+CTCCGCCA" : 630,
+    "AGCTCGCT+TATTATGC" : 629,
+    "TCTGTTGG+CAATTCTA" : 628,
+    "TAAGGTCA+CTACGAAC" : 628,
+    "GACGTCTT+NNTGAACC" : 627,
+    "ATTGTGAA+TGCAATGC" : 627,
+    "AACACTAA+ATATGGAT" : 626,
+    "ATTGTGAA+GCAATTGC" : 625,
+    "CCAATTCG+CGGACAAC" : 624,
+    "TGGGGGGG+TAAGTGGT" : 622,
+    "ACACTAAG+ATATTGGA" : 622,
+    "CGGTGGGG+GGGGGGGG" : 620,
+    "AGTACTCC+NNCAGGTT" : 620,
+    "TGGCCGGT+TAGCTATA" : 617,
+    "CATAGAGT+NNGTGGCA" : 617,
+    "GTCTACAC+CCTTGGCG" : 616,
+    "GCCACAGG+NNGGCATG" : 616,
+    "AAGATACT+GCGCAAGC" : 614,
+    "TTGCCTAG+AAACTGGT" : 612,
+    "TTCCGTTA+AAGATACT" : 612,
+    "TCATCCTT+ACCTAGCT" : 612,
+    "AGGTACTC+AACAGGTT" : 612,
+    "GGTCACGA+CATAAATA" : 610,
+    "TTGCCTAG+TAATTGTT" : 608,
+    "TTCCTGTT+AATATAAT" : 608,
+    "GGGTCGGG+GGGGGGGG" : 608,
+    "CATAGAGT+AAGTGGCA" : 606,
+    "TTTCCTGT+AAGATACT" : 605,
+    "TGCGAGAC+NNACAATG" : 605,
+    "TCTGTTGG+ACATTCTA" : 604,
+    "CCCGGCGC+AGGCAGAG" : 602,
+    "ACTCGTGT+TTTCAAAT" : 602,
+    "TGGGGGGG+GGGGGGGT" : 601,
+    "GAACCGCG+NNAGGTCA" : 601,
+    "GTGAATAT+TAATGACA" : 600,
+    "CCTTCACC+AGATCTCG" : 600,
+    "AGTAATAC+AACAGGTT" : 598,
+    "ACTCGTGT+GATACAAT" : 597,
+    "GCCACAGG+AATGCATG" : 595,
+    "CCACAGGA+ATGGCATG" : 594,
+    "CCATTCGA+NNGACAAC" : 593,
+    "GGGGCGGG+AGATCTCG" : 591,
+    "ACAGGCGC+TGGGGGGG" : 591,
+    "TAAGGTCA+AAAATAAA" : 590,
+    "TATCGCAC+ACATAAGG" : 588,
+    "GACGTCTT+GGGGCACC" : 588,
+    "CCTTCACC+GGGGCGGG" : 588,
+    "CCATTCGA+AGGACAAA" : 588,
+    "ACACTAAG+AAATGGAA" : 588,
+    "CTCACCAA+TTGAATAG" : 585,
+    "CCTTCACC+TGATCGTC" : 585,
+    "AGCTCGCT+TATTCTTC" : 585,
+    "GTGTCGGA+ATGTAAGT" : 584,
+    "TGCGAGAC+AAACAAAG" : 582,
+    "CTCCCCCA+TTGCCTAG" : 582,
+    "ACTCGTGT+GATCCAAA" : 582,
+    "TGGCCGGT+GCGCTAGT" : 581,
+    "GGGTGGGT+GGGGGGGG" : 581,
+    "ATTGTGAA+CAAATGCA" : 580,
+    "AGCTCGCT+TGATTCTG" : 580,
+    "ACTCGTGT+ATTACAAT" : 580,
+    "ACAACTAA+ATATGGAT" : 580,
+    "CTGCTTCC+NNTCTATC" : 579,
+    "TATCGCAC+ACAATAAT" : 578,
+    "CTCACCAA+GCCTAGGT" : 578,
+    "ACAGGCGC+AGTCAGAT" : 576,
+    "AGTACTCC+AAAAGGTA" : 575,
+    "GTGAATAT+GAATCATA" : 574,
+    "GGGGGGGC+GATCTATC" : 574,
+    "TATCGCAC+AAAATAAA" : 572,
+    "TTGCCTAG+TAACTGTT" : 569,
+    "TTCCTGTT+AAGAAAAT" : 569,
+    "TGGCCGGT+GCGCCTCT" : 569,
+    "GTGAATAT+AAAAAAAA" : 569,
+    "GCGTGCCC+GGAGCGTC" : 569,
+    "GCCACAGG+ATGGCAAT" : 568,
+    "GAACCGCG+TAAGTTAA" : 568,
+    "TGCCGAGA+CAACAATG" : 566,
+    "GCCGGCTT+GGTGAACC" : 566,
+    "CGGGGCGG+GGGGGGGG" : 564,
+    "ACTCGTGT+GTTACAAA" : 564,
+    "GGGGGGCG+AGGCAGAG" : 562,
+    "GGGGGGTT+GGGGGGGG" : 561,
+    "GTTGCCTA+TAAGTGGT" : 560,
+    "GAACCGCG+TAAGGTAG" : 560,
+    "TCTGTTGG+CCATAAGA" : 558,
+    "GGTCACGA+CCATAATA" : 558,
+    "GGTCACGA+TCATAATA" : 557,
+    "AGGTTATA+NNGAACTG" : 556,
+    "TTCTGTTG+CCATTCGA" : 554,
+    "TAAGGTCA+AAAAGACA" : 554,
+    "CCTTCACC+TCAGCGTC" : 554,
+    "GGGGGGCC+ACCTTGGC" : 553,
+    "GGGCGGGG+AGATCTCG" : 552,
+    "ACAGGCGC+AGGCCGCG" : 552,
+    "GTGTGGGG+GGGGGGGG" : 551,
+    "CGGAACCT+TCGTAGTG" : 550,
+    "CATAGAGT+TCGTTGCA" : 550,
+    "TATCGCAC+TACACTAA" : 549,
+    "TATCGCAC+AAACTAAC" : 549,
+    "GTGAATAT+GAAAGATA" : 549,
+    "GGGGGGGG+NGATCTCG" : 549,
+    "CCTTCACC+AAAGCGTC" : 549,
+    "ATTGTGAA+CAATGCAG" : 548,
+    "ACACTAAG+ATATGGGA" : 548,
+    "TCTTGTTG+CCATTCGA" : 547,
+    "GGGGGGGC+AGATCTCG" : 547,
+    "ATTGTGAA+TCAATGAA" : 547,
+    "AGTACTCC+AACCAGGT" : 547,
+    "TCATCCTT+AGATAGCT" : 546,
+    "CATAGAGT+TTGTGTCA" : 546,
+    "TCATCCTT+ACATCGCT" : 545,
+    "TAAGGTCA+CTACGAAG" : 544,
+    "GTGTCGGA+TGCGCAAG" : 544,
+    "AACTGTAG+TGAGGAGT" : 544,
+    "CAGTACTC+AACAGGTT" : 543,
+    "TCATCCTT+NNCTCGCT" : 542,
+    "CCGGGGGG+GGGGGGGG" : 542,
+    "GTGGGGTG+GGGGGGGG" : 540,
+    "GTCTACAC+AAATAAAA" : 540,
+    "CCTTCCAC+GGAGCGTC" : 540,
+    "ACAGGCGC+NNGCAGAG" : 540,
+    "TATCGCAC+CACTAAGG" : 539,
+    "AGGTTATA+CTTAACTG" : 538,
+    "ACAGGCGC+AGGCCAGA" : 538,
+    "TATCGCAC+ACCACTAA" : 536,
+    "TAAGGTCA+CTACTAAA" : 536,
+    "CCTTCACC+TGGGGGGG" : 536,
+    "ACTCGTGT+TTACCAAT" : 536,
+    "CTGCTTCC+TAACTATC" : 535,
+    "CTCACCAA+ATGCCAAG" : 535,
+    "AGGCTCGC+GATTCTGC" : 535,
+    "GGCGGGGG+AGATCTCG" : 534,
+    "GCCACAGG+ATTGCATT" : 534,
+    "ACTTCACA+GGAGCGTC" : 534,
+    "TTGGCCGG+GCGCTCTA" : 533,
+    "ACTCCGTG+GTTCCAAT" : 533,
+    "GAACCGCG+AAAGGACA" : 530,
+    "CTCACCAA+TTGGCCTA" : 530,
+    "ATTGTGAA+AAAATGAA" : 530,
+    "GCGGGGGG+CGGACAAC" : 529,
+    "AGGTTATA+CGTAAATG" : 529,
+    "AGCTCGCT+TAATCTGC" : 528,
+    "AACCTGTA+TGCGGCGT" : 528,
+    "TTGCCTAG+AAAGTGTT" : 527,
+    "GGGGGGCG+AGATCTCG" : 527,
+    "CAATTAAC+NNATCTCG" : 527,
+    "AACTAAGA+ATATGGAT" : 527,
+    "TGGGGTGG+CCATTCGA" : 526,
+    "TAAGTTAA+CTACGACA" : 526,
+    "GTGGGGGT+GGGGGGGG" : 526,
+    "GCCACAGG+TGGGGGGG" : 526,
+    "CTGCGAGA+CAACAATG" : 526,
+    "GTGGGGGG+TAAGTGGT" : 525,
+    "GGGGGGGG+GGCGGGGG" : 525,
+    "CGGAACTG+TCGGTAGT" : 525,
+    "TGGCCGGT+GCGCTCGT" : 524,
+    "TCGGGTGG+CCATTCGA" : 524,
+    "ACAGGCCG+AGGCAGAG" : 524,
+    "CCTTCACC+GTAGCTTC" : 522,
+    "TGGCCGGT+GCGCAATA" : 521,
+    "ACAGGCGC+ACGAAGAG" : 519,
+    "TATCGCAC+NNACTAAG" : 517,
+    "CTGCTTCC+AATATATC" : 517,
+    "GCATTTAC+ATATCTCG" : 516,
+    "GACGTCTT+TGTTAACC" : 516,
+    "TCATCCTT+AGCTCGGG" : 515,
+    "TCATCCTT+AGCTCGGC" : 514,
+    "GTGTCGGA+GATCAAGC" : 514,
+    "TGGCCGGT+NNGCTCTA" : 513,
+    "TAAGGTCA+CTAAGAAA" : 513,
+    "ACTTCGTG+GTTCCAAT" : 513,
+    "TAAGGTCA+AAAATACA" : 512,
+    "CATAGCGG+TGGTGGCA" : 512,
+    "GGGGTTGG+GGGGGGGG" : 511,
+    "AGTGGGGG+GGGGGGGG" : 511,
+    "GCGGGGGG+GGTGAACC" : 510,
+    "ACAGGCGC+AGGCAGGA" : 510,
+    "TTGCGAGA+CAACAATG" : 509,
+    "CCATTCGA+CTGACAAA" : 509,
+    "GGGGGGGG+GGGGGCGG" : 508,
+    "GCCGGCGG+GGGGGGGG" : 508,
+    "AACTGTAG+TGGGCGTG" : 508,
+    "TCATCCTT+ATCTCTCT" : 507,
+    "GGGGCCGG+CATAATAC" : 507,
+    "TGGCCGGT+GCGCTCCT" : 506,
+    "CCCTTCGC+CGGACAAC" : 506,
+    "ACCAGGCG+AGGCAGAG" : 506,
+    "GGGGGTTT+CGGAACTG" : 505,
+    "GCCACCAG+ATGGCATG" : 505,
+    "CTGCTTCC+GAACTATA" : 505,
+    "CTCACCAA+TTTCCTAT" : 505,
+    "GGCGGCGG+GGGGGGGG" : 504,
+    "CCTTAAAC+GGAGCGTC" : 504,
+    "TGGGCGGT+GGGGGGGG" : 503,
+    "GTGAATAT+GGAATGAG" : 503,
+    "AGGTTATA+AGGAACTT" : 503,
+    "GTCTACAC+AACTTTGC" : 502,
+    "GACGTCTT+ATTGAACC" : 502,
+    "CCATTCGA+CGGGGGGG" : 502,
+    "TTCCTGTT+NNGATACT" : 499,
+    "TGGCCGGT+TATCTCTA" : 499,
+    "CTCTGTTG+CCATTCGA" : 498,
+    "GTGTCGGA+AAGCAAGC" : 497,
+    "ACAGGCGC+AGGAATAG" : 497,
+    "GGGTGCGG+GGGGGGGG" : 496,
+    "CAATTAAC+AAATCTCC" : 496,
+    "TTCCTGTT+TGGGGGGG" : 495,
+    "TCATCCTT+AAATAAAA" : 495,
+    "GTCTACAC+ACATTGTC" : 495,
+    "GGCCACAG+ATGGCATG" : 495,
+    "AGGTTATA+CGGAAAAG" : 495,
+    "ACACTAAG+NNATGGAT" : 495,
+    "AGTACTCC+TGGGGGGG" : 493,
+    "AGGGGGGG+AACAGGTT" : 493,
+    "CAAACCAA+TTGCCTAG" : 492,
+    "TATCGCAC+AACTAAGG" : 491,
+    "TGGCCGGT+GAGATCTA" : 490,
+    "GTGTCGGA+CGCAAGCG" : 490,
+    "GGTCACGA+AATAAAAA" : 490,
+    "CTGCTTCC+GGATCTAT" : 487,
+    "ACACTAAG+ATATTTAT" : 487,
+    "GAACCGAT+TAAGGTCA" : 486,
+    "CTCACCAA+TTGACTAT" : 486,
+    "ATTGTGAA+GCAATGGC" : 486,
+    "TCATCCTT+AGATCTCT" : 485
+   }
+  },
+  {
+   "Lane" : 4,
+   "Barcodes" : {
+    "GGGGGGGG+GGGGGGGG" : 1176312,
+    "GGGGGGGG+AGATCTCG" : 1087172,
+    "GGGGGGGG+CCATTCGA" : 41099,
+    "GGGGGGGG+GGTGAACC" : 33444,
+    "GGGGGGGG+AGCTCGCT" : 30948,
+    "GGGGGGGG+CAACAATG" : 30766,
+    "GGGGGGGG+TCGTAGTG" : 29242,
+    "GGGGGGGG+GAATGAGA" : 29038,
+    "GGGGGGGG+GCGCTCTA" : 28493,
+    "GGGGGGGG+TAAGGTCA" : 28047,
+    "GGGGGGGG+TGGGGGGG" : 26954,
+    "GGGGGGGG+TAAGTGGT" : 26470,
+    "GGGGGGGG+AACAGGTT" : 26465,
+    "GGGGGGGG+CTACGACA" : 25751,
+    "GGGGGGGG+GTTCCAAT" : 24094,
+    "GGGGGGGG+ATATCTCG" : 23041,
+    "GGGGGGGG+GATCTATC" : 22980,
+    "GGGGGGGG+ATGGCATG" : 21711,
+    "GGGGGGGG+TGGTGGCA" : 21620,
+    "GGGGGGGG+GCAATGCA" : 21389,
+    "GGGGGGGG+ACCTTGGC" : 21030,
+    "GGGGGGGG+AAGATACT" : 20471,
+    "GGGGGGGG+GGAGCGTC" : 19492,
+    "GGGGGGGG+CGGAACTG" : 18845,
+    "GGGGGGGG+GATTCTGC" : 18700,
+    "GGGGGGGG+CATAATAC" : 18630,
+    "GGGGGGGG+CGGACAAC" : 18155,
+    "GGGGGGGG+AGGCAGAG" : 18028,
+    "TGGGGGGG+GGGGGGGG" : 17183,
+    "GGGGGGGG+TGCGGCGT" : 16370,
+    "GGGGGGGG+GTGGGGGG" : 15692,
+    "GGGGGGGG+GCGCAAGC" : 15481,
+    "GGGGGGGG+TTGCCTAG" : 15345,
+    "TCTGTTGG+AAATTCGA" : 14982,
+    "GGGGGGGG+ACACTAAG" : 14515,
+    "GGGGGGGG+ATATGGAT" : 11897,
+    "GGGGGGGT+GGGGGGGG" : 11267,
+    "GTGGGGGG+GGGGGGGG" : 11001,
+    "CTGCTTCC+GGGGGGGG" : 10553,
+    "GGGGGTGG+GGGGGGGG" : 10270,
+    "GACGTCTT+GGGGGGGG" : 10227,
+    "GGGTGGGG+GGGGGGGG" : 8943,
+    "TAAGGTCA+AAACGACA" : 8777,
+    "GGGGGGGG+AGATATCG" : 8727,
+    "GTGATATA+GAATGAGA" : 8721,
+    "CCTTCACC+GGGGGGGG" : 8438,
+    "CCATTCGA+ATGACAAC" : 8378,
+    "CGGAACTG+AAGTAGTG" : 8285,
+    "GTGAATAT+GGGGGGGG" : 8230,
+    "TGGCCGGT+GGGGGGGG" : 8048,
+    "CGGAACTG+GGGGGGGG" : 7903,
+    "GGGGGGGG+AGCTCTCG" : 7794,
+    "GGGGGGGG+GGGGGGGT" : 7718,
+    "CAATTACA+ATATCTCG" : 7647,
+    "ATTGTGAA+AAAATGCA" : 7597,
+    "CATAGAGT+GGGGGGGG" : 7585,
+    "GGGGGGTG+GGGGGGGG" : 7530,
+    "GGGGGGGG+GGGGGGTG" : 7529,
+    "TGGCCGGT+TAGCTCTA" : 7507,
+    "TCTGTTGG+GGGGGGGG" : 7482,
+    "ACTCGTGT+GGGGGGGG" : 7479,
+    "GGTGGGGG+GGGGGGGG" : 7478,
+    "TCATCCTT+GGGGGGGG" : 7453,
+    "TCTGTGGA+CCATTCGA" : 7439,
+    "AATTAACA+ATATCTCG" : 7327,
+    "CATTAACA+ATATCTCG" : 7297,
+    "GGGGCGGG+GGGGGGGG" : 7133,
+    "GCGGGGGG+GGGGGGGG" : 7080,
+    "TCATCTTA+AGCTCGCT" : 7054,
+    "CTCACCAA+GGGGGGGG" : 7042,
+    "AGTACTCC+GGGGGGGG" : 6886,
+    "ATTGTGAA+TAAATGCA" : 6884,
+    "GGGGTGGG+GGGGGGGG" : 6876,
+    "AGGTTATA+GGGGGGGG" : 6721,
+    "CAATTAAC+GGGGGGGG" : 6636,
+    "TGGCCGGT+AAGCTCTA" : 6625,
+    "GGGGGGGG+GGGGTGGG" : 6505,
+    "GGGGGGGG+AGGGGGGG" : 6502,
+    "TTGCCTAG+GGGGGGGG" : 6170,
+    "GCCACAGG+GGGGGGGG" : 6119,
+    "GGGCGGGG+GGGGGGGG" : 6118,
+    "CTCACCAA+TGCCTAGG" : 6099,
+    "GCCCCGCG+TAAGGTCA" : 6062,
+    "GAACGCGA+TAAGGTCA" : 6055,
+    "AGGTTATA+ATGAACTG" : 5940,
+    "GTCTACAC+AAATTGGC" : 5863,
+    "AACTGTAG+GGGGGGGG" : 5764,
+    "TCTGTTGG+CATTCGAG" : 5758,
+    "GGGGGGGG+CGGGGGGG" : 5747,
+    "GGGGGGGG+GCGGGGGG" : 5655,
+    "TAAGGTCA+GGGGGGGG" : 5638,
+    "AGCTCGCT+GGGGGGGG" : 5603,
+    "CCTTCACC+TTAGCGTC" : 5519,
+    "GGCGGGGG+GGGGGGGG" : 5377,
+    "GGGGGCGG+GGGGGGGG" : 5355,
+    "CATAGAGT+ATGTGGCA" : 5340,
+    "CGGGGGGG+GGGGGGGG" : 5310,
+    "GAACCGCG+GGGGGGGG" : 5300,
+    "GTCTACAC+GGGGGGGG" : 5272,
+    "GGGGGGGG+GGGTGGGG" : 5224,
+    "CCATTCGA+GGGGGGGG" : 5210,
+    "AGGTTTAA+CGGAACTG" : 5134,
+    "ATTGTGAA+GGGGGGGG" : 5123,
+    "CATAGGTA+TGGTGGCA" : 5104,
+    "AGGTATAA+CGGAACTG" : 5082,
+    "TCTGTTGG+CCATCGAG" : 5030,
+    "TGCGAGCA+CAACAATG" : 4930,
+    "TTGTTGGA+CCATTCGA" : 4834,
+    "TGCTTCCA+GATCTATC" : 4810,
+    "ACAGGCGC+GGGGGGGG" : 4804,
+    "GGGGGGGC+GGGGGGGG" : 4799,
+    "TCACCAAA+TTGCCTAG" : 4664,
+    "GACCGCGA+TAAGGTCA" : 4633,
+    "ACACTAAG+GGGGGGGG" : 4594,
+    "GGGGGGGG+TTGGGGGG" : 4522,
+    "GGGGGGGG+GGTGGGGG" : 4433,
+    "CTGCTCCA+GATCTATC" : 4426,
+    "TCATCCTT+ATATCGCT" : 4319,
+    "TGCGGACA+CAACAATG" : 4318,
+    "TTCCTGTT+GGGGGGGG" : 4259,
+    "ATAGAGTA+TGGTGGCA" : 4225,
+    "TCTTTGGA+CCATTCGA" : 4205,
+    "ACTGTAGA+TGCGGCGT" : 4189,
+    "TGCGAGAC+GGGGGGGG" : 4183,
+    "GACGTCTT+TTTGAACC" : 4166,
+    "GCGTCTTA+GGTGAACC" : 4153,
+    "GAACCGCG+AAGGTCAG" : 4123,
+    "GGTTATAA+CGGAACTG" : 3974,
+    "GTGAATTA+GAATGAGA" : 3942,
+    "ACTCGTGT+AATCCAAT" : 3881,
+    "GGGGGGGG+GGGGGTGG" : 3873,
+    "CATAGAGT+GGTGGCAG" : 3869,
+    "TGCGCGCC+CAACAATG" : 3868,
+    "GTGTCGGA+GGGGGGGG" : 3850,
+    "GACGTCTT+GTGAACCG" : 3807,
+    "GGGGGGCG+GGGGGGGG" : 3738,
+    "AGTATCCA+AACAGGTT" : 3718,
+    "GGGGGGGG+ACATCTCG" : 3711,
+    "GGGGGGGG+AGATCTAG" : 3706,
+    "CATGAGTA+TGGTGGCA" : 3692,
+    "CTCACCAA+AAGCCTAG" : 3675,
+    "TCGTTGGA+CCATTCGA" : 3673,
+    "CATTCGAA+CGGACAAC" : 3657,
+    "GGTCACGA+GGGGGGGG" : 3653,
+    "ACTCGTGT+GTTCCATG" : 3634,
+    "CGGAACTG+CGTAGTGG" : 3599,
+    "TCTGTTGG+CAATTAGA" : 3557,
+    "CCATTCGA+AAGACAAC" : 3548,
+    "ACAGGCGC+ATTCAGAG" : 3529,
+    "GTGAAATA+GAATGAGA" : 3524,
+    "AGTACTCC+AACAGTTG" : 3520,
+    "CCTTCACC+ATAGCGTC" : 3519,
+    "CTGTTGGA+CCATTCGA" : 3512,
+    "AGTACTCC+ACAGGTTG" : 3511,
+    "CCATTCGA+CGGCCACC" : 3482,
+    "AGTCTCCA+AACAGGTT" : 3460,
+    "CAATAACA+ATATCTCG" : 3450,
+    "GGGGGGGG+AGATCTCT" : 3386,
+    "CGAACTGA+TCGTAGTG" : 3319,
+    "GACGTTTA+GGTGAACC" : 3308,
+    "ACAGCGCA+AGGCAGAG" : 3288,
+    "CTTCACCA+GGAGCGTC" : 3278,
+    "ACTCGTGT+GTCCAATG" : 3260,
+    "GTACTCCA+AACAGGTT" : 3247,
+    "GGAACTGA+TCGTAGTG" : 3211,
+    "GAACCGGA+TAAGGTCA" : 3201,
+    "GAACCGCG+AAATGTCA" : 3201,
+    "AACTGTAG+GCGGCGTG" : 3179,
+    "TAGGTCAA+CTACGACA" : 3101,
+    "AGGTTATA+GGAACTGG" : 3093,
+    "TGCGAGAC+AACAATGG" : 3069,
+    "TGCGAGAC+AAAAAATG" : 3058,
+    "TATCGCAC+AAAATAAG" : 3056,
+    "AACTGTAG+ATCGGCGT" : 3043,
+    "ACTCGTGT+TATCCAAT" : 2952,
+    "TCTGTTGG+AAATTAGA" : 2919,
+    "GCGAGACA+CAACAATG" : 2910,
+    "CTGTTCCA+GATCTATC" : 2892,
+    "ACTCGTGT+GTTCAATG" : 2891,
+    "GACGTCTT+GGTGACCG" : 2869,
+    "ACGGCGCA+AGGCAGAG" : 2863,
+    "CTCCCAAA+TTGCCTAG" : 2852,
+    "CCTTCACC+AAAGCGTC" : 2828,
+    "TATCGCCA+ACACTAAG" : 2824,
+    "GTCTACAC+ACCTTTGG" : 2818,
+    "AACTGTAG+TGCGCGTG" : 2803,
+    "TTGCTAGA+TAAGTGGT" : 2788,
+    "TTGCCTAG+AAGTGGTG" : 2767,
+    "AGTACCCA+AACAGGTT" : 2762,
+    "GCCCCCGG+ATGGCATG" : 2758,
+    "ACACTAGA+ATATGGAT" : 2758,
+    "ACAGGCGC+AATCAGAG" : 2751,
+    "GTGTCGGA+TAGCAAGC" : 2742,
+    "AGGTTATA+CGAACTGG" : 2734,
+    "TATCGCAC+GGGGGGGG" : 2720,
+    "CATAGAGT+TGTGGCAG" : 2719,
+    "ACTGTGTA+GTTCCAAT" : 2712,
+    "TTGCCTAG+TAAGTGTG" : 2709,
+    "GCACAGGA+ATGGCATG" : 2709,
+    "TGCGAGAC+CAACATGG" : 2703,
+    "GGGGGGGG+GGGGCGGG" : 2695,
+    "TTGCCTAG+AAATTGGT" : 2693,
+    "TGCGAGAC+CACAATGG" : 2691,
+    "TGCAGACA+CAACAATG" : 2687,
+    "CAGGCGCA+AGGCAGAG" : 2669,
+    "CCTTCACC+GAGCGTCG" : 2662,
+    "TGGCCGTA+GCGCTCTA" : 2658,
+    "CCATTCGA+GGACAACG" : 2657,
+    "AGGTTATA+CGGACTGG" : 2649,
+    "TGGCGGTA+GCGCTCTA" : 2645,
+    "AGGTTATA+AAGAACTG" : 2645,
+    "GGGGGTGG+CCATTCGA" : 2623,
+    "AGTTATAA+CGGAACTG" : 2611,
+    "GGTCACGA+ATAATACG" : 2609,
+    "GGTCACGA+CATATACG" : 2608,
+    "GGGGGGGG+AGATCACG" : 2600,
+    "GTCTACAC+ACCTGGCG" : 2597,
+    "CTCACCAA+TTTGCCTA" : 2573,
+    "CTACCAAA+TTGCCTAG" : 2551,
+    "ACAGGCGC+AGCAGAGG" : 2549,
+    "TCTCCTTA+AGCTCGCT" : 2545,
+    "TCATCCTT+AAATCGCT" : 2541,
+    "ACAGGCGC+AAAAAAAA" : 2537,
+    "GGCCGGTA+GCGCTCTA" : 2532,
+    "GTGAATAT+GATGAGAG" : 2499,
+    "GACGCTTA+GGTGAACC" : 2492,
+    "GGGGGGGG+GGGGGGGC" : 2487,
+    "TATCCTTA+AGCTCGCT" : 2486,
+    "TGCCTAGA+TAAGTGGT" : 2469,
+    "CCTTCCCA+GGAGCGTC" : 2466,
+    "CCATTCGA+CGACAACG" : 2449,
+    "CATAGAGT+AAGTGGCA" : 2444,
+    "CCATTCGA+CGGACACG" : 2431,
+    "CAATTAAC+AAATATCG" : 2428,
+    "AACCGCGA+TAAGGTCA" : 2425,
+    "GAACCGCG+TAAGTCAG" : 2417,
+    "TGCGAACA+CAACAATG" : 2412,
+    "CCTCACCA+GGAGCGTC" : 2406,
+    "CCATTCGA+AAAAAAAA" : 2401,
+    "ACTCGTGT+TTTACAAT" : 2399,
+    "GTCTCCCC+ACCTTGGC" : 2389,
+    "GGGGGGGG+ATGGGGGG" : 2364,
+    "CATAGAGT+TGGTGCAG" : 2327,
+    "GGTCACGA+AAAAATAC" : 2325,
+    "GAGTCTTA+GGTGAACC" : 2323,
+    "TAAGGTCA+ATAAGACA" : 2322,
+    "GGGGGGGG+GGGCGGGG" : 2303,
+    "TAAGGTCA+TACGACAG" : 2297,
+    "TTGCCTAG+TTAAGTGG" : 2271,
+    "TTGCCTAG+TAGTGGTG" : 2263,
+    "GACGTCTT+ATTGAACC" : 2250,
+    "AATGTAGA+TGCGGCGT" : 2248,
+    "GACGTCTT+GGTGCCCC" : 2246,
+    "TAAAGGTC+CTACGACA" : 2238,
+    "GCCACAGG+ATGCATGG" : 2230,
+    "CCGTCCCC+GGAGCGTC" : 2229,
+    "GTAATATA+GAATGAGA" : 2222,
+    "GTGAATAT+GAATGAAG" : 2174,
+    "TGGCCGGT+GCGCTCAG" : 2166,
+    "TCTGTTGG+AAATTATA" : 2149,
+    "ATATGGAT+ACACTAAG" : 2137,
+    "CGCTTCCA+GATCTATC" : 2134,
+    "GGGGGGGG+AGATCTCC" : 2132,
+    "TATCGCAC+TAATACAG" : 2130,
+    "TGGCCGGT+AAAAAAAA" : 2128,
+    "GACGTCTT+GGGAACCG" : 2127,
+    "ACACTAAG+ATATGATG" : 2123,
+    "TTCCTGTT+AGATACTG" : 2121,
+    "AGCTCGCT+GATCTGCG" : 2115,
+    "TGGCCGGT+GAGCTATA" : 2105,
+    "GTGTCGGA+AAGCAAGC" : 2100,
+    "TATCGCAC+AAACTAAT" : 2092,
+    "GGTCCCGC+CATAATAC" : 2091,
+    "CAATTAAC+ATACTCGG" : 2084,
+    "GGTCCGAA+CATAATAC" : 2074,
+    "GTGTCGGA+GCGCAGCG" : 2073,
+    "ACACTAAG+AAATTGAT" : 2067,
+    "TCTGTTGG+ACATTAGA" : 2066,
+    "GAACCGCG+TAGGTCAG" : 2062,
+    "GGGGGGGG+GGGGGGCG" : 2043,
+    "AACTGTAG+TTAGGCGT" : 2021,
+    "ACAGGCGC+ATGAAGAG" : 2014,
+    "GTCTACAC+ACCTTGCG" : 1987,
+    "CTGCTTCC+GACTATCG" : 1982,
+    "CCATTCGA+ACGACAAC" : 1967,
+    "AGGGTTAT+CGGAACTG" : 1950,
+    "ACTCGTGT+GTTTCCAA" : 1948,
+    "CAATTAAC+AATCTCGG" : 1943,
+    "CGGAACTG+TATTAGTG" : 1940,
+    "TCGAGACA+CAACAATG" : 1928,
+    "AACGTAGA+TGCGGCGT" : 1926,
+    "ATCGTGTA+GTTCCAAT" : 1924,
+    "ATACTCCA+AACAGGTT" : 1917,
+    "CTCACCAA+TTGCCAGG" : 1907,
+    "GAACCGCG+TAAGGCAG" : 1901,
+    "GTCACGAA+CATAATAC" : 1896,
+    "ATTGTGAA+GCATGCAG" : 1888,
+    "GGAATATA+GAATGAGA" : 1887,
+    "CTGCTTCC+GATCATCG" : 1872,
+    "GGGGGGGC+CAACAATG" : 1866,
+    "CCACCAAA+TTGCCTAG" : 1861,
+    "CGGAACTG+TCGAGTGG" : 1848,
+    "CGGAACTG+TCGTGTGG" : 1847,
+    "CAATTAAC+ATATCCGG" : 1845,
+    "TGGCCGGT+AATCTCTA" : 1843,
+    "GAACCGCG+TTAAGGTC" : 1835,
+    "GGTACGAA+CATAATAC" : 1834,
+    "TCTGTTGG+CCATTTCG" : 1832,
+    "ACGTCTTA+GGTGAACC" : 1807,
+    "GTGAATAT+GAATGGAG" : 1793,
+    "CGGAACTG+TCGTATGG" : 1790,
+    "TATGCACA+ACACTAAG" : 1787,
+    "GGTCACGA+CAAATACG" : 1784,
+    "TGCGAGAC+AAACAATT" : 1770,
+    "CATAGAGT+TTGGTGGC" : 1767,
+    "GTGAATAT+TAATGATA" : 1760,
+    "CTAGAGTA+TGGTGGCA" : 1760,
+    "TCACCTTA+AGCTCGCT" : 1755,
+    "CGGACTGA+TCGTAGTG" : 1748,
+    "GAAACCGC+TAAGGTCA" : 1734,
+    "GGCGGGGT+GGTGAACC" : 1706,
+    "GTGAATAT+TAATTAGA" : 1702,
+    "ACTAAGAT+ATATGGAT" : 1702,
+    "AGGTTATA+ACGAACTG" : 1699,
+    "CCATCGAA+CGGACAAC" : 1692,
+    "AGTACTCC+AACGGTTG" : 1691,
+    "CGGAAACT+TCGTAGTG" : 1688,
+    "TAAGGTCA+AAAAGACA" : 1685,
+    "AAAAAAAA+AAAAAAAA" : 1684,
+    "CGGAACTG+TTCGTAGT" : 1682,
+    "ACACTAAG+ATATGGTG" : 1681,
+    "TCATCCTT+AGCCGCTG" : 1680,
+    "CTGCTTCC+TATATATC" : 1678,
+    "GCCACGGA+ATGGCATG" : 1663,
+    "ACAGGCGC+ATGCATAG" : 1662,
+    "GGTCAGAA+CATAATAC" : 1658,
+    "GAACCGCG+AAAGTTCA" : 1658,
+    "TGGGGGGG+GCGCTCTA" : 1654,
+    "TCTGTTGG+CCATTATA" : 1653,
+    "CGGAACTG+AATTAGTG" : 1651,
+    "TAAGGTCA+CAACTACA" : 1644,
+    "CCTTCACC+GGCGCGGC" : 1644,
+    "CATAGAGT+TTTTGGCA" : 1644,
+    "CTGCTTCC+ATCTATCG" : 1637,
+    "TAAGTCAA+CTACGACA" : 1628,
+    "TCATCCTT+ACTCGCTG" : 1613,
+    "GTCTACAC+ACTTGGCG" : 1613,
+    "TTCGCACA+ACACTAAG" : 1612,
+    "TCTGTTGG+CCATTCAG" : 1609,
+    "GAACCCGA+TAAGGTCA" : 1602,
+    "CATCCTTA+AGCTCGCT" : 1602,
+    "AAGGTCAA+CTACGACA" : 1598,
+    "CCTTCACC+GGAGCGCG" : 1585,
+    "GGCACGAA+CATAATAC" : 1584,
+    "CTGCTTCC+GATCTACG" : 1580,
+    "GTCTAACA+ACCTTGGC" : 1579,
+    "CTGCTTCC+AATATATC" : 1574,
+    "GTCTACCA+ACCTTGGC" : 1565,
+    "TCCTGTTA+AAGATACT" : 1559,
+    "CTCGTGTA+GTTCCAAT" : 1554,
+    "GGGGGGGT+GGTGAACC" : 1547,
+    "CTCACCAA+TTGCCCTA" : 1538,
+    "TGCCGGTA+GCGCTCTA" : 1537,
+    "TAAGGGTC+CTACGACA" : 1537,
+    "GCCACAGG+AATGCATG" : 1536,
+    "GCCGTCGT+GGTGAACC" : 1530,
+    "ACAGGCGC+AAACAGAG" : 1530,
+    "ACAGGCGC+ATGCAGAT" : 1529,
+    "TATCGACA+ACACTAAG" : 1522,
+    "GGGGGTGC+GATCTATC" : 1521,
+    "TCATCCTT+AGCTCGTG" : 1519,
+    "ACCGTGTA+GTTCCAAT" : 1519,
+    "GAACGTCT+GGTGAACC" : 1517,
+    "TATCGCAC+ACACAAGG" : 1511,
+    "GGGGGGGG+GAGGGGGG" : 1509,
+    "ACAGGCGC+AGGCAAGG" : 1502,
+    "GAACCGCG+AAACGTCA" : 1494,
+    "CTGCTTCC+GTCTATCG" : 1494,
+    "CGGAATGA+TCGTAGTG" : 1489,
+    "AGGCGCAT+AGGCAGAG" : 1487,
+    "TAAGGTCA+ACGACAGT" : 1482,
+    "CCTTCACC+GGGCGTCG" : 1478,
+    "TAAGGCAA+CTACGACA" : 1471,
+    "GACGTCTT+AATGAACC" : 1469,
+    "AGTACTCC+AAAATGTT" : 1469,
+    "TGGCCGGT+GCGCCTAG" : 1454,
+    "TGCGAGAC+CAACAAAT" : 1453,
+    "AGGGGGGG+GGGGGGGG" : 1445,
+    "AGGTTATA+CTGAAATG" : 1444,
+    "GTGAATAT+GAAGAGAG" : 1441,
+    "ACTCGGTA+GTTCCAAT" : 1439,
+    "CCATTCGA+CTTACAAC" : 1435,
+    "ACAGGCGC+GGCAGAGG" : 1434,
+    "AGCTCGCT+AAATCTGC" : 1433,
+    "CATAGAGT+ACGTGGCA" : 1431,
+    "TTGCCAGA+TAAGTGGT" : 1428,
+    "AAACTGTA+TGCGGCGT" : 1425,
+    "TCTGTTGG+CCTTCGAG" : 1424,
+    "CTCACCAA+TTGCTAGG" : 1415,
+    "AACTGTAG+TTGCGGCG" : 1415,
+    "CTGCTTCC+GATCTTCG" : 1412,
+    "GGGGCGGG+GCGCTCTA" : 1405,
+    "TGGCCGGT+TCGCTATA" : 1404,
+    "CCTTCACC+GGACGTCG" : 1401,
+    "GGTCACGA+AATAATAA" : 1400,
+    "TAAGGTCA+AAAATAAA" : 1398,
+    "TTCCTAGA+TAAGTGGT" : 1389,
+    "TAAGGTCA+AAAAAAAA" : 1387,
+    "CCATTCGA+AATACAAC" : 1383,
+    "AACTGTGA+TGCGGCGT" : 1380,
+    "GACGTCTT+GGTAACCG" : 1376,
+    "CGGCCCTG+TCGTAGTG" : 1374,
+    "GGGGGGGT+GAATGAGA" : 1369,
+    "GTGAATAT+GAATTATA" : 1365,
+    "CGGGAACT+TCGTAGTG" : 1362,
+    "GTGAATAT+AAATTAGA" : 1356,
+    "ACAGGGCG+AGGCAGAG" : 1350,
+    "CCATTCGA+CGGCCCAC" : 1346,
+    "TTGCCTGA+TAAGTGGT" : 1344,
+    "ACAGGCGC+AAGAAGAG" : 1344,
+    "TATCGCAC+AAAATAAT" : 1343,
+    "GTTACACA+ACCTTGGC" : 1341,
+    "CGGAACGA+TCGTAGTG" : 1341,
+    "TGGGCCGG+GCGCTCTA" : 1338,
+    "TGGCCGGT+GCGTCTAG" : 1338,
+    "GGTCACGA+CATAAACG" : 1337,
+    "TGGCCGGT+GCGCTTAG" : 1336,
+    "GGGGGGGG+AGAACTCG" : 1334,
+    "ACTCGTGT+TCCAATGT" : 1326,
+    "CGGAACTG+TCGTTAGT" : 1325,
+    "TGAATATA+GAATGAGA" : 1323,
+    "CTGCTTCC+GATTATCG" : 1323,
+    "TACGCACA+ACACTAAG" : 1322,
+    "TGGCCGGT+AAAAAATA" : 1318,
+    "GTGAATAT+AATGAGAG" : 1317,
+    "CGGAACTG+TGTAGTGG" : 1312,
+    "TCTGTTGG+CCCATTCG" : 1308,
+    "TGGGGGGG+CCATTCGA" : 1303,
+    "CCATTCGA+ATTACAAC" : 1302,
+    "AGTACTCC+AAAAGTTT" : 1302,
+    "TAAGGTCA+CAAAGACA" : 1300,
+    "TTGCCTAG+AAAGTGTT" : 1298,
+    "AAGGCGCA+AGGCAGAG" : 1298,
+    "TTGCCTAG+TAAGGGTG" : 1295,
+    "AGACTCCA+AACAGGTT" : 1293,
+    "TGGCCGGT+GATCTCTA" : 1292,
+    "CAAATTAA+ATATCTCG" : 1292,
+    "AGGTTAAT+CGGAACTG" : 1291,
+    "CCTTCACC+TAAGCGTC" : 1286,
+    "CATAGAGT+TGGGGCAG" : 1283,
+    "ACTCGTGT+GTTAAAAT" : 1261,
+    "GTCTCACA+ACCTTGGC" : 1260,
+    "CCTTACCA+GGAGCGTC" : 1257,
+    "TTGCCTAG+AAACTGGT" : 1256,
+    "GGGGGGGG+TCGGGGGG" : 1252,
+    "CCTTCACC+AAAAAAAA" : 1250,
+    "GCCCAGGA+ATGGCATG" : 1248,
+    "CTCTTCCA+GATCTATC" : 1246,
+    "TAAGGTCA+CTACGCAG" : 1245,
+    "ACTCGTGT+ATTACAAT" : 1239,
+    "CATAAGTA+TGGTGGCA" : 1230,
+    "ATCGCACA+ACACTAAG" : 1220,
+    "TTGCCTAG+TAAGTTGG" : 1217,
+    "AACTGTAG+AACGGCGT" : 1206,
+    "GACTCTTA+GGTGAACC" : 1202,
+    "GCCACAGG+AGGCATGG" : 1200,
+    "TGGGCGGG+GCGCTCTA" : 1192,
+    "CGGAACTG+TAGTATTG" : 1188,
+    "CCTTCACC+TCAGCGTC" : 1187,
+    "CTCACCAA+TTGCCTTA" : 1185,
+    "AACTGTAG+TGGGGGGG" : 1184,
+    "CTGCTTCC+AAACTATC" : 1179,
+    "GGTCACGA+CTAATACG" : 1178,
+    "CTCACCAA+ATGACTAG" : 1178,
+    "ACAGGCGC+AGGCGAGG" : 1178,
+    "GGGGGTGG+AGATCTCG" : 1171,
+    "GCCACAGG+ATGGCTGG" : 1168,
+    "ATTGTGAA+CAAATGCA" : 1166,
+    "CGGGGGGG+TCGTAGTG" : 1162,
+    "ACACAAGA+ATATGGAT" : 1159,
+    "ACAGGCCA+AGGCAGAG" : 1158,
+    "ACTCGTGT+AATACAAT" : 1157,
+    "CCCGGCGC+AGGCAGAG" : 1152,
+    "GGTGAATA+GAATGAGA" : 1151,
+    "TTGCCTAG+TAATGGTG" : 1150,
+    "GAACCGCG+AAAGGTAA" : 1148,
+    "TTCTGTTA+AAGATACT" : 1147,
+    "GCTACACA+ACCTTGGC" : 1141,
+    "TGGGGGGT+GGGGGGGG" : 1140,
+    "TGGCCGGT+TCGATCTA" : 1140,
+    "ACTCGTGT+TTCCAATG" : 1138,
+    "GACGTCTT+GGGTGAAC" : 1128,
+    "ATTGTGAA+GAAATTCA" : 1123,
+    "GTGTCGGA+GCGCCCGC" : 1122,
+    "GGGGGGGT+AGATCTCG" : 1121,
+    "CGGAACTG+TCGTAGGT" : 1119,
+    "TCATCCTT+AGCTCCTG" : 1118,
+    "TAAGGTCA+AAACTACA" : 1118,
+    "GTCACACA+ACCTTGGC" : 1116,
+    "TGGCCGGT+GGCTCTAG" : 1113,
+    "CCATTCGA+AAAACAAC" : 1109,
+    "TAAGGTCA+AAAATACA" : 1106,
+    "CTGCTTCC+TATCTATA" : 1106,
+    "CCGGAACT+TCGTAGTG" : 1105,
+    "CCATTCGA+CGGACCCC" : 1105,
+    "AGCTCGCT+TATTATGC" : 1104,
+    "GTGAATAT+AAATGATA" : 1101,
+    "CTCCCCAC+TTGCCTAG" : 1100,
+    "ACTCGTTA+GTTCCAAT" : 1100,
+    "TAAGGTCA+ATACGAAA" : 1099,
+    "GGGGGGGG+GGGGGCGG" : 1096,
+    "AAGGTTAT+CGGAACTG" : 1093,
+    "GTCTACAC+ACATTGGA" : 1092,
+    "GTGAATAT+GAATAGAG" : 1090,
+    "AGCTCGCT+GATTTCTG" : 1090,
+    "TGGCCGGT+TAGCTATA" : 1088,
+    "TAAGGTCA+CTCGACAG" : 1086,
+    "CCATTCGA+CGGCAACG" : 1086,
+    "ACACTAAG+AATGGATG" : 1086,
+    "GGGGGTTT+GAATGAGA" : 1082,
+    "CATAGAGT+TGGTGGGC" : 1082,
+    "TGGCCGGT+GCCTCTAG" : 1080,
+    "TAAGGTCA+ATACTACA" : 1077,
+    "TAAGGTCA+CTACACAG" : 1075,
+    "GAACCGCG+TAAGGGTC" : 1068,
+    "TGCGAAGA+CAACAATG" : 1066,
+    "AATTGTGA+GCAATGCA" : 1066,
+    "TGGCCGGT+TATCTCTA" : 1065,
+    "TCTGTTGG+CCATTGAG" : 1064,
+    "CCATAGAG+TGGTGGCA" : 1064,
+    "CATAGATA+TGGTGGCA" : 1063,
+    "GCCACAGG+AAGGAATG" : 1061,
+    "TTCCTGTT+AATATAAT" : 1060,
+    "TGGCCGGT+AAAATATA" : 1060,
+    "TCTGTTGG+ACATTCTA" : 1058,
+    "ACTCGTGT+TGTTCCAA" : 1058,
+    "CAATTAAC+ATATATAG" : 1054,
+    "GTCTACAC+ACCCTTGG" : 1052,
+    "ACAGGGCA+AGGCAGAG" : 1052,
+    "CGGAACTG+TAGTAGTT" : 1048,
+    "GGGGGGGG+GGCGGGGG" : 1044,
+    "AGGTTATA+CGGCCCTG" : 1043,
+    "ACTCTGTA+GTTCCAAT" : 1042,
+    "GCCGGCTT+GGTGAACC" : 1040,
+    "ATTGTGAA+AAAATGAA" : 1040,
+    "AGCTCGCT+GATTCGCG" : 1039,
+    "TGGCCGGT+CGCTCTAG" : 1037,
+    "AGGTTATA+AGGAAATG" : 1037,
+    "GTGTGGAA+GCGCAAGC" : 1036,
+    "AGCTCGCT+GTTCTGCG" : 1035,
+    "TCATCCTT+GCTCGCTG" : 1034,
+    "TGGGTTGG+CCATTCGA" : 1033,
+    "TCTGTTGG+AAATTCTA" : 1029,
+    "CCATTCGA+CGGAAACG" : 1026,
+    "CATAGAGT+TGGTTGGC" : 1025,
+    "CTCACCAA+TTCCTAGG" : 1022,
+    "TGGCCGGT+AAACTCTA" : 1018,
+    "CTGCTTCC+GATCTTAT" : 1017,
+    "CTGCTTCC+GATATATA" : 1017,
+    "CACTAAGA+ATATGGAT" : 1017,
+    "AGTACTAA+AACAGGTT" : 1011,
+    "TGGGCGGG+GGGGGGGG" : 1002,
+    "CGGACCGG+TCGTAGTG" : 1002,
+    "ACAAGGCG+AGGCAGAG" : 1002,
+    "TCATCCTT+AAATAAAT" : 1001,
+    "TAAGGTCA+CTCCGCCA" : 999,
+    "TCATCCTT+AGCTCCGC" : 997,
+    "GTCTACAC+TACCTTGG" : 996,
+    "ACTCGTGT+AAACCAAT" : 996,
+    "TGCGAGAC+CAAACAAT" : 991,
+    "ACAGGCGC+AAAAAGAG" : 991,
+    "TCATCCTT+ACATCGCT" : 984,
+    "CTGCTTCC+TAACTATC" : 983,
+    "TGCGAGAC+AAACAAAG" : 979,
+    "GAACCGCG+AAAGGACA" : 979,
+    "AGCTCGCT+TATTCTTC" : 978,
+    "AACTGTAG+ACCGGCGT" : 976,
+    "CATAGAAG+TGGTGGCA" : 974,
+    "CGGAACTG+TCTAGTGG" : 973,
+    "GGGCCGGG+GGGGGGGG" : 972,
+    "ACACTAAG+ATGGATGT" : 970,
+    "AACTGTAG+TCGGCGTG" : 970,
+    "GACGTCTT+TCTGAACC" : 968,
+    "TGGCCCGG+GCGCTCTA" : 962,
+    "GGCCCCGG+ATGGCATG" : 961,
+    "CCTTCACC+TGGAGCGT" : 960,
+    "GGGGGGGG+CTGGGGGG" : 959,
+    "CCATTCGA+AGGAAAAC" : 959,
+    "GGGGGGTG+AGATCTCG" : 958,
+    "CCCTTCAC+GGAGCGTC" : 957,
+    "TGGCCGGT+AAGCTATA" : 956,
+    "TGGAGACA+CAACAATG" : 956,
+    "CCTTCACC+GGAGCTCG" : 955,
+    "AGCTCGCT+ATTCTGCG" : 955,
+    "GCCAACAG+ATGGCATG" : 953,
+    "CTCCCCCA+TTGCCTAG" : 953,
+    "ACACTAAG+ATAGGATG" : 953,
+    "GAACCGCG+TAATTTCA" : 952,
+    "CATAGGAG+TGGTGGCA" : 952,
+    "GTGAATAT+AAAAAAAA" : 947,
+    "TGGGGTGG+CCATTCGA" : 946,
+    "GTGTCGGA+GCGCAACG" : 944,
+    "TAAGGTCA+CTAATACA" : 941,
+    "TGGCCGGT+AAGATCTA" : 940,
+    "GAACCCGC+TAAGGTCA" : 940,
+    "CCCCTAAG+ATATGGAT" : 939,
+    "TGGCCGGT+GCGCTTCT" : 938,
+    "CCCATTCG+CGGACAAC" : 937,
+    "GAACCGCG+TAAGGTTC" : 936,
+    "GAACCGCG+TAAAGGTC" : 935,
+    "TTGGGGGG+GGGGGGGG" : 934,
+    "GGGGGGGG+AAGGGGGG" : 925,
+    "ACTCGTGT+TTACCAAT" : 925,
+    "ACTCGTGT+GATCAAAT" : 925,
+    "TCATCCTT+AGTCGCTG" : 923,
+    "GTGGGGGG+AGATCTCG" : 922,
+    "GAACCGCG+AAATTTCA" : 922,
+    "GTCTACAC+ACATTTGC" : 921,
+    "GCCGGGGG+GGGGGGGG" : 917,
+    "CTGCTTCC+GATTCTAT" : 916,
+    "AGTACTCC+AAAGGTTG" : 915,
+    "TTCCTGTT+AAGATCTG" : 912,
+    "GGGGGGGG+TAGGGGGG" : 912,
+    "GACGTCTT+GGTTGAAC" : 909,
+    "CCTGCTTC+GATCTATC" : 908,
+    "AACTGTAG+TTCGGAGT" : 907,
+    "TAAGGTCA+CTTACGAC" : 906,
+    "GTGAATAT+TGAATGAG" : 906,
+    "AACTCGTG+GTTCCAAT" : 904,
+    "CTGCTTCC+GATCCTAT" : 903,
+    "GAACCGCG+AAAGCTCA" : 902,
+    "GCCACAGG+AAGTCATG" : 901,
+    "TCATCCTT+AGCTGCTG" : 900,
+    "GTCTACAC+ACATTGTC" : 900,
+    "CCTTCACC+TGATCGTC" : 900,
+    "ACTCGTGT+GATACAAT" : 900,
+    "ACAGGCGC+AAAAAAAT" : 900,
+    "TGGCCGGT+GCTCTATA" : 897,
+    "TCGGGTGG+CCATTCGA" : 897,
+    "GCGGGGGG+GGAGCGTC" : 897,
+    "CTGCTTCC+TGATCTAT" : 897,
+    "AGCTCGCT+GATTTGCG" : 897,
+    "AGGTTTAT+CGGAACTG" : 896,
+    "AGCTCGCT+TAATCTGC" : 896,
+    "AACTGTAG+TGCGGGCG" : 895,
+    "CAATTAAC+ATATCTTC" : 894,
+    "TGGGGGGG+TGGGGGGG" : 891,
+    "TCTGTTGG+CAATTCTA" : 891,
+    "GGGTGGGG+AGATCTCG" : 890,
+    "TTCCTGTT+AAGAACTG" : 889,
+    "ACATAAGA+ATATGGAT" : 889,
+    "AAGTACTC+AACAGGTT" : 889,
+    "CATAAGAG+TGGTGGCA" : 887,
+    "ATTGTGAA+AAAATTAA" : 886,
+    "GCCACAGG+TGGCATGG" : 884,
+    "CATAGAGT+TGGGGGGG" : 884,
+    "GTGTCGGA+GCGAAGCG" : 880,
+    "TGGCGAGA+CAACAATG" : 879,
+    "AGGTTATA+CTTAACTG" : 879,
+    "TGCGAGAC+AAAAAATT" : 878,
+    "CATAGAGT+AATTGGCA" : 877,
+    "AGGTTATA+CGGGAACT" : 877,
+    "CAATTAAC+TATCTCGG" : 875,
+    "GCTCGCTA+GATTCTGC" : 871,
+    "TGGCCGGT+GCTCTAGT" : 870,
+    "GGGGGGTT+GAATGAGA" : 868,
+    "CCTTCGAA+CGGACAAC" : 868,
+    "ACAGGCGC+ACGAAGAG" : 868,
+    "TTCCTGTT+AAAATAAT" : 866,
+    "ACTCGTGT+TTTCAAAT" : 866,
+    "GGGGGGGG+AAATCTCG" : 864,
+    "TTGCCTAG+TAAGTTTT" : 863,
+    "TGCGAGAC+TCAACAAT" : 863,
+    "GCCACAGG+TATGGCAT" : 861,
+    "ACCTAAGA+ATATGGAT" : 860,
+    "AGCTCGCT+GATTCTCG" : 859,
+    "CCTCACCA+TTGCCTAG" : 858,
+    "GAACCGCG+AAAAAAAA" : 857,
+    "TTGCCTAG+TAAGGGGG" : 855,
+    "GCCACAGG+ATTGGCAT" : 853,
+    "TTCCTGTT+AAGTACTG" : 851,
+    "ACAGGCGC+AATAAGAG" : 851,
+    "GGGGGGGC+ACCTTGGC" : 850,
+    "GGGTCACG+CATAATAC" : 849,
+    "CCTTCACC+GGAGCCGT" : 848,
+    "GGGGTTTT+GAATGAGA" : 845,
+    "TGGCCGGT+CAGCTCTA" : 843,
+    "GACGTCTT+TATGAACC" : 842,
+    "AGGTTATA+AATAACTG" : 840,
+    "TGCGGAGA+CAACAATG" : 839,
+    "TCTGTTGG+TCCATTCG" : 838,
+    "GGTCACGA+CATAATCG" : 838,
+    "CCTTCACC+AAATCGTC" : 838,
+    "AACTGTAG+TGAGGAGT" : 838,
+    "AGCTCGTA+GATTCTGC" : 837,
+    "TCATCCTT+ACCTAGCT" : 835,
+    "GGGGTTGG+CCATTCGA" : 835,
+    "CTCACCAA+ATGCCAAG" : 832,
+    "CGGAACTG+AAATAGTG" : 832,
+    "CATAGAGT+TGGGTGGC" : 831,
+    "TGTGGGGG+GGGGGGGG" : 830,
+    "TTCCTGTT+AAATACTG" : 828,
+    "CTCACCAA+ATTCCTAG" : 828,
+    "GGTCACGA+AAAAAAAA" : 827,
+    "CTCAACCA+TTGCCTAG" : 827,
+    "TTTGCCTA+TAAGTGGT" : 826,
+    "GGCGGGGG+GGTGAACC" : 826,
+    "GGGGGGGG+AGATCGCG" : 825,
+    "CCATTGAA+CGGACAAC" : 824,
+    "CAAGAGTA+TGGTGGCA" : 824,
+    "GGTCACGA+CATAAAAA" : 823,
+    "GACGGTCT+GGTGAACC" : 823,
+    "ATTGTGAA+TCAATGAA" : 823,
+    "ACACTAAG+ATTGGATG" : 821,
+    "CAATAGAG+TGGTGGCA" : 820,
+    "CCTTCACC+AAATAAAA" : 818,
+    "CTCACCAA+TAGCATAG" : 817,
+    "CCATTCGA+CCGAAAAC" : 817,
+    "TGCGAGAC+CAAAATGG" : 816,
+    "GGTCACGA+CATTAATA" : 815,
+    "TTCCTGTT+AAGATATG" : 814,
+    "AGCTGCTA+GATTCTGC" : 813,
+    "GGGGTGGG+AGATCTCG" : 812,
+    "GGGGCGGG+TAAGGTCA" : 811,
+    "TCATCCTT+AGCCTCGC" : 809,
+    "TAAGGTCA+TCTACGAC" : 807,
+    "GTGAATAT+TAATGACA" : 807,
+    "GGTGGGGG+AGATCTCG" : 804,
+    "TGGGGGGG+CAACAATG" : 803,
+    "TGGCCGGT+TGCGCTCT" : 803,
+    "AGTACTCC+TAACAGGT" : 799,
+    "GTGAATAT+GAATTGAG" : 797,
+    "CCATTCGA+AGGACAAA" : 796,
+    "CCTTCACC+ACAGCGTC" : 793,
+    "AGCCGCTA+GATTCTGC" : 793,
+    "TCATCCTT+AAAAAAAA" : 792,
+    "GGACGTCT+GGTGAACC" : 792,
+    "GGTCACGA+AATAAAAC" : 787,
+    "ACTCGTGT+CATCCAAT" : 787,
+    "TATCCACA+ACACTAAG" : 784,
+    "GGGCCGGG+TAAGGTCA" : 784,
+    "AACAGGCG+AGGCAGAG" : 783,
+    "TGGCCGGT+GCGATATA" : 780,
+    "TATCGCAC+ACCTAAGG" : 780,
+    "ACTCGTGT+AAAACAAT" : 778,
+    "TATCGCAC+AAAAAAAA" : 773,
+    "GACGTCTT+TGGTGAAC" : 772,
+    "AGGTTATA+AGGAACTT" : 771,
+    "ATTGTGAA+GAAATGAA" : 768,
+    "TGGGGGGG+AGATCTCG" : 767,
+    "TCTGGTTG+CCATTCGA" : 765,
+    "ACACTAAG+AAATGGAA" : 763,
+    "TGGCCGGT+AATATATA" : 762,
+    "GACGTCTT+TGTTAACC" : 761,
+    "TAAGGTCA+ATACCACA" : 760,
+    "GGGGGGGG+ACGGGGGG" : 758,
+    "CATAGAGT+ATTTGGCA" : 757,
+    "GTCTACAC+AACTTGTC" : 755,
+    "GCCACAGG+ATGGATGG" : 754,
+    "AGGTTATA+CGTAAATG" : 754,
+    "ACTCGTGT+GTTCCCAA" : 753,
+    "TGGCCGGT+AATCTATA" : 751,
+    "ATTGTGAA+AATGCAGT" : 751,
+    "GCTGGGGG+GGGGGGGG" : 748,
+    "TCATCCTT+AGATAGCT" : 747,
+    "ACACTAAG+TATGGATG" : 747,
+    "TTGCCTAG+AAAGTTGT" : 746,
+    "ACTCGGTG+GTTCCAAT" : 745,
+    "ATTGTGAA+AAAAAAAA" : 744,
+    "AGGTTATA+TCGGAACT" : 744,
+    "GACGTCTT+GGGGCACC" : 743,
+    "CCTGCCCC+GGAGCGTC" : 743,
+    "GTGTCGGA+GATCAAGC" : 742,
+    "CCATTCGA+AGTACAAC" : 741,
+    "ATTGTGAA+AAAATTCA" : 740,
+    "ACTCGTGT+GATCCAAA" : 740,
+    "CCCTTCGC+CGGACAAC" : 739,
+    "CAATTAAC+AAATCTCC" : 737,
+    "GCCACAGG+ATTGCATT" : 736,
+    "CCTTCACC+GGAGCGGT" : 735,
+    "CCATTCGA+TCGGACAA" : 735,
+    "TGGCGGGG+GGGGGGGG" : 734,
+    "CGGAACTG+GTAGTGGT" : 734,
+    "CCATTTCG+CGGACAAC" : 734,
+    "TGGCCGGT+TCTCTCTA" : 733,
+    "GTGAATAT+AAATTATA" : 733,
+    "CCTTCACC+CTAGCGTC" : 733,
+    "AGCTCGCT+TATTCTGA" : 733,
+    "ACAGGCGC+AGGAAGAT" : 733,
+    "GGGGGGGG+GTTGGGGG" : 732,
+    "TTCCTGTT+AAGATTAC" : 731,
+    "ACACTAAG+AAATGTAT" : 731,
+    "ATGTGAAA+GCAATGCA" : 730,
+    "ACAGGCGC+TAGGCAGA" : 730,
+    "GTGAATAT+GAAATGAG" : 729,
+    "AGCTCGCT+GATTCTTG" : 728,
+    "CTCACCAA+TATCCTAG" : 727,
+    "CCTTCAAA+GGAGCGTC" : 727,
+    "GCGGGGGG+GTTCCAAT" : 726,
+    "CCTTAACA+GGAGCGTC" : 723,
+    "CATTAGAG+TGGTGGCA" : 722,
+    "CCAATTAA+ATATCTCG" : 720,
+    "ATTGTGAA+GCAAATGC" : 720,
+    "TTCCTGTT+TAAGATAC" : 719,
+    "CAATTAAC+AAATCTCT" : 719,
+    "TGGCCGGT+AATAAATA" : 718,
+    "CAATTAAC+ATCTCGGT" : 717,
+    "GGGCCGGG+GCGCTCTA" : 714,
+    "AGGTTATA+ATGAAATG" : 714,
+    "CCTTCACC+GGGAGCGT" : 713,
+    "AACTTAGA+TGCGGCGT" : 713,
+    "TGCGAGAC+CAAAAATT" : 711,
+    "TATCGCAC+ACAATAAT" : 711,
+    "CAATTAAC+ATATTCGG" : 710,
+    "ACTCGTGT+CTTACAAT" : 708,
+    "ACTCGTGT+AAAAAAAT" : 708,
+    "GCGGGCGG+GGGGGGGG" : 707,
+    "GTGTCGGA+GGCAAGCG" : 706,
+    "TATCGCAC+AAACAAAG" : 705,
+    "GTGGGGGG+TAAGTGGT" : 704,
+    "GGTGGGGG+GCAATGCA" : 703,
+    "GGGGGGGC+GATCTATC" : 703,
+    "TTGCCTAG+TAAAGTGG" : 702,
+    "TCATCCTT+TAGCTCGC" : 701,
+    "TCATCCTT+AGATCTCT" : 701,
+    "ACTCGTGT+AATAAAAT" : 700,
+    "TCATCCTT+ATCTAGCT" : 698,
+    "CAATTAAC+ATTCTCGG" : 698,
+    "CCATTCGA+CGGGACAA" : 697,
+    "TCATCCTT+AGCTTCGC" : 696,
+    "GCCCACAG+ATGGCATG" : 696,
+    "ATTGTGAA+GAATGCAG" : 696,
+    "CGCCCCAA+TTGCCTAG" : 695,
+    "AGTAACTC+AACAGGTT" : 695,
+    "TATCGCAC+AAACTAAC" : 694,
+    "CTCACCAA+AATCCTAG" : 694,
+    "AACTGTAG+AAAGGCGT" : 694,
+    "ATTGTGAA+GCCAATGC" : 693,
+    "AGGTTATA+ATTAACTG" : 693,
+    "CAATTAAC+TATATCTC" : 692,
+    "TATCGCAC+ACACTTAA" : 691,
+    "TATCGCAC+AAAATAAA" : 691,
+    "GGGGGGGT+AGCTCGCT" : 691,
+    "ACTCGGGG+GTTCCAAT" : 691,
+    "TGCGAGAC+CAACCAAT" : 690,
+    "GTTGGGGG+GGGGGGGG" : 690,
+    "TGCGAGAC+CCAACAAT" : 689,
+    "TCATCCTT+ATCTCTCT" : 687,
+    "GGGTGGGT+GGGGGGGG" : 684,
+    "GGGGGTTG+GGGGGGGG" : 684,
+    "TCTGTTGG+AAAAAAAA" : 681,
+    "GCCAAGGA+ATGGCATG" : 681,
+    "TCGTGTAT+GTTCCAAT" : 679,
+    "GACGTCTT+GGGGACCC" : 679,
+    "GGGGTTGG+GGGGGGGG" : 678,
+    "AGGTTATA+CGGAATGG" : 678,
+    "TGGGGGGG+GGGGGGGT" : 677,
+    "GCGGGGGG+AGATCTCG" : 677,
+    "GTGTCGGA+GCCAAGCG" : 676,
+    "GCCACAGG+AAGGCATT" : 674,
+    "ACACTAAG+ATATTTAT" : 674,
+    "TCGGGGGG+GGGGGGGG" : 672,
+    "CTCACCAA+TTGAATAG" : 671,
+    "CGGAACTG+ACCTAGTG" : 670,
+    "TCTGGGGG+CCATTCGA" : 669,
+    "CATAGAGT+TCGTTGCA" : 669,
+    "CCATTCGA+CTGACAAA" : 668,
+    "GTGGAATA+GAATGAGA" : 667,
+    "CATAGAGT+AGGTTGCA" : 667,
+    "TTGCCCTA+TAAGTGGT" : 666,
+    "TGGCCGGT+AAAATCTA" : 666,
+    "GTCTACAC+AACTTTGC" : 666,
+    "GGTCACGA+AATAAAAA" : 666,
+    "GGTCAACG+CATAATAC" : 665,
+    "GACCGTCT+GGTGAACC" : 665,
+    "CGTGAATA+GAATGAGA" : 664,
+    "TCTGTTGG+CCAATAGA" : 663,
+    "GTGGGGGG+TGGGGGGG" : 663,
+    "GAACCGCG+TAAGTTAA" : 663,
+    "CTGCTTCC+AAAATATC" : 663,
+    "AGCTCGCT+AATTATGC" : 663,
+    "GACGTCTT+GGTGGAAC" : 662,
+    "TCATCCTT+AGATCTCG" : 661,
+    "TAAGGTCA+CTACCAAA" : 661,
+    "GGGGCGGG+AGATCTCG" : 661,
+    "AGTCGCTA+GATTCTGC" : 661,
+    "CTGCTTCC+GAACTATA" : 660,
+    "ACACTAAG+TATATGGA" : 660,
+    "GTGTCGGA+GCAAGCGT" : 659,
+    "GGGGGGGT+GTTCCAAT" : 659,
+    "AGTACTCC+AAACAGGT" : 659,
+    "TGCGAGAC+AAAAAAAA" : 658,
+    "TAAGGTCA+CTACGAAC" : 658,
+    "TCTGTTGG+CCATTCCG" : 657,
+    "GGGGGCGG+AGATCTCG" : 657,
+    "AACTGTAG+ATAGGCGT" : 657,
+    "TGGCCGGT+GAGATCTA" : 656,
+    "GTGCGGAA+GCGCAAGC" : 655,
+    "CATAGAGT+TTGTGTCA" : 652,
+    "AGTACTCC+AAAAGGTA" : 652,
+    "ATTGTGAA+GCAAGCAG" : 651,
+    "GTGAATAT+TAATTATA" : 649,
+    "GGGTCGGG+GGGGGGGG" : 649,
+    "GGGGTGTG+GGGGGGGG" : 649,
+    "AGGTTATA+CGGAAACT" : 649,
+    "ACTCGTGT+AAAAAAAA" : 649,
+    "TGGGGGTG+GGGGGGGG" : 648,
+    "TCATCCTT+ATCTCGAT" : 647,
+    "GGGGGGGG+AGAGCTCG" : 645,
+    "GCCACAGG+AAGCCATG" : 645,
+    "TGGCCGGT+GGGGGGGT" : 644,
+    "ACAGGCGC+AGGGCAGA" : 644,
+    "CCTTAAAC+GGAGCGTC" : 643,
+    "GGGGGCGG+CATAATAC" : 642,
+    "AGTACTCC+AAAACGTT" : 642,
+    "GCGCCGCG+TAAGGTCA" : 641,
+    "TTCCCTGT+AAGATACT" : 640,
+    "CTCACCAA+TTTCCTAT" : 640,
+    "AGCTCGCT+GATTATTC" : 640,
+    "CAATTAAC+ATTATCTC" : 639,
+    "ACTCGTGT+GAACCAAT" : 639,
+    "ACTCGTGT+ATACCAAT" : 638,
+    "AACTGTAG+TGCGGCCG" : 637,
+    "AGTAATAC+AACAGGTT" : 636,
+    "AACTGTAG+AGAGGCGT" : 636,
+    "GTCTACAC+AAATTGTC" : 635,
+    "CGGAACTG+TCCGTAGT" : 634,
+    "CGGAACTG+ACTTAGTG" : 634,
+    "TTCCTGTT+AAAAAAAA" : 632,
+    "GCACCGGG+TAAGGTCA" : 632,
+    "GACGTCTT+GTTGAACA" : 632,
+    "CAATTAAC+ATATTCTC" : 632,
+    "TCATCCTT+AGATCGAT" : 631,
+    "CTGCTTCC+CAACTATC" : 630,
+    "TCTGTTGG+CCATTACA" : 629,
+    "GCCACAGG+ATGGGCAT" : 625,
+    "GTCTACAC+AAATAAAA" : 624,
+    "TCTGTTGG+CCAATTCG" : 623,
+    "CTCACCAA+TTGACTAT" : 621,
+    "GGCCCCCG+ATGGCATG" : 619,
+    "ACACTAAG+ATTATGGA" : 619,
+    "GCTGGTGG+CCATTCGA" : 618,
+    "TGGCCGGT+AATATCTA" : 617,
+    "GTGTGGGG+GGGGGGGG" : 616,
+    "GCCCCGGG+TAAGGTCA" : 616,
+    "TCTGTTGG+CCATAAGA" : 615,
+    "GGTCACGA+AAAAATAA" : 615,
+    "AAGCTCGC+GATTCTGC" : 615,
+    "TGGCCGGT+GCGCTAGT" : 614,
+    "GGGCCCCA+TTGCCTAG" : 614,
+    "ACAGGCGC+ACTCAGAG" : 614,
+    "TTGCCTAG+TAATTGTT" : 613,
+    "GCGGTTGG+CCATTCGA" : 613,
+    "CCTTCACC+GGAGGTCG" : 613,
+    "ACAGGCGC+ATACAGAG" : 612,
+    "AACTGTAG+TGCGGCTG" : 612,
+    "TAAGTTAA+CTACGACA" : 611,
+    "TAAGGTCA+CAACGAAA" : 611,
+    "GTGGCGGC+GCGCAAGC" : 610,
+    "TAAGGTCA+ATACGCCA" : 608,
+    "GGGGGGGC+AGATCTCG" : 608,
+    "GGGCGGGG+TAAGGTCA" : 608,
+    "CGGCACGG+TCGTAGTG" : 608,
+    "TAAGGTCA+CACGACAG" : 607,
+    "GGGGGTGG+GATCTATC" : 607,
+    "AACTGTAG+TGCCGGCG" : 607,
+    "GTGAATAT+GAAAGATA" : 606,
+    "GGGGTGGG+CCATTCGA" : 606,
+    "CCATTCGA+AAAAAAAC" : 606,
+    "GCCCCTGG+ATGGCATG" : 603,
+    "CAATTAAC+AAATCTAG" : 603,
+    "AGCTCGCT+AATTCTTC" : 603,
+    "GCGGGGGG+CCATTCGA" : 601,
+    "GTGTCGGA+TCGAAAGC" : 600,
+    "GGGGGGTT+GGGGGGGG" : 600,
+    "GCCACAGG+AAAGCATG" : 600,
+    "CCATTCGA+CTGCCAAC" : 600,
+    "TGGGGGGG+GTTCCAAT" : 598,
+    "CAATTAAC+AAATCACG" : 598,
+    "TCATCCTT+AAATAAAA" : 597,
+    "GTGAATAT+GAATCATA" : 596,
+    "TCAATCCT+AGCTCGCT" : 595,
+    "CTGCTTAA+GATCTATC" : 595,
+    "ACAGGCGC+ATTAAGAG" : 595,
+    "TGCGGGGG+GGGGGGGG" : 594,
+    "TCTGTTGG+ACATTCCA" : 593,
+    "TCATCCTT+TGGGGGGG" : 593,
+    "GGGGGGTG+TAAGTGGT" : 593,
+    "GGGGGGCC+CAACAATG" : 593,
+    "CCTTCACC+GTAGCTTC" : 593,
+    "TATCGCAC+ACACCTAA" : 592,
+    "CTGCTTCC+TATCTAAC" : 592,
+    "GCCACAGG+ATGTCATT" : 591,
+    "CTGCTTCC+GATCTAAT" : 591,
+    "CCTTCACC+GTAGCGTA" : 591,
+    "TTCCGTTA+AAGATACT" : 590,
+    "GTCTACAC+CCTTGGCG" : 590,
+    "ATTGTGAA+GCAATTAA" : 590,
+    "ACACTAAG+AAAAGGAT" : 590,
+    "GGGGGGGT+AAGATACT" : 589
+   }
+  }
+ ]
+}
