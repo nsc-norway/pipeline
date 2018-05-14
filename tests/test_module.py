@@ -126,7 +126,7 @@ class TestTaskFramework(unittest.TestCase):
     def test_sample_sheet_parsing_no_index(self):
         with open("files/samples/no-index.json") as jsonfile:
             correct_projects = json.load(jsonfile)
-        task = taskmgr.Task("TEST_NAME", "TEST_DESCRIPTION", ["work_dir", "sample_sheet"]) 
+        task = taskmgr.Task("SsParseNoIndex", "TEST_DESCRIPTION", ["work_dir", "sample_sheet"]) 
         RUN_DIR = "files/runs/180502_NS500336_0001_ANOINDEX"
         testargs = ["script", RUN_DIR, "--sample-sheet=files/samplesheet/no-index.csv"]
         with patch.object(sys, 'argv', testargs):
@@ -138,7 +138,7 @@ class TestTaskFramework(unittest.TestCase):
     def test_sample_sheet_parsing_with_index_merged_lanes(self):
         with open("files/samples/indexed-merged.json") as jsonfile:
             correct_projects = json.load(jsonfile)
-        task = taskmgr.Task("TEST_NAME", "TEST_DESCRIPTION", ["work_dir", "sample_sheet"]) 
+        task = taskmgr.Task("SsParseMerged", "TEST_DESCRIPTION", ["work_dir", "sample_sheet"]) 
         RUN_DIR = "files/runs/180502_NS500336_0001_AINDEXMERGED"
         testargs = ["script", RUN_DIR, "--sample-sheet=files/samplesheet/ns-indexed.csv"]
         with patch.object(sys, 'argv', testargs):
@@ -150,7 +150,7 @@ class TestTaskFramework(unittest.TestCase):
     def test_sample_sheet_parsing_with_extra_comma(self):
         with open("files/samples/indexed-merged.json") as jsonfile:
             correct_projects = json.load(jsonfile)
-        task = taskmgr.Task("TEST_NAME", "TEST_DESCRIPTION", ["work_dir", "sample_sheet"]) 
+        task = taskmgr.Task("SsParseCommas", "TEST_DESCRIPTION", ["work_dir", "sample_sheet"]) 
         RUN_DIR = "files/runs/180502_NS500336_0001_AINDEXMERGED"
         testargs = ["script", RUN_DIR, "--sample-sheet=files/samplesheet/ns-indexed-spreadsheet.csv"]
         with patch.object(sys, 'argv', testargs):
@@ -161,7 +161,7 @@ class TestTaskFramework(unittest.TestCase):
     def test_sample_sheet_parsing_hi4000(self):
         with open("files/samples/hi4000.json") as jsonfile:
             correct_projects = json.load(jsonfile)
-        task = taskmgr.Task("TEST_NAME", "TEST_DESCRIPTION", ["work_dir", "sample_sheet"]) 
+        task = taskmgr.Task("SsParseHi4000", "TEST_DESCRIPTION", ["work_dir", "sample_sheet"]) 
         RUN_DIR = "files/runs/180502_E00401_0001_BQCTEST"
         testargs = ["script", RUN_DIR,
                 "--sample-sheet=files/runs/180502_E00401_0001_BQCTEST/DemultiplexingSampleSheet.csv"]
@@ -256,6 +256,9 @@ class Test40MoveResults(TaskTestCase):
         INPUT_SAMPLE_SHEET = "files/samplesheet/ns-indexed.csv"
         tempparent = tempfile.mkdtemp()
         local_tempdir = os.path.join(tempparent, RUN_ID)
+        # Load projects from the json file, will use this to check that the files exist
+        with open("files/samples/indexed-merged.json") as jsonfile:
+            projects = json.load(jsonfile)
         try:
             shutil.copytree("files/runs/{}".format(RUN_ID), local_tempdir)
             shutil.copy(INPUT_SAMPLE_SHEET, os.path.join(local_tempdir, "DemultiplexingSampleSheet.csv"))
@@ -264,30 +267,32 @@ class Test40MoveResults(TaskTestCase):
 
             with patch.object(sys, 'argv', testargs):
                 self.module.main(self.task)
-                projects = self.task.projects
-                samples.flag_empty_files(projects, local_tempdir)
-                self.assertTrue(all(not f.empty for p in projects for s in p.samples for f in s.files))
                 self.task.success_finish.assert_called_once()
+                for project in projects:
+                    for sample in project['samples']:
+                        for file in sample['files']:
+                            self.assertTrue(os.path.exists(os.path.join(local_tempdir,
+                                "Data", "Intensities", "BaseCalls", file['path'])))
         finally:
             shutil.rmtree(tempparent)
 
 
-#class Test50QcAnalysis(TaskTestCase):
-#    module = __import__("50_qc_analysis")
-#
-#    def test_qc_analysis(self):
-#        """Test that QC analysis script starts jobs for all the files"""
-#
-#        self.make_qc_dir()
-#        testargs = ["script", self.tempdir]
-#        with patch.object(sys, 'argv', testargs), patch('subprocess.call') as call:
-#            call.return_value = 0
-#            self.module.main(self.task)
-#            program_args = set()
-#            for args in call.call_args:
-#                print args
-#            self.assertTrue(all(not f.empty for p in projects for s in p.samples for f in s.files))
-#            self.task.success_finish.assert_called_once()
+class Test50QcAnalysis(TaskTestCase):
+    module = __import__("50_qc_analysis")
+
+    def test_qc_analysis(self):
+        """Test that QC analysis script starts jobs for all the files"""
+
+        self.make_qc_dir()
+        testargs = ["script", self.tempdir]
+        with patch.object(sys, 'argv', testargs), patch('subprocess.call') as call:
+            call.return_value = 0
+            self.module.main(self.task)
+            program_args = set()
+            for args in call.call_args:
+                print args
+            self.assertTrue(all(not f.empty for p in projects for s in p.samples for f in s.files))
+            self.task.success_finish.assert_called_once()
 
 
 class Test60PPP(TaskTestCase):
