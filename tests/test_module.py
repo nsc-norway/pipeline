@@ -43,7 +43,7 @@ class TaskTestCase(unittest.TestCase):
         os.mkdir(self.tempdir)
         os.mkdir(logdir)
 
-    def make_qc_dir(self, run_id="180502_E00401_001_BQCTEST"):
+    def make_qc_dir(self, run_id="180502_E00401_0001_BQCTEST"):
         self.tempparent = tempfile.mkdtemp()
         self.tempdir = os.path.join(self.tempparent, run_id)
         shutil.copytree(os.path.join("files/run", run_id), self.tempdir)
@@ -127,7 +127,7 @@ class TestTaskFramework(unittest.TestCase):
         with open("files/samples/no-index.json") as jsonfile:
             correct_projects = json.load(jsonfile)
         task = taskmgr.Task("TEST_NAME", "TEST_DESCRIPTION", ["work_dir", "sample_sheet"]) 
-        RUN_DIR = "files/run/180502_NS500336_001_ANOINDEX"
+        RUN_DIR = "files/run/180502_NS500336_0001_ANOINDEX"
         testargs = ["script", RUN_DIR, "--sample-sheet=files/samplesheet/no-index.csv"]
         with patch.object(sys, 'argv', testargs):
             task.__enter__()
@@ -139,7 +139,7 @@ class TestTaskFramework(unittest.TestCase):
         with open("files/samples/indexed-merged.json") as jsonfile:
             correct_projects = json.load(jsonfile)
         task = taskmgr.Task("TEST_NAME", "TEST_DESCRIPTION", ["work_dir", "sample_sheet"]) 
-        RUN_DIR = "files/run/180502_NS500336_001_AINDEXMERGED"
+        RUN_DIR = "files/run/180502_NS500336_0001_AINDEXMERGED"
         testargs = ["script", RUN_DIR, "--sample-sheet=files/samplesheet/ns-indexed.csv"]
         with patch.object(sys, 'argv', testargs):
             task.__enter__()
@@ -151,7 +151,7 @@ class TestTaskFramework(unittest.TestCase):
         with open("files/samples/indexed-merged.json") as jsonfile:
             correct_projects = json.load(jsonfile)
         task = taskmgr.Task("TEST_NAME", "TEST_DESCRIPTION", ["work_dir", "sample_sheet"]) 
-        RUN_DIR = "files/run/180502_NS500336_001_AINDEXMERGED"
+        RUN_DIR = "files/run/180502_NS500336_0001_AINDEXMERGED"
         testargs = ["script", RUN_DIR, "--sample-sheet=files/samplesheet/ns-indexed-spreadsheet.csv"]
         with patch.object(sys, 'argv', testargs):
             task.__enter__()
@@ -171,7 +171,7 @@ class Test10CopyRun(TaskTestCase):
     def test_copy_run(self):
         """Test rsync and mkdir called with specific args."""
 
-        RUN_ID = "180502_NS500336_001_ANOINDEX"
+        RUN_ID = "180502_NS500336_0001_ANOINDEX"
         SOURCE_DIR = "files/run/{}".format(RUN_ID)
         parent_dir = tempfile.mkdtemp()
         output_dir = os.path.join(parent_dir, RUN_ID)
@@ -197,7 +197,7 @@ class Test20PrepareSampleSheet(TaskTestCase):
     def test_prepare_sample_sheet(self):
         """Testing that the script just writes out an identical sample sheet."""
 
-        RUN_ID = "180502_NS500336_001_ANOINDEX"
+        RUN_ID = "180502_NS500336_0001_ANOINDEX"
         INPUT_SAMPLE_SHEET = "files/samplesheet/ns-indexed.csv"
         self.make_tempdir(RUN_ID)
         shutil.copy(INPUT_SAMPLE_SHEET, os.path.join(self.tempdir, "SampleSheet.csv"))
@@ -216,7 +216,7 @@ class Test30Demultiplexing(TaskTestCase):
     def test_demultiplexing(self):
         """Test that the script calls bcl2fastq2."""
 
-        RUN_ID = "180502_NS500336_001_ANOINDEX"
+        RUN_ID = "180502_NS500336_0001_ANOINDEX"
         SOURCE_DIR = "files/run/{}".format(RUN_ID)
 
         self.make_tempdir(RUN_ID)
@@ -243,7 +243,7 @@ class Test40MoveResults(TaskTestCase):
     def test_move_results(self):
         """Test moving files in a temp directory."""
 
-        RUN_ID = "180502_NS500336_001_AINDEXMERGED"
+        RUN_ID = "180502_NS500336_0001_AINDEXMERGED"
         INPUT_SAMPLE_SHEET = "files/samplesheet/ns-indexed.csv"
         tempparent = tempfile.mkdtemp()
         local_tempdir = os.path.join(tempparent, RUN_ID)
