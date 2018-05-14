@@ -2,6 +2,8 @@
 
 # Create fastq files in new dir with one byte gziped
 
+set -e
+
 SOURCE_RUN=$1
 DEST_RUN=`readlink -f $2`
 
