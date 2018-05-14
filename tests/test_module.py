@@ -25,6 +25,10 @@ class DummyTestCase(unittest.TestCase):
 ### Support code
 
 class TaskTestCase(unittest.TestCase):
+
+    H4RUN = "180502_E00401_0001_BQCTEST"
+    NSRUN = "180502_NS500336_0001_AHTJFWBGX5"
+
     def setUp(self):
         self.task =  taskmgr.Task(
                     self.module.TASK_NAME,
@@ -43,7 +47,7 @@ class TaskTestCase(unittest.TestCase):
         os.mkdir(self.tempdir)
         os.mkdir(logdir)
 
-    def make_qc_dir(self, run_id="180502_E00401_0001_BQCTEST"):
+    def make_qc_dir(self, run_id):
         self.tempparent = tempfile.mkdtemp()
         self.tempdir = os.path.join(self.tempparent, run_id)
         shutil.copytree(os.path.join("files/runs", run_id), self.tempdir)
@@ -261,7 +265,8 @@ class Test40MoveResults(TaskTestCase):
             projects = json.load(jsonfile)
         try:
             shutil.copytree("files/runs/{}".format(RUN_ID), local_tempdir)
-            shutil.copy(INPUT_SAMPLE_SHEET, os.path.join(local_tempdir, "DemultiplexingSampleSheet.csv"))
+            shutil.copy(INPUT_SAMPLE_SHEET, os.path.join(local_tempdir,
+                    "DemultiplexingSampleSheet.csv"))
             os.mkdir(os.path.join(local_tempdir, "DemultiplexLogs"))
             testargs = ["script", local_tempdir]
 
@@ -288,16 +293,26 @@ class Test50QcAnalysis(TaskTestCase):
         with patch.object(sys, 'argv', testargs), patch('subprocess.call') as call:
             call.return_value = 0
             self.module.main(self.task)
-            program_args = set()
-            for args in call.call_args:
-                print args
-            self.assertTrue(all(not f.empty for p in projects for s in p.samples for f in s.files))
+            # This test is quite incomplete: because the local array job
+            # uses subprocess, we don't get the args back! Can only test
+            # that it didn't crash.
             self.task.success_finish.assert_called_once()
 
 
-class Test60PPP(TaskTestCase):
-    pass
+class Test60DemultiplexStats(TaskTestCase):
+    module = __import__("60_demultiplex_stats")
 
+    def test_dx_stats_hi4k(self):
+        self.make_qc_dir(self.H4RUN)
+        testargs = ["script", self.tempdir]
+        with patch.object(sys, 'argv', testargs):
+            self.module.main(self.task)
+            self.task.success_finish.assert_called_once()
+
+
+
+    def test_dx_stats_nsq(self):
+        pass
 
 
 if __name__ == "__main__":
