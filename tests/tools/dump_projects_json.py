@@ -9,17 +9,21 @@
 # you can alter the parameters in this code if other settings
 # are required.
 
+# USAGE:
+# python dump_projects_json.py SAMPLE_SHEET_PATH RUN_ID
+
 import sys
 import json
 sys.path.append('..')
 from common import samples, nsc
 from test_module import projects_to_dicts
 
+collapse_lanes = False # This setting turns lane number into "X"
+
 with open(sys.argv[1]) as sample_sheet_file:
     sample_sheet_content = sample_sheet_file.read()
 sample_sheet = samples.parse_sample_sheet(sample_sheet_content)
 sample_sheet_data = sample_sheet['data']
-projects = samples.get_projects("180502_NS500336_001_ANOINDEX",
-        sample_sheet_data, 2, True)
+projects = samples.get_projects(sys.argv[2], sample_sheet_data, 2, collapse_lanes)
 print(json.dumps(projects_to_dicts(projects)))
 
