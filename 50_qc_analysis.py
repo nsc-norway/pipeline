@@ -113,8 +113,10 @@ def main(task):
     remote.ArrayJob.start_jobs(jobs, max_local_threads=task.threads)
 
     task.array_job_status(jobs)
+    delay = 1
     while not all(job.is_finished for job in jobs):
-        time.sleep(30)
+        time.sleep(delay)
+        delay = 30
         remote.ArrayJob.update_status(jobs)
         task.array_job_status(jobs)
     
