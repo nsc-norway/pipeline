@@ -10,10 +10,13 @@ import random
 import shutil
 
 sys.path.append('..')
-from common import taskmgr, nsc, samples, remote
+
+from common import nsc
 nsc.SITE = None # Note: this isn't quite effective, how to set it up?
 nsc.REMOTE_MODE = "local"
 nsc.BCL2FASTQ_USE_D_OPTION = False
+
+from common import taskmgr, samples, remote
 from genologics.lims import *
 
 
@@ -50,6 +53,7 @@ class TaskTestCase(unittest.TestCase):
     def make_qc_dir(self, run_id):
         self.tempparent = tempfile.mkdtemp()
         self.tempdir = os.path.join(self.tempparent, run_id)
+        self.basecalls = os.path.join(self.tempdir, "Data", "Intensities", "BaseCalls")
         shutil.copytree(os.path.join("files/runs", run_id), self.tempdir)
 
     def tearDown(self):
@@ -288,7 +292,7 @@ class Test50QcAnalysis(TaskTestCase):
     def test_qc_analysis(self):
         """Test that QC analysis script starts jobs for all the files"""
 
-        self.make_qc_dir()
+        self.make_qc_dir(self.H4RUN)
         testargs = ["script", self.tempdir]
         with patch.object(sys, 'argv', testargs), patch('subprocess.call') as call:
             call.return_value = 0
@@ -308,8 +312,8 @@ class Test60DemultiplexStats(TaskTestCase):
         with patch.object(sys, 'argv', testargs):
             self.module.main(self.task)
             self.task.success_finish.assert_called_once()
-
-
+            for reference in glob.glob("files/fasit/60_demultiplex_stats/h4k/*/Demultiplex_stats.htm"):
+                pass
 
     def test_dx_stats_nsq(self):
         pass

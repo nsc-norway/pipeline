@@ -1,0 +1,5 @@
+BCL to FASTQ file converter
+bcl2fastq v2.18.0.12
+Copyright (c) 2007-2015 Illumina, Inc.
+
+2018-05-14 15:39:01 [7fb330f277c0] Processing completed with 0 errors and 0 warnings.
