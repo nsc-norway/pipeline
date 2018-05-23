@@ -48,3 +48,14 @@ dependencies of the pipeline may also be required.
 The tests will only run on Unix-like platforms, with slash as path 
 separator.
 
+
+### Debugging mode ###
+
+To troubleshoot test failures, set the environment variable DEBUG=true. E.g.
+run this:
+
+    DEBUG=true python test_module.py
+
+This will disable deletion of the test directories, and output the path for
+each test.
+

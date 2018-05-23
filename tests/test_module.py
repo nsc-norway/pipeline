@@ -8,6 +8,8 @@ import subprocess
 import string
 import random
 import shutil
+import glob
+from contextlib import contextmanager
 
 sys.path.append('..')
 
@@ -15,6 +17,7 @@ from common import nsc
 nsc.SITE = None # Note: this isn't quite effective, how to set it up?
 nsc.REMOTE_MODE = "local"
 nsc.BCL2FASTQ_USE_D_OPTION = False
+DEBUG = os.environ.get('DEBUG') == 'true'
 
 from common import taskmgr, samples, remote
 from genologics.lims import *
@@ -31,6 +34,7 @@ class TaskTestCase(unittest.TestCase):
 
     H4RUN = "180502_E00401_0001_BQCTEST"
     NSRUN = "180502_NS500336_0001_AHTJFWBGX5"
+
 
     def setUp(self):
         self.task =  taskmgr.Task(
@@ -54,7 +58,25 @@ class TaskTestCase(unittest.TestCase):
         self.tempparent = tempfile.mkdtemp()
         self.tempdir = os.path.join(self.tempparent, run_id)
         self.basecalls = os.path.join(self.tempdir, "Data", "Intensities", "BaseCalls")
+        self.qualitycontrol = os.path.join(self.basecalls, "QualityControl")
         shutil.copytree(os.path.join("files/runs", run_id), self.tempdir)
+
+
+    def check_reference_files(self, ref_dir, test_dir):
+        self.assertTrue(os.path.isdir(test_dir))
+        for name in os.listdir(ref_dir):
+            if not name.startswith("."):
+                ref_path = os.path.join(ref_dir, name)
+                test_path = os.path.join(test_dir, name)
+                if os.path.isdir(ref_path):
+                    self.check_reference_files(ref_path, test_path)
+                elif os.path.isfile(ref_path):
+                    self.assertTrue(os.path.isfile(test_path))
+                    with open(ref_path) as ref_file,\
+                            open(test_path) as test_file:
+                        test_data = test_file.read()
+                        self.assertEquals(ref_file.read(), test_data)
+
 
     def tearDown(self):
         self.patcher.stop()
@@ -63,7 +85,20 @@ class TaskTestCase(unittest.TestCase):
         except OSError:
             pass
         if self.tempparent:
-            shutil.rmtree(self.tempparent)
+            if DEBUG:
+                print self.__class__.__name__, ">>>", self.tempparent, "<<<"
+            else:
+                shutil.rmtree(self.tempparent)
+
+
+@contextmanager
+def chdir(path):
+    old_dir = os.getcwd()
+    os.chdir(path)
+    try:
+        yield None
+    finally:
+        os.chdir(old_dir)
 
 
 def convert_strings_to_unicode(dic):
@@ -308,15 +343,69 @@ class Test60DemultiplexStats(TaskTestCase):
 
     def test_dx_stats_hi4k(self):
         self.make_qc_dir(self.H4RUN)
+        testargs = ["script", "."]
+        with patch.object(sys, 'argv', testargs):
+            with chdir(self.tempdir):
+                self.module.main(self.task)
+            self.task.success_finish.assert_called_once()
+            self.check_reference_files("files/fasit/60_demultiplex_stats/h4k", self.qualitycontrol)
+
+
+    def test_dx_stats_nsq(self):
+        self.make_qc_dir(self.NSRUN)
+        testargs = ["script", "."]
+        with patch.object(sys, 'argv', testargs):
+            with chdir(self.tempdir):
+                self.module.main(self.task)
+            self.task.success_finish.assert_called_once()
+            self.check_reference_files("files/fasit/60_demultiplex_stats/nsq", self.qualitycontrol)
+
+
+class Test60Emails(TaskTestCase):
+    module = __import__("60_emails")
+
+    def test_emails_hi4k(self):
+        self.make_qc_dir(self.H4RUN)
         testargs = ["script", self.tempdir]
         with patch.object(sys, 'argv', testargs):
             self.module.main(self.task)
             self.task.success_finish.assert_called_once()
-            for reference in glob.glob("files/fasit/60_demultiplex_stats/h4k/*/Demultiplex_stats.htm"):
-                pass
+            self.check_reference_files("files/fasit/60_emails/h4k/",
+                    os.path.join(self.qualitycontrol, "Delivery"))
 
-    def test_dx_stats_nsq(self):
-        pass
+
+    def test_emails_nsq(self):
+        self.make_qc_dir(self.NSRUN)
+        testargs = ["script", self.tempdir]
+        with patch.object(sys, 'argv', testargs):
+            self.module.main(self.task)
+            self.task.success_finish.assert_called_once()
+            self.check_reference_files("files/fasit/60_emails/nsq/",
+                    os.path.join(self.qualitycontrol, "Delivery"))
+
+
+#class Test60Reports(TaskTestCase):
+#    module = __import__("60_emails")
+#
+#    def test_reports_hi4k(self):
+#        self.make_qc_dir(self.H4RUN)
+#        testargs = ["script", self.tempdir]
+#        with patch.object(sys, 'argv', testargs):
+#            self.module.main(self.task)
+#            self.task.success_finish.assert_called_once()
+#            self.check_reference_files("files/fasit/60_emails/h4k/",
+#                    os.path.join(self.qualitycontrol, "Delivery"))
+#
+#
+#    def test_reports_nsq(self):
+#        self.make_qc_dir(self.NSRUN)
+#        testargs = ["script", self.tempdir]
+#        with patch.object(sys, 'argv', testargs):
+#            self.module.main(self.task)
+#            self.task.success_finish.assert_called_once()
+#            self.check_reference_files("files/fasit/60_emails/nsq/",
+#                    os.path.join(self.qualitycontrol, "Delivery"))
+
 
 
 if __name__ == "__main__":
