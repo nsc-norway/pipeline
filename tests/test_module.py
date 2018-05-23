@@ -71,7 +71,7 @@ class TaskTestCase(unittest.TestCase):
                 if os.path.isdir(ref_path):
                     self.check_reference_files(ref_path, test_path)
                 elif os.path.isfile(ref_path):
-                    self.assertTrue(os.path.isfile(test_path))
+                    self.assertTrue(os.path.isfile(test_path), "{0} is not a file".format(test_path))
                     with open(ref_path) as ref_file,\
                             open(test_path) as test_file:
                         test_data = test_file.read()
