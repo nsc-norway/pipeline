@@ -1,9 +1,10 @@
 import unittest
-from mock import patch
+from mock import patch, Mock, call, ANY
 import sys
 import json
 import tempfile
 import os
+import re
 import subprocess
 import string
 import random
@@ -42,11 +43,19 @@ class TaskTestCase(unittest.TestCase):
                     self.module.TASK_DESCRIPTION,
                     self.module.TASK_ARGS
                     )
-        self.patcher = patch.object(self.task, 'success_finish')
-        self.patcher.start()
+        success_patcher = patch.object(self.task, 'success_finish')
+        success_patcher.start()
+        self.addCleanup(success_patcher.stop)
+        # Disable multiprocessing using Pool everywhere
+        object_mock = Mock()
+        object_mock.map = map
+        fake_pool = Mock(return_value=object_mock)
+        pool_map_patcher = patch('multiprocessing.Pool', fake_pool)
+        pool_map_patcher.start()
+        self.addCleanup(pool_map_patcher.stop)
         self.task.__enter__()
         self.tempparent = None
-
+        
     def make_tempdir(self, run_id):
         self.tempparent = tempfile.mkdtemp()
         self.tempdir = os.path.join(self.tempparent, run_id)
@@ -54,13 +63,22 @@ class TaskTestCase(unittest.TestCase):
         os.mkdir(self.tempdir)
         os.mkdir(logdir)
 
-    def make_qc_dir(self, run_id):
+    @contextmanager
+    def qc_dir(self, run_id):
         self.tempparent = tempfile.mkdtemp()
         self.tempdir = os.path.join(self.tempparent, run_id)
         self.basecalls = os.path.join(self.tempdir, "Data", "Intensities", "BaseCalls")
         self.qualitycontrol = os.path.join(self.basecalls, "QualityControl")
         shutil.copytree(os.path.join("files/runs", run_id), self.tempdir)
-
+        do_cleanup = False
+        try:
+            yield self.tempdir
+            do_cleanup = not DEBUG
+        finally:
+            if do_cleanup:
+                shutil.rmtree(self.tempparent)
+            else:
+                print self.__class__.__name__, ">>>", self.tempparent, "<<<"
 
     def check_reference_files(self, ref_dir, test_dir):
         self.assertTrue(os.path.isdir(test_dir))
@@ -77,18 +95,11 @@ class TaskTestCase(unittest.TestCase):
                         test_data = test_file.read()
                         self.assertEquals(ref_file.read(), test_data)
 
-
     def tearDown(self):
-        self.patcher.stop()
         try:
             os.unlink("../{}.pyc".format(self.module.__name__))
         except OSError:
             pass
-        if self.tempparent:
-            if DEBUG:
-                print self.__class__.__name__, ">>>", self.tempparent, "<<<"
-            else:
-                shutil.rmtree(self.tempparent)
 
 
 @contextmanager
@@ -327,85 +338,215 @@ class Test50QcAnalysis(TaskTestCase):
     def test_qc_analysis(self):
         """Test that QC analysis script starts jobs for all the files"""
 
-        self.make_qc_dir(self.H4RUN)
-        testargs = ["script", self.tempdir]
-        with patch.object(sys, 'argv', testargs), patch('subprocess.call') as call:
-            call.return_value = 0
-            self.module.main(self.task)
-            # This test is quite incomplete: because the local array job
-            # uses subprocess, we don't get the args back! Can only test
-            # that it didn't crash.
-            self.task.success_finish.assert_called_once()
+        with self.qc_dir(self.H4RUN) as tempdir:
+            testargs = ["script", tempdir]
+            with patch.object(sys, 'argv', testargs), patch('subprocess.call') as call:
+                call.return_value = 0
+                self.module.main(self.task)
+                # This test is quite incomplete: because the local array job
+                # uses subprocess, we don't get the args back! Can only test
+                # that it didn't crash.
+                self.task.success_finish.assert_called_once()
 
 
 class Test60DemultiplexStats(TaskTestCase):
     module = __import__("60_demultiplex_stats")
 
-    def test_dx_stats_hi4k(self):
-        self.make_qc_dir(self.H4RUN)
+    def test_dx_stats_h4k(self):
         testargs = ["script", "."]
         with patch.object(sys, 'argv', testargs):
-            with chdir(self.tempdir):
-                self.module.main(self.task)
-            self.task.success_finish.assert_called_once()
-            self.check_reference_files("files/fasit/60_demultiplex_stats/h4k", self.qualitycontrol)
-
+            with self.qc_dir(self.H4RUN) as tempdir:
+                with chdir(tempdir):
+                    self.module.main(self.task)
+                self.task.success_finish.assert_called_once()
+                self.check_reference_files("files/fasit/60_demultiplex_stats/h4k", self.qualitycontrol)
 
     def test_dx_stats_nsq(self):
-        self.make_qc_dir(self.NSRUN)
         testargs = ["script", "."]
         with patch.object(sys, 'argv', testargs):
-            with chdir(self.tempdir):
-                self.module.main(self.task)
-            self.task.success_finish.assert_called_once()
-            self.check_reference_files("files/fasit/60_demultiplex_stats/nsq", self.qualitycontrol)
+            with self.qc_dir(self.NSRUN) as tempdir:
+                with chdir(tempdir):
+                    self.module.main(self.task)
+                self.task.success_finish.assert_called_once()
+                self.check_reference_files("files/fasit/60_demultiplex_stats/nsq", self.qualitycontrol)
 
 
 class Test60Emails(TaskTestCase):
     module = __import__("60_emails")
 
-    def test_emails_hi4k(self):
-        self.make_qc_dir(self.H4RUN)
-        testargs = ["script", self.tempdir]
-        with patch.object(sys, 'argv', testargs):
-            self.module.main(self.task)
-            self.task.success_finish.assert_called_once()
-            self.check_reference_files("files/fasit/60_emails/h4k/",
-                    os.path.join(self.qualitycontrol, "Delivery"))
-
+    def test_emails_h4k(self):
+        with self.qc_dir(self.H4RUN) as tempdir:
+            testargs = ["script", tempdir]
+            with patch.object(sys, 'argv', testargs):
+                self.module.main(self.task)
+                self.task.success_finish.assert_called_once()
+                self.check_reference_files("files/fasit/60_emails/h4k/",
+                        os.path.join(self.qualitycontrol, "Delivery"))
 
     def test_emails_nsq(self):
-        self.make_qc_dir(self.NSRUN)
-        testargs = ["script", self.tempdir]
-        with patch.object(sys, 'argv', testargs):
-            self.module.main(self.task)
-            self.task.success_finish.assert_called_once()
-            self.check_reference_files("files/fasit/60_emails/nsq/",
-                    os.path.join(self.qualitycontrol, "Delivery"))
+        with self.qc_dir(self.NSRUN) as tempdir:
+            testargs = ["script", tempdir]
+            with patch.object(sys, 'argv', testargs):
+                self.module.main(self.task)
+                self.task.success_finish.assert_called_once()
+                self.check_reference_files("files/fasit/60_emails/nsq/",
+                        os.path.join(self.qualitycontrol, "Delivery"))
 
 
-#class Test60Reports(TaskTestCase):
-#    module = __import__("60_emails")
-#
-#    def test_reports_hi4k(self):
-#        self.make_qc_dir(self.H4RUN)
-#        testargs = ["script", self.tempdir]
-#        with patch.object(sys, 'argv', testargs):
-#            self.module.main(self.task)
-#            self.task.success_finish.assert_called_once()
-#            self.check_reference_files("files/fasit/60_emails/h4k/",
-#                    os.path.join(self.qualitycontrol, "Delivery"))
-#
-#
-#    def test_reports_nsq(self):
-#        self.make_qc_dir(self.NSRUN)
-#        testargs = ["script", self.tempdir]
-#        with patch.object(sys, 'argv', testargs):
-#            self.module.main(self.task)
-#            self.task.success_finish.assert_called_once()
-#            self.check_reference_files("files/fasit/60_emails/nsq/",
-#                    os.path.join(self.qualitycontrol, "Delivery"))
+class Test60Reports(TaskTestCase):
+    module = __import__("60_reports")
 
+    def test_reports_h4k(self):
+        with open("files/samples/hi4000.json") as jsonfile:
+            projects = json.load(jsonfile)
+        pdfpaths = []
+        for project in projects:
+            if project['name'] is not None:
+                pdir = str(project['proj_dir'])
+                for s in project['samples']:
+                    for f in s['files']:
+                        fname = str(os.path.basename(f['path']))
+                        sname = "Sample_" + str(s['name'])
+                        qcpath = str(os.path.join(pdir, sname, self.H4RUN + "." + str(f['lane']) + "." + 
+                            re.sub(r"fastq\.gz$", "qc.pdf", fname)))
+                        pdfpaths.append(qcpath)
+        self.reports_general_tester(projects, self.H4RUN, pdfpaths)
+
+    def test_reports_nsq(self):
+        with open("files/samples/nsqctest.json") as jsonfile:
+            projects = json.load(jsonfile)
+        pdfpaths = []
+        for project in projects:
+            if project['name'] is not None:
+                pdir = str(project['proj_dir'])
+                for s in project['samples']:
+                    for f in s['files']:
+                        fname = str(os.path.basename(f['path']))
+                        qcpath = str(os.path.join(pdir, self.NSRUN + "." + 
+                            re.sub(r"fastq\.gz$", "qc.pdf", fname)))
+                        pdfpaths.append(qcpath)
+        self.reports_general_tester(projects, self.NSRUN, pdfpaths)
+
+    @patch('os.rename')
+    def reports_general_tester(self, projects, run_id, pdfpaths, os_rename):
+        with self.qc_dir(run_id) as tempdir:
+            testargs = ["script", self.tempdir]
+            with patch.object(sys, 'argv', testargs),\
+                    patch('subprocess.check_call') as sub_call:
+                self.module.main(self.task)
+                calls = []
+                for fp in (str(f['path']) for p in projects for s in p['samples'] for f in s['files']):
+                    tex_name = re.sub(r"\.fastq\.gz$", ".qc.tex", os.path.basename(fp))
+                    calls.append(call(['/usr/bin/pdflatex', '-shell-escape', tex_name],
+                        cwd=os.path.join(self.qualitycontrol, 'pdf'), stdin=ANY, stdout=ANY))
+                sub_call.assert_has_calls(calls, any_order=True)
+                os_rename.assert_has_calls(
+                    call(ANY, os.path.join(self.basecalls, pdfpath)) for pdfpath in pdfpaths
+                    )
+                self.task.success_finish.assert_called_once()
+
+
+# Test Update LIMS -- Not a priority right now (it's very difficult)
+
+
+class Test70MultiQC(TaskTestCase):
+    """MultiQC script is very simple. Make sure MultiQC tool would be called."""
+
+    module = __import__("70_multiqc")
+
+    def test_multiqc_h4k(self):
+        self.multiqc_general_tester("files/samples/hi4000.json", self.H4RUN)
+
+    def test_multiqc_nsq(self):
+        self.multiqc_general_tester("files/samples/nsqctest.json", self.NSRUN)
+
+    def multiqc_general_tester(self, json_path, run_id):
+        with open(json_path) as jsonfile:
+            projects = json.load(jsonfile)
+        with self.qc_dir(run_id) as tempdir:
+            testargs = ["script", self.tempdir]
+            with patch.object(sys, 'argv', testargs), patch('subprocess.call') as sub_call:
+                self.module.main(self.task)
+                calls = [
+                        call(['multiqc', '-q', '-f', 'Stats/'], cwd=self.basecalls)
+                        ]
+                for project in projects:
+                    if project['name'] is None:
+                        project['name'] = "Undetermined"
+                    calls.append(
+                        call(['multiqc', '-q', '-f', '.'], cwd=os.path.join(self.qualitycontrol, project['name']))
+                        )
+                sub_call.assert_has_calls(calls, any_order=True)
+                self.task.success_finish.assert_called_once()
+
+
+
+class Test80md5sum(TaskTestCase):
+    """MultiQC script is very simple. Make sure MultiQC tool would be called."""
+
+    module = __import__("80_md5sum")
+
+    def test_md5_h4k(self):
+        with open("files/samples/hi4000.json") as jsonfile:
+            projects = json.load(jsonfile)
+        with self.qc_dir(self.H4RUN) as tempdir:
+            testargs = ["script", self.tempdir]
+            with patch.object(sys, 'argv', testargs), patch('subprocess.call') as sub_call:
+                sub_call.return_value = 0
+                self.module.main(self.task)
+                calls = [] # list of expected calls to md5sum
+                for project in projects:
+                    if project['name'] is not None:
+                        files = []
+                        # Note: this test is too strict. File names could be in any order. If this
+                        # test fails, it may need to be rewritten, but then we can't use assert_has_calls.
+
+                        # This is also a test for the PDF names. If it fails, the PDF names may be 
+                        # broken. 60_reports may not fail then.
+                        for s in project['samples']:
+                            for f in s['files']:
+                                fname = str(os.path.basename(f['path']))
+                                sname = "Sample_" + str(s['name'])
+                                fpath = os.path.join(sname, fname)
+                                files.append(fpath)
+                                qcpath = str(os.path.join(sname, self.H4RUN + "." + str(f['lane']) + "." + 
+                                    re.sub(r"fastq\.gz$", "qc.pdf", fname)))
+                                files.append(qcpath)
+                        calls.append(
+                            call(['/usr/bin/md5deep', '-rl', '-j5'] + files,
+                                cwd=os.path.join(self.basecalls, project['proj_dir']),
+                                stderr=ANY, stdout=ANY)
+                            )
+                sub_call.assert_has_calls(calls, any_order=True)
+                self.task.success_finish.assert_called_once()
+
+
+    def test_md5_nsq(self):
+        with open("files/samples/nsqctest.json") as jsonfile:
+            projects = json.load(jsonfile)
+        with self.qc_dir(self.NSRUN) as tempdir:
+            testargs = ["script", self.tempdir]
+            with patch.object(sys, 'argv', testargs), patch('subprocess.call') as sub_call:
+                sub_call.return_value = 0
+                self.module.main(self.task)
+                calls = [] # list of expected calls to md5sum
+                for project in projects:
+                    if project['name'] is not None:
+                        files = []
+                        # Note: this test is too strict. File names could be in any order. If this
+                        # test fails, it may need to be rewritten, but then we can't use assert_has_calls.
+                        for s in project['samples']:
+                            for f in s['files']:
+                                fname = str(os.path.basename(f['path']))
+                                files.append(fname)
+                                files.append(self.NSRUN + "." + re.sub(r"fastq\.gz$", "qc.pdf", fname))
+                        calls.append(
+                            call(['/usr/bin/md5deep', '-rl', '-j5'] + files,
+                                cwd=os.path.join(self.basecalls, project['proj_dir']),
+                                stderr=ANY, stdout=ANY)
+                            )
+                sub_call.assert_has_calls(calls, any_order=True)
+                self.task.success_finish.assert_called_once()
 
 
 if __name__ == "__main__":
