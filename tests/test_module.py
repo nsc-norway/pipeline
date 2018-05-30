@@ -11,7 +11,7 @@ import random
 import shutil
 import glob
 from contextlib import contextmanager
-
+import illuminate
 sys.path.append('..')
 
 from common import nsc
@@ -582,8 +582,8 @@ class Test90PrepareDelivery(TaskTestCase):
                 patch.object(sys, 'argv', ["script", self.tempdir]):
             deliv_test_dir = os.path.join(self.tempparent, "delivery")
             os.mkdir(deliv_test_dir)
-            with patch.object(nsc, 'DELIVERY_DIR', deliv_test_dir),\
-                    patch.object(nsc, 'DEFAULT_DELIVERY_MODE', 'User HDD'):
+            with patch.object(nsc, 'DELIVERY_DIR', deliv_test_dir, create=True),\
+                    patch.object(nsc, 'DEFAULT_DELIVERY_MODE', 'User HDD', create=True):
                 self.module.main(self.task)
                 self.task.success_finish.assert_called_once()
                 for project in projects:
@@ -601,8 +601,8 @@ class Test90PrepareDelivery(TaskTestCase):
                 patch.object(sys, 'argv', ["script", self.tempdir]):
             deliv_test_dir = os.path.join(self.tempparent, "delivery")
             os.mkdir(deliv_test_dir)
-            with patch.object(nsc, 'DELIVERY_DIR', deliv_test_dir),\
-                    patch.object(nsc, 'DEFAULT_DELIVERY_MODE', 'Norstore'),\
+            with patch.object(nsc, 'DELIVERY_DIR', deliv_test_dir, create=True),\
+                    patch.object(nsc, 'DEFAULT_DELIVERY_MODE', 'Norstore', create=True),\
                     patch('subprocess.call') as sub_call:
                 sub_call.return_value = 0
                 self.module.main(self.task)
@@ -634,9 +634,9 @@ class Test90PrepareDelivery(TaskTestCase):
         with self.qc_dir(run_id) as tempdir, patch.object(sys, 'argv', ["script", "."]):
             deliv_test_dir = os.path.join(self.tempparent, "delivery")
             os.mkdir(deliv_test_dir)
-            with patch.object(nsc, 'DELIVERY_DIR', deliv_test_dir),\
-                    patch.object(nsc, 'DIAGNOSTICS_DELIVERY', deliv_test_dir),\
-                    patch.object(nsc, 'DEFAULT_DELIVERY_MODE', 'Transfer to diagnostics'):
+            with patch.object(nsc, 'DELIVERY_DIR', deliv_test_dir, create=True),\
+                    patch.object(nsc, 'DIAGNOSTICS_DELIVERY', deliv_test_dir, create=True),\
+                    patch.object(nsc, 'DEFAULT_DELIVERY_MODE', 'Transfer to diagnostics', create=True):
                 with chdir(tempdir):
                     self.module.main(self.task)
                 self.task.success_finish.assert_called_once()
