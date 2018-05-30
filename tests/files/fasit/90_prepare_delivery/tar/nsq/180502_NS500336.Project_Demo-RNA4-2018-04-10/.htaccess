@@ -1,0 +1,9 @@
+AuthUserFile /data/180502_NS500336.Project_Demo-RNA4-2018-04-10/.htpasswd
+AuthGroupFile /dev/null
+AuthName ByPassword
+AuthType Basic
+
+<Limit GET>
+require user demo-rna4
+</Limit>
+        

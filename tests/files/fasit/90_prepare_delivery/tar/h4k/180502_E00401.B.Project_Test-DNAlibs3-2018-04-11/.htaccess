@@ -1,0 +1,9 @@
+AuthUserFile /data/180502_E00401.B.Project_Test-DNAlibs3-2018-04-11/.htpasswd
+AuthGroupFile /dev/null
+AuthName ByPassword
+AuthType Basic
+
+<Limit GET>
+require user test-dnalibs3
+</Limit>
+        
