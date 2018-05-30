@@ -51,6 +51,12 @@ need to be present:
   * `tar`
   * `cp`
 
+If `cp` doesn't support the `-l` option to create hard links, two of the delivery
+tests will fail:
+
+  * `test_hdd_delivery_h4k`
+  * `test_hdd_delivery_nsq`
+
 Furthermore, this Python library is required in order to test the gathering
 of run statistics:
 
