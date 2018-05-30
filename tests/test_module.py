@@ -78,22 +78,25 @@ class TaskTestCase(unittest.TestCase):
             if do_cleanup:
                 shutil.rmtree(self.tempparent)
             else:
-                print self.__class__.__name__, ">>>", self.tempparent, "<<<"
+                print self.__class__.__name__, ">>>", self.tempparent,\
+                        "<<< Test dir preserved due to failure or debug mode"
 
-    def check_reference_files(self, ref_dir, test_dir):
-        self.assertTrue(os.path.isdir(test_dir))
+    def check_files_with_reference(self, test_dir, ref_dir):
+        self.assertTrue(os.path.isdir(test_dir), "Expected {0} to be a directory, but it isn't.".format(
+                    test_dir))
         for name in os.listdir(ref_dir):
             if not name.startswith("."):
                 ref_path = os.path.join(ref_dir, name)
                 test_path = os.path.join(test_dir, name)
                 if os.path.isdir(ref_path):
-                    self.check_reference_files(ref_path, test_path)
+                    self.check_files_with_reference(test_path, ref_path)
                 elif os.path.isfile(ref_path):
                     self.assertTrue(os.path.isfile(test_path), "{0} is not a file".format(test_path))
                     with open(ref_path) as ref_file,\
                             open(test_path) as test_file:
                         test_data = test_file.read()
-                        self.assertEquals(ref_file.read(), test_data)
+                        self.assertEquals(ref_file.read(), test_data, "File {0} differs from the "
+                                "reference {1}.".format(test_path, ref_path))
 
     def tearDown(self):
         try:
@@ -359,7 +362,8 @@ class Test60DemultiplexStats(TaskTestCase):
                 with chdir(tempdir):
                     self.module.main(self.task)
                 self.task.success_finish.assert_called_once()
-                self.check_reference_files("files/fasit/60_demultiplex_stats/h4k", self.qualitycontrol)
+                self.check_files_with_reference(self.qualitycontrol,
+                        "files/fasit/60_demultiplex_stats/h4k")
 
     def test_dx_stats_nsq(self):
         testargs = ["script", "."]
@@ -368,7 +372,8 @@ class Test60DemultiplexStats(TaskTestCase):
                 with chdir(tempdir):
                     self.module.main(self.task)
                 self.task.success_finish.assert_called_once()
-                self.check_reference_files("files/fasit/60_demultiplex_stats/nsq", self.qualitycontrol)
+                self.check_files_with_reference(self.qualitycontrol,
+                        "files/fasit/60_demultiplex_stats/nsq")
 
 
 class Test60Emails(TaskTestCase):
@@ -380,8 +385,8 @@ class Test60Emails(TaskTestCase):
             with patch.object(sys, 'argv', testargs):
                 self.module.main(self.task)
                 self.task.success_finish.assert_called_once()
-                self.check_reference_files("files/fasit/60_emails/h4k/",
-                        os.path.join(self.qualitycontrol, "Delivery"))
+                self.check_files_with_reference(os.path.join(self.qualitycontrol, "Delivery"),
+                        "files/fasit/60_emails/h4k/")
 
     def test_emails_nsq(self):
         with self.qc_dir(self.NSRUN) as tempdir:
@@ -389,8 +394,8 @@ class Test60Emails(TaskTestCase):
             with patch.object(sys, 'argv', testargs):
                 self.module.main(self.task)
                 self.task.success_finish.assert_called_once()
-                self.check_reference_files("files/fasit/60_emails/nsq/",
-                        os.path.join(self.qualitycontrol, "Delivery"))
+                self.check_files_with_reference(os.path.join(self.qualitycontrol, "Delivery"),
+                        "files/fasit/60_emails/nsq/")
 
 
 class Test60Reports(TaskTestCase):
@@ -401,7 +406,7 @@ class Test60Reports(TaskTestCase):
             projects = json.load(jsonfile)
         pdfpaths = []
         for project in projects:
-            if project['name'] is not None:
+            if not project['is_undetermined']:
                 pdir = str(project['proj_dir'])
                 for s in project['samples']:
                     for f in s['files']:
@@ -417,7 +422,7 @@ class Test60Reports(TaskTestCase):
             projects = json.load(jsonfile)
         pdfpaths = []
         for project in projects:
-            if project['name'] is not None:
+            if not project['is_undetermined']:
                 pdir = str(project['proj_dir'])
                 for s in project['samples']:
                     for f in s['files']:
@@ -471,7 +476,7 @@ class Test70MultiQC(TaskTestCase):
                         call(['multiqc', '-q', '-f', 'Stats/'], cwd=self.basecalls)
                         ]
                 for project in projects:
-                    if project['name'] is None:
+                    if project['is_undetermined']:
                         project['name'] = "Undetermined"
                     calls.append(
                         call(['multiqc', '-q', '-f', '.'], cwd=os.path.join(self.qualitycontrol, project['name']))
@@ -496,22 +501,18 @@ class Test80md5sum(TaskTestCase):
                 self.module.main(self.task)
                 calls = [] # list of expected calls to md5sum
                 for project in projects:
-                    if project['name'] is not None:
+                    if not project['is_undetermined']:
                         files = []
                         # Note: this test is too strict. File names could be in any order. If this
                         # test fails, it may need to be rewritten, but then we can't use assert_has_calls.
-
-                        # This is also a test for the PDF names. If it fails, the PDF names may be 
-                        # broken. 60_reports may not fail then.
+                        # Paths for QC PDF files are not tested.
                         for s in project['samples']:
                             for f in s['files']:
                                 fname = str(os.path.basename(f['path']))
                                 sname = "Sample_" + str(s['name'])
                                 fpath = os.path.join(sname, fname)
                                 files.append(fpath)
-                                qcpath = str(os.path.join(sname, self.H4RUN + "." + str(f['lane']) + "." + 
-                                    re.sub(r"fastq\.gz$", "qc.pdf", fname)))
-                                files.append(qcpath)
+                                files.append(ANY)
                         calls.append(
                             call(['/usr/bin/md5deep', '-rl', '-j5'] + files,
                                 cwd=os.path.join(self.basecalls, project['proj_dir']),
@@ -531,15 +532,14 @@ class Test80md5sum(TaskTestCase):
                 self.module.main(self.task)
                 calls = [] # list of expected calls to md5sum
                 for project in projects:
-                    if project['name'] is not None:
+                    if not project['is_undetermined']:
                         files = []
-                        # Note: this test is too strict. File names could be in any order. If this
-                        # test fails, it may need to be rewritten, but then we can't use assert_has_calls.
+                        # Same note as for HiSeq 4000 applies here. Too specific test.
                         for s in project['samples']:
                             for f in s['files']:
                                 fname = str(os.path.basename(f['path']))
                                 files.append(fname)
-                                files.append(self.NSRUN + "." + re.sub(r"fastq\.gz$", "qc.pdf", fname))
+                                files.append(ANY)
                         calls.append(
                             call(['/usr/bin/md5deep', '-rl', '-j5'] + files,
                                 cwd=os.path.join(self.basecalls, project['proj_dir']),
@@ -547,6 +547,100 @@ class Test80md5sum(TaskTestCase):
                             )
                 sub_call.assert_has_calls(calls, any_order=True)
                 self.task.success_finish.assert_called_once()
+
+
+class Test90PrepareDelivery(TaskTestCase):
+    
+    module = __import__("90_prepare_delivery")
+
+    def test_hdd_delivery_nsq(self):
+        self.hdd_delivery_check(self.NSRUN, "files/samples/nsqctest.json")
+
+    def test_hdd_delivery_h4k(self):
+        self.hdd_delivery_check(self.H4RUN, "files/samples/hi4000.json")
+
+    def test_tar_delivery_nsq(self):
+        self.tar_delivery_check(self.NSRUN, "files/samples/nsqctest.json",
+                "files/fasit/90_prepare_delivery/tar/nsq")
+
+    def test_tar_delivery_h4k(self):
+        self.tar_delivery_check(self.H4RUN, "files/samples/hi4000.json",
+                "files/fasit/90_prepare_delivery/tar/h4k")
+
+    def test_diag_delivery_nsq(self):
+        self.diag_delivery_check(self.NSRUN, "files/samples/nsqctest.json",
+                "files/fasit/90_prepare_delivery/diag/nsq")
+
+    def test_diag_delivery_h4k(self):
+        self.diag_delivery_check(self.H4RUN, "files/samples/hi4000.json",
+                "files/fasit/90_prepare_delivery/diag/h4k")
+
+    def hdd_delivery_check(self, run_id, jsonpath):
+        with open(jsonpath) as jsonfile:
+            projects = json.load(jsonfile)
+        with self.qc_dir(run_id) as tempdir,\
+                patch.object(sys, 'argv', ["script", self.tempdir]):
+            deliv_test_dir = os.path.join(self.tempparent, "delivery")
+            os.mkdir(deliv_test_dir)
+            with patch.object(nsc, 'DELIVERY_DIR', deliv_test_dir),\
+                    patch.object(nsc, 'DEFAULT_DELIVERY_MODE', 'User HDD'):
+                self.module.main(self.task)
+                self.task.success_finish.assert_called_once()
+                for project in projects:
+                    if not project['is_undetermined']:
+                        deliv_project_dir = os.path.join(deliv_test_dir, str(project['proj_dir']))
+                        self.check_files_with_reference(deliv_project_dir,
+                                "files/runs/{run_id}/Data/Intensities/BaseCalls/{project}".format(
+                                    run_id=run_id,
+                                    project=project['proj_dir']))
+
+    def tar_delivery_check(self, run_id, jsonpath, ref_dir):
+        with open(jsonpath) as jsonfile:
+            projects = json.load(jsonfile)
+        with self.qc_dir(run_id) as tempdir,\
+                patch.object(sys, 'argv', ["script", self.tempdir]):
+            deliv_test_dir = os.path.join(self.tempparent, "delivery")
+            os.mkdir(deliv_test_dir)
+            with patch.object(nsc, 'DELIVERY_DIR', deliv_test_dir),\
+                    patch.object(nsc, 'DEFAULT_DELIVERY_MODE', 'Norstore'),\
+                    patch('subprocess.call') as sub_call:
+                sub_call.return_value = 0
+                self.module.main(self.task)
+                self.task.success_finish.assert_called_once()
+                expected_calls = []
+                for project in projects:
+                    if not project['is_undetermined']:
+                        proj_dir = str(project['proj_dir'])
+                        deliv_project_dir = os.path.join(deliv_test_dir, proj_dir)
+                        tar_name = proj_dir + ".tar"
+                        expected_calls.append(
+                               call(['/bin/tar', 'cf', os.path.join(deliv_project_dir, tar_name),
+                                   proj_dir], cwd=self.basecalls, stderr=ANY, stdout=ANY) 
+                                )
+                        expected_calls.append(
+                               call(['/usr/bin/md5deep', '-l', '-j1', tar_name],
+                                   cwd=deliv_project_dir, stderr=ANY, stdout=ANY) 
+                                )
+                self.check_files_with_reference(deliv_test_dir, ref_dir)
+                sub_call.assert_has_calls(expected_calls, any_order=True)
+
+    def diag_delivery_check(self, run_id, jsonpath, ref_dir):
+        """Diag delivery is quite different from others, and requires copying and renaming of
+        QualityControl files. All the code can run locally in test mode, since it's mainly
+        rsync and cp. Reference dir is used to confirm compliance."""
+
+        with open(jsonpath) as jsonfile:
+            projects = json.load(jsonfile)
+        with self.qc_dir(run_id) as tempdir, patch.object(sys, 'argv', ["script", "."]):
+            deliv_test_dir = os.path.join(self.tempparent, "delivery")
+            os.mkdir(deliv_test_dir)
+            with patch.object(nsc, 'DELIVERY_DIR', deliv_test_dir),\
+                    patch.object(nsc, 'DIAGNOSTICS_DELIVERY', deliv_test_dir),\
+                    patch.object(nsc, 'DEFAULT_DELIVERY_MODE', 'Transfer to diagnostics'):
+                with chdir(tempdir):
+                    self.module.main(self.task)
+                self.task.success_finish.assert_called_once()
+                self.check_files_with_reference(deliv_test_dir, ref_dir)
 
 
 if __name__ == "__main__":
