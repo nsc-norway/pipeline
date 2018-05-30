@@ -59,6 +59,8 @@ def delivery_diag(task, project, basecalls_dir, project_path):
         try:
             os.mkdir(qc_dir)
         except OSError:
+            task.info("Waiting for directory {0} to appear on remote filesystem...".format(
+                os.path.basename(project_path)))
             time.sleep(30) # Try again after a delay. Seems to be a timing issue related to running on different nodes.
 
     # When moving to bcl2fastq2 diag. have to decide how they extract the QC metrics.
