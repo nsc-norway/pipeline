@@ -38,7 +38,28 @@ path for LIMS and non-LIMS modes where possible.
   * test_module.py -- This file contains all of the test code.
   * tools/         -- Directory containing scripts used to prepare the
                       tests. Not actually part of the testing code.
-              
+
+
+### Requirements ###
+
+The tests require the `mock` library in order to run.
+
+Some requirements of `pipeline` are mocked out, but the following commands
+need to be present:
+
+  * `rsync`
+  * `tar`
+  * `cp`
+
+Furthermore, this Python library is required in order to test the gathering
+of run statistics:
+
+  * `illuminate`
+
+(illuminate is not a strict runtime dependency of the pipeline, since it can
+get stats from text files and from LIMS also. Due to the targeted nature of the
+tests, illuminate is absolutely required for running the tests)
+
 
 ### Running the tests ###
 
