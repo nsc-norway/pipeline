@@ -92,8 +92,8 @@ def get_from_interop(run_dir, merge_lanes=False):
 
     try:
         import illuminate
-    except ImportError:
-        raise NotSupportedException
+    except ImportError as e:
+        raise NotSupportedException("Could not import illuminate library", e)
 
     dataset = illuminate.InteropDataset(run_dir)
     df = dataset.TileMetrics().df
