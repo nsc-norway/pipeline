@@ -226,6 +226,9 @@ def main(task):
     task.running()
 
     lims_projects = {}
+    if not os.path.isdir(nsc.DELIVERY_DIR):
+        task.fail("Delivery directory {0} does not exist.".format(nsc.DELIVERY_DIR))
+
     if task.process:
         inputs = task.process.all_inputs(unique=True, resolve=True)
         samples = (sample for i in inputs for sample in i.samples)
@@ -259,7 +262,7 @@ def main(task):
             task.warn("Project " + project.name + " is missing delivery information!")
             continue
 
-        if project_type == "Diagnostics":
+        if project_type == "Diagnostics" or delivery_type == "Transfer to diagnostics":
             task.info("Copying " + project.name + " to diagnostics...")
             delivery_diag(task, project, task.bc_dir, project_path)
         elif project_type == "Immunology":
