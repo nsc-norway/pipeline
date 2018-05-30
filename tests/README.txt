@@ -23,6 +23,10 @@ tests are designed to be independent of the architecture of the
 scripts. Some additional tests (near the top of the file) are more
 integrated with the framework, and work more like unit tests.
 
+LIMS integration is not tested whatsoever. This is too complex to
+implement right now, and the goal is anyway to have a shared code
+path for LIMS and non-LIMS modes where possible.
+
 
 ### Files ###
 
