@@ -48,6 +48,11 @@ dependencies of the pipeline may also be required.
 The tests will only run on Unix-like platforms, with slash as path 
 separator.
 
+To run only one specific test, invoke test_module.py with the class name and the 
+function name:
+
+    python test_module.py Test90PrepareDelivery.test_diag_delivery_nsq
+
 
 ### Debugging mode ###
 
