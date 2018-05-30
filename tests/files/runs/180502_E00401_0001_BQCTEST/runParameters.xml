@@ -19,5 +19,6 @@
     <CameraDriver>7.5.180.4395</CameraDriver>
     <FtdiDriver>2.12.0.0</FtdiDriver>
   </Setup>
+  <RunID>180502_E00401_0001_BQCTEST</RunID>
   <Version>1</Version>
 </RunParameters>
