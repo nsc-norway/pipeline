@@ -347,11 +347,12 @@ def write_html_file(jinja_env, process, output_path, runid, projects, print_lane
         run_parameters = None
 
     with open(output_path, 'w') as out:
-        out.write(jinja_env.get_template('run_emails.html').render(
-            run_id=runid, lane_data=lane_data, lane_header=lane_header,
-            run_parameters=run_parameters,
-            project_datas=project_datas
-            ).encode('utf-8'))
+        doc_content = jinja_env.get_template('run_emails.html').render(
+                                run_id=runid, lane_data=lane_data, lane_header=lane_header,
+                                run_parameters=run_parameters, project_datas=project_datas
+                                )
+        doc_bytes = doc_content.encode('utf-8') 
+        out.write(doc_bytes)
 
 
 def write_sample_info_table(output_path, runid, project):
