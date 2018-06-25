@@ -71,7 +71,7 @@ def post_stats(lims, process, projects, demultiplex_stats, lane_metrics):
 
         projects_map[project.name] = samples_map
 
-    update_artifacts = []
+    update_artifacts = set()
     for coordinates, stats in demultiplex_stats.items():
         # Note: while it may seem that this works for both aggregate_reads and
         # separate reads, it does not, the code must be changed for separate reads
@@ -90,17 +90,20 @@ def post_stats(lims, process, projects, demultiplex_stats, lane_metrics):
                     except KeyError:
                         pass
                 resultfile.udf['Sample sheet position'] = projects_map[project][sample_name].sample_index
-                update_artifacts.append(resultfile)
+                update_artifacts.add(resultfile)
             
 
         else: # Undetermined: sample_name = None in demultiplex_stats
             lane_analyte = get_lane(process, lane)
             if lane_analyte:
                 lane_analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
-                duplicates = lane_metrics.get(lane, {}).get('% Sequencing Duplicates', None)
-                if duplicates is not None:
-                    lane_analyte.udf['% Sequencing Duplicates'] = duplicates
-                update_artifacts.append(lane_analyte)
+
+    for lane, metric in lane_metrics.items():
+        duplicates = metric.get('% Sequencing Duplicates', None)
+        if duplicates is not None:
+            lane_analyte = get_lane(process, lane)
+            lane_analyte.udf['% Sequencing Duplicates'] = duplicates
+            update_artifacts.add(lane_analyte)
 
     #print "Updating"
     lims.put_batch(update_artifacts)
