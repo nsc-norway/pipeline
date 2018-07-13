@@ -128,12 +128,14 @@ def copy_sav_files(task, dest_dir, srun_user_args=[]):
             "RunInfo.xml",
             "RunParameters.xml",
             "InterOp",
+            "DemultiplexingSampleSheet*.csv",
             ]
     else:
         SAV_INCLUDE_PATHS = [
             "RunInfo.xml",
             "runParameters.xml",
             "InterOp",
+            "DemultiplexingSampleSheet*.csv",
             ]
     rsync_cmd = [nsc.RSYNC, '-r']
     rsync_cmd += SAV_INCLUDE_PATHS
