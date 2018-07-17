@@ -13,6 +13,7 @@ import crypt
 import time
 import subprocess
 import datetime
+import glob
 import demultiplex_stats
 from genologics.lims import *
 from common import nsc, utilities, taskmgr, remote, samples
@@ -124,21 +125,22 @@ def delivery_diag(task, project, basecalls_dir, project_path):
 def copy_sav_files(task, dest_dir, srun_user_args=[]):
     # Copy "SAV" files for advanced users
     if task.instrument == "nextseq":
-        SAV_INCLUDE_PATHS = [
+        sav_include_paths = [
             "RunInfo.xml",
             "RunParameters.xml",
             "InterOp",
-            "DemultiplexingSampleSheet*.csv",
             ]
     else:
-        SAV_INCLUDE_PATHS = [
+        sav_include_paths = [
             "RunInfo.xml",
             "runParameters.xml",
             "InterOp",
-            "DemultiplexingSampleSheet*.csv",
             ]
+    demultiplexing_sample_sheets = glob.glob(os.path.join(task.work_dir, "DemultiplexingSampleSheet*.csv"))
+    if demultiplexing_sample_sheets:
+        sav_include_paths.append(os.path.relpath(sorted(demultiplexing_sample_sheets)[-1], task.work_dir))
     rsync_cmd = [nsc.RSYNC, '-r']
-    rsync_cmd += SAV_INCLUDE_PATHS
+    rsync_cmd += sav_include_paths
     rsync_cmd += [os.path.join(dest_dir, task.run_id) + "/"]
     rcode = remote.run_command(rsync_cmd, task, "rsync_sav_files", time="01:00", storage_job=True,
             srun_user_args=srun_user_args, cwd=task.work_dir, comment=task.run_id)
