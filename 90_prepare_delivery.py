@@ -69,7 +69,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     # should only give the relevant lanes.
     for subdir in ["Stats" + task.suffix, "Reports" + task.suffix]:
         source = os.path.join(basecalls_dir, subdir)
-        subprocess.check_call(rsync_args + [source, dest_dir])
+        subprocess.call(rsync_args + [source, dest_dir])
 
     # Copy the QualityControl files
     copy_sav_files(task, dest_dir, ['--nodelist=vali'])
