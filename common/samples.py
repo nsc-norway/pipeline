@@ -154,7 +154,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
             lanes.add(lane_id)
 
             # Keep track of non-indexed lanes. Non-indexed lanes don't have Undetermined
-            if not entry.get('index'):
+            if not entry.get('index') and not entry.get('index2'):
                 not_multiplexed_lanes.add(lane_id)
 
             path = ""
@@ -180,9 +180,16 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
                 # path contains trailing slash
                 fastq_path = path + fastq_name
 
-                index_sequence = entry.get("index")
-                if entry.has_key("index2") and entry['index2']:
-                    index_sequence += "-" + entry["index2"]
+                index1 = entry.get("index")
+                index2 = entry.get("index2")
+                if index1 and not index2:
+                    index_sequence = index1
+                elif index2 and not index1:
+                    index_sequence = index2
+                elif index2 and index2:
+                    index_sequence = index1 + "-" + index2
+                else:
+                    index_sequence = None
 
                 sample.files.append(FastqFile(lane_id, i_read, fastq_name, fastq_path, index_sequence, None))
                 # Stats can be added in later
