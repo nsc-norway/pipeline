@@ -251,11 +251,6 @@ def flag_empty_files(projects, run_dir):
             for f in s.files:
                 full_path = os.path.join(basecalls_dir, f.path)
                 f.empty = not os.path.exists(full_path)
-                if not f.empty:
-                    # Additional check for empty gzip file
-                    gzfile = gzip.open(full_path, 'rb')
-                    data = gzfile.read(1)
-                    f.empty = data == ""
 
 
 ################# SAMPLE SHEET ##################
