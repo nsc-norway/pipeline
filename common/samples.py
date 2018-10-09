@@ -47,7 +47,7 @@ class Sample(object):
     @property
     def limsid(self):
         if self.description: return self.description
-        else return self.sample_id
+        else: return self.sample_id
 
 
 class FastqFile(object):
