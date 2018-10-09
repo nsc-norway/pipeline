@@ -21,12 +21,6 @@ def move_files(bc_dir, projects):
             if not os.path.exists(projdir):
                 os.mkdir(projdir)
 
-    no_sample_id_dir = all(
-            sample.sample_id == sample.name 
-            for project in projects for sample in project.samples
-            if not project.is_undetermined
-            )
-
     for project in projects:
         if not project.is_undetermined:
             for sample in project.samples:
@@ -35,6 +29,9 @@ def move_files(bc_dir, projects):
                     sample_path = os.path.join(bc_dir, project.proj_dir, sample.sample_dir)
                     if not os.path.exists(sample_path):
                         os.mkdir(sample_path)
+
+
+                no_sample_id_dir = sample.sample_id == sample.sample_name
 
                 for f in sample.files:
                     orig_fname = samples.bcl2fastq2_file_name(
