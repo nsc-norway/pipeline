@@ -79,7 +79,7 @@ def post_stats(lims, process, projects, demultiplex_stats, lane_metrics):
         
         if sample_name: # Not undetermined
             try:
-                limsid = projects_map[project][sample_name].sample_id
+                limsid = projects_map[project][sample_name].limsid
             except KeyError:
                 continue # Skip unknown samples / project
             resultfile = get_resultfile(lims, process, lane, limsid, 1)

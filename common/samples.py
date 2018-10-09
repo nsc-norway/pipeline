@@ -36,12 +36,18 @@ class Sample(object):
     
     """
 
-    def __init__(self, sample_index, sample_id, name, sample_dir, files):
+    def __init__(self, sample_index, sample_id, name, sample_dir, files, description=None):
         self.sample_index = sample_index
         self.sample_id = sample_id
         self.name = name
         self.sample_dir = sample_dir
         self.files = files
+        self.description = description
+
+    @property
+    def limsid(self):
+        if self.description: return self.description
+        else return self.sample_id
 
 
 class FastqFile(object):
@@ -143,7 +149,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
                 sample_name = entry['sampleid']
             sample_name = utilities.strip_chars(sample_name)
             sample_dir = get_sample_dir(instrument, sample_name)
-            sample = Sample(sample_index, entry['sampleid'], sample_name, sample_dir, [])
+            sample = Sample(sample_index, entry['sampleid'], sample_name, sample_dir, [], entry.get('description'))
             sample_index += 1
             known_samples[(project.name, sample.sample_id)] = sample
             if file_lanes: # Don't add sample if in ignored lane
@@ -196,7 +202,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
 
     # Create an undetermined file for each lane, read seen
     undetermined_project = Project(None, None, [], True)
-    undetermined_sample = Sample(0, None, None, None, [])
+    undetermined_sample = Sample(0, None, None, None, [], None)
     undetermined_project.samples.append(undetermined_sample)
     for lane in lanes:
         if lane in not_multiplexed_lanes:
