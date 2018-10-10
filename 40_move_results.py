@@ -31,7 +31,7 @@ def move_files(bc_dir, projects):
                         os.mkdir(sample_path)
 
 
-                no_sample_id_dir = sample.sample_id == sample.sample_name
+                no_sample_id_dir = sample.sample_id == sample.name
 
                 for f in sample.files:
                     orig_fname = samples.bcl2fastq2_file_name(
