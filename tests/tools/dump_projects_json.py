@@ -21,6 +21,10 @@ sys.path.append('..')
 from common import samples, nsc
 from test_module import projects_to_dicts
 
+if len(sys.argv) < 3:
+    print("Please see script code for usage information (require 2 arguments)")
+    sys.exit(1)
+
 collapse_lanes = os.environ.get('COLLAPSE_LANES') == 'true' # This setting turns lane number into "X"
 reads = int(os.environ.get('READS', 2)) # Number of data reads; 1=single read, 2=paired end
 
