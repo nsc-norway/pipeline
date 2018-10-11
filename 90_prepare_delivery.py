@@ -25,7 +25,7 @@ TASK_ARGS = ['work_dir', 'sample_sheet', 'lanes']
 if nsc.TAG == "prod":
     from common import secure
 else:
-    print "Using dummy security module"
+    sys.stderr.write("Using dummy security module\n")
     from common import secure_dummy as secure
 
 
