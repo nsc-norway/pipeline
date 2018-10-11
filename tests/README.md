@@ -171,3 +171,8 @@ json files can be generated using the script `tools/dump_projects_json.py`.
 4.  Commit the updated references.
 
     
+#### Updating other reference files ####
+
+Most files can be updated more directly, by copying the newly produced file into the
+location under files/.
+
