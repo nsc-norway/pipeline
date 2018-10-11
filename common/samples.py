@@ -195,7 +195,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
                 elif index2 and index2:
                     index_sequence = index1 + "-" + index2
                 else:
-                    index_sequence = None
+                    index_sequence = ""
 
                 sample.files.append(FastqFile(lane_id, i_read, fastq_name, fastq_path, index_sequence, None))
                 # Stats can be added in later
