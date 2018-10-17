@@ -97,6 +97,7 @@ def post_stats(lims, process, projects, demultiplex_stats, lane_metrics):
             lane_analyte = get_lane(process, lane)
             if lane_analyte:
                 lane_analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
+                update_artifacts.add(lane_analyte)
 
     for lane, metric in lane_metrics.items():
         duplicates = metric.get('% Sequencing Duplicates', None)
