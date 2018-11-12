@@ -262,13 +262,13 @@ def flag_empty_files(projects, run_dir):
 ################# SAMPLE SHEET ##################
 # Low level sample sheet parsing
 
-def parse_sample_sheet_data(sample_sheet):
+def parse_sample_sheet_data(sample_sheet, sep=","):
     lines = sample_sheet.splitlines()
-    headers = [x.lower().replace("_", "") for x in lines[0].split(",")]
+    headers = [x.lower().replace("_", "") for x in lines[0].split(sep)]
     samples = []
     for l in lines[1:]:
         sam = {}
-        for h, v in zip(headers, l.split(",")):
+        for h, v in zip(headers, l.split(sep)):
             sam[h] = v
         samples.append(sam)
     return samples
@@ -285,24 +285,27 @@ def parse_sample_sheet(sample_sheet):
 
     # Will contain ['', Header 1, Data 1, Header 2, Data 2] where "header" are the 
     # things in []s
-    sections = re.split(r"(\[\w+\])[,\r\n]+", sample_sheet)
+    sep = ","
+    sections = re.split(r"(\[\w+\])[,;\r\n]+", sample_sheet)
     # If sample sheet is edited in Excel it will contain commas after the [Header],,,
     result = {}
     for header, data in zip(sections[1::2], sections[2::2]):
         if header == "[Header]":
             result['header'] = {}
+            if data.count(";") > data.count(","):
+                sep = ";"
             for l in data.splitlines():
-                parts = l.split(",")
+                parts = l.split(sep)
                 if len(parts) >= 2:
                     result['header'][parts[0]] = parts[1]
         elif header == "[Reads]":
             result['reads'] = []
             for line in data.splitlines():
-                c = line.strip(",")
+                c = line.strip(sep)
                 if c.isdigit() and not int(c) == 0:
                     result['reads'].append(int(c))
         elif header == "[Data]":
-            result['data'] = parse_sample_sheet_data(data)
+            result['data'] = parse_sample_sheet_data(data, sep)
 
     return result
 
