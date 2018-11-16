@@ -196,8 +196,12 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
                     index_sequence = index1 + "-" + index2
                 else:
                     index_sequence = ""
-
-                sample.files.append(FastqFile(lane_id, i_read, fastq_name, fastq_path, index_sequence, None))
+                
+                # If there is a sample with the same SampleID as the current line, and also the same
+                # lane ID, then we don't add it. This happens when each sample uses multiple indexes,
+                # but get written to one file.
+                if not any(f.lane == lane_id and f.i_read == i_read for f in sample.files):
+                    sample.files.append(FastqFile(lane_id, i_read, fastq_name, fastq_path, index_sequence, None))
                 # Stats can be added in later
 
     # Create an undetermined file for each lane, read seen
