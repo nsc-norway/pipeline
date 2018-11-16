@@ -96,29 +96,6 @@ def merged_lanes(run_id):
     return get_instrument_by_runid(run_id) == "nextseq"
 
 
-def get_index_sequence(artifact):
-    for label in artifact.reagent_labels:
-        # The structure of the reagent label XML isn't consistent with other lims
-        # objects: there is no parent tag that holds all other data. Let's do an
-        # ad hoc get request for now.
-        lims = artifact.lims
-        list_root = lims.get(lims.get_uri('reagenttypes'), params={'name': label})
-
-        # Gets a list of reagent types with that name
-        for rt in list_root.findall('reagent-type'):
-            # Gets the reagent type by ID
-            rt_root = lims.get(rt.attrib['uri'])
-
-            # Look for the index in the XML hierarchy
-            for special_type in rt_root.findall('special-type'):
-                if special_type.attrib['name'] == "Index":
-                    for attribute_tag in special_type.findall('attribute'):
-                        if attribute_tag.attrib['name'] == "Sequence":
-                            return attribute_tag.attrib['value']
-
-        return None
-
-
 def upload_file(process, name, path = None, data = None):
     """This function uploads the provided file to a ResultFile output with 
     on the given process with the specified name."""
