@@ -58,25 +58,11 @@ def main(task):
     task.success_finish()
 
 
-def get_rta_version(run_dir):
-    try:
-        xmltree = ElementTree.parse(os.path.join(run_dir, 'RunParameters.xml'))
-    except IOError:
-        xmltree = ElementTree.parse(os.path.join(run_dir, 'runParameters.xml'))
-
-    run_parameters = xmltree.getroot()
-    rta_ver_element = run_parameters.find("RTAVersion")
-    if rta_ver_element == None:
-        rta_ver_element = run_parameters.find("Setup").find("RTAVersion")
-
-    return rta_ver_element.text
-
-
 def make_reports(work_dir, suffix, run_id, projects, bcl2fastq_version=None):
     basecalls_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls")
     quality_control_dir = os.path.join(basecalls_dir, "QualityControl" + suffix)
 
-    software_versions = [("RTA", get_rta_version(work_dir))]
+    software_versions = [("RTA", utilities.get_rta_version(work_dir))]
     if bcl2fastq_version:
         software_versions += [("bcl2fastq", bcl2fastq_version)]
 

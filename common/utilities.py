@@ -1,5 +1,5 @@
 #--------------------------------------#
-# Utilities for LIMS status tracking   #
+# Utility function                     #
 #--------------------------------------#
 
 # Various utility functions for managing workflow progress,
@@ -83,7 +83,19 @@ def get_bcl2fastq2_version(work_dir):
                 return l.split(" ")[1].strip("\n")
     else:
         return None
-    
+
+
+def get_rta_version(run_dir):
+    try:
+        xmltree = ElementTree.parse(os.path.join(run_dir, 'RunParameters.xml'))
+    except IOError:
+        xmltree = ElementTree.parse(os.path.join(run_dir, 'runParameters.xml'))
+    run_parameters = xmltree.getroot()
+    rta_ver_element = run_parameters.find("RTAVersion")
+    if rta_ver_element == None:
+        rta_ver_element = run_parameters.find("Setup").find("RTAVersion")
+    return rta_ver_element.text 
+
 
 def get_fcid_by_runid(run_id):
     runid = get_instrument_by_runid(run_id)
@@ -163,7 +175,6 @@ def strip_chars(string):
     """Strips special characters to prevent unexpected behaviour or security issues when 
     user input is used as file names, or similar."""
     return "".join(c for c in string if c.isalnum() or c in '-_.')
-
 
 
 # *** Compatibility support functions ***
