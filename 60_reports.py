@@ -23,11 +23,6 @@ TASK_ARGS = ['work_dir', 'sample_sheet', 'lanes']
 
 
 def main(task):
-    task.add_argument(
-            '--bcl2fastq-version',
-            default=None,
-            help="bcl2fastq version to put in the reports"
-            )
     task.running()
     run_id = task.run_id
     instrument = utilities.get_instrument_by_runid(run_id)
@@ -43,22 +38,15 @@ def main(task):
             )
     samples.add_stats(projects, run_stats)
     samples.flag_empty_files(projects, work_dir)
-
-    if task.args.bcl2fastq_version:
-        bcl2fastq_version = task.args.bcl2fastq_version
-    elif task.process:
-        bcl2fastq_version = utilities.get_udf(task.process, nsc.BCL2FASTQ_VERSION_UDF, None)
-    else:
-        bcl2fastq_version = utilities.get_bcl2fastq2_version(work_dir)
-        if not bcl2fastq_version:
-            task.warn("bcl2fastq version cannot be detected, use the --bcl2fastq-version option to specify!")
-
+    try:
+        bcl2fastq_version = utilities.get_bcl2fastq2_version(task.process, work_dir)
+    except RuntimeError:
+        pass
     make_reports(work_dir, task.suffix, run_id, projects, bcl2fastq_version)
-
     task.success_finish()
 
 
-def make_reports(work_dir, suffix, run_id, projects, bcl2fastq_version=None):
+def make_reports(work_dir, suffix, run_id, projects, bcl2fastq_version):
     basecalls_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls")
     quality_control_dir = os.path.join(basecalls_dir, "QualityControl" + suffix)
 

@@ -63,11 +63,17 @@ def get_instrument_by_runid(run_id):
         return None
 
 
-def get_bcl2fastq2_version(work_dir):
-    """Check version in log file in standard location (for non-LIMS).
+def get_bcl2fastq2_version(process, work_dir):
+    """Attemts to get bcl2fastq version using LIMS, then by inspecting
+    the log file.
     
-    Less than bullet proof way to get bcl2fastq2 version."""
+    If nothing works, it will raise a RuntimeError."""
 
+    if process:
+        try:
+            return process.udf[nsc.BCL2FASTQ_VERSION_UDF]
+        except KeyError:
+            pass
     log_path_pattern = os.path.join(
             work_dir,
             nsc.RUN_LOG_DIR,
@@ -81,8 +87,7 @@ def get_bcl2fastq2_version(work_dir):
             l = next(log)
             if l.startswith("bcl2fastq v"):
                 return l.split(" ")[1].strip("\n")
-    else:
-        return None
+    raise RuntimeError("Unable to determine bcl2fastq version.")
 
 
 def get_rta_version(run_dir):
