@@ -81,6 +81,12 @@ td.text {
     </tr>
     {% endfor %}
 </table>
+<h4>Versions</h4>
+<table>
+{% for row in software_versions %}
+    <tr><td>{{ row[0] }}</td><td>{{ row[1] }}</td></tr>
+{% endfor %}
+</table>
 {% endif %}
 
 <h2>Projects</h2>

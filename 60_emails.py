@@ -26,6 +26,10 @@ def main(task):
     work_dir = task.work_dir
     instrument = utilities.get_instrument_by_runid(run_id)
     
+    qc_dir = os.path.join(task.bc_dir, "QualityControl" + task.suffix)
+    if not os.path.exists(qc_dir):
+        os.mkdir(qc_dir)
+
     try:
         lane_stats = lane_info.get_from_interop(task.work_dir, task.no_lane_splitting)
     except lane_info.NotSupportedException:
@@ -35,9 +39,7 @@ def main(task):
             lane_stats = lane_info.get_from_lims(task.process, instrument, expand_lanes)
         else:
             lane_stats = lane_info.get_from_files(work_dir, instrument, expand_lanes)
-
     projects = task.projects
-
     run_stats = stats.get_stats(
             instrument,
             work_dir,
@@ -47,19 +49,9 @@ def main(task):
             )
     samples.add_stats(projects, run_stats)
     if task.instrument in ["hiseq4k", "hiseqx"]:
-        qc_dir = os.path.join(task.bc_dir, "QualityControl" + task.suffix)
         stats.add_duplication_results(qc_dir, projects)
     samples.flag_empty_files(projects, work_dir)
 
-    qc_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls", "QualityControl" + task.suffix)
-    make_reports(instrument, qc_dir, run_id, projects, lane_stats, task.lims, task.process)
-
-    task.success_finish()
-
-
-def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, lims, process):
-    if not os.path.exists(qc_dir):
-        os.mkdir(qc_dir)
     delivery_dir = os.path.join(qc_dir, "Delivery")
     if not os.path.exists(delivery_dir):
         os.mkdir(delivery_dir)
@@ -69,15 +61,27 @@ def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, lims, pr
             fname = delivery_dir + "/Email_for_" + project.name + ".xls"
             write_sample_info_table(fname, run_id, project)
 
-    patterned = instrument_type in ["hiseqx", "hiseq4k"]
+    patterned = instrument in ["hiseqx", "hiseq4k"]
+    software_versions = [
+            ("RTA", utilities.get_rta_version(work_dir))
+            ]
+    try:
+        bcl2fastq_version = utilities.get_bcl2fastq2_version(task.process, work_dir)
+        software_versions.append(("bcl2fastq", bcl2fastq_version))
+    except RuntimeError:
+        pass
+
     fname_html = delivery_dir + "/Emails_for_" + run_id + ".html"
     template_dir = os.path.join(os.path.dirname(__file__), "template")
     if select_autoescape is None:
         jinja_env = Environment(loader=FileSystemLoader(template_dir))
     else:
-        jinja_env = Environment(loader=FileSystemLoader(template_dir), autoescape=select_autoescape(['html','xml']))
-    write_html_file(jinja_env, process, fname_html, run_id, projects, instrument_type.startswith('hiseq'),
-            lane_stats, patterned)
+        jinja_env = Environment(loader=FileSystemLoader(template_dir),
+                autoescape=select_autoescape(['html','xml']))
+    write_html_file(jinja_env, task.process, fname_html, run_id, projects, instrument.startswith('hiseq'),
+            lane_stats, software_versions, patterned)
+
+    task.success_finish()
 
 
 def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned):
@@ -319,7 +323,8 @@ class LimsInfo(object):
         self.sequencing_status = ", ".join(str(k) + ": " + str(v) for k, v in state_count.items())
 
 
-def write_html_file(jinja_env, process, output_path, runid, projects, print_lane_number, lane_stats, patterned):
+def write_html_file(jinja_env, process, output_path, runid, projects, print_lane_number,
+        lane_stats, software_versions, patterned):
     """Stats summary file for emails, etc."""
 
     project_datas = []
@@ -349,7 +354,8 @@ def write_html_file(jinja_env, process, output_path, runid, projects, print_lane
     with open(output_path, 'w') as out:
         doc_content = jinja_env.get_template('run_emails.html').render(
                                 run_id=runid, lane_data=lane_data, lane_header=lane_header,
-                                run_parameters=run_parameters, project_datas=project_datas
+                                run_parameters=run_parameters, software_versions=software_versions,
+                                project_datas=project_datas
                                 )
         doc_bytes = doc_content.encode('utf-8') 
         out.write(doc_bytes)
