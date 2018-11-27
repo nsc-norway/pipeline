@@ -183,6 +183,7 @@ elif SITE == "ous":
         DELIVERY_DIR="/data/runScratch.boston/test/delivery"# used by prepare-delivery after QC
         DIAGNOSTICS_DELIVERY = "/data/runScratch.boston/test/diag"
         TRIGGER_DIR="/data/runScratch.boston/scripts/dev/trigger"
+        LIMS_SERVER="dev-lims"
         
 else:
     PRIMARY_STORAGE = "/tmp"
@@ -203,6 +204,10 @@ def get_lims(server_id=None):
         if server_id == "ous-lims":
             url = "https://ous-lims.sequencing.uio.no"
             pw_file = "/data/runScratch.boston/scripts/etc/seq-user/apiuser-password.txt"
+
+        elif server_id == "dev-lims":
+            url = "https://dev-lims.sequencing.uio.no"
+            pw_file = "/data/runScratch.boston/scripts/etc/seq-user/dev-apiuser-password.txt"
 
         elif server_id == "cees-lims":
             url = "https://cees-lims.sequencing.uio.no"
