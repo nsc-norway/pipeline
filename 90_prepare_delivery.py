@@ -107,10 +107,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     # format as that used by the first version of bcl2fastq.
 
     fcid = utilities.get_fcid_by_runid(task.run_id)
-    if task.process:
-        bcl2fastq_version = utilities.get_udf(task.process, nsc.BCL2FASTQ_VERSION_UDF, None)
-    else:
-        bcl2fastq_version = utilities.get_bcl2fastq2_version(task.work_dir)
+    bcl2fastq_version = utilities.get_bcl2fastq2_version(task.process, task.work_dir)
     undetermined_project = next(p for p in task.projects if p.is_undetermined)
     demultiplex_stats_content = demultiplex_stats.demultiplex_stats(
             project, undetermined_project, task.work_dir, basecalls_dir, task.instrument,
