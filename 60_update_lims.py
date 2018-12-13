@@ -70,7 +70,6 @@ def post_stats(lims, process, projects, demultiplex_stats, lane_metrics):
         lane, project, sample_name = coordinates[0:3]
         
         if sample_name: # Not undetermined
-                limsid = projects_map[project][sample_name].limsid
             limsid = None
             for tproject in projects:
                 if tproject.name == project:
