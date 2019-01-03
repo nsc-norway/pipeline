@@ -106,6 +106,9 @@ def get_from_interop(run_dir, merge_lanes=False):
     pf = means[means.code==101].value.values
     phix = means[means.code==300].value.values / 100.0
 
+    if phix.size == 0:
+        phix = [0] * len(raw)
+
     if merge_lanes:
         lanes = dict([("X", LaneStats(raw[0], pf[0], pf[0] / max(raw[0], 1), phix[0]))])
     else:
