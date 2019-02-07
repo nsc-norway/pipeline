@@ -44,6 +44,7 @@ LANE_UNDETERMINED_UDF = "NSC % Undetermined Indices (PF)"
 # On Project
 DELIVERY_METHOD_UDF = "Delivery method"
 PROJECT_TYPE_UDF = "Project type"
+PROJECT_16S_UDF = "Internal barcode demultiplexing (16S)"
 # On Container << to be removed when moving overview page
 RECENTLY_COMPLETED_UDF = "Recently completed"
 PROCESSED_DATE_UDF = "Processing completed date"

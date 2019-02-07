@@ -29,6 +29,43 @@ else:
     from common import secure_dummy as secure
 
 
+def delivery_16s(task, project, delivery_method, basecalls_dir, project_path):
+    """Special delivery method for demultiplexing internal 16S barcodes."""
+
+    # TODO -- test this in production mode, we don't have a way to emulate a 16S project as
+    # of now.
+
+    assert task.process is not None, "delivery_16s can only run with LIMS mode."
+
+    subprocess.check_call(["/bin/cp", "-rl", source_path, nsc.DELIVERY_DIR])
+    sample_sheet_file, parameter_file = [os.path.join(
+            nsc.DELIVERY_DIR,
+            os.path.basename(project_path),
+            filename
+            )
+            for filename in ["16SSampleSheet.tsv", "Parameters.tsv"] ]
+
+    outputs = task.process.all_outputs(unique=True, resolve=True)
+    with open(sample_sheet_file, "w") as f:
+        for output in outputs:
+            reagent = next(iter(output.reagent_labels))
+            m = re.match(r"16S_... \((.*)-(.*)\)", reagent)
+            if m:
+                bc1, bc2 = m.groups((1,2))
+            else:
+                bc1 = ""
+                bc2 = ""
+            f.write("\t".join(output.name, bc1, bc2) + "\n")
+
+    with open(parameter_file, "w") as f:
+        ps  =    [["RunID",     task.run_id]]
+        ps.append(["bcl2fastq", utilities.get_bcl2fastq2_version(task.process, task.bc_dir)])
+        ps.append(["RTA",       utilities.get_rta_version(task.bc_dir)])
+        ps.append(["DeliveryMethod",delivery_method])
+        # TODO: Save .htaccess file if Norstore deliery
+        f.write("\n".join("\t".join(p for p in ps)))
+
+
 def delivery_diag(task, project, basecalls_dir, project_path):
     """Special delivery method for diagnostics at OUS"""
 
@@ -254,6 +291,7 @@ def main(task):
         if lims_project:
             delivery_type = lims_project.udf[nsc.DELIVERY_METHOD_UDF]
             project_type = lims_project.udf[nsc.PROJECT_TYPE_UDF]
+            project_16s = lims_project.udf.get(nsc.PROJECT_16S_UDF)
         elif not task.process:
             delivery_type = nsc.DEFAULT_DELIVERY_MODE
             if delivery_type is None:
@@ -261,11 +299,15 @@ def main(task):
             project_type = "Non-Sensitive"
             if project.name.startswith("Diag-"):
                 project_type = "Diagnostics"
+            project_16s = False
         else:
             task.warn("Project " + project.name + " is missing delivery information!")
             continue
 
-        if project_type == "Diagnostics" or delivery_type == "Transfer to diagnostics":
+        if project_16s: # Only supported for LIMS mode...
+            task.info("Running 16S delivery for " + project.name + "...")
+            delivery_16s(task, project, delivery_type, task.bc_dir, project_path)
+        elif project_type == "Diagnostics" or delivery_type == "Transfer to diagnostics":
             task.info("Copying " + project.name + " to diagnostics...")
             delivery_diag(task, project, task.bc_dir, project_path)
         elif project_type == "Immunology":
