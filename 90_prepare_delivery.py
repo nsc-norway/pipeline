@@ -32,20 +32,21 @@ else:
 def delivery_16s(task, project, delivery_method, basecalls_dir, project_path):
     """Special delivery method for demultiplexing internal 16S barcodes."""
 
-    # TODO -- test this in production mode, we don't have a way to emulate a 16S project as
-    # of now.
-
     assert task.process is not None, "delivery_16s can only run with LIMS mode."
 
-    subprocess.check_call(["/bin/cp", "-rl", source_path, nsc.DELIVERY_DIR])
-    sample_sheet_file, parameter_file = [os.path.join(
-            nsc.DELIVERY_DIR,
-            os.path.basename(project_path),
-            filename
-            )
-            for filename in ["16SSampleSheet.tsv", "Parameters.tsv"] ]
+    lims_param_dir = os.path.join(project_path, "lims_parameters")
+    try:
+        os.mkdir(lims_param_dir)
+    except OSError as e:
+        if e.errno == 17:
+            pass
+        else:
+            raise e
+    sample_sheet_file, parameter_file = [os.path.join(lims_param_dir, filename)
+            for filename in ["16SSampleSheet.tsv", "params.csv"]]
 
-    outputs = task.process.all_outputs(unique=True, resolve=True)
+    outputs = task.lims.get_batch(o['uri'] for i,o in task.process.input_output_maps
+                                    if o['output-generation-type'] == "PerReagentLabel")
     with open(sample_sheet_file, "w") as f:
         for output in outputs:
             reagent = next(iter(output.reagent_labels))
@@ -55,15 +56,21 @@ def delivery_16s(task, project, delivery_method, basecalls_dir, project_path):
             else:
                 bc1 = ""
                 bc2 = ""
-            f.write("\t".join(output.name, bc1, bc2) + "\n")
+            sample_name = re.sub(r"^\d+-", "", output.name)
+            f.write("\t".join((sample_name, bc1, bc2)) + "\n")
 
     with open(parameter_file, "w") as f:
         ps  =    [["RunID",     task.run_id]]
-        ps.append(["bcl2fastq", utilities.get_bcl2fastq2_version(task.process, task.bc_dir)])
-        ps.append(["RTA",       utilities.get_rta_version(task.bc_dir)])
+        ps.append(["bcl2fastq", utilities.get_bcl2fastq2_version(task.process, task.work_dir)])
+        ps.append(["RTA",       utilities.get_rta_version(task.work_dir)])
         ps.append(["DeliveryMethod",delivery_method])
-        # TODO: Save .htaccess file if Norstore deliery
-        f.write("\n".join("\t".join(p for p in ps)))
+        f.write("\n".join(",".join(p) for p in ps))
+
+    if delivery_method == "Norstore": 
+        project_dir = os.path.basename(project_path).rstrip("/")
+        create_htaccess_files(task.process, project.name, project_dir, lims_param_dir)
+
+    subprocess.call(["/data/runScratch.boston/scripts/run-16s-pipeline.sh", project_path])
 
 
 def delivery_diag(task, project, basecalls_dir, project_path):
@@ -202,6 +209,31 @@ def delivery_harddrive(project_name, source_path):
     #    raise RuntimeError("Copying files to loki failed, rsync returned an error")
 
 
+def create_htaccess_files(process, project_name, project_dir, save_path):
+    # Generate username / password files
+    match = re.match("^([^-]+)-([^-]+)-\d\d\d\d-\d\d-\d\d$", project_name)
+    name = match.group(1)
+    proj_type = match.group(2)
+    username = name.lower() + "-" + proj_type.lower()
+    password = secure.get_norstore_password(process, project_name)
+    crypt_pw = crypt.crypt(password)
+    
+    htaccess = """\
+AuthUserFile /data/{project_dir}/.htpasswd
+AuthGroupFile /dev/null
+AuthName ByPassword
+AuthType Basic
+
+<Limit GET>
+require user {username}
+</Limit>
+    """.format(project_dir=project_dir, username=username)
+    open(save_path + "/.htaccess", "w").write(htaccess)
+
+    htpasswd = "{username}:{crypt_pw}\n".format(username=username, crypt_pw=crypt_pw)
+    open(save_path + "/.htpasswd", "w").write(htpasswd)
+
+
 def delivery_norstore(process, project_name, source_path, task):
     """Create a tar file"""
 
@@ -234,32 +266,10 @@ def delivery_norstore(process, project_name, source_path, task):
         raise RuntimeError("Failed to compute checksum for tar file for Norstore, "+
                 "md5deep returned an error")
 
-    # Generate username / password files
     try:
-        match = re.match("^([^-]+)-([^-]+)-\d\d\d\d-\d\d-\d\d$", project_name)
-        name = match.group(1)
-        proj_type = match.group(2)
-        username = name.lower() + "-" + proj_type.lower()
-        password = secure.get_norstore_password(process, project_name)
-        crypt_pw = crypt.crypt(password)
-        
-        htaccess = """\
-AuthUserFile /data/{project_dir}/.htpasswd
-AuthGroupFile /dev/null
-AuthName ByPassword
-AuthType Basic
-
-<Limit GET>
-require user {username}
-</Limit>
-        """.format(project_dir=project_dir, username=username)
-        open(save_path + "/.htaccess", "w").write(htaccess)
-
-        htpasswd = "{username}:{crypt_pw}\n".format(username=username, crypt_pw=crypt_pw)
-        open(save_path + "/.htpasswd", "w").write(htpasswd)
-    except Exception, e:
+        create_htaccess_files(process, project_name, project_dir, save_path) 
+    except Exception as e:
         task.warn("Password generation failed: " + str(e))
-    
 
 
 def main(task):
