@@ -2,7 +2,6 @@ import sys
 import os
 import re
 import operator
-from collections import defaultdict
 from jinja2 import Environment, FileSystemLoader
 try:
     from jinja2 import select_autoescape

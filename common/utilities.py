@@ -14,6 +14,7 @@ import re
 import requests
 import glob
 import locale # Not needed in 2.7, see display_int
+from collections import defaultdict
 from xml.etree import ElementTree
 
 from genologics.lims import *
