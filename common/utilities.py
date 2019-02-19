@@ -165,6 +165,40 @@ def get_num_reads(run_dir):
     return n_data, n_index
 
 
+# LimsInfo class can be used to get information about a project!
+# Used in 60_emails and 90_prepare_delivery, so moved here.
+class LimsInfo(object):
+    """Gets project information: contact person, etc., from UDFs in LIMS.
+    Also identifies previous sequencing runs, and counts the number of lanes
+    which are either PASSED, FAILED, or unknown."""
+    def __init__(self, lims_project, seq_process):
+        self.contact_person = lims_project.udf.get('Contact person')
+        self.contact_email = lims_project.udf.get('Contact email')
+        self.delivery_method = lims_project.udf.get('Delivery method')
+        self.total_number_of_lanes = lims_project.udf.get('Number of lanes')
+        completed_runs = lims_project.lims.get_processes(
+                type=(t[1] for t in nsc.SEQ_PROCESSES),
+                projectname=lims_project.name
+                )
+        completed_lanes_all = sum(
+                (run_process.all_inputs(unique=True)
+                for run_process in completed_runs),
+                []
+                )
+        completed_lanes = set(lane.stateless for lane in completed_lanes_all)
+        lims_project.lims.get_batch(completed_lanes)
+        lims_project.lims.get_batch(lane.samples[0] for lane in completed_lanes)
+        state_count = defaultdict(int)
+        this_run_lanes = set(seq_process.all_inputs())
+        for lane in completed_lanes:
+            if lane in this_run_lanes:
+                state = "THIS_RUN"
+            else:
+                state = lane.qc_flag
+            if lane.samples[0].project == lims_project:
+                state_count[state]+=1
+        self.status_map = state_count
+        self.sequencing_status = ", ".join(str(k) + ": " + str(v) for k, v in state_count.items())
 
 
 def get_udf(process, udf, default):

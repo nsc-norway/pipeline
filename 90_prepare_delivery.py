@@ -29,7 +29,7 @@ else:
     from common import secure_dummy as secure
 
 
-def delivery_16s(task, project, delivery_method, basecalls_dir, project_path):
+def delivery_16s(task, project, lims_project, delivery_method, basecalls_dir, project_path):
     """Special delivery method for demultiplexing internal 16S barcodes."""
 
     assert task.process is not None, "delivery_16s can only run with LIMS mode."
@@ -69,7 +69,11 @@ def delivery_16s(task, project, delivery_method, basecalls_dir, project_path):
     if delivery_method == "Norstore": 
         project_dir = os.path.basename(project_path).rstrip("/")
         create_htaccess_files(task.process, project.name, project_dir, lims_param_dir)
-
+    
+    seq_process = utilities.get_sequencing_process(task.process)
+    lims_info = utilities.LimsInfo(lims_project, seq_process)
+    #if lims_info.total_number_of_lanes == 1 + lims_info.status_map('COMPLETED', 0):
+        # All runs have been completed for this project
     subprocess.call(["/data/runScratch.boston/scripts/run-16s-pipeline.sh", project_path])
 
 
@@ -316,7 +320,7 @@ def main(task):
 
         if project_16s: # Only supported for LIMS mode...
             task.info("Running 16S delivery for " + project.name + "...")
-            delivery_16s(task, project, delivery_type, task.bc_dir, project_path)
+            delivery_16s(task, project, lims_project, delivery_type, task.bc_dir, project_path)
         elif project_type == "Diagnostics" or delivery_type == "Transfer to diagnostics":
             task.info("Copying " + project.name + " to diagnostics...")
             delivery_diag(task, project, task.bc_dir, project_path)
