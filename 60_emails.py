@@ -10,6 +10,12 @@ except ImportError:
 
 from common import nsc, stats, utilities, lane_info, samples, taskmgr
 
+if nsc.TAG == "prod":
+    from common import secure
+else:
+    sys.stderr.write("Using dummy security module\n")
+    from common import secure_dummy as secure
+
 TASK_NAME = "60. Emails"
 TASK_DESCRIPTION = """Produce delivery reports for emails."""
 TASK_ARGS = ['work_dir', 'sample_sheet', 'lanes']
@@ -26,8 +32,10 @@ def main(task):
     instrument = utilities.get_instrument_by_runid(run_id)
     
     qc_dir = os.path.join(task.bc_dir, "QualityControl" + task.suffix)
-    if not os.path.exists(qc_dir):
-        os.mkdir(qc_dir)
+    try:
+        os.makedirs(os.path.join(qc_dir, "Delivery", "email_content"))
+    except OSError:
+        pass
 
     try:
         lane_stats = lane_info.get_from_interop(task.work_dir, task.no_lane_splitting)
@@ -52,8 +60,6 @@ def main(task):
     samples.flag_empty_files(projects, work_dir)
 
     delivery_dir = os.path.join(qc_dir, "Delivery")
-    if not os.path.exists(delivery_dir):
-        os.mkdir(delivery_dir)
 
     for project in projects:
         if not project.is_undetermined:
@@ -70,14 +76,14 @@ def main(task):
     except RuntimeError:
         pass
 
-    fname_html = delivery_dir + "/Emails_for_" + run_id + ".html"
     template_dir = os.path.join(os.path.dirname(__file__), "template")
     if select_autoescape is None:
         jinja_env = Environment(loader=FileSystemLoader(template_dir))
     else:
         jinja_env = Environment(loader=FileSystemLoader(template_dir),
                 autoescape=select_autoescape(['html','xml']))
-    write_html_file(jinja_env, task.process, fname_html, run_id, projects, instrument.startswith('hiseq'),
+    write_html_and_email_files(jinja_env, task.process, task.bc_dir, delivery_dir, run_id, projects,
+            instrument.startswith('hiseq'),
             lane_stats, software_versions, patterned)
 
     task.success_finish()
@@ -213,11 +219,12 @@ class ProjectData(object):
     per pair of reads (if paired end sequencing).
     """
     def __init__(self, project, lims_project, seq_process):
+        self.project = project
         self.nsamples = len(project.samples)
         self.name = project.name
         self.file_fragments_table = []
         self.dir = project.proj_dir
-        diag_project= project.name.startswith("Diag-") or (
+        self.diag_project= project.name.startswith("Diag-") or (
                 lims_project and
                 lims_project.udf.get('Project type') == "Diagnostics"
                 )
@@ -239,7 +246,7 @@ class ProjectData(object):
 
         diag_sample_counter = 1
         for s,f in files:
-            if diag_project:
+            if self.diag_project:
                 if f.i_read == 1:
                     sample = "Sample {0}".format(diag_sample_counter)
                     diag_sample_counter += 1
@@ -256,6 +263,8 @@ class ProjectData(object):
                         )
         if lims_project:
             self.lims = utilities.LimsInfo(lims_project, seq_process)
+        else:
+            self.lims = None
 
 
 class RunParameters(object):
@@ -289,7 +298,16 @@ class RunParameters(object):
                 self.run_mode_value = p
 
 
-def write_html_file(jinja_env, process, output_path, runid, projects, print_lane_number,
+def get_data_size(bc_dir, project):
+    size = 0
+    for sample in project.samples:
+        for file in sample.files:
+            if not file.empty:
+                size += os.path.getsize(os.path.join(bc_dir, file.path))
+    return size
+
+
+def write_html_and_email_files(jinja_env, process, bc_dir, delivery_dir, run_id, projects, print_lane_number,
         lane_stats, software_versions, patterned):
     """Stats summary file for emails, etc."""
 
@@ -313,18 +331,95 @@ def write_html_file(jinja_env, process, output_path, runid, projects, print_lane
 
     lane_header, lane_data = get_lane_summary_data(projects, print_lane_number, lane_stats, patterned)
     if process:
-        run_parameters = RunParameters(runid, seq_process)
+        run_parameters = RunParameters(run_id, seq_process)
     else:
         run_parameters = None
 
-    with open(output_path, 'w') as out:
+    with open(delivery_dir + "/Emails_for_" + run_id + ".html", 'w') as out:
         doc_content = jinja_env.get_template('run_emails.html').render(
-                                run_id=runid, lane_data=lane_data, lane_header=lane_header,
+                                run_id=run_id, lane_data=lane_data, lane_header=lane_header,
                                 run_parameters=run_parameters, software_versions=software_versions,
                                 project_datas=project_datas
                                 )
         doc_bytes = doc_content.encode('utf-8') 
         out.write(doc_bytes)
+
+
+    # Summary file for email content
+    summary_file_path = delivery_dir + "/email_content/Summary_for_" + run_id + ".html"
+    with open(summary_file_path, 'w') as out:
+        doc_content = jinja_env.get_template('run_summary.html').render(
+                                lane_data=lane_data, lane_header=lane_header,
+                                run_parameters=run_parameters, software_versions=software_versions,
+                                project_datas=project_datas
+                                )
+        doc_bytes = doc_content.encode('utf-8') 
+        out.write(doc_bytes)
+
+    # Per-project file for email content
+    for project_data in project_datas:
+        with open(delivery_dir + "/email_content/" + project_data.name + ".txt", 'w') as out:
+            size = username = password = None
+            if project_data.lims is None or project_data.lims.delivery_method == "User HDD":
+                size = get_data_size(bc_dir, project_data.project) / 1024.0**2
+            elif project_data.lims.delivery_method == "Norstore":
+                match = re.match("^([^-]+)-([^-]+)-\d\d\d\d-\d\d-\d\d$", project_data.name)
+                name = match.group(1)
+                proj_type = match.group(2)
+                username = name.lower() + "-" + proj_type.lower()
+                password = secure.get_norstore_password(process, project_name)
+            doc_content = jinja_env.get_template('project_email.txt').render(project_data=project_data,
+                    username=username, password=password, size=size)
+            doc_bytes = doc_content.encode('utf-8') 
+            out.write(doc_bytes)
+
+    # List of emails to send
+    with open(delivery_dir + "/automatic_email_list.txt", 'w') as out:
+        for e in get_email_recipient_info(run_id, project_datas):
+            out.write("|".join(e) + "\n")
+
+    script_file = os.path.join(delivery_dir, "Open_emails.command")
+    if not os.path.exists(script_file):
+        os.link("/data/runScratch.boston/scripts/Open_emails.command", script_file)
+            
+
+def get_email_recipient_info(run_id, project_datas):
+    summary_recipients = set(('nsc-ous-data-delivery@sequencing.uio.no',))
+    emails = []
+    for project_data in project_datas:
+        if project_data.lims:
+            email_to = project_data.lims.contact_email
+        else:
+            email_to = ""
+        if project_data.diag_project:
+            email_to = ["diag-lab@medisin.uio.no,diag-bioinf@medisin.uio.no"]
+            summary_recipients.add('diag-lab@medisin.uio.no')
+            summary_recipients.add('diag-bioinf@medisin.uio.no')
+            if project.name.startswith("Diag-EKG"):
+                summary_recipients.add('EKG-HTS@medisin.uio.no')
+                email_to += ',EKG-HTS@medisin.uio.no'
+            elif project.name.startswith("Diag-EHG"):
+                summary_recipients.append('EHG-HTS@medisin.uio.no')
+                email_to += ',EHG-HTS@medisin.uio.no'
+        email_cc = ""
+        email_bcc = "nsc-ous-data-delivery@sequencing.uio.no"
+        email_subject = "Sequence ready for download - sequencing run {run_id} - {name} ({nsamples} samples)".format(
+                run_id = run_id,
+                name = project_data.name,
+                nsamples = project_data.nsamples
+                )
+        email_content_file = "email_content/{}.txt".format(project_data.name)
+        email_attachment = "../" + project_data.name + "/multiqc_report.html"
+        emails.append(("text", email_to, email_cc, email_bcc, email_subject, email_content_file, email_attachment))
+    
+    email_to = ",".join(summary_recipients)
+    email_cc = ""
+    email_bcc = ""
+    email_subject = "Summary for run {run_id}".format(run_id=run_id)
+    email_content_file = "email_content/Summary_for_{run_id}.html".format(run_id=run_id)
+    email_attachment = ""
+    emails.append(("html", email_to, email_cc, email_bcc, email_subject, email_content_file, email_attachment))
+    return emails
 
 
 def write_sample_info_table(output_path, runid, project):
@@ -360,6 +455,7 @@ def write_sample_info_table(output_path, runid, project):
                 else:
                     out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
                 out.write("fragments\r\n")
+
 
 
 if __name__ == "__main__":

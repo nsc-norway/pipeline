@@ -1,0 +1,116 @@
+<!doctype html>
+
+<html>
+<head>
+<title>Run {{ run_id }} summary</title>
+<meta charset="UTF-8">
+</head>
+
+<style>
+body {
+    margin-bottom: 30px;
+}
+
+table {
+    border-collapse: collapse;
+    margin: 5px;
+}
+table, th, td {
+    border: 1px solid black;
+}
+table.lims_info {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+td {
+    padding: 3px;
+}
+td.number {
+    text-align: center;
+}
+td.center {
+    text-align: center;
+}
+td.text {
+}
+</style>
+
+<body>
+<table>
+<tr>
+{% for cell in lane_header %}
+    <th>{{ cell }}</th>
+{% endfor %}
+</tr>
+{% for row in lane_data %}
+<tr>
+{% for cell in row %}
+    <td class="{{ cell[1] }}">{{ cell[0] }}</td>
+{% endfor %}
+</tr>
+{% endfor %}
+</table>
+
+{% if run_parameters %}
+<h3>Run parameters</h3>
+<table>
+    <tr>
+        <td>Instrument</td>
+        <td>{{ run_parameters.instrument_type }}</td>
+        <td>{{ run_parameters.instrument_id }} ({{ run_parameters.instrument_name }})</td>
+    </tr>
+    {% if run_parameters.run_mode_field %}
+    <tr>
+        <td>Parameter</td>
+        <td>{{ run_parameters.run_mode_field }}</td>
+        <td>{{ run_parameters.run_mode_value }}</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <td>Cycles</td>
+        <td>{{ run_parameters.cycles[0][0] }}</td>
+        <td>{{ run_parameters.cycles[0][1] }}</td>
+    </tr>
+    {% for cycles in run_parameters.cycles[1:] %}
+    <tr>
+        <td></td>
+        <td>{{ cycles[0] }}</td>
+        <td>{{ cycles[1] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<h4>Versions</h4>
+<table>
+{% for row in software_versions %}
+    <tr><td>{{ row[0] }}</td><td>{{ row[1] }}</td></tr>
+{% endfor %}
+</table>
+{% endif %}
+
+<h2>Projects</h2>
+{% for project_data in project_datas %}
+<h3>{{ project_data.name }}</h3>
+<p>Sequence ready for download - sequencing run {{ run_id }} - {{ project_data.name }} ({{ project_data.nsamples }} samples)</p>
+{% if project_data.lims %}
+<table class="lims_info">
+    <tr><td>Contact person</td><td>{{ project_data.lims.contact_person }}</td></tr>
+    <tr><td>Contact email</td><td>{{ project_data.lims.contact_email }}</td></tr>
+    <tr><td>Delivery method</td><td>{{ project_data.lims.delivery_method }}</td></tr>
+    <tr><td>Directory name</td><td>{{ project_data.dir }}</td></tr>
+    <tr><td>Total lanes requested</td><td>{{ project_data.lims.total_number_of_lanes }}</td></tr>
+    <tr><td>Sequenced lanes for project</td><td>{{ project_data.lims.sequencing_status }}</td></tr>
+</table>
+{% endif %}
+<table>
+{% for (file, frags, rel_frags) in project_data.file_fragments_table %}
+<tr>
+    <td>{{ file }}</td>
+    <td>{{ "{0:,}".format(frags) }} fragments</td>
+    <td>{{ "{0:+.01f}".format(rel_frags*100) }} %</td>
+</tr>
+{% endfor %}
+</table>
+{% endfor %}
+
+</body>
+</html>
