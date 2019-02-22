@@ -401,14 +401,14 @@ def get_email_recipient_info(run_id, project_datas):
         else:
             email_to = ""
         if project_data.diag_project:
-            email_to = ["diag-lab@medisin.uio.no,diag-bioinf@medisin.uio.no"]
+            email_to = "diag-lab@medisin.uio.no,diag-bioinf@medisin.uio.no"
             summary_recipients.add('diag-lab@medisin.uio.no')
             summary_recipients.add('diag-bioinf@medisin.uio.no')
             if project_data.name.startswith("Diag-EKG"):
                 summary_recipients.add('EKG-HTS@medisin.uio.no')
                 email_to += ',EKG-HTS@medisin.uio.no'
             elif project_data.name.startswith("Diag-EHG"):
-                summary_recipients.append('EHG-HTS@medisin.uio.no')
+                summary_recipients.add('EHG-HTS@medisin.uio.no')
                 email_to += ',EHG-HTS@medisin.uio.no'
         email_cc = ""
         email_bcc = "nsc-ous-data-delivery@sequencing.uio.no"
