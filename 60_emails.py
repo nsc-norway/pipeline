@@ -367,7 +367,7 @@ def write_html_and_email_files(jinja_env, process, bc_dir, delivery_dir, run_id,
                 name = match.group(1)
                 proj_type = match.group(2)
                 username = name.lower() + "-" + proj_type.lower()
-                password = secure.get_norstore_password(process, project_name)
+                password = secure.get_norstore_password(process, project.name)
             doc_content = jinja_env.get_template('project_email.txt').render(project_data=project_data,
                     username=username, password=password, size=size)
             doc_bytes = doc_content.encode('utf-8') 
