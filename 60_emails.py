@@ -376,8 +376,11 @@ def write_html_and_email_files(jinja_env, process, bc_dir, delivery_dir, run_id,
     # Make symlink to multiqc report
     for project_data in project_datas:
         link_placement = delivery_dir + "/email_content/{}_multiqc.html".format(project_data.dir)
-        if not os.path.exists(link_placement):
+        try:
             os.symlink("../../{}/multiqc_report.html".format(project_data.name), link_placement)
+        except OSError as e:
+            if e.errno == 17: pass # File exists
+            else: raise
 
     # List of emails to send
     with open(delivery_dir + "/automatic_email_list.txt", 'w') as out:
