@@ -2,6 +2,7 @@ import sys
 import os
 import re
 import operator
+import shutil
 from jinja2 import Environment, FileSystemLoader
 try:
     from jinja2 import select_autoescape
@@ -389,7 +390,12 @@ def write_html_and_email_files(jinja_env, process, bc_dir, delivery_dir, run_id,
 
     script_file = os.path.join(delivery_dir, "Open_emails.command")
     if not os.path.exists(script_file):
-        os.link("/data/runScratch.boston/scripts/Open_emails.command", script_file)
+        try:
+            os.link("/data/runScratch.boston/scripts/Open_emails.command", script_file)
+        except OSError as e:
+            if e.errno == 18: # Cross-device link
+                shutil.copyfile("/data/runScratch.boston/scripts/Open_emails.command", script_file)
+
             
 
 def get_email_recipient_info(run_id, project_datas):
