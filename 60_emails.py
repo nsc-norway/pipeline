@@ -418,7 +418,10 @@ def get_email_recipient_info(run_id, project_datas):
                 nsamples = project_data.nsamples
                 )
         email_content_file = "email_content/{}.txt".format(project_data.dir)
-        email_attachment = "email_content/" + project_data.dir + "_multiqc.html"
+        if project_data.diag_project:
+            email_attachment = ""
+        else:
+            email_attachment = "email_content/" + project_data.dir + "_multiqc.html"
         emails.append(("text", email_to, email_cc, email_bcc, email_subject, email_content_file, email_attachment))
     
     email_to = ",".join(summary_recipients)
