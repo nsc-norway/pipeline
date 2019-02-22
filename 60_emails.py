@@ -367,11 +367,16 @@ def write_html_and_email_files(jinja_env, process, bc_dir, delivery_dir, run_id,
                 name = match.group(1)
                 proj_type = match.group(2)
                 username = name.lower() + "-" + proj_type.lower()
-                password = secure.get_norstore_password(process, project.name)
+                password = secure.get_norstore_password(process, project_data.name)
             doc_content = jinja_env.get_template('project_email.txt').render(project_data=project_data,
                     username=username, password=password, size=size)
             doc_bytes = doc_content.encode('utf-8') 
             out.write(doc_bytes)
+
+    # Make symlink to multiqc report
+    for project_data in project_datas:
+        os.symlink("../{}/multiqc_report.html".format(project_data.name), 
+                delivery_dir + "/email_content/{}_multiqc.html".format(project_data.dir))
 
     # List of emails to send
     with open(delivery_dir + "/automatic_email_list.txt", 'w') as out:
@@ -409,7 +414,7 @@ def get_email_recipient_info(run_id, project_datas):
                 nsamples = project_data.nsamples
                 )
         email_content_file = "email_content/{}.txt".format(project_data.dir)
-        email_attachment = "../" + project_data.name + "/multiqc_report.html"
+        email_attachment = "email_content/" + project_data.dir + "_multiqc.html"
         emails.append(("text", email_to, email_cc, email_bcc, email_subject, email_content_file, email_attachment))
     
     email_to = ",".join(summary_recipients)
