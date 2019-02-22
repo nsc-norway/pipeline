@@ -358,7 +358,7 @@ def write_html_and_email_files(jinja_env, process, bc_dir, delivery_dir, run_id,
 
     # Per-project file for email content
     for project_data in project_datas:
-        with open(delivery_dir + "/email_content/" + project_data.name + ".txt", 'w') as out:
+        with open(delivery_dir + "/email_content/" + project_data.dir + ".txt", 'w') as out:
             size = username = password = None
             if project_data.lims is None or project_data.lims.delivery_method == "User HDD":
                 size = get_data_size(bc_dir, project_data.project) / 1024.0**2
@@ -408,7 +408,7 @@ def get_email_recipient_info(run_id, project_datas):
                 name = project_data.name,
                 nsamples = project_data.nsamples
                 )
-        email_content_file = "email_content/{}.txt".format(project_data.name)
+        email_content_file = "email_content/{}.txt".format(project_data.dir)
         email_attachment = "../" + project_data.name + "/multiqc_report.html"
         emails.append(("text", email_to, email_cc, email_bcc, email_subject, email_content_file, email_attachment))
     
