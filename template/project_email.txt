@@ -44,7 +44,7 @@ Data will be stored at our local storage facility for a period of 3 months from 
 Here is an overview of your data files and the number of fragments that were sequenced. Samples are identifiable through the file names: file name consists of sampleName_index_lane_read_digit.fastq.gz:
 
 {% for (file, frags, rel_frags) in project_data.file_fragments_table %}
-{{ "{:30}".format(file) }}{{ "\t{0:12,}".format(frags) }} fragments{% endfor %}
+{{ "{:35}".format(file) }}{{ "\t{0:12,}".format(frags) }} fragments{% endfor %}
 
 
 Use the following formula to compute the yield (in number of bases): number of reads x read length (note: for pair-end sequencing, there are two fastq files associated with one sample)
