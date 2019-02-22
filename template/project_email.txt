@@ -9,7 +9,7 @@ The quality control files show that the sequencing data passes our error rate an
 
 
 ------ Delivery method ------{% if project_data.lims.delivery_method == "NeLS" %}
-The data files have been transferred to the NeLS project "XXXX", in the directory YYYYY. Please wait for a confirmation from the Elixir help desk before you access the data.
+The data files have been transferred to your NeLS project, and stored in the directory {{ project_data.dir }}. Please wait for a confirmation from the Elixir help desk before you access the data.
 {% elif project_data.lims.delivery_method == "Norstore" %}
 You can download data and all quality control reports from NSC ftp site by applying the following information:
 
