@@ -375,7 +375,7 @@ def write_html_and_email_files(jinja_env, process, bc_dir, delivery_dir, run_id,
 
     # Make symlink to multiqc report
     for project_data in project_datas:
-        os.symlink("../{}/multiqc_report.html".format(project_data.name), 
+        os.symlink("../../{}/multiqc_report.html".format(project_data.name), 
                 delivery_dir + "/email_content/{}_multiqc.html".format(project_data.dir))
 
     # List of emails to send
