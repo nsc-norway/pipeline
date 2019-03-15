@@ -417,6 +417,8 @@ def get_email_recipient_info(run_id, project_datas):
             elif project_data.name.startswith("Diag-EHG"):
                 summary_recipients.add('EHG-HTS@medisin.uio.no')
                 email_to += ',EHG-HTS@medisin.uio.no'
+        elif project_data.name.startswith("TI-") or project_data.name.startswith("MIK-"):
+            summary_recipients.add(email_to)
         email_cc = ""
         email_bcc = "nsc-ous-data-delivery@sequencing.uio.no"
         email_subject = "Sequence ready for download - sequencing run {run_id} - {name} ({nsamples} samples)".format(
