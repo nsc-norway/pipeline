@@ -15,15 +15,12 @@ See SETUP.md for setup instructions. (currently out of date)
 
 ### Main scripts: the primary data processing / analysis tasks.
 The scripts are named with a number prefix followed by a name. They are run in
-the order of these numbers. The script lineup is frequently subject to change, so 
-no documentation of each script is given here. At the top of each script, there's
-a set of keywords about what it does, but for anything else you have to refer to
-the code itself.
-
-(note: `50_emails.py` script is not about sending emails)
+the order of these numbers. There is a short description of what the scripts
+do at the top of the files.
 
 ### LIMS integration, automation: scripts to manage LIMS processes / workflow.
-* `sequencing-to-demultiplexing.py` - A button to be added to the sequencing step, to add a run to demultiplexing.
+* `sequencing-to-demultiplexing-cron.py` - Script to open "Demultiplexing" step in LIMS
+  for all Sequencing steps located.
 * `lims-setup-step.py` - Called when entering the demultiplexing step, to set the source / destination folders and get the sample sheet from the cluster generation step.
 * `auto-next-script.py` - Automatic "button clicker" to continue calling next script when tasks complete. Runs in cron job.
 
