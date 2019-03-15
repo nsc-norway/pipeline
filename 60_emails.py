@@ -3,6 +3,7 @@ import os
 import re
 import operator
 import shutil
+from math import ceil
 from jinja2 import Environment, FileSystemLoader
 try:
     from jinja2 import select_autoescape
@@ -362,7 +363,7 @@ def write_html_and_email_files(jinja_env, process, bc_dir, delivery_dir, run_id,
         with open(delivery_dir + "/email_content/" + project_data.dir + ".txt", 'w') as out:
             size = username = password = None
             if project_data.lims is None or project_data.lims.delivery_method == "User HDD":
-                size = get_data_size(bc_dir, project_data.project) / 1024.0**2
+                size = ceil(get_data_size(bc_dir, project_data.project) / 1024.0**3) + 1
             elif project_data.lims.delivery_method == "Norstore":
                 match = re.match("^([^-]+)-([^-]+)-\d\d\d\d-\d\d-\d\d$", project_data.name)
                 name = match.group(1)
