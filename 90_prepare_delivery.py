@@ -64,6 +64,7 @@ def delivery_16s(task, project, lims_project, delivery_method, basecalls_dir, pr
         ps.append(["bcl2fastq", utilities.get_bcl2fastq2_version(task.process, task.work_dir)])
         ps.append(["RTA",       utilities.get_rta_version(task.work_dir)])
         ps.append(["DeliveryMethod",delivery_method])
+        ps.append(["ProjectName",project.name])
         f.write("\n".join(",".join(p) for p in ps) + "\n")
 
     if delivery_method == "Norstore": 
