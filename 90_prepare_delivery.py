@@ -62,10 +62,14 @@ def delivery_16s(task, project, lims_project, delivery_method, basecalls_dir, pr
             f.write("\t".join((sample_name, bc1, bc2)) + "\n")
 
     with open(sample_metadata_file, "w") as f:
-        f.write("\t".join(["sample-id", "nsc-prep-batch", "nsc-row", "nsc-column"]) + "\n")
+        f.write("\t".join(["sample-id", "nsc-sample-number", "nsc-prep-batch", "nsc-row", "nsc-column"]) + "\n")
         prep_batches = dict()
         for output in outputs:
-            sample_name = re.sub(r"^\d+-", "", output.name)
+            match = re.match(r"^(\d+)-(.*)$", output.name)
+            if match:
+                sample_number, sample_name = match.groups()
+            else:
+                sample_number, sample_name = "X", output.name
             process = task.process
             label = next(iter(output.reagent_labels))
             while process and not (process.type_name.startswith("16S") and 'Sample prep' in process.type_name):
@@ -92,7 +96,7 @@ def delivery_16s(task, project, lims_project, delivery_method, basecalls_dir, pr
                 batch, row, col = [str(i_batch)] + output.location[1].split(":")
             else:
                 batch, row, col = "NA", "", ""
-            f.write("\t".join([sample_name, batch, row, col]) + "\n")
+            f.write("\t".join([sample_name, sample_number, batch, row, col]) + "\n")
 
 
     with open(parameter_file, "w") as f:
