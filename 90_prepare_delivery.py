@@ -42,8 +42,10 @@ def delivery_16s(task, project, lims_project, delivery_method, basecalls_dir, pr
             pass
         else:
             raise e
-    sample_sheet_file, parameter_file = [os.path.join(lims_param_dir, filename)
-            for filename in ["16SSampleSheet.tsv", "params.csv"]]
+    sample_sheet_file, sample_metadata_file, parameter_file = [
+            os.path.join(lims_param_dir, filename)
+            for filename in ["16SSampleSheet.tsv", "sample-metadata.tsv", "params.csv"]
+            ]
 
     outputs = task.lims.get_batch(o['uri'] for i,o in task.process.input_output_maps
                                     if o['output-generation-type'] == "PerReagentLabel")
@@ -58,6 +60,40 @@ def delivery_16s(task, project, lims_project, delivery_method, basecalls_dir, pr
                 bc2 = ""
             sample_name = re.sub(r"^\d+-", "", output.name)
             f.write("\t".join((sample_name, bc1, bc2)) + "\n")
+
+    with open(sample_metadata_file, "w") as f:
+        f.write("\t".join(["sample-id", "nsc-prep-batch", "nsc-row", "nsc-column"]) + "\n")
+        prep_batches = dict()
+        for output in outputs:
+            sample_name = re.sub(r"^\d+-", "", output.name)
+            process = task.process
+            label = next(iter(output.reagent_labels))
+            while process and not (process.type_name.startswith("16S") and 'Sample prep' in process.type_name):
+                inputs = [i['uri'] for i, o in process.input_output_maps if o['uri'].id == output.id]
+                if len(inputs) == 1:
+                    input = inputs[0]
+                else:
+                    try:
+                        input = next(input for input in inputs if next(iter(input.reagent_labels)) == label)
+                    except StopIteration:
+                        task.warn("Unable to find ancestor artifact for {} at process {} (number of inputs: {})".format(
+                            sample_name, process.id, len(inputs)))
+                        process = None
+                        break
+                process = input.parent_process
+                output = input
+            if process:
+                container = output.location[0]
+                try:
+                    i_batch = prep_batches[container.id]
+                except KeyError:
+                    i_batch = len(prep_batches) + 1
+                    prep_batches[container.id] = i_batch
+                batch, row, col = [str(i_batch)] + output.location[1].split(":")
+            else:
+                batch, row, col = "NA", "", ""
+            f.write("\t".join([sample_name, batch, row, col]) + "\n")
+
 
     with open(parameter_file, "w") as f:
         ps  =    [["RunID",     task.run_id]]
