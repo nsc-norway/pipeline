@@ -176,6 +176,7 @@ class LimsInfo(object):
         self.contact_person = lims_project.udf.get('Contact person')
         self.contact_email = lims_project.udf.get('Contact email')
         self.delivery_method = lims_project.udf.get('Delivery method')
+        self.internal_bc_demultiplexing_16s = lims_project.udf.get(nsc.PROJECT_16S_UDF)
         self.total_number_of_lanes = lims_project.udf.get('Number of lanes')
         completed_runs = lims_project.lims.get_processes(
                 type=(t[1] for t in nsc.SEQ_PROCESSES),
