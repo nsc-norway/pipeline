@@ -392,11 +392,12 @@ def write_html_and_email_files(jinja_env, process, bc_dir, delivery_dir, run_id,
     script_file = os.path.join(delivery_dir, "Open_emails.command")
     if not os.path.exists(script_file):
         try:
-            os.link("/data/runScratch.boston/scripts/Open_emails.command", script_file)
+            os.link(nsc.OPEN_EMAILS_SCRIPT, script_file)
         except OSError as e:
             if e.errno == 18: # Cross-device link
-                shutil.copyfile("/data/runScratch.boston/scripts/Open_emails.command", script_file)
-
+                shutil.copyfile(nsc.OPEN_EMAILS_SCRIPT, script_file)
+            else:
+                pass # Missing script file is not an error
             
 
 def get_email_recipient_info(run_id, project_datas):

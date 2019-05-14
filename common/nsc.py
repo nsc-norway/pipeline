@@ -103,6 +103,8 @@ MULTIQC = "multiqc"
 # The -d option is required for bcl2fastq versions < 2.19
 BCL2FASTQ_USE_D_OPTION = False
 
+OPEN_EMAILS_SCRIPT = "/data/runScratch.boston/scripts/Open_emails.command"
+
 ### Site specific configuration ###
 
 if SITE and SITE.startswith("cees"):
