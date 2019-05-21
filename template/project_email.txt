@@ -24,7 +24,6 @@ You can pick up the data in a portable hard drive (please notice the size of the
 NOTE: UNKNOWN DELIVERY METHOD
 {% endif %}
 
-
 ------ Data output ------
 Here is an overview of your data files and the number of fragments that were sequenced:
 {% if project_data.lims.internal_bc_demultiplexing_16s %}
@@ -33,13 +32,11 @@ TABLE_PLACEHOLDER
 {{ "{:35}".format(file) }}{{ "\t{0:12,}".format(frags) }} fragments{% endfor %}
 {% endif %}
 
-
 ----- Bioinformatic analyses ----{% if project_data.lims.internal_bc_demultiplexing_16s %}
 We have analysed the data using our pipeline based on QIIME 2. The tar file in your delivery contains both the raw data, demultiplexed data and the QIIME 2 analysis results. Please see the attached report file for more information.
 {% else %}
 Data alignment/analysis can be ordered as a service. For further details: http://www.sequencing.uio.no/services/bioinformatics/
 {% endif %}
-
 
 If you have any questions, don't hesitate to get in touch. 
 
@@ -63,3 +60,4 @@ The Norwegian Sequencing Centre (NSC) operates as a core facility and you will t
 Data storage policy: https://www.sequencing.uio.no/services/data-delivery/#toc4
 Data security:  https://www.sequencing.uio.no/services/data-delivery/#toc3
 *********************************************************************************************************************
+
