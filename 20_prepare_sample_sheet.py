@@ -255,7 +255,7 @@ def filter_lanes(original_data, lanes):
             try:
                 if int(row[lane_col_index]) in lanes:
                     filtered.append(row)
-            except ValueError: 
+            except (IndexError, ValueError):
                 filtered.append(row)
     return "\r\n".join([",".join(cells) for cells in filtered]) + "\r\n"
 
