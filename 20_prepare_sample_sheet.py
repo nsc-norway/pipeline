@@ -123,6 +123,9 @@ def main(task):
         else:
             task.info("Not in LIMS mode, don't know if we should reverse index2, leaving it as on Sample Sheet.")
 
+    if task.lanes:
+        sample_sheet = filter_lanes(sample_sheet, task.lanes)
+
     # Post the result, as appropriate...
     if task.process:
         utilities.upload_file(
@@ -230,6 +233,32 @@ def convert_from_bcl2fastqv1(original_data):
             [",".join(cells) for cells in data]
             )
     
+
+def filter_lanes(original_data, lanes):
+    data = [l.strip("\r\n").split(",") for l in original_data.splitlines()]
+    filtered = []
+    lane_col_index = -1
+    data_section = False
+    for row in data:
+        if data_section:
+            for i, col_header in enumerate(row):
+                if col_header.lower() == "lane":
+                    lane_col_index = i
+            data_section = False
+            filtered.append(row)
+        elif lane_col_index == -1 and row[0].lower() == "[data]":
+            data_section = True
+            filtered.append(row)
+        elif lane_col_index == -1:
+            filtered.append(row)
+        else:
+            try:
+                if int(row[lane_col_index]) in lanes:
+                    filtered.append(row)
+            except ValueError: 
+                filtered.append(row)
+    return "\r\n".join([",".join(cells) for cells in filtered]) + "\r\n"
+
 
 if __name__ == "__main__":
     with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:
