@@ -1,0 +1,55 @@
+Dear ,
+
+Samples/Libraries submitted under Placeholder-gDNA10-2018-03-16 to NSC, Ullevål has been sequenced and are now ready for pick-up. You will therefore be billed for this service.
+
+
+------ Data collection ------
+You can pick up the data in a portable hard drive (please notice the size of the data  is approximately 2 GB).
+
+NOTE: UNKNOWN DELIVERY METHOD
+
+
+------ Data output ------
+Here is an overview of your data files and the number of fragments that were sequenced:
+
+1-RM8-0GR_S1_L001_R1_001.fastq.gz  	 147,693,866 fragments
+1-RM8-0GR_S1_L001_R2_001.fastq.gz  	 147,693,866 fragments
+2-3KM-5GL_S2_L001_R1_001.fastq.gz  	 141,626,210 fragments
+2-3KM-5GL_S2_L001_R2_001.fastq.gz  	 141,626,210 fragments
+3-GEU-MRS_S3_L001_R1_001.fastq.gz  	 132,861,390 fragments
+3-GEU-MRS_S3_L001_R2_001.fastq.gz  	 132,861,390 fragments
+1-RM8-0GR_S1_L002_R1_001.fastq.gz  	 146,864,717 fragments
+1-RM8-0GR_S1_L002_R2_001.fastq.gz  	 146,864,717 fragments
+2-3KM-5GL_S2_L002_R1_001.fastq.gz  	 140,723,055 fragments
+2-3KM-5GL_S2_L002_R2_001.fastq.gz  	 140,723,055 fragments
+3-GEU-MRS_S3_L002_R1_001.fastq.gz  	 131,580,049 fragments
+3-GEU-MRS_S3_L002_R2_001.fastq.gz  	 131,580,049 fragments
+
+
+----- Bioinformatic analyses ----
+Data alignment/analysis can be ordered as a service. For further details: http://www.sequencing.uio.no/services/bioinformatics/
+
+
+If you have any questions, don't hesitate to get in touch. 
+
+
+Regards
+Arvind Sundaram / Marius Bjørnstad
+
+Bioinformatician(s)
+Norwegian Sequencing Centre (https://www.sequencing.uio.no) / Part of NorSeq (https://www.norseq.org/)
+Oslo University Hospital, Ullevål, Oslo, Norway
+
+
+*********************************************************************************************************************
+Understanding the data: http://www.sequencing.uio.no/services/data-delivery/
+
+------- Acknowledgement -------
+The Norwegian Sequencing Centre (NSC) operates as a core facility and you will therefore not be billed for the labour costs incurred. However, you are requested to acknowledge the support you have received from the bodies funding the NSC. Please use the following text in articles or reports relating to this sequence data:
+"The sequencing service was provided by the Norwegian Sequencing Centre (www.sequencing.uio.no), a national technology platform hosted by the University of Oslo and supported by the "Functional Genomics" and "Infrastructure" programs of the Research Council of Norway and the Southeastern Regional Health Authorities".
+
+-----Terms, conditions and usage-----
+Data storage policy: https://www.sequencing.uio.no/services/data-delivery/#toc4
+Data security:  https://www.sequencing.uio.no/services/data-delivery/#toc3
+*********************************************************************************************************************
+

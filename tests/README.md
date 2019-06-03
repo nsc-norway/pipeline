@@ -176,3 +176,7 @@ json files can be generated using the script `tools/dump_projects_json.py`.
 Most files can be updated more directly, by copying the newly produced file into the
 location under files/.
 
+Set the environment variable DEBUG=true to produce a new set of outputs even if the
+test does not fail (e.g. in case new files are added, but existing files remain).
+
+

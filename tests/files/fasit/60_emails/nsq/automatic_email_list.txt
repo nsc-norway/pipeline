@@ -1,0 +1,2 @@
+text|||nsc-ous-data-delivery@sequencing.uio.no|Sequence ready for download - sequencing run 180502_NS500336_0001_AHTJFWBGX5 - Demo-RNA4-2018-04-10 (30 samples)|email_content/180502_NS500336.Project_Demo-RNA4-2018-04-10.txt|email_content/180502_NS500336.Project_Demo-RNA4-2018-04-10_multiqc.html
+html|nsc-ous-data-delivery@sequencing.uio.no|||Summary for run 180502_NS500336_0001_AHTJFWBGX5|email_content/Summary_for_180502_NS500336_0001_AHTJFWBGX5.html|
