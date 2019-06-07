@@ -186,11 +186,12 @@ def delivery_diag(task, project, basecalls_dir, project_path):
 
         for f in sample.files:
             source = os.path.join(source_qc_dir, samples.get_fastqc_dir(project, sample, f) + "/")
-            fqc_name = re.sub(r".fastq.gz$", "_fastqc/", f.filename)
-            dest = os.path.join(sample_dir, fqc_name)
-            if os.path.exists(dest):
-                shutil.rmtree(dest)
-            subprocess.check_call(rsync_args + [source, dest])
+            if os.path.exists(source):
+                fqc_name = re.sub(r".fastq.gz$", "_fastqc/", f.filename)
+                dest = os.path.join(sample_dir, fqc_name)
+                if os.path.exists(dest):
+                    shutil.rmtree(dest)
+                subprocess.check_call(rsync_args + [source, dest])
 
     # Get the demultiplex stats for diag. We generate a HTML file in the same 
     # format as that used by the first version of bcl2fastq.
