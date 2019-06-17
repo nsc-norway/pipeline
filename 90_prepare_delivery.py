@@ -258,10 +258,14 @@ def delivery_harddrive(project_name, source_path):
 def create_htaccess_files(process, project_name, project_dir, save_path):
     # Generate username / password files
     match = re.match("^([^-]+)-([^-]+)-\d\d\d\d-\d\d-\d\d$", project_name)
-    name = match.group(1)
-    proj_type = match.group(2)
-    username = name.lower() + "-" + proj_type.lower()
-    password = secure.get_norstore_password(process, project_name)
+    if match:
+        name = match.group(1)
+        proj_type = match.group(2)
+        username = name.lower() + "-" + proj_type.lower()
+        password = secure.get_norstore_password(process, project_name)
+    else:
+        username = "invalid"
+        password = "invalid"
     crypt_pw = crypt.crypt(password)
     
     htaccess = """\

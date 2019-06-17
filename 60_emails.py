@@ -366,10 +366,14 @@ def write_html_and_email_files(jinja_env, process, bc_dir, delivery_dir, run_id,
                 size = ceil(get_data_size(bc_dir, project_data.project) / 1024.0**3) + 1
             elif project_data.lims.delivery_method == "Norstore":
                 match = re.match("^([^-]+)-([^-]+)-\d\d\d\d-\d\d-\d\d$", project_data.name)
-                name = match.group(1)
-                proj_type = match.group(2)
-                username = name.lower() + "-" + proj_type.lower()
-                password = secure.get_norstore_password(process, project_data.name)
+                if match:
+                    name = match.group(1)
+                    proj_type = match.group(2)
+                    username = name.lower() + "-" + proj_type.lower()
+                    password = secure.get_norstore_password(process, project_data.name)
+                else:
+                    username = "invalid"
+                    password = "invalid"
             doc_content = jinja_env.get_template('project_email.txt').render(project_data=project_data,
                     username=username, password=password, size=size)
             doc_bytes = doc_content.encode('utf-8') 
