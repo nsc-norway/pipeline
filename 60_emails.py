@@ -391,7 +391,7 @@ def write_html_and_email_files(jinja_env, process, bc_dir, delivery_dir, run_id,
     # List of emails to send
     with open(delivery_dir + "/automatic_email_list.txt", 'w') as out:
         for e in get_email_recipient_info(run_id, project_datas):
-            out.write("|".join(e) + "\n")
+            out.write(("|".join(e) + "\n").encode('utf-8'))
 
     script_file = os.path.join(delivery_dir, "Open_emails.command")
     if not os.path.exists(script_file):
