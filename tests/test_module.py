@@ -331,6 +331,17 @@ class Test40MoveResults(TaskTestCase):
                         for file in sample['files']:
                             self.assertTrue(os.path.exists(os.path.join(local_tempdir,
                                 "Data", "Intensities", "BaseCalls", file['path'])))
+                            # Also require existence of index read file _I1_ and _I2_, even
+                            # though these are not in the json.
+                            # This particular test is set up to include index read FASTQ files, as if
+                            # bcl2fastq was given the option --create-fastq-for-index-reads.
+                            if file['i_read'] == 1:
+                                index_1_path = re.sub(r"R1_001.fastq.gz$", "I1_001.fastq.gz", file['path'])
+                                self.assertTrue(os.path.exists(os.path.join(local_tempdir,
+                                    "Data", "Intensities", "BaseCalls", index_1_path)))
+                                index_2_path = re.sub(r"R1_001.fastq.gz$", "I2_001.fastq.gz", file['path'])
+                                self.assertTrue(os.path.exists(os.path.join(local_tempdir,
+                                    "Data", "Intensities", "BaseCalls", index_2_path)))
         finally:
             shutil.rmtree(tempparent)
 
