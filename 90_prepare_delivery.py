@@ -331,17 +331,18 @@ def main(task):
 
     if task.process:
         inputs = task.process.all_inputs(unique=True, resolve=True)
-        samples = (sample for i in inputs for sample in i.samples)
+        l_samples = (sample for i in inputs for sample in i.samples)
         lims_projects = dict(
                 (utilities.get_sample_sheet_proj_name(sample.project.name), sample.project)
-                for sample in samples
+                for sample in l_samples
                 if sample.project
                 )
     else:
         lims_projects = {}
 
     runid = task.run_id
-    projects = (project for project in task.projects if not project.is_undetermined)
+    projects = list(project for project in task.projects if not project.is_undetermined)
+    samples.add_index_read_files(projects, task.work_dir)
 
     sensitive_fail = []
     for project in projects:

@@ -314,9 +314,11 @@ class Test40MoveResults(TaskTestCase):
         tempparent = tempfile.mkdtemp()
         local_tempdir = os.path.join(tempparent, RUN_ID)
         # Load projects from the json file, will use this to check that the files exist
+        # in the correct location after running the script
         with open("files/samples/indexed-merged.json") as jsonfile:
             projects = json.load(jsonfile)
         try:
+            # Prepare input directory
             shutil.copytree("files/runs/{}".format(RUN_ID), local_tempdir)
             shutil.copy(INPUT_SAMPLE_SHEET, os.path.join(local_tempdir,
                     "DemultiplexingSampleSheet.csv"))
@@ -329,6 +331,7 @@ class Test40MoveResults(TaskTestCase):
                 for project in projects:
                     for sample in project['samples']:
                         for file in sample['files']:
+                            # Check that file has been moved correctly
                             self.assertTrue(os.path.exists(os.path.join(local_tempdir,
                                 "Data", "Intensities", "BaseCalls", file['path'])))
                             # Also require existence of index read file _I1_ and _I2_, even
@@ -498,7 +501,8 @@ class Test70MultiQC(TaskTestCase):
 
 
 class Test80md5sum(TaskTestCase):
-    """MultiQC script is very simple. Make sure MultiQC tool would be called."""
+    """Check that md5sum was called on all fastq files. It does not currently check that
+    the md5sum file also contains the checksums of the QC reports in PDF format."""
 
     module = __import__("80_md5sum")
 
@@ -506,7 +510,7 @@ class Test80md5sum(TaskTestCase):
         with open("files/samples/hi4000.json") as jsonfile:
             projects = json.load(jsonfile)
         with self.qc_dir(self.H4RUN) as tempdir:
-            testargs = ["script", self.tempdir]
+            testargs = ["script", tempdir]
             with patch.object(sys, 'argv', testargs), patch('subprocess.call') as sub_call:
                 sub_call.return_value = 0
                 self.module.main(self.task)
@@ -534,10 +538,10 @@ class Test80md5sum(TaskTestCase):
 
 
     def test_md5_nsq(self):
-        with open("files/samples/nsqctest.json") as jsonfile:
+        with open("files/samples/nsqctest-indexfiles.json") as jsonfile:
             projects = json.load(jsonfile)
         with self.qc_dir(self.NSRUN) as tempdir:
-            testargs = ["script", self.tempdir]
+            testargs = ["script", tempdir]
             with patch.object(sys, 'argv', testargs), patch('subprocess.call') as sub_call:
                 sub_call.return_value = 0
                 self.module.main(self.task)
@@ -565,13 +569,13 @@ class Test90PrepareDelivery(TaskTestCase):
     module = __import__("90_prepare_delivery")
 
     def test_hdd_delivery_nsq(self):
-        self.hdd_delivery_check(self.NSRUN, "files/samples/nsqctest.json")
+        self.hdd_delivery_check(self.NSRUN, "files/samples/nsqctest-indexfiles.json")
 
     def test_hdd_delivery_h4k(self):
         self.hdd_delivery_check(self.H4RUN, "files/samples/hi4000.json")
 
     def test_tar_delivery_nsq(self):
-        self.tar_delivery_check(self.NSRUN, "files/samples/nsqctest.json",
+        self.tar_delivery_check(self.NSRUN, "files/samples/nsqctest-indexfiles.json",
                 "files/fasit/90_prepare_delivery/tar/nsq")
 
     def test_tar_delivery_h4k(self):
@@ -579,7 +583,7 @@ class Test90PrepareDelivery(TaskTestCase):
                 "files/fasit/90_prepare_delivery/tar/h4k")
 
     def test_diag_delivery_nsq(self):
-        self.diag_delivery_check(self.NSRUN, "files/samples/nsqctest.json",
+        self.diag_delivery_check(self.NSRUN, "files/samples/nsqctest-indexfiles.json",
                 "files/fasit/90_prepare_delivery/diag/nsq")
 
     def test_diag_delivery_h4k(self):

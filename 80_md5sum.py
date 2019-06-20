@@ -38,6 +38,7 @@ def main(task):
     n_threads = min(task.threads, 5)
     projects = task.projects
     samples.flag_empty_files(projects, task.work_dir)
+    samples.add_index_read_files(projects, task.work_dir)
     for project in projects:
         if not project.is_undetermined:
             pathses = [paths_for_project(run_id, project)]
