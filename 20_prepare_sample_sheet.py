@@ -102,7 +102,7 @@ def main(task):
                 data = sample_sheet
                 )
 
-    # Always replace special characters with ?
+    # Always replace special characters with ? and fix line breaks
     sample_sheet = replace_special_chars(sample_sheet)
 
     # Doctor the sample sheet, only if using HiSeq and it doesn't have [Data] header
@@ -143,7 +143,9 @@ def main(task):
 
 
 def replace_special_chars(sample_sheet_data):
-    return "".join(c if ord(c) < 128 else '?' for c in sample_sheet_data)
+    question_marks = "".join(c if ord(c) < 128 else '?' for c in sample_sheet_data)
+    normal_line_breaks = question_marks.replace("\r\r\n", "\n")
+    return normal_line_breaks
 
 
 def rev_comp(sequence):
