@@ -57,7 +57,9 @@ class FastqFile(object):
     lane is an integer representing the lane, or "X" for merged lanes
 
     i_read is the read ordinal, 1 or 2 (second read is only available for paired
-    end). Index reads are not considered.
+    end). Index reads are given STRING values I1 and I2. These are only 
+    considered if add_index_read_files is called, otherwise only data reads 1
+    and 2 are present.
 
     Path is the path to the fastq file relative to the "Unaligned"
     (bcl2fastq output) directory or Data/Intensities/BaseCalls.
@@ -261,6 +263,25 @@ def flag_empty_files(projects, run_dir):
             for f in s.files:
                 full_path = os.path.join(basecalls_dir, f.path)
                 f.empty = not os.path.exists(full_path)
+
+
+def add_index_read_files(projects, run_dir, force=False):
+    """Add files for Index read 1 and 2 to the projects data structure, if they
+    exist. The files are created if the option --create-fastq-for-index-reads
+    is give to bcl2fastq."""
+    basecalls_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
+    for p in projects:
+        for s in p.samples:
+            for f in s.files:
+                if f.i_read == 1:
+                    for i_index_read in [1,2]:
+                        index_read_path = re.sub(r"R1_001.fastq.gz$",
+                                "I{}_001.fastq.gz".format(i_index_read), f.path)
+                        full_path = os.path.join(basecalls_dir, index_read_path)
+                        if force or os.path.exists(full_path):
+                            s.files.append(FastqFile(f.lane, "I{}".format(i_index_read),
+                                os.path.basename(index_read_path), index_read_path,
+                                f.index_sequence, None))
 
 
 ################# SAMPLE SHEET ##################
