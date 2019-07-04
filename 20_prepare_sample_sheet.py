@@ -8,14 +8,13 @@
 #  * LIMS mode *
 #  - This script takes the sample sheet from the "Input sample sheet" ResultFile 
 #    object associated with the task's LIMS process. If there is no sample sheet, 
-#    it takes it from the cluster generation process. If
-#    no clustering process is found, it takes it from <run folder>/SampleSheet.csv
+#    it takes it from <run folder>/SampleSheet.csv
 #  - It stores the *input* sample sheet in the LIMS process if it was fetched from
 #    somewhere else, but this is not used further.
 #  - It adds the headers and copies it to the process in the LIMS, on the 
 #    "Demultiplexing sample sheet" ResultFile object. 
 #  - Other tasks always take the sample sheet from the LIMS process ("Demultiplexing
-#    sample sheet"), but the demultiplexing process also writes it to
+#    sample sheet"), not any local file. The demultiplexing process writes it to
 #    DemultiplexingSampleSheet.<process_id>.csv because bcl2fastq2 needs an on-disk copy.
 #
 #  * Command line mode *
@@ -33,8 +32,6 @@ import argparse
 import subprocess
 import datetime
 import re
-
-#from Bio.Seq import Seq
 
 from genologics.lims import *
 from common import nsc, utilities, taskmgr
