@@ -375,8 +375,14 @@ def main(task):
             delivery_external_user(task, lims_project, project_path, "/data/runScratch.boston/imm_data")
         elif project_type == "Microbiology":
             delivery_external_user(task, lims_project, project_path, "/data/runScratch.boston/mik_data")
-        elif delivery_type in ["User HDD", "New HDD", "NeLS project", "TSD project"]:
+        elif delivery_type in ["User HDD", "New HDD", "TSD project"]:
             task.info("Hard-linking " + project.name + " to delivery area...")
+            delivery_harddrive(project.name, project_path)
+        elif delivery_type == "NeLS project":
+            task.info("Hard-linking " + project.name + " to delivery area (NeLS)...")
+            if project_type != "Non-Sensitive":
+                sensitive_fail.append(project.name)
+                continue
             delivery_harddrive(project.name, project_path)
         elif delivery_type == "Norstore":
             if project_type != "Non-Sensitive":
@@ -388,7 +394,7 @@ def main(task):
             print "No delivery prep done for project", project.name
 
     if sensitive_fail:
-        task.fail("Selected Norstore delivery for sensitive data, nothing done for: " + ",".join(sensitive_fail))
+        task.fail("Selected Internet-based delivery for sensitive data, nothing done for: " + ",".join(sensitive_fail))
     task.success_finish()
 
 
