@@ -11,6 +11,7 @@ then
         rm -rf $DIR/Data/Intensities/BaseCalls/multiqc_*
         rm -rf $DIR/Data/Intensities/BaseCalls/Undetermined_*.fastq.gz
         rm -rf $DIR/Data/Intensities/BaseCalls/*.qc.pdf
+        rm -rf $DIR/DemultiplexLogs/[3456789]*.txt
         echo "Successfully deleted the outputs."
     else
         echo "Error: '$1' is not a directory."
