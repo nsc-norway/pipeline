@@ -122,7 +122,7 @@ if SITE and SITE.startswith("cees"):
 elif SITE == "ous":
     # Data processing/analysis programs
     #BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
-    BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.20.0/nscinstallbin/bin/bcl2fastq"
+    BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.18.0.12/nscinstallbin/bin/bcl2fastq"
     BCL2FASTQ_USE_D_OPTION = True
     FASTQC="/data/common/tools/nscbin/fastqc"
     FASTDUP="/data/common/tools/nscbin/fastdup"
