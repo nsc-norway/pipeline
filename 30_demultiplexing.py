@@ -74,11 +74,7 @@ def get_thread_args(n_threads):
     loading = max(4, int(ceil(n_threads*0.20)))
     writing = max(4, int(ceil(n_threads*0.20)))
     processing = int(ceil(n_threads * 1.0))     #  100 %
-    if nsc.BCL2FASTQ_USE_D_OPTION: # Option for older versions of bcl2fastq -- could be removed in the future
-        demultiplexing = int(ceil(n_threads * 0.7))     #  70 %
-        return ['-r', str(loading), '-p', str(processing), '-w', str(writing), '-d', str(demultiplexing)]
-    else:
-        return ['-r', str(loading), '-p', str(processing), '-w', str(writing)]
+    return ['-r', str(loading), '-p', str(processing), '-w', str(writing)]
 
 
 def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
