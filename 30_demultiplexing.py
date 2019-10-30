@@ -71,8 +71,8 @@ def get_thread_args(n_threads):
     # Computing number of threads: use something similar to the
     # standard allocation, but by default it considers the total
     # number of threads on the system.
-    loading = max(4, int(ceil(n_threads*0.20)))
-    writing = max(4, int(ceil(n_threads*0.20)))
+    loading = min(4, int(ceil(n_threads*0.20)))
+    writing = min(4, int(ceil(n_threads*0.20)))
     processing = int(ceil(n_threads * 1.0))     #  100 %
     return ['-r', str(loading), '-p', str(processing), '-w', str(writing)]
 
