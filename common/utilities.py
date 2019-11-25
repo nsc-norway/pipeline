@@ -235,6 +235,8 @@ def display_int(val):
     upgrading to Python 2.7"""
     if val is None:
         return "-"
+    elif sys.version_info >= (2,7):
+        return "{:,.0f}".format(val)
     else:
         return locale.format("%d", round(val), grouping=True)
 
