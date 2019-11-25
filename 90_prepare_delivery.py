@@ -176,13 +176,14 @@ def delivery_diag(task, project, basecalls_dir, project_path):
         if not os.path.exists(sample_dir):
             os.mkdir(sample_dir)
 
-        if task.instrument in ['hiseqx', 'hiseq4k']:
+        if task.instrument in ['hiseqx', 'hiseq4k', 'novaseq']:
             source = os.path.join(source_qc_dir, samples.get_fastdup_path(project, sample, sample.files[0]))
-            fdp_name = re.sub(r".fastq.gz$", "_fastdup.txt", sample.files[0].filename)
-            dest = os.path.join(sample_dir, fdp_name)
-            if os.path.exists(dest):
-                shutil.rmtree(dest)
-            subprocess.check_call(rsync_args + [source, dest])
+            if os.path.exists(source):
+                fdp_name = re.sub(r".fastq.gz$", "_fastdup.txt", sample.files[0].filename)
+                dest = os.path.join(sample_dir, fdp_name)
+                if os.path.exists(dest):
+                    shutil.rmtree(dest)
+                subprocess.check_call(rsync_args + [source, dest])
 
         for f in sample.files:
             source = os.path.join(source_qc_dir, samples.get_fastqc_dir(project, sample, f) + "/")
