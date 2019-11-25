@@ -11,7 +11,6 @@ import random
 import shutil
 import glob
 from contextlib import contextmanager
-import illuminate
 sys.path.append('..')
 
 from common import nsc
