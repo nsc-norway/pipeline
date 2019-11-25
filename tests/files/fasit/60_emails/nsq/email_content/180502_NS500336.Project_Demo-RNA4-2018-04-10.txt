@@ -1,0 +1,73 @@
+Dear ,
+
+Samples/Libraries submitted under Demo-RNA4-2018-04-10 to NSC, Ullevål has been sequenced and are now ready for pick-up. You will therefore be billed for this service.
+
+
+------ Data collection ------
+You can pick up the data in a portable hard drive (please notice the size of the data  is approximately 2 GB).
+
+NOTE: UNKNOWN DELIVERY METHOD
+
+
+------ Data output ------
+Here is an overview of your data files and the number of fragments that were sequenced:
+
+10-0V57-RW2-HO_S1_R1_001.fastq.gz  	  13,904,227 fragments
+18-I0SQ-1UY-HM_S2_R1_001.fastq.gz  	  14,031,219 fragments
+26-EHOT-DG5-XB_S3_R1_001.fastq.gz  	  13,051,346 fragments
+2-S576-5FS-V_S4_R1_001.fastq.gz    	  17,322,225 fragments
+11-C6GU-28B-2G_S5_R1_001.fastq.gz  	  14,447,203 fragments
+19-UZ60-U85-NW_S6_R1_001.fastq.gz  	  14,015,192 fragments
+27-5F3T-F33-QU_S7_R1_001.fastq.gz  	  15,559,193 fragments
+3-G6DZ-YY6-1_S8_R1_001.fastq.gz    	  16,228,845 fragments
+12-VOKD-EF7-4B_S9_R1_001.fastq.gz  	  16,878,111 fragments
+20-RKIR-LCQ-XZ_S10_R1_001.fastq.gz 	  13,159,306 fragments
+28-TMXC-UOH-PD_S11_R1_001.fastq.gz 	  14,601,762 fragments
+4-OGFA-XGC-Y_S12_R1_001.fastq.gz   	  15,913,444 fragments
+13-1JWP-NV1-YY_S13_R1_001.fastq.gz 	  15,109,521 fragments
+21-5H0X-5R5-OF_S14_R1_001.fastq.gz 	  15,271,562 fragments
+29-IKSB-E1J-MI_S15_R1_001.fastq.gz 	  17,502,425 fragments
+5-02AA-IVA-C_S16_R1_001.fastq.gz   	  14,745,176 fragments
+14-4HJZ-1XS-9A_S17_R1_001.fastq.gz 	  12,410,014 fragments
+22-GSBI-B0C-QK_S18_R1_001.fastq.gz 	  10,886,706 fragments
+30-XWPM-MQ8-YV_S19_R1_001.fastq.gz 	  10,922,360 fragments
+6-WEAP-4OX-4_S20_R1_001.fastq.gz   	  11,952,637 fragments
+15-QYNF-G5E-88_S21_R1_001.fastq.gz 	  12,322,569 fragments
+23-DN12-IIZ-6J_S22_R1_001.fastq.gz 	  10,004,906 fragments
+7-XEGN-3DZ-1_S23_R1_001.fastq.gz   	   9,759,217 fragments
+16-795G-SHL-02_S24_R1_001.fastq.gz 	  14,905,846 fragments
+24-GII9-WAZ-D7_S25_R1_001.fastq.gz 	  14,312,662 fragments
+8-XIUZ-QGC-9_S26_R1_001.fastq.gz   	  11,309,551 fragments
+17-08ID-R8Y-M0_S27_R1_001.fastq.gz 	  14,772,609 fragments
+25-PVV2-99O-0K_S28_R1_001.fastq.gz 	  12,600,113 fragments
+1-IP62-HHJ-R_S29_R1_001.fastq.gz   	  10,834,388 fragments
+9-TZFB-86B-0_S30_R1_001.fastq.gz   	  15,980,347 fragments
+
+
+----- Bioinformatic analyses ----
+Data alignment/analysis can be ordered as a service. For further details: http://www.sequencing.uio.no/services/bioinformatics/
+
+
+If you have any questions, don't hesitate to get in touch. 
+
+
+Regards
+Arvind Sundaram / Marius Bjørnstad
+
+Bioinformatician(s)
+Norwegian Sequencing Centre (https://www.sequencing.uio.no) / Part of NorSeq (https://www.norseq.org/)
+Oslo University Hospital, Ullevål, Oslo, Norway
+
+
+*********************************************************************************************************************
+Understanding the data: http://www.sequencing.uio.no/services/data-delivery/
+
+------- Acknowledgement -------
+The Norwegian Sequencing Centre (NSC) operates as a core facility and you will therefore not be billed for the labour costs incurred. However, you are requested to acknowledge the support you have received from the bodies funding the NSC. Please use the following text in articles or reports relating to this sequence data:
+"The sequencing service was provided by the Norwegian Sequencing Centre (www.sequencing.uio.no), a national technology platform hosted by the University of Oslo and supported by the "Functional Genomics" and "Infrastructure" programs of the Research Council of Norway and the Southeastern Regional Health Authorities".
+
+-----Terms, conditions and usage-----
+Data storage policy: https://www.sequencing.uio.no/services/data-delivery/#toc4
+Data security:  https://www.sequencing.uio.no/services/data-delivery/#toc3
+*********************************************************************************************************************
+

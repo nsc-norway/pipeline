@@ -3,6 +3,7 @@
 <html>
 <head>
 <title>Run {{ run_id }} summary</title>
+<meta charset="UTF-8">
 </head>
 
 <style>
@@ -79,6 +80,12 @@ td.text {
         <td>{{ cycles[1] }}</td>
     </tr>
     {% endfor %}
+</table>
+<h4>Versions</h4>
+<table>
+{% for row in software_versions %}
+    <tr><td>{{ row[0] }}</td><td>{{ row[1] }}</td></tr>
+{% endfor %}
 </table>
 {% endif %}
 

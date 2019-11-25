@@ -1,5 +1,5 @@
 #--------------------------------------#
-# Utilities for LIMS status tracking   #
+# Utility function                     #
 #--------------------------------------#
 
 # Various utility functions for managing workflow progress,
@@ -14,6 +14,7 @@ import re
 import requests
 import glob
 import locale # Not needed in 2.7, see display_int
+from collections import defaultdict
 from xml.etree import ElementTree
 
 from genologics.lims import *
@@ -63,11 +64,17 @@ def get_instrument_by_runid(run_id):
         return None
 
 
-def get_bcl2fastq2_version(work_dir):
-    """Check version in log file in standard location (for non-LIMS).
+def get_bcl2fastq2_version(process, work_dir):
+    """Attemts to get bcl2fastq version using LIMS, then by inspecting
+    the log file.
     
-    Less than bullet proof way to get bcl2fastq2 version."""
+    If nothing works, it will raise a RuntimeError."""
 
+    if process:
+        try:
+            return process.udf[nsc.BCL2FASTQ_VERSION_UDF]
+        except KeyError:
+            pass
     log_path_pattern = os.path.join(
             work_dir,
             nsc.RUN_LOG_DIR,
@@ -81,9 +88,20 @@ def get_bcl2fastq2_version(work_dir):
             l = next(log)
             if l.startswith("bcl2fastq v"):
                 return l.split(" ")[1].strip("\n")
-    else:
-        return None
-    
+    raise RuntimeError("Unable to determine bcl2fastq version.")
+
+
+def get_rta_version(run_dir):
+    try:
+        xmltree = ElementTree.parse(os.path.join(run_dir, 'RunParameters.xml'))
+    except IOError:
+        xmltree = ElementTree.parse(os.path.join(run_dir, 'runParameters.xml'))
+    run_parameters = xmltree.getroot()
+    rta_ver_element = run_parameters.find("RTAVersion")
+    if rta_ver_element == None:
+        rta_ver_element = run_parameters.find("Setup").find("RTAVersion")
+    return rta_ver_element.text 
+
 
 def get_fcid_by_runid(run_id):
     runid = get_instrument_by_runid(run_id)
@@ -94,29 +112,6 @@ def get_fcid_by_runid(run_id):
 
 def merged_lanes(run_id):
     return get_instrument_by_runid(run_id) == "nextseq"
-
-
-def get_index_sequence(artifact):
-    for label in artifact.reagent_labels:
-        # The structure of the reagent label XML isn't consistent with other lims
-        # objects: there is no parent tag that holds all other data. Let's do an
-        # ad hoc get request for now.
-        lims = artifact.lims
-        list_root = lims.get(lims.get_uri('reagenttypes'), params={'name': label})
-
-        # Gets a list of reagent types with that name
-        for rt in list_root.findall('reagent-type'):
-            # Gets the reagent type by ID
-            rt_root = lims.get(rt.attrib['uri'])
-
-            # Look for the index in the XML hierarchy
-            for special_type in rt_root.findall('special-type'):
-                if special_type.attrib['name'] == "Index":
-                    for attribute_tag in special_type.findall('attribute'):
-                        if attribute_tag.attrib['name'] == "Sequence":
-                            return attribute_tag.attrib['value']
-
-        return None
 
 
 def upload_file(process, name, path = None, data = None):
@@ -171,6 +166,41 @@ def get_num_reads(run_dir):
     return n_data, n_index
 
 
+# LimsInfo class can be used to get information about a project!
+# Used in 60_emails and 90_prepare_delivery, so moved here.
+class LimsInfo(object):
+    """Gets project information: contact person, etc., from UDFs in LIMS.
+    Also identifies previous sequencing runs, and counts the number of lanes
+    which are either PASSED, FAILED, or unknown."""
+    def __init__(self, lims_project, seq_process):
+        self.contact_person = lims_project.udf.get('Contact person')
+        self.contact_email = lims_project.udf.get('Contact email')
+        self.delivery_method = lims_project.udf.get('Delivery method')
+        self.internal_bc_demultiplexing_16s = lims_project.udf.get(nsc.PROJECT_16S_UDF)
+        self.total_number_of_lanes = lims_project.udf.get('Number of lanes')
+        completed_runs = lims_project.lims.get_processes(
+                type=(t[1] for t in nsc.SEQ_PROCESSES),
+                projectname=lims_project.name
+                )
+        completed_lanes_all = sum(
+                (run_process.all_inputs(unique=True)
+                for run_process in completed_runs),
+                []
+                )
+        completed_lanes = set(lane.stateless for lane in completed_lanes_all)
+        lims_project.lims.get_batch(completed_lanes)
+        lims_project.lims.get_batch(lane.samples[0] for lane in completed_lanes)
+        state_count = defaultdict(int)
+        this_run_lanes = set(seq_process.all_inputs())
+        for lane in completed_lanes:
+            if lane in this_run_lanes:
+                state = "THIS_RUN"
+            else:
+                state = lane.qc_flag
+            if lane.samples[0].project == lims_project:
+                state_count[state]+=1
+        self.status_map = state_count
+        self.sequencing_status = ", ".join(str(k) + ": " + str(v) for k, v in state_count.items())
 
 
 def get_udf(process, udf, default):
@@ -186,7 +216,6 @@ def strip_chars(string):
     """Strips special characters to prevent unexpected behaviour or security issues when 
     user input is used as file names, or similar."""
     return "".join(c for c in string if c.isalnum() or c in '-_.')
-
 
 
 # *** Compatibility support functions ***

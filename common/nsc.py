@@ -44,6 +44,7 @@ LANE_UNDETERMINED_UDF = "NSC % Undetermined Indices (PF)"
 # On Project
 DELIVERY_METHOD_UDF = "Delivery method"
 PROJECT_TYPE_UDF = "Project type"
+PROJECT_16S_UDF = "Internal barcode demultiplexing (16S)"
 # On Container << to be removed when moving overview page
 RECENTLY_COMPLETED_UDF = "Recently completed"
 PROCESSED_DATE_UDF = "Processing completed date"
@@ -62,11 +63,11 @@ FASTQ_OUTPUT = "{sample_name}"
 # Sequencing processes
 SEQ_PROCESSES=[
         ('hiseqx', 'Illumina Sequencing (HiSeq X) 1.0'),
-        ('hiseqx', 'AUTOMATED - Sequence'),
         ('hiseq4k', 'Illumina Sequencing (HiSeq 3000/4000) 1.0'),
         ('hiseq', 'Illumina Sequencing (Illumina SBS) 5.0'),
         ('nextseq', 'NextSeq Run (NextSeq) 1.0'),
-        ('miseq', 'MiSeq Run (MiSeq) 5.0')
+        ('miseq', 'MiSeq Run (MiSeq) 5.0'),
+        ('miseq', 'MiSeq Run (MiSeq v1.0)')
         ]
 
 DEMULTIPLEXING_QC_PROCESS = "Demultiplexing and QC NSC 2.0"
@@ -100,7 +101,8 @@ MULTIQC = "multiqc"
 
 ### Default configuration parameters ###
 # The -d option is required for bcl2fastq versions < 2.19
-BCL2FASTQ_USE_D_OPTION = False
+
+OPEN_EMAILS_SCRIPT = "/data/runScratch.boston/scripts/Open_emails.command"
 
 ### Site specific configuration ###
 
@@ -119,8 +121,7 @@ if SITE and SITE.startswith("cees"):
 elif SITE == "ous":
     # Data processing/analysis programs
     #BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
-    BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.18.0.12/nscinstallbin/bin/bcl2fastq"
-    BCL2FASTQ_USE_D_OPTION = True
+    BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.20.0/nscinstallbin/bin/bcl2fastq"
     FASTQC="/data/common/tools/nscbin/fastqc"
     FASTDUP="/data/common/tools/nscbin/fastdup"
     BASEURI="https://ous-lims.sequencing.uio.no"
@@ -131,7 +132,7 @@ elif SITE == "ous":
     # * Command line to run slurm *
 
     # sbatch commands for "scheduler mode". Sudo mode is not supported.
-    SBATCH_ARGLIST=["/usr/bin/sbatch", "--partition=prod"]
+    SBATCH_ARGLIST=["/usr/bin/sbatch", "--partition=prod", "--qos=prod"]
     
     # Args for jobs which mainly do I/O on the secondary storage, not processing
     # Set a higher than default priority to make sure they run in preference of 
@@ -183,6 +184,7 @@ elif SITE == "ous":
         DELIVERY_DIR="/data/runScratch.boston/test/delivery"# used by prepare-delivery after QC
         DIAGNOSTICS_DELIVERY = "/data/runScratch.boston/test/diag"
         TRIGGER_DIR="/data/runScratch.boston/scripts/dev/trigger"
+        LIMS_SERVER="dev-lims"
         
 else:
     PRIMARY_STORAGE = "/tmp"
@@ -203,6 +205,10 @@ def get_lims(server_id=None):
         if server_id == "ous-lims":
             url = "https://ous-lims.sequencing.uio.no"
             pw_file = "/data/runScratch.boston/scripts/etc/seq-user/apiuser-password.txt"
+
+        elif server_id == "dev-lims":
+            url = "https://dev-lims.sequencing.uio.no"
+            pw_file = "/data/runScratch.boston/scripts/etc/seq-user/dev-apiuser-password.txt"
 
         elif server_id == "cees-lims":
             url = "https://cees-lims.sequencing.uio.no"

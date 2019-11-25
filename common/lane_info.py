@@ -92,8 +92,8 @@ def get_from_interop(run_dir, merge_lanes=False):
 
     try:
         import illuminate
-    except ImportError:
-        raise NotSupportedException
+    except ImportError as e:
+        raise NotSupportedException("Could not import illuminate library", e)
 
     dataset = illuminate.InteropDataset(run_dir)
     df = dataset.TileMetrics().df
@@ -105,6 +105,9 @@ def get_from_interop(run_dir, merge_lanes=False):
     raw = means[means.code==100].value.values
     pf = means[means.code==101].value.values
     phix = means[means.code==300].value.values / 100.0
+
+    if phix.size == 0:
+        phix = [0] * len(raw)
 
     if merge_lanes:
         lanes = dict([("X", LaneStats(raw[0], pf[0], pf[0] / max(raw[0], 1), phix[0]))])

@@ -13,6 +13,7 @@ import crypt
 import time
 import subprocess
 import datetime
+import glob
 import demultiplex_stats
 from genologics.lims import *
 from common import nsc, utilities, taskmgr, remote, samples
@@ -24,8 +25,97 @@ TASK_ARGS = ['work_dir', 'sample_sheet', 'lanes']
 if nsc.TAG == "prod":
     from common import secure
 else:
-    print "Using dummy security module"
+    sys.stderr.write("Using dummy security module\n")
     from common import secure_dummy as secure
+
+
+def delivery_16s(task, project, lims_project, delivery_method, basecalls_dir, project_path):
+    """Special delivery method for demultiplexing internal 16S barcodes."""
+
+    assert task.process is not None, "delivery_16s can only run with LIMS mode."
+
+    lims_param_dir = os.path.join(project_path, "lims_parameters")
+    try:
+        os.mkdir(lims_param_dir)
+    except OSError as e:
+        if e.errno == 17:
+            pass
+        else:
+            raise e
+    sample_sheet_file, sample_metadata_file, parameter_file = [
+            os.path.join(lims_param_dir, filename)
+            for filename in ["16SSampleSheet.tsv", "sample-metadata.tsv", "params.csv"]
+            ]
+
+    outputs = task.lims.get_batch(o['uri'] for i,o in task.process.input_output_maps
+                                    if o['output-generation-type'] == "PerReagentLabel")
+    with open(sample_sheet_file, "w") as f:
+        for output in outputs:
+            reagent = next(iter(output.reagent_labels))
+            m = re.match(r"16S_... \((.*)-(.*)\)", reagent)
+            if m:
+                bc1, bc2 = m.groups((1,2))
+            else:
+                bc1 = ""
+                bc2 = ""
+            sample_name = re.sub(r"^\d+-", "", output.name)
+            f.write("\t".join((sample_name, bc1, bc2)) + "\n")
+
+    with open(sample_metadata_file, "w") as f:
+        f.write("\t".join(["sample-id", "nsc-sample-number", "nsc-prep-batch", "nsc-row", "nsc-column"]) + "\n")
+        prep_batches = dict()
+        for output in outputs:
+            match = re.match(r"^(\d+)-(.*)$", output.name)
+            if match:
+                sample_number, sample_name = match.groups()
+            else:
+                sample_number, sample_name = "X", output.name
+            process = task.process
+            label = next(iter(output.reagent_labels))
+            while process and not (process.type_name.startswith("16S") and 'Sample prep' in process.type_name):
+                inputs = [i['uri'] for i, o in process.input_output_maps if o['uri'].id == output.id]
+                if len(inputs) == 1:
+                    input = inputs[0]
+                else:
+                    try:
+                        input = next(input for input in inputs if next(iter(input.reagent_labels)) == label)
+                    except StopIteration:
+                        task.warn("Unable to find ancestor artifact for {} at process {} (number of inputs: {})".format(
+                            sample_name, process.id, len(inputs)))
+                        process = None
+                        break
+                process = input.parent_process
+                output = input
+            if process:
+                container = output.location[0]
+                try:
+                    i_batch = prep_batches[container.id]
+                except KeyError:
+                    i_batch = len(prep_batches) + 1
+                    prep_batches[container.id] = i_batch
+                batch, row, col = [str(i_batch)] + output.location[1].split(":")
+            else:
+                batch, row, col = "NA", "", ""
+            f.write("\t".join([sample_name, sample_number, batch, row, col]) + "\n")
+
+
+    with open(parameter_file, "w") as f:
+        ps  =    [["RunID",     task.run_id]]
+        ps.append(["bcl2fastq", utilities.get_bcl2fastq2_version(task.process, task.work_dir)])
+        ps.append(["RTA",       utilities.get_rta_version(task.work_dir)])
+        ps.append(["DeliveryMethod",delivery_method])
+        ps.append(["ProjectName",project.name])
+        f.write("\n".join(",".join(p) for p in ps) + "\n")
+
+    if delivery_method == "Norstore": 
+        project_dir = os.path.basename(project_path).rstrip("/")
+        create_htaccess_files(task.process, project.name, project_dir, lims_param_dir)
+    
+    seq_process = utilities.get_sequencing_process(task.process)
+    lims_info = utilities.LimsInfo(lims_project, seq_process)
+    #if lims_info.total_number_of_lanes == 1 + lims_info.status_map('COMPLETED', 0):
+        # All runs have been completed for this project
+    subprocess.call(["/data/runScratch.boston/scripts/run-16s-pipeline.sh", project_path])
 
 
 def delivery_diag(task, project, basecalls_dir, project_path):
@@ -59,6 +149,8 @@ def delivery_diag(task, project, basecalls_dir, project_path):
         try:
             os.mkdir(qc_dir)
         except OSError:
+            task.info("Waiting for directory {0} to appear on remote filesystem...".format(
+                os.path.basename(project_path)))
             time.sleep(30) # Try again after a delay. Seems to be a timing issue related to running on different nodes.
 
     # When moving to bcl2fastq2 diag. have to decide how they extract the QC metrics.
@@ -66,7 +158,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     # should only give the relevant lanes.
     for subdir in ["Stats" + task.suffix, "Reports" + task.suffix]:
         source = os.path.join(basecalls_dir, subdir)
-        subprocess.check_call(rsync_args + [source, dest_dir])
+        subprocess.call(rsync_args + [source, dest_dir])
 
     # Copy the QualityControl files
     copy_sav_files(task, dest_dir, ['--nodelist=vali'])
@@ -84,30 +176,29 @@ def delivery_diag(task, project, basecalls_dir, project_path):
         if not os.path.exists(sample_dir):
             os.mkdir(sample_dir)
 
-        if task.instrument in ['hiseqx', 'hiseq4k']:
+        if task.instrument in ['hiseqx', 'hiseq4k', 'novaseq']:
             source = os.path.join(source_qc_dir, samples.get_fastdup_path(project, sample, sample.files[0]))
-            fdp_name = re.sub(r".fastq.gz$", "_fastdup.txt", sample.files[0].filename)
-            dest = os.path.join(sample_dir, fdp_name)
-            if os.path.exists(dest):
-                shutil.rmtree(dest)
-            subprocess.check_call(rsync_args + [source, dest])
+            if os.path.exists(source):
+                fdp_name = re.sub(r".fastq.gz$", "_fastdup.txt", sample.files[0].filename)
+                dest = os.path.join(sample_dir, fdp_name)
+                if os.path.exists(dest):
+                    shutil.rmtree(dest)
+                subprocess.check_call(rsync_args + [source, dest])
 
         for f in sample.files:
             source = os.path.join(source_qc_dir, samples.get_fastqc_dir(project, sample, f) + "/")
-            fqc_name = re.sub(r".fastq.gz$", "_fastqc/", f.filename)
-            dest = os.path.join(sample_dir, fqc_name)
-            if os.path.exists(dest):
-                shutil.rmtree(dest)
-            subprocess.check_call(rsync_args + [source, dest])
+            if os.path.exists(source):
+                fqc_name = re.sub(r".fastq.gz$", "_fastqc/", f.filename)
+                dest = os.path.join(sample_dir, fqc_name)
+                if os.path.exists(dest):
+                    shutil.rmtree(dest)
+                subprocess.check_call(rsync_args + [source, dest])
 
     # Get the demultiplex stats for diag. We generate a HTML file in the same 
     # format as that used by the first version of bcl2fastq.
 
     fcid = utilities.get_fcid_by_runid(task.run_id)
-    if task.process:
-        bcl2fastq_version = utilities.get_udf(task.process, nsc.BCL2FASTQ_VERSION_UDF, None)
-    else:
-        bcl2fastq_version = utilities.get_bcl2fastq2_version(task.work_dir)
+    bcl2fastq_version = utilities.get_bcl2fastq2_version(task.process, task.work_dir)
     undetermined_project = next(p for p in task.projects if p.is_undetermined)
     demultiplex_stats_content = demultiplex_stats.demultiplex_stats(
             project, undetermined_project, task.work_dir, basecalls_dir, task.instrument,
@@ -122,19 +213,22 @@ def delivery_diag(task, project, basecalls_dir, project_path):
 def copy_sav_files(task, dest_dir, srun_user_args=[]):
     # Copy "SAV" files for advanced users
     if task.instrument == "nextseq":
-        SAV_INCLUDE_PATHS = [
+        sav_include_paths = [
             "RunInfo.xml",
             "RunParameters.xml",
             "InterOp",
             ]
     else:
-        SAV_INCLUDE_PATHS = [
+        sav_include_paths = [
             "RunInfo.xml",
             "runParameters.xml",
             "InterOp",
             ]
+    demultiplexing_sample_sheets = glob.glob(os.path.join(task.work_dir, "DemultiplexingSampleSheet*.csv"))
+    if demultiplexing_sample_sheets:
+        sav_include_paths.append(os.path.relpath(sorted(demultiplexing_sample_sheets)[-1], task.work_dir))
     rsync_cmd = [nsc.RSYNC, '-r']
-    rsync_cmd += SAV_INCLUDE_PATHS
+    rsync_cmd += sav_include_paths
     rsync_cmd += [os.path.join(dest_dir, task.run_id) + "/"]
     rcode = remote.run_command(rsync_cmd, task, "rsync_sav_files", time="01:00", storage_job=True,
             srun_user_args=srun_user_args, cwd=task.work_dir, comment=task.run_id)
@@ -160,6 +254,35 @@ def delivery_harddrive(project_name, source_path):
     #rcode = remote.run_command(args, task,  "delivery_hdd", "04:00:00", storage_job=True, logfile=log_path)
     #if rcode != 0:
     #    raise RuntimeError("Copying files to loki failed, rsync returned an error")
+
+
+def create_htaccess_files(process, project_name, project_dir, save_path):
+    # Generate username / password files
+    match = re.match("^([^-]+)-([^-]+)-\d\d\d\d-\d\d-\d\d$", project_name)
+    if match:
+        name = match.group(1)
+        proj_type = match.group(2)
+        username = name.lower() + "-" + proj_type.lower()
+        password = secure.get_norstore_password(process, project_name)
+    else:
+        username = "invalid"
+        password = "invalid"
+    crypt_pw = crypt.crypt(password)
+    
+    htaccess = """\
+AuthUserFile /data/{project_dir}/.htpasswd
+AuthGroupFile /dev/null
+AuthName ByPassword
+AuthType Basic
+
+<Limit GET>
+require user {username}
+</Limit>
+    """.format(project_dir=project_dir, username=username)
+    open(save_path + "/.htaccess", "w").write(htaccess)
+
+    htpasswd = "{username}:{crypt_pw}\n".format(username=username, crypt_pw=crypt_pw)
+    open(save_path + "/.htpasswd", "w").write(htpasswd)
 
 
 def delivery_norstore(process, project_name, source_path, task):
@@ -194,51 +317,33 @@ def delivery_norstore(process, project_name, source_path, task):
         raise RuntimeError("Failed to compute checksum for tar file for Norstore, "+
                 "md5deep returned an error")
 
-    # Generate username / password files
     try:
-        match = re.match("^([^-]+)-([^-]+)-\d\d\d\d-\d\d-\d\d$", project_name)
-        name = match.group(1)
-        proj_type = match.group(2)
-        username = name.lower() + "-" + proj_type.lower()
-        password = secure.get_norstore_password(process, project_name)
-        crypt_pw = crypt.crypt(password)
-        
-        htaccess = """\
-AuthUserFile /data/{project_dir}/.htpasswd
-AuthGroupFile /dev/null
-AuthName ByPassword
-AuthType Basic
-
-<Limit GET>
-require user {username}
-</Limit>
-        """.format(project_dir=project_dir, username=username)
-        open(save_path + "/.htaccess", "w").write(htaccess)
-
-        htpasswd = "{username}:{crypt_pw}\n".format(username=username, crypt_pw=crypt_pw)
-        open(save_path + "/.htpasswd", "w").write(htpasswd)
-    except Exception, e:
+        create_htaccess_files(process, project_name, project_dir, save_path) 
+    except Exception as e:
         task.warn("Password generation failed: " + str(e))
-    
 
 
 def main(task):
     task.running()
 
     lims_projects = {}
+    if not os.path.isdir(nsc.DELIVERY_DIR):
+        task.fail("Delivery directory {0} does not exist.".format(nsc.DELIVERY_DIR))
+
     if task.process:
         inputs = task.process.all_inputs(unique=True, resolve=True)
-        samples = (sample for i in inputs for sample in i.samples)
+        l_samples = (sample for i in inputs for sample in i.samples)
         lims_projects = dict(
                 (utilities.get_sample_sheet_proj_name(sample.project.name), sample.project)
-                for sample in samples
+                for sample in l_samples
                 if sample.project
                 )
     else:
         lims_projects = {}
 
     runid = task.run_id
-    projects = (project for project in task.projects if not project.is_undetermined)
+    projects = list(project for project in task.projects if not project.is_undetermined)
+    samples.add_index_read_files(projects, task.work_dir)
 
     sensitive_fail = []
     for project in projects:
@@ -248,6 +353,7 @@ def main(task):
         if lims_project:
             delivery_type = lims_project.udf[nsc.DELIVERY_METHOD_UDF]
             project_type = lims_project.udf[nsc.PROJECT_TYPE_UDF]
+            project_16s = lims_project.udf.get(nsc.PROJECT_16S_UDF)
         elif not task.process:
             delivery_type = nsc.DEFAULT_DELIVERY_MODE
             if delivery_type is None:
@@ -255,19 +361,29 @@ def main(task):
             project_type = "Non-Sensitive"
             if project.name.startswith("Diag-"):
                 project_type = "Diagnostics"
+            project_16s = False
         else:
             task.warn("Project " + project.name + " is missing delivery information!")
             continue
 
-        if project_type == "Diagnostics":
+        if project_16s: # Only supported for LIMS mode...
+            task.info("Running 16S delivery for " + project.name + "...")
+            delivery_16s(task, project, lims_project, delivery_type, task.bc_dir, project_path)
+        elif project_type == "Diagnostics" or delivery_type == "Transfer to diagnostics":
             task.info("Copying " + project.name + " to diagnostics...")
             delivery_diag(task, project, task.bc_dir, project_path)
         elif project_type == "Immunology":
             delivery_external_user(task, lims_project, project_path, "/data/runScratch.boston/imm_data")
         elif project_type == "Microbiology":
             delivery_external_user(task, lims_project, project_path, "/data/runScratch.boston/mik_data")
-        elif delivery_type in ["User HDD", "New HDD", "NeLS project", "TSD project"]:
+        elif delivery_type in ["User HDD", "New HDD", "TSD project"]:
             task.info("Hard-linking " + project.name + " to delivery area...")
+            delivery_harddrive(project.name, project_path)
+        elif delivery_type == "NeLS project":
+            task.info("Hard-linking " + project.name + " to delivery area (NeLS)...")
+            if project_type != "Non-Sensitive":
+                sensitive_fail.append(project.name)
+                continue
             delivery_harddrive(project.name, project_path)
         elif delivery_type == "Norstore":
             if project_type != "Non-Sensitive":
@@ -279,7 +395,7 @@ def main(task):
             print "No delivery prep done for project", project.name
 
     if sensitive_fail:
-        task.fail("Selected Norstore delivery for sensitive data, nothing done for: " + ",".join(sensitive_fail))
+        task.fail("Selected Internet-based delivery for sensitive data, nothing done for: " + ",".join(sensitive_fail))
     task.success_finish()
 
 

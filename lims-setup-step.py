@@ -55,8 +55,7 @@ else:
                 "No lane splitting",
                 "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
                 "Auto 40. Move fastq files", "Auto 50-80. QC",
-                "Auto 90. Delivery and triggers", "Auto 95. Copy run again (NextSeq)",
-                "Close when finished"
+                "Auto 90. Delivery and triggers", "Close when finished"
                 ],
             "hiseqx": [
                 "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
@@ -74,7 +73,7 @@ else:
             "hiseqx": 64,
             "hiseq4k": 64,
             "miseq": 16,
-            "nextseq": 16
+            "nextseq": 64
             }
 
 

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<RunParameters xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Setup>
+    <ExperimentName>2018-05-04-X</ExperimentName>
+    <FCPosition>B</FCPosition>
+    <Read1>151</Read1>
+    <IndexRead1>8</IndexRead1>
+    <IndexRead2>8</IndexRead2>
+    <Read2>151</Read2>
+    <OutputFolder>Z:\</OutputFolder>
+    <ApplicationName>HiSeq Control Software</ApplicationName>
+    <ApplicationVersion>HD 3.5.0.7</ApplicationVersion>
+    <FPGAVersion>10.37.13</FPGAVersion>
+    <CPLDVersion>3.0.0</CPLDVersion>
+    <RTAVersion>2.7.7</RTAVersion>
+    <BaseSpaceBrokerVersion>2.9.2.15</BaseSpaceBrokerVersion>
+    <ChemistryVersion>Illumina,Bruno Fluidics Controller,0,v2.0420</ChemistryVersion>
+    <CameraFirmware>2.22-E02-R05</CameraFirmware>
+    <CameraDriver>7.5.180.4395</CameraDriver>
+    <FtdiDriver>2.12.0.0</FtdiDriver>
+  </Setup>
+  <RunID>180502_E00401_0001_BQCTEST</RunID>
+  <Version>1</Version>
+</RunParameters>

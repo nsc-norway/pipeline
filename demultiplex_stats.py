@@ -181,7 +181,7 @@ def interactive(task):
     instrument = utilities.get_instrument_by_runid(task.run_id)
     fcid = utilities.get_fcid_by_runid(task.run_id)
 
-    bcl2fastq_version = utilities.get_bcl2fastq2_version(task.work_dir)
+    bcl2fastq_version = utilities.get_bcl2fastq2_version(process, task.work_dir)
 
     project = next(project for project in projects if not project.is_undetermined and project.name.startswith(task.args.PROJECT))
     undetermined_project = next(

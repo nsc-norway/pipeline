@@ -2,7 +2,8 @@ import sys
 import os
 import re
 import operator
-from collections import defaultdict
+import shutil
+from math import ceil
 from jinja2 import Environment, FileSystemLoader
 try:
     from jinja2 import select_autoescape
@@ -10,6 +11,12 @@ except ImportError:
     select_autoescape = None
 
 from common import nsc, stats, utilities, lane_info, samples, taskmgr
+
+if nsc.TAG == "prod":
+    from common import secure
+else:
+    sys.stderr.write("Using dummy security module\n")
+    from common import secure_dummy as secure
 
 TASK_NAME = "60. Emails"
 TASK_DESCRIPTION = """Produce delivery reports for emails."""
@@ -26,18 +33,22 @@ def main(task):
     work_dir = task.work_dir
     instrument = utilities.get_instrument_by_runid(run_id)
     
+    qc_dir = os.path.join(task.bc_dir, "QualityControl" + task.suffix)
+    try:
+        os.makedirs(os.path.join(qc_dir, "Delivery", "email_content"))
+    except OSError:
+        pass
+
     try:
         lane_stats = lane_info.get_from_interop(task.work_dir, task.no_lane_splitting)
-    except: # lane_info.NotSupportedException:
+    except lane_info.NotSupportedException:
         expand_lanes = instrument == "nextseq" and not task.no_lane_splitting
 
         if task.process: # lims mode
             lane_stats = lane_info.get_from_lims(task.process, instrument, expand_lanes)
         else:
             lane_stats = lane_info.get_from_files(work_dir, instrument, expand_lanes)
-
     projects = task.projects
-
     run_stats = stats.get_stats(
             instrument,
             work_dir,
@@ -47,37 +58,37 @@ def main(task):
             )
     samples.add_stats(projects, run_stats)
     if task.instrument in ["hiseq4k", "hiseqx"]:
-        qc_dir = os.path.join(task.bc_dir, "QualityControl" + task.suffix)
         stats.add_duplication_results(qc_dir, projects)
     samples.flag_empty_files(projects, work_dir)
 
-    qc_dir = os.path.join(work_dir, "Data", "Intensities", "BaseCalls", "QualityControl" + task.suffix)
-    make_reports(instrument, qc_dir, run_id, projects, lane_stats, task.lims, task.process)
-
-    task.success_finish()
-
-
-def make_reports(instrument_type, qc_dir, run_id, projects, lane_stats, lims, process):
-    if not os.path.exists(qc_dir):
-        os.mkdir(qc_dir)
     delivery_dir = os.path.join(qc_dir, "Delivery")
-    if not os.path.exists(delivery_dir):
-        os.mkdir(delivery_dir)
 
     for project in projects:
         if not project.is_undetermined:
             fname = delivery_dir + "/Email_for_" + project.name + ".xls"
             write_sample_info_table(fname, run_id, project)
 
-    patterned = instrument_type in ["hiseqx", "hiseq4k"]
-    fname_html = delivery_dir + "/Emails_for_" + run_id + ".html"
+    patterned = instrument in ["hiseqx", "hiseq4k"]
+    software_versions = [
+            ("RTA", utilities.get_rta_version(work_dir))
+            ]
+    try:
+        bcl2fastq_version = utilities.get_bcl2fastq2_version(task.process, work_dir)
+        software_versions.append(("bcl2fastq", bcl2fastq_version))
+    except RuntimeError:
+        pass
+
     template_dir = os.path.join(os.path.dirname(__file__), "template")
     if select_autoescape is None:
         jinja_env = Environment(loader=FileSystemLoader(template_dir))
     else:
-        jinja_env = Environment(loader=FileSystemLoader(template_dir), autoescape=select_autoescape(['html','xml']))
-    write_html_file(jinja_env, process, fname_html, run_id, projects, instrument_type.startswith('hiseq'),
-            lane_stats, patterned)
+        jinja_env = Environment(loader=FileSystemLoader(template_dir),
+                autoescape=select_autoescape(['html','xml']))
+    write_html_and_email_files(jinja_env, task.process, task.bc_dir, delivery_dir, run_id, projects,
+            instrument.startswith('hiseq'),
+            lane_stats, software_versions, patterned)
+
+    task.success_finish()
 
 
 def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned):
@@ -210,11 +221,12 @@ class ProjectData(object):
     per pair of reads (if paired end sequencing).
     """
     def __init__(self, project, lims_project, seq_process):
+        self.project = project
         self.nsamples = len(project.samples)
         self.name = project.name
         self.file_fragments_table = []
         self.dir = project.proj_dir
-        diag_project= project.name.startswith("Diag-") or (
+        self.diag_project= project.name.startswith("Diag-") or (
                 lims_project and
                 lims_project.udf.get('Project type') == "Diagnostics"
                 )
@@ -236,7 +248,7 @@ class ProjectData(object):
 
         diag_sample_counter = 1
         for s,f in files:
-            if diag_project:
+            if self.diag_project:
                 if f.i_read == 1:
                     sample = "Sample {0}".format(diag_sample_counter)
                     diag_sample_counter += 1
@@ -252,7 +264,9 @@ class ProjectData(object):
                             (f.stats['# Reads PF'] - mean_frags[f.lane]) * 1.0 / mean_frags[f.lane])
                         )
         if lims_project:
-            self.lims = LimsInfo(lims_project, seq_process)
+            self.lims = utilities.LimsInfo(lims_project, seq_process)
+        else:
+            self.lims = None
 
 
 class RunParameters(object):
@@ -286,40 +300,17 @@ class RunParameters(object):
                 self.run_mode_value = p
 
 
-class LimsInfo(object):
-    """Gets project information: contact person, etc., from UDFs in LIMS.
-    Also identifies previous sequencing runs, and counts the number of lanes
-    which are either PASSED, FAILED, or unknown."""
-    def __init__(self, lims_project, seq_process):
-        self.contact_person = lims_project.udf.get('Contact person')
-        self.contact_email = lims_project.udf.get('Contact email')
-        self.delivery_method = lims_project.udf.get('Delivery method')
-        self.total_number_of_lanes = lims_project.udf.get('Number of lanes')
-        completed_runs = lims_project.lims.get_processes(
-                type=(t[1] for t in nsc.SEQ_PROCESSES),
-                projectname=lims_project.name
-                )
-        completed_lanes_all = sum(
-                (run_process.all_inputs(unique=True)
-                for run_process in completed_runs),
-                []
-                )
-        completed_lanes = set(lane.stateless for lane in completed_lanes_all)
-        lims_project.lims.get_batch(completed_lanes)
-        lims_project.lims.get_batch(lane.samples[0] for lane in completed_lanes)
-        state_count = defaultdict(int)
-        this_run_lanes = set(seq_process.all_inputs())
-        for lane in completed_lanes:
-            if lane in this_run_lanes:
-                state = "THIS_RUN"
-            else:
-                state = lane.qc_flag
-            if lane.samples[0].project == lims_project:
-                state_count[state]+=1
-        self.sequencing_status = ", ".join(str(k) + ": " + str(v) for k, v in state_count.items())
+def get_data_size(bc_dir, project):
+    size = 0
+    for sample in project.samples:
+        for file in sample.files:
+            if not file.empty:
+                size += os.path.getsize(os.path.join(bc_dir, file.path))
+    return size
 
 
-def write_html_file(jinja_env, process, output_path, runid, projects, print_lane_number, lane_stats, patterned):
+def write_html_and_email_files(jinja_env, process, bc_dir, delivery_dir, run_id, projects, print_lane_number,
+        lane_stats, software_versions, patterned):
     """Stats summary file for emails, etc."""
 
     project_datas = []
@@ -342,16 +333,120 @@ def write_html_file(jinja_env, process, output_path, runid, projects, print_lane
 
     lane_header, lane_data = get_lane_summary_data(projects, print_lane_number, lane_stats, patterned)
     if process:
-        run_parameters = RunParameters(runid, seq_process)
+        run_parameters = RunParameters(run_id, seq_process)
     else:
         run_parameters = None
 
-    with open(output_path, 'w') as out:
-        out.write(jinja_env.get_template('run_emails.html').render(
-            run_id=runid, lane_data=lane_data, lane_header=lane_header,
-            run_parameters=run_parameters,
-            project_datas=project_datas
-            ).encode('utf-8'))
+    with open(delivery_dir + "/Emails_for_" + run_id + ".html", 'w') as out:
+        doc_content = jinja_env.get_template('run_emails.html').render(
+                                run_id=run_id, lane_data=lane_data, lane_header=lane_header,
+                                run_parameters=run_parameters, software_versions=software_versions,
+                                project_datas=project_datas
+                                )
+        doc_bytes = doc_content.encode('utf-8') 
+        out.write(doc_bytes)
+
+
+    # Summary file for email content
+    summary_file_path = delivery_dir + "/email_content/Summary_for_" + run_id + ".html"
+    with open(summary_file_path, 'w') as out:
+        doc_content = jinja_env.get_template('run_summary.html').render(
+                                lane_data=lane_data, lane_header=lane_header,
+                                run_parameters=run_parameters, software_versions=software_versions,
+                                project_datas=project_datas
+                                )
+        doc_bytes = doc_content.encode('utf-8') 
+        out.write(doc_bytes)
+
+    # Per-project file for email content
+    for project_data in project_datas:
+        with open(delivery_dir + "/email_content/" + project_data.dir + ".txt", 'w') as out:
+            size = username = password = None
+            if project_data.lims is None or project_data.lims.delivery_method == "User HDD":
+                size = ceil(get_data_size(bc_dir, project_data.project) / 1024.0**3) + 1
+            elif project_data.lims.delivery_method == "Norstore":
+                match = re.match("^([^-]+)-([^-]+)-\d\d\d\d-\d\d-\d\d$", project_data.name)
+                if match:
+                    name = match.group(1)
+                    proj_type = match.group(2)
+                    username = name.lower() + "-" + proj_type.lower()
+                    password = secure.get_norstore_password(process, project_data.name)
+                else:
+                    username = "invalid"
+                    password = "invalid"
+            doc_content = jinja_env.get_template('project_email.txt').render(project_data=project_data,
+                    username=username, password=password, size=size)
+            doc_bytes = doc_content.encode('utf-8') 
+            out.write(doc_bytes)
+
+    # Make symlink to multiqc report
+    for project_data in project_datas:
+        link_placement = delivery_dir + "/email_content/{}_multiqc.html".format(project_data.dir)
+        try:
+            os.symlink("../../{}/multiqc_report.html".format(project_data.name), link_placement)
+        except OSError as e:
+            if e.errno == 17: pass # File exists
+            else: raise
+
+    # List of emails to send
+    with open(delivery_dir + "/automatic_email_list.txt", 'w') as out:
+        for e in get_email_recipient_info(run_id, project_datas):
+            if not any(x is None for x in e):
+                out.write(("|".join(e) + "\n").encode('utf-8'))
+
+    script_file = os.path.join(delivery_dir, "Open_emails.command")
+    if not os.path.exists(script_file):
+        try:
+            os.link(nsc.OPEN_EMAILS_SCRIPT, script_file)
+        except OSError as e:
+            if e.errno == 18: # Cross-device link
+                shutil.copyfile(nsc.OPEN_EMAILS_SCRIPT, script_file)
+            else:
+                pass # Missing script file is not an error
+            
+
+def get_email_recipient_info(run_id, project_datas):
+    summary_recipients = set(('nsc-ous-data-delivery@sequencing.uio.no',))
+    emails = []
+    for project_data in project_datas:
+        if project_data.lims:
+            email_to = project_data.lims.contact_email
+        else:
+            email_to = ""
+        if project_data.diag_project:
+            email_to = "diag-lab@medisin.uio.no,diag-bioinf@medisin.uio.no"
+            summary_recipients.add('diag-lab@medisin.uio.no')
+            summary_recipients.add('diag-bioinf@medisin.uio.no')
+            if project_data.name.startswith("Diag-EKG"):
+                summary_recipients.add('EKG@ous-hf.no')
+                email_to += ',EKG@ous-hf.no'
+            elif project_data.name.startswith("Diag-EHG"):
+                summary_recipients.add('EHG-HTS@medisin.uio.no')
+                email_to += ',EHG-HTS@medisin.uio.no'
+        elif project_data.name.startswith("TI-") or project_data.name.startswith("MIK-"):
+            summary_recipients.add(email_to)
+        email_cc = ""
+        email_bcc = "nsc-ous-data-delivery@sequencing.uio.no"
+        email_subject = "Sequence ready for download - sequencing run {run_id} - {name} ({nsamples} samples)".format(
+                run_id = run_id,
+                name = project_data.name,
+                nsamples = project_data.nsamples
+                )
+        email_content_file = "email_content/{}.txt".format(project_data.dir)
+        if project_data.diag_project:
+            email_attachment = ""
+        else:
+            email_attachment = "email_content/" + project_data.dir + "_multiqc.html"
+        emails.append(("text", email_to, email_cc, email_bcc, email_subject, email_content_file, email_attachment))
+    
+    email_to = ",".join(summary_recipients)
+    email_cc = ""
+    email_bcc = ""
+    email_subject = "Summary for run {run_id}".format(run_id=run_id)
+    email_content_file = "email_content/Summary_for_{run_id}.html".format(run_id=run_id)
+    email_attachment = ""
+    emails.append(("html", email_to, email_cc, email_bcc, email_subject, email_content_file, email_attachment))
+    return emails
 
 
 def write_sample_info_table(output_path, runid, project):
@@ -387,6 +482,7 @@ def write_sample_info_table(output_path, runid, project):
                 else:
                     out.write(utilities.display_int(f.stats['# Reads PF']) + "\t")
                 out.write("fragments\r\n")
+
 
 
 if __name__ == "__main__":

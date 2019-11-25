@@ -36,12 +36,18 @@ class Sample(object):
     
     """
 
-    def __init__(self, sample_index, sample_id, name, sample_dir, files):
+    def __init__(self, sample_index, sample_id, name, sample_dir, files, description=None):
         self.sample_index = sample_index
         self.sample_id = sample_id
         self.name = name
         self.sample_dir = sample_dir
         self.files = files
+        self.description = description
+
+    @property
+    def limsid(self):
+        if self.description: return self.description
+        else: return self.sample_id
 
 
 class FastqFile(object):
@@ -51,7 +57,9 @@ class FastqFile(object):
     lane is an integer representing the lane, or "X" for merged lanes
 
     i_read is the read ordinal, 1 or 2 (second read is only available for paired
-    end). Index reads are not considered.
+    end). Index reads are given STRING values I1 and I2. These are only 
+    considered if add_index_read_files is called, otherwise only data reads 1
+    and 2 are present.
 
     Path is the path to the fastq file relative to the "Unaligned"
     (bcl2fastq output) directory or Data/Intensities/BaseCalls.
@@ -143,7 +151,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
                 sample_name = entry['sampleid']
             sample_name = utilities.strip_chars(sample_name)
             sample_dir = get_sample_dir(instrument, sample_name)
-            sample = Sample(sample_index, entry['sampleid'], sample_name, sample_dir, [])
+            sample = Sample(sample_index, entry['sampleid'], sample_name, sample_dir, [], entry.get('description'))
             sample_index += 1
             known_samples[(project.name, sample.sample_id)] = sample
             if file_lanes: # Don't add sample if in ignored lane
@@ -154,7 +162,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
             lanes.add(lane_id)
 
             # Keep track of non-indexed lanes. Non-indexed lanes don't have Undetermined
-            if not entry.get('index'):
+            if not entry.get('index') and not entry.get('index2'):
                 not_multiplexed_lanes.add(lane_id)
 
             path = ""
@@ -180,16 +188,27 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
                 # path contains trailing slash
                 fastq_path = path + fastq_name
 
-                index_sequence = entry.get("index")
-                if entry.has_key("index2") and entry['index2']:
-                    index_sequence += "-" + entry["index2"]
-
-                sample.files.append(FastqFile(lane_id, i_read, fastq_name, fastq_path, index_sequence, None))
+                index1 = entry.get("index")
+                index2 = entry.get("index2")
+                if index1 and not index2:
+                    index_sequence = index1
+                elif index2 and not index1:
+                    index_sequence = index2
+                elif index2 and index2:
+                    index_sequence = index1 + "-" + index2
+                else:
+                    index_sequence = ""
+                
+                # If there is a sample with the same SampleID as the current line, and also the same
+                # lane ID, then we don't add it. This happens when each sample uses multiple indexes,
+                # but get written to one file.
+                if not any(f.lane == lane_id and f.i_read == i_read for f in sample.files):
+                    sample.files.append(FastqFile(lane_id, i_read, fastq_name, fastq_path, index_sequence, None))
                 # Stats can be added in later
 
     # Create an undetermined file for each lane, read seen
     undetermined_project = Project(None, None, [], True)
-    undetermined_sample = Sample(0, None, None, None, [])
+    undetermined_sample = Sample(0, None, None, None, [], None)
     undetermined_project.samples.append(undetermined_sample)
     for lane in lanes:
         if lane in not_multiplexed_lanes:
@@ -244,11 +263,25 @@ def flag_empty_files(projects, run_dir):
             for f in s.files:
                 full_path = os.path.join(basecalls_dir, f.path)
                 f.empty = not os.path.exists(full_path)
-                if not f.empty:
-                    # Additional check for empty gzip file
-                    gzfile = gzip.open(full_path, 'rb')
-                    data = gzfile.read(1)
-                    f.empty = data == ""
+
+
+def add_index_read_files(projects, run_dir, force=False):
+    """Add files for Index read 1 and 2 to the projects data structure, if they
+    exist. The files are created if the option --create-fastq-for-index-reads
+    is give to bcl2fastq."""
+    basecalls_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
+    for p in projects:
+        for s in p.samples:
+            for f in s.files:
+                if f.i_read == 1:
+                    for i_index_read in [1,2]:
+                        index_read_path = re.sub(r"R1_001.fastq.gz$",
+                                "I{}_001.fastq.gz".format(i_index_read), f.path)
+                        full_path = os.path.join(basecalls_dir, index_read_path)
+                        if force or os.path.exists(full_path):
+                            s.files.append(FastqFile(f.lane, "I{}".format(i_index_read),
+                                os.path.basename(index_read_path), index_read_path,
+                                f.index_sequence, None))
 
 
 ################# SAMPLE SHEET ##################

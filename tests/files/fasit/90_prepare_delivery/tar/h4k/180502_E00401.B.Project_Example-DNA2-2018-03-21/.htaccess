@@ -1,0 +1,9 @@
+AuthUserFile /data/180502_E00401.B.Project_Example-DNA2-2018-03-21/.htpasswd
+AuthGroupFile /dev/null
+AuthName ByPassword
+AuthType Basic
+
+<Limit GET>
+require user example-dna2
+</Limit>
+        

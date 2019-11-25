@@ -1,0 +1,64 @@
+Dear {{ "Diagnostics" if project_data.diag_project else project_data.lims.contact_person }},
+
+Samples/Libraries submitted under {{ project_data.name }} to NSC, Ullevål has been sequenced and are now ready for pick-up. You will therefore be billed for this service.
+
+
+------ Data collection ------{% if project_data.lims.delivery_method == "NeLS project" %}
+The data files have been transferred to your NeLS project, and stored in the directory {{ project_data.dir }}. Please wait for a confirmation from the Elixir help desk before you access the data.
+{% elif project_data.lims.delivery_method == "Norstore" %}
+You can download the data and all quality control reports using the following information:
+
+https://hts-nonsecure.web.sigma2.no/{{ project_data.dir }}/
+
+username: {{ username }}
+password: {{ password }}
+{% elif project_data.lims.delivery_method == "User HDD" %}
+You can pick up the data in a portable hard drive (please notice the size of the data  is approximately {{ "%.0f" % size if size else "XXXX" }} GB).
+{% elif project_data.lims.delivery_method == "New HDD" %}
+You can pick up the new hard drive with the data.
+{% elif project_data.lims.delivery_method == "Transfer to diagnostics" %}
+Data has been transferred to /data/diag/nscDelivery folder in vali.
+{% else %}
+You can pick up the data in a portable hard drive (please notice the size of the data  is approximately {{ "%.0f" % size if size else "XXXX" }} GB).
+
+NOTE: UNKNOWN DELIVERY METHOD
+{% endif %}
+
+------ Data output ------
+Here is an overview of your data files and the number of fragments that were sequenced:
+{% if project_data.lims.internal_bc_demultiplexing_16s %}
+TABLE_PLACEHOLDER
+{% else %}{% for (file, frags, rel_frags) in project_data.file_fragments_table %}
+{{ "{:35}".format(file) }}{{ "\t{0:12,}".format(frags) }} fragments{% endfor %}
+{% endif %}
+
+----- Bioinformatic analyses ----{% if project_data.lims.internal_bc_demultiplexing_16s %}
+We have analysed the data using our pipeline based on QIIME 2. The tar file in your delivery contains both the raw data, demultiplexed data and the QIIME 2 analysis results. Please see the attached report file for more information.
+{% else %}
+Data alignment/analysis can be ordered as a service. For further details: http://www.sequencing.uio.no/services/bioinformatics/
+{% endif %}
+
+If you have any questions, don't hesitate to get in touch. 
+
+
+Regards
+Arvind Sundaram / Marius Bjørnstad
+
+Bioinformatician(s)
+Norwegian Sequencing Centre (https://www.sequencing.uio.no) / Part of NorSeq (https://www.norseq.org/)
+Oslo University Hospital, Ullevål, Oslo, Norway
+
+
+*********************************************************************************************************************
+Understanding the data: http://www.sequencing.uio.no/services/data-delivery/
+
+------- Acknowledgement -------
+The Norwegian Sequencing Centre (NSC) operates as a core facility and you will therefore not be billed for the labour costs incurred. However, you are requested to acknowledge the support you have received from the bodies funding the NSC. Please use the following text in articles or reports relating to this sequence data:
+"The sequencing service was provided by the Norwegian Sequencing Centre (www.sequencing.uio.no), a national technology platform hosted by the University of Oslo and supported by the "Functional Genomics" and "Infrastructure" programs of the Research Council of Norway and the Southeastern Regional Health Authorities".
+
+-----Terms, conditions and usage-----
+Data storage policy: https://www.sequencing.uio.no/services/data-delivery/#toc4
+Data security:  https://www.sequencing.uio.no/services/data-delivery/#toc3
+*********************************************************************************************************************
+
+

@@ -8,14 +8,13 @@
 #  * LIMS mode *
 #  - This script takes the sample sheet from the "Input sample sheet" ResultFile 
 #    object associated with the task's LIMS process. If there is no sample sheet, 
-#    it takes it from the cluster generation process. If
-#    no clustering process is found, it takes it from <run folder>/SampleSheet.csv
+#    it takes it from <run folder>/SampleSheet.csv
 #  - It stores the *input* sample sheet in the LIMS process if it was fetched from
 #    somewhere else, but this is not used further.
 #  - It adds the headers and copies it to the process in the LIMS, on the 
 #    "Demultiplexing sample sheet" ResultFile object. 
 #  - Other tasks always take the sample sheet from the LIMS process ("Demultiplexing
-#    sample sheet"), but the demultiplexing process also writes it to
+#    sample sheet"), not any local file. The demultiplexing process writes it to
 #    DemultiplexingSampleSheet.<process_id>.csv because bcl2fastq2 needs an on-disk copy.
 #
 #  * Command line mode *
@@ -33,8 +32,6 @@ import argparse
 import subprocess
 import datetime
 import re
-
-#from Bio.Seq import Seq
 
 from genologics.lims import *
 from common import nsc, utilities, taskmgr
@@ -105,7 +102,7 @@ def main(task):
                 data = sample_sheet
                 )
 
-    # Always replace special characters with ?
+    # Always replace special characters with ? and fix line breaks
     sample_sheet = replace_special_chars(sample_sheet)
 
     # Doctor the sample sheet, only if using HiSeq and it doesn't have [Data] header
@@ -122,6 +119,9 @@ def main(task):
                 sample_sheet = reverse_complement_index2(sample_sheet)
         else:
             task.info("Not in LIMS mode, don't know if we should reverse index2, leaving it as on Sample Sheet.")
+
+    if task.lanes:
+        sample_sheet = filter_lanes(sample_sheet, task.lanes)
 
     # Post the result, as appropriate...
     if task.process:
@@ -143,7 +143,9 @@ def main(task):
 
 
 def replace_special_chars(sample_sheet_data):
-    return "".join(c if ord(c) < 128 else '?' for c in sample_sheet_data)
+    question_marks = "".join(c if ord(c) < 128 else '?' for c in sample_sheet_data)
+    normal_line_breaks = question_marks.replace("\r\r\n", "\n")
+    return normal_line_breaks
 
 
 def rev_comp(sequence):
@@ -230,6 +232,32 @@ def convert_from_bcl2fastqv1(original_data):
             [",".join(cells) for cells in data]
             )
     
+
+def filter_lanes(original_data, lanes):
+    data = [l.strip("\r\n").split(",") for l in original_data.splitlines()]
+    filtered = []
+    lane_col_index = -1
+    data_section = False
+    for row in data:
+        if data_section:
+            for i, col_header in enumerate(row):
+                if col_header.lower() == "lane":
+                    lane_col_index = i
+            data_section = False
+            filtered.append(row)
+        elif lane_col_index == -1 and row[0].lower() == "[data]":
+            data_section = True
+            filtered.append(row)
+        elif lane_col_index == -1:
+            filtered.append(row)
+        else:
+            try:
+                if int(row[lane_col_index]) in lanes:
+                    filtered.append(row)
+            except (IndexError, ValueError):
+                filtered.append(row)
+    return "\r\n".join([",".join(cells) for cells in filtered]) + "\r\n"
+
 
 if __name__ == "__main__":
     with taskmgr.Task(TASK_NAME, TASK_DESCRIPTION, TASK_ARGS) as task:

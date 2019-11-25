@@ -38,21 +38,27 @@ def main(task):
     n_threads = min(task.threads, 5)
     projects = task.projects
     samples.flag_empty_files(projects, task.work_dir)
+    samples.add_index_read_files(projects, task.work_dir)
     for project in projects:
         if not project.is_undetermined:
-
             pathses = [paths_for_project(run_id, project)]
+            rcode = 0
             task.info(project.name)
-            stdout = os.path.join(bc_dir, project.proj_dir, "md5sum.txt")
             while pathses: 
                 try:
-                    for paths in pathses:
-                        rcode = remote.run_command(
-                                [nsc.MD5DEEP, '-rl', '-j' + str(n_threads)] + paths, task, "md5deep",
-                                time="08:00:00", cpus=n_threads, mem="2048M", bandwidth=str(n_threads*1200) + "M",
-                                storage_job=True, cwd=os.path.join(bc_dir, project.proj_dir),
-                                stdout=stdout, comment=run_id
-                                )
+                    for i, paths in enumerate(pathses):
+                        partial_stdout = os.path.join(bc_dir, project.proj_dir, "md5sum_{}.txt".format(i))
+                        if paths:
+                            rcode = rcode | remote.run_command(
+                                    [nsc.MD5DEEP, '-rl', '-j' + str(n_threads)] + paths, task, "md5deep",
+                                    time="08:00:00", cpus=n_threads, mem="2048M", bandwidth=str(n_threads*1200) + "M",
+                                    storage_job=True, cwd=os.path.join(bc_dir, project.proj_dir),
+                                    stdout=partial_stdout, comment=run_id
+                                    )
+                        else:
+                            with open(partial_stdout, 'w'):
+                                pass
+                    num_jobs = len(pathses) # The command suceeded
                     pathses = None
                 except OSError as e:
                     if e.args[0] == 7: #Argument list too long!
@@ -63,8 +69,16 @@ def main(task):
                         pathses = pathss2
                     else:
                         raise
-
-            if rcode != 0:
+            if rcode == 0:
+                # Combine all md5sum jobs
+                stdout = os.path.join(bc_dir, project.proj_dir, "md5sum.txt")
+                with open(stdout, 'w') as outfile:
+                    for i in range(num_jobs):
+                        partial_stdout = os.path.join(bc_dir, project.proj_dir, "md5sum_{}.txt".format(i))
+                        with open(partial_stdout) as infile:
+                            outfile.write(infile.read())
+                        os.unlink(partial_stdout)
+            else:
                 task.fail(
                         "md5deep failed for project " + project.name,
                         "\n".join(paths)

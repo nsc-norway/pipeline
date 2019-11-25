@@ -63,24 +63,22 @@ def post_stats(lims, process, projects, demultiplex_stats, lane_metrics):
     lims.get_batch(sum((a.samples for a in process.all_inputs()), []))
     #print "Done loading"
 
-    projects_map = {}
-    for project in projects:
-        samples_map = {}
-        for sample in project.samples:
-            samples_map[sample.name] = sample
-
-        projects_map[project.name] = samples_map
-
-    update_artifacts = []
+    update_artifacts = set()
     for coordinates, stats in demultiplex_stats.items():
         # Note: while it may seem that this works for both aggregate_reads and
         # separate reads, it does not, the code must be changed for separate reads
         lane, project, sample_name = coordinates[0:3]
         
         if sample_name: # Not undetermined
-            try:
-                limsid = projects_map[project][sample_name].sample_id
-            except KeyError:
+            limsid = None
+            for tproject in projects:
+                if tproject.name == project:
+                    for sample in tproject.samples:
+                        if sample.name == sample_name:
+                            if any(f.lane == lane for f in sample.files):
+                                limsid = sample.limsid
+                                sample_index = sample.sample_index
+            if limsid is None:
                 continue # Skip unknown samples / project
             resultfile = get_resultfile(lims, process, lane, limsid, 1)
             if resultfile:
@@ -89,18 +87,22 @@ def post_stats(lims, process, projects, demultiplex_stats, lane_metrics):
                         resultfile.udf[statname] = stats[statname]
                     except KeyError:
                         pass
-                resultfile.udf['Sample sheet position'] = projects_map[project][sample_name].sample_index
-                update_artifacts.append(resultfile)
+                resultfile.udf['Sample sheet position'] = sample_index
+                update_artifacts.add(resultfile)
             
 
         else: # Undetermined: sample_name = None in demultiplex_stats
             lane_analyte = get_lane(process, lane)
             if lane_analyte:
                 lane_analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
-                duplicates = lane_metrics.get(lane, {}).get('% Sequencing Duplicates', None)
-                if duplicates is not None:
-                    lane_analyte.udf['% Sequencing Duplicates'] = duplicates
-                update_artifacts.append(lane_analyte)
+                update_artifacts.add(lane_analyte)
+
+    for lane, metric in lane_metrics.items():
+        duplicates = metric.get('% Sequencing Duplicates', None)
+        if duplicates is not None:
+            lane_analyte = get_lane(process, lane)
+            lane_analyte.udf['% Sequencing Duplicates'] = duplicates
+            update_artifacts.add(lane_analyte)
 
     #print "Updating"
     lims.put_batch(update_artifacts)

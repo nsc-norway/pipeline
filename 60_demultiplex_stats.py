@@ -23,13 +23,7 @@ def main(task):
     basecalls_dir = task.bc_dir
     projects = task.projects
     qc_dir = os.path.join(basecalls_dir, "QualityControl" + task.suffix)
-
-    if task.process:
-        bcl2fastq_version = utilities.get_udf(task.process, nsc.BCL2FASTQ_VERSION_UDF, None)
-    else:
-        bcl2fastq_version = utilities.get_bcl2fastq2_version(work_dir)
-        if not bcl2fastq_version:
-            task.warn("bcl2fastq version cannot be detected!")
+    bcl2fastq_version = utilities.get_bcl2fastq2_version(task.process, work_dir)
 
     real_projects = []
     for project in projects:

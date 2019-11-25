@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<RunParameters xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Setup>
+    <SupportMultipleSurfacesInUI>true</SupportMultipleSurfacesInUI>
+    <ApplicationVersion>2.1.0.31</ApplicationVersion>
+    <ApplicationName>NextSeq Control Software</ApplicationName>
+    <NumTilesPerSwath>12</NumTilesPerSwath>
+    <NumSwaths>3</NumSwaths>
+    <NumLanes>4</NumLanes>
+    <Read1>76</Read1>
+    <Read2>0</Read2>
+    <Index1Read>8</Index1Read>
+    <Index2Read>8</Index2Read>
+    <SectionPerLane>3</SectionPerLane>
+    <LanePerSection>2</LanePerSection>
+  </Setup>
+  <RunParametersVersion>NextSeq_2_1_0</RunParametersVersion>
+  <RunID>180502_NS500336_0230_AHTJFWBGX5</RunID>
+  <InstrumentID>NS500336</InstrumentID>
+  <RunNumber>230</RunNumber>
+  <RTAVersion>2.4.11</RTAVersion>
+  <SystemSuiteVersion>2.1.3.2</SystemSuiteVersion>
+</RunParameters>
