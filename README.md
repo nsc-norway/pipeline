@@ -14,20 +14,25 @@ See SETUP.md for setup instructions. (currently out of date)
 ## Content
 
 ### Main scripts: the primary data processing / analysis tasks.
+
 The scripts are named with a number prefix followed by a name. They are run in
 the order of these numbers. The script lineup is frequently subject to change, so 
 no documentation of each script is given here. At the top of each script, there's
 a set of keywords about what it does, but for anything else you have to refer to
 the code itself.
 
-(note: `50_emails.py` script is not about sending emails)
-
 ### LIMS integration, automation: scripts to manage LIMS processes / workflow.
-* `sequencing-to-demultiplexing.py` - A button to be added to the sequencing step, to add a run to demultiplexing.
+
+The scripts support a somewhat tight integration with Clarity LIMS, and can use
+the state inside of LIMS to manage the workflow progress?
+
 * `lims-setup-step.py` - Called when entering the demultiplexing step, to set the source / destination folders and get the sample sheet from the cluster generation step.
-* `auto-next-script.py` - Automatic "button clicker" to continue calling next script when tasks complete. Runs in cron job.
+
+Also some external scripts from the `lims` repository are necessary in order to
+manage the workflow with LIMS. `auto-next-script.py` - Automatic "button clicker" to continue calling next script when tasks complete. Runs in cron job.
 
 ### Batch scripts
+
 * `lims-qc.sh` - QC scripts combined into one, for use on the QC button in LIMS, to reduce the number of buttons. Called with the process-ID.
 * `run-qc.sh` - Run all QC scripts, used in command-line mode.
 * `hiseq.sh` - Command-line processing of runs, includes all commands relevant for the sequencers for non-LIMS mode.
