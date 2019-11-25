@@ -123,11 +123,10 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
         # whole entry
         if merged_lanes:
             file_lanes = set("X")
+        elif 'lane' in entry:
+            file_lanes =  set( (int(entry['lane']),) )
         else:
-            try:
-                file_lanes =  set( (int(entry['lane']),) )
-            except KeyError:
-                file_lanes = set(expand_lanes)
+            file_lanes = set(expand_lanes)
 
         if only_process_lanes_set:
             file_lanes &= only_process_lanes_set
@@ -239,7 +238,19 @@ def check_files_merged_lanes(run_dir):
     elif unmerged_exists and not merged_exists:
         return False
     else:
-        raise RuntimeError("Unable to determine if lanes were merged (no-lane-splitting option)")
+        raise ValueError("Unable to determine if lanes were merged (no-lane-splitting option)."
+               "Make sure there is at least one FASTQ file.")
+
+def get_lane_numbers_from_fastq_files(run_dir):
+    """This function identifies the lane numbers. Useful for the "expand_lanes" option
+    used when the sample sheet does not have lane number. This assumes that the lanes
+    """
+
+    basecalls_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
+    files = glob.glob(basecalls_dir + "Undetermined_S0_L00*_R1_001.fastq.gz")
+    files += glob.glob(basecalls_dir + "/*/*_S1_L00*_R1_001.fastq.gz")
+    files += glob.glob(basecalls_dir + "/*/*/*_S1_L00*_R1_001.fastq.gz")
+    return set(int(re.search(r"_L00(\d)_", os.path.basename(file)).group(1)) for file in files)
 
 
 def add_stats(projects, run_stats):
@@ -354,7 +365,7 @@ def get_ne_mi_project_dir(run_id, project_name):
 
 
 def get_sample_dir(instrument, sample_name):
-    if instrument in ['hiseq', 'hiseq4k', 'hiseqx']:
+    if instrument in ['hiseq', 'hiseq4k', 'hiseqx', 'novaseq']:
         return "Sample_" + sample_name
     else:
         return None

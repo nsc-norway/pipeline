@@ -98,7 +98,7 @@ def main(task):
     except IndexError:
         pass
 
-    if task.instrument in ["hiseqx", "hiseq4k"] and nsc.FASTDUP != None:
+    if task.instrument in ["hiseqx", "hiseq4k", "novaseq"] and nsc.FASTDUP != None:
         dup = remote.ArrayJob(dup_commands, "fastdup", "6:00:00", 
                 dup_log_path.replace(".txt", ".%a.txt"))
         dup.mem_per_task = 500

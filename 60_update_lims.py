@@ -4,7 +4,7 @@ import sys
 import requests
 from collections import defaultdict
 from genologics.lims import *
-from common import nsc, taskmgr, stats, utilities
+from common import nsc, taskmgr, stats, utilities, lane_info
 
 TASK_NAME = "60. LIMS stats"
 TASK_DESCRIPTION = """Post demultiplexing stats to LIMS (doesn't make an effort
@@ -44,17 +44,25 @@ def main(task):
             aggregate_reads = True,
             suffix=task.suffix
             )
+    # Get lane stats and lane metrics
+    # Here, lane stats refers to the data from lane_info module, containing primarily
+    # the well occupancy percentage. Lane metrics is based on superDUPr and contains the
+    # duplication rate.
+    try:
+        lane_stats = lane_info.get_from_interop(task.work_dir, task.no_lane_splitting)
+    except lane_info.NotSupportedException:
+        lane_stats = {}
     qc_dir = os.path.join(task.bc_dir, "QualityControl" + task.suffix)
-    if task.instrument in ['hiseq4k', 'hiseqx']:
+    if task.instrument in ['hiseq4k', 'hiseqx', 'novaseq']:
         stats.add_duplication_results(qc_dir, projects)
         lane_metrics = get_lane_metrics(projects)
     else:
         lane_metrics = {}
-    post_stats(task.lims, task.process, projects, run_stats, lane_metrics)
+    post_stats(task.lims, task.process, projects, run_stats, lane_metrics, lane_stats)
     task.success_finish()
 
 
-def post_stats(lims, process, projects, demultiplex_stats, lane_metrics):
+def post_stats(lims, process, projects, demultiplex_stats, lane_metrics, lane_stats):
     """Find the resultfiles in the LIMS and post the demultiplexing
     stats.
     """ 
@@ -103,7 +111,10 @@ def post_stats(lims, process, projects, demultiplex_stats, lane_metrics):
             lane_analyte = get_lane(process, lane)
             lane_analyte.udf['% Sequencing Duplicates'] = duplicates
             update_artifacts.add(lane_analyte)
-
+        stats = lane_stats.get(lane)
+        if stats and stats.occupancy: # Attempt to get occupancy, None if not supported
+            lane_analyte.udf['% Occupied wells'] = stats.occupancy
+            update_artifacts.add(lane_analyte)
     #print "Updating"
     lims.put_batch(update_artifacts)
 

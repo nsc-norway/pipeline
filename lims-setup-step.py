@@ -67,11 +67,17 @@ else:
                 "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Delivery and triggers",
                 "Close when finished"
                 ],
+            "novaseq": [
+                "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
+                "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Delivery and triggers",
+                "Close when finished"
+                ],
             }
     THREADS_OVERRIDE = {
             "hiseq": 64,
             "hiseqx": 64,
             "hiseq4k": 64,
+            "novaseq": 64,
             "miseq": 16,
             "nextseq": 64
             }

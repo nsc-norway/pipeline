@@ -35,7 +35,7 @@ class TaskTestCase(unittest.TestCase):
 
     H4RUN = "180502_E00401_0001_BQCTEST"
     NSRUN = "180502_NS500336_0001_AHTJFWBGX5"
-
+    NOVRUN = "191119_A00943_0005_AHMNCHDMXX"
 
     def setUp(self):
         self.task =  taskmgr.Task(
@@ -275,6 +275,21 @@ class Test20PrepareSampleSheet(TaskTestCase):
         new_samplesheet = open(os.path.join(self.tempdir, "DemultiplexingSampleSheet.csv")).read()
         self.assertEquals(old_samplesheet, new_samplesheet)
 
+    def test_novaseq_samplesheet_edited(self):
+        """Testing that the script replaced underscores with dashes."""
+
+        RUN_ID = "191119_A00943_0005_AHMNCHDMXX"
+        INPUT_SAMPLE_SHEET = "files/samplesheet/NV0000001-LIB.csv"
+        self.make_tempdir(RUN_ID)
+        shutil.copy(INPUT_SAMPLE_SHEET, os.path.join(self.tempdir, "SampleSheet.csv"))
+        testargs = ["script", self.tempdir]
+        with patch.object(sys, 'argv', testargs):
+            self.module.main(self.task)
+            self.task.success_finish.assert_called_once()
+        correct_samplesheet = open("files/fasit/20_prepare_sample_sheet/novaseq-standard-fixed.csv").read()
+        new_samplesheet = open(os.path.join(self.tempdir, "DemultiplexingSampleSheet.csv")).read()
+        self.assertEquals(correct_samplesheet, new_samplesheet)
+
 
 class Test30Demultiplexing(TaskTestCase):
     module = __import__("30_demultiplexing")
@@ -404,6 +419,15 @@ class Test60Emails(TaskTestCase):
 
     def test_emails_nsq(self):
         with self.qc_dir(self.NSRUN) as tempdir:
+            testargs = ["script", tempdir]
+            with patch.object(sys, 'argv', testargs):
+                self.module.main(self.task)
+                self.task.success_finish.assert_called_once()
+                self.check_files_with_reference(os.path.join(self.qualitycontrol, "Delivery"),
+                        "files/fasit/60_emails/nsq/")
+
+    def test_emails_novs2standard(self):
+        with self.qc_dir(self.NOVRUN) as tempdir:
             testargs = ["script", tempdir]
             with patch.object(sys, 'argv', testargs):
                 self.module.main(self.task)
