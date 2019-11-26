@@ -5,6 +5,7 @@ import json
 import tempfile
 import os
 import re
+import gzip
 import subprocess
 import string
 import random
@@ -69,6 +70,13 @@ class TaskTestCase(unittest.TestCase):
         self.basecalls = os.path.join(self.tempdir, "Data", "Intensities", "BaseCalls")
         self.qualitycontrol = os.path.join(self.basecalls, "QualityControl")
         shutil.copytree(os.path.join("files/runs", run_id), self.tempdir)
+        # For NovaSeq we have to compress the ConversionStats.xml file, because it is very large
+        conversion_stats_file = os.path.join(self.basecalls, "Stats", "ConversionStats.xml")
+        compressed_file  = conversion_stats_file + ".gz"
+        if os.path.exists(compressed_file):
+            with gzip.open(compressed_file) as inf:
+                with open(conversion_stats_file, "w") as outf:
+                    outf.write(inf.read())
         do_cleanup = False
         try:
             yield self.tempdir
@@ -509,7 +517,7 @@ class Test60Reports(TaskTestCase):
                         cwd=os.path.join(self.qualitycontrol, 'pdf'), stdin=ANY, stdout=ANY))
                 sub_call.assert_has_calls(calls, any_order=True)
                 os_rename.assert_has_calls(
-                    call(ANY, os.path.join(self.basecalls, pdfpath)) for pdfpath in pdfpaths
+                    [call(ANY, os.path.join(self.basecalls, pdfpath)) for pdfpath in pdfpaths]
                     )
                 self.task.success_finish.assert_called_once()
 
