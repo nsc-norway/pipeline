@@ -1,0 +1,6953 @@
+{
+ "Flowcell" : "HMNCHDMXX",
+ "RunNumber" : 5,
+ "RunId" : "191119_A00943_0005_AHMNCHDMXX",
+ "ReadInfosForLanes" : [
+  {
+   "LaneNumber" : 1,
+   "ReadInfos" : [
+    {
+     "Number" : 1,
+     "NumCycles" : 151,
+     "IsIndexedRead" : false
+    },
+    {
+     "Number" : 1,
+     "NumCycles" : 8,
+     "IsIndexedRead" : true
+    },
+    {
+     "Number" : 2,
+     "NumCycles" : 151,
+     "IsIndexedRead" : false
+    }
+   ]
+  },
+  {
+   "LaneNumber" : 2,
+   "ReadInfos" : [
+    {
+     "Number" : 1,
+     "NumCycles" : 151,
+     "IsIndexedRead" : false
+    },
+    {
+     "Number" : 1,
+     "NumCycles" : 8,
+     "IsIndexedRead" : true
+    },
+    {
+     "Number" : 2,
+     "NumCycles" : 151,
+     "IsIndexedRead" : false
+    }
+   ]
+  }
+ ],
+ "ConversionResults" : [
+  {
+   "LaneNumber" : 1,
+   "TotalClustersRaw" : 2880700416,
+   "TotalClustersPF" : 2340749756,
+   "Yield" : 706906426312,
+   "DemuxResults" : [
+    {
+     "SampleId" : "KIR2001A10PA1",
+     "SampleName" : "51NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACAGCAGA",
+       "MismatchCounts" : {
+        "0" : 29384650,
+        "1" : 299869
+       }
+      }
+     ],
+     "NumberReads" : 29684519,
+     "Yield" : 8964724738,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4482362369,
+       "YieldQ30" : 4226014130,
+       "QualityScoreSum" : 161439972838,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4482362369,
+       "YieldQ30" : 4132155514,
+       "QualityScoreSum" : 159760886759,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A11PA1",
+     "SampleName" : "24NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CAATGGAA",
+       "MismatchCounts" : {
+        "0" : 26433064,
+        "1" : 345173
+       }
+      }
+     ],
+     "NumberReads" : 26778237,
+     "Yield" : 8087027574,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4043513787,
+       "YieldQ30" : 3813982963,
+       "QualityScoreSum" : 145667108389,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4043513787,
+       "YieldQ30" : 3742236020,
+       "QualityScoreSum" : 144394585462,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A12PA1",
+     "SampleName" : "40NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGCACCTC",
+       "MismatchCounts" : {
+        "0" : 25650484,
+        "1" : 267085
+       }
+      }
+     ],
+     "NumberReads" : 25917569,
+     "Yield" : 7827105838,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3913552919,
+       "YieldQ30" : 3689538053,
+       "QualityScoreSum" : 140958298253,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3913552919,
+       "YieldQ30" : 3639972462,
+       "QualityScoreSum" : 140085991294,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A13PA1",
+     "SampleName" : "57NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CTCAATGA",
+       "MismatchCounts" : {
+        "0" : 30627716,
+        "1" : 203221
+       }
+      }
+     ],
+     "NumberReads" : 30830937,
+     "Yield" : 9310942974,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4655471487,
+       "YieldQ30" : 4393776909,
+       "QualityScoreSum" : 167755087736,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4655471487,
+       "YieldQ30" : 4324058955,
+       "QualityScoreSum" : 166524190152,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A14PA1",
+     "SampleName" : "74NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TCCGTCTA",
+       "MismatchCounts" : {
+        "0" : 31574566,
+        "1" : 280975
+       }
+      }
+     ],
+     "NumberReads" : 31855541,
+     "Yield" : 9620373382,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4810186691,
+       "YieldQ30" : 4540868918,
+       "QualityScoreSum" : 173369894633,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4810186691,
+       "YieldQ30" : 4469725955,
+       "QualityScoreSum" : 172112048431,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A15PA1",
+     "SampleName" : "66NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CATACCAA",
+       "MismatchCounts" : {
+        "0" : 30007524,
+        "1" : 305725
+       }
+      }
+     ],
+     "NumberReads" : 30313249,
+     "Yield" : 9154601198,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4577300599,
+       "YieldQ30" : 4316489518,
+       "QualityScoreSum" : 164862094300,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4577300599,
+       "YieldQ30" : 4265381421,
+       "QualityScoreSum" : 163974069808,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A16PA1",
+     "SampleName" : "39NovaSeq-000000PM-UtAv-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TATCAGCA",
+       "MismatchCounts" : {
+        "0" : 25965942,
+        "1" : 255100
+       }
+      }
+     ],
+     "NumberReads" : 26221042,
+     "Yield" : 7918754684,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3959377342,
+       "YieldQ30" : 3732563349,
+       "QualityScoreSum" : 142604929400,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3959377342,
+       "YieldQ30" : 3635838371,
+       "QualityScoreSum" : 140851412532,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A17PA1",
+     "SampleName" : "79NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ATAGCGAC",
+       "MismatchCounts" : {
+        "0" : 30837593,
+        "1" : 250316
+       }
+      }
+     ],
+     "NumberReads" : 31087909,
+     "Yield" : 9388548518,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4694274259,
+       "YieldQ30" : 4428260490,
+       "QualityScoreSum" : 169131131868,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4694274259,
+       "YieldQ30" : 4374185908,
+       "QualityScoreSum" : 168187167275,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A18PA1",
+     "SampleName" : "37NovaSeq-000000PK-UtAv-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACGCTCGA",
+       "MismatchCounts" : {
+        "0" : 27695937,
+        "1" : 200389
+       }
+      }
+     ],
+     "NumberReads" : 27896326,
+     "Yield" : 8424690452,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4212345226,
+       "YieldQ30" : 3972571934,
+       "QualityScoreSum" : 151739274477,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4212345226,
+       "YieldQ30" : 3929978690,
+       "QualityScoreSum" : 151005614231,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A19PA1",
+     "SampleName" : "61NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGGCTAAC",
+       "MismatchCounts" : {
+        "0" : 30719604,
+        "1" : 273515
+       }
+      }
+     ],
+     "NumberReads" : 30993119,
+     "Yield" : 9359921938,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4679960969,
+       "YieldQ30" : 4417110314,
+       "QualityScoreSum" : 168653990387,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4679960969,
+       "YieldQ30" : 4330976563,
+       "QualityScoreSum" : 167136297374,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A1PA1",
+     "SampleName" : "10NovaSeq-MigraForst-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACGTATCA",
+       "MismatchCounts" : {
+        "0" : 28277874,
+        "1" : 309153
+       }
+      }
+     ],
+     "NumberReads" : 28587027,
+     "Yield" : 8633282154,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4316641077,
+       "YieldQ30" : 4060612562,
+       "QualityScoreSum" : 155315930748,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4316641077,
+       "YieldQ30" : 4007884144,
+       "QualityScoreSum" : 154361237742,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A20PA1",
+     "SampleName" : "56NovaSeq-PU-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCATCCTC",
+       "MismatchCounts" : {
+        "0" : 31495523,
+        "1" : 434005
+       }
+      }
+     ],
+     "NumberReads" : 31929528,
+     "Yield" : 9642717456,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4821358728,
+       "YieldQ30" : 4549972155,
+       "QualityScoreSum" : 173742222074,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4821358728,
+       "YieldQ30" : 4506638502,
+       "QualityScoreSum" : 173010771690,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A21PA1",
+     "SampleName" : "41NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGATGTAC",
+       "MismatchCounts" : {
+        "0" : 33668018,
+        "1" : 483111
+       }
+      }
+     ],
+     "NumberReads" : 34151129,
+     "Yield" : 10313640958,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 5156820479,
+       "YieldQ30" : 4868055564,
+       "QualityScoreSum" : 185862764669,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 5156820479,
+       "YieldQ30" : 4827814429,
+       "QualityScoreSum" : 185180349629,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A22PA1",
+     "SampleName" : "33NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TCTTCACA",
+       "MismatchCounts" : {
+        "0" : 27931024,
+        "1" : 274546
+       }
+      }
+     ],
+     "NumberReads" : 28205570,
+     "Yield" : 8518082140,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4259041070,
+       "YieldQ30" : 4010955767,
+       "QualityScoreSum" : 153327094184,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4259041070,
+       "YieldQ30" : 3943297253,
+       "QualityScoreSum" : 152142012274,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A23PA1",
+     "SampleName" : "71NovaSeq-BevegForst-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCGAAGTA",
+       "MismatchCounts" : {
+        "0" : 27963193,
+        "1" : 202267
+       }
+      }
+     ],
+     "NumberReads" : 28165460,
+     "Yield" : 8505968920,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4252984460,
+       "YieldQ30" : 4011824562,
+       "QualityScoreSum" : 153215732975,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4252984460,
+       "YieldQ30" : 3964923070,
+       "QualityScoreSum" : 152395349497,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A24PA1",
+     "SampleName" : "63NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CGCATACA",
+       "MismatchCounts" : {
+        "0" : 27145820,
+        "1" : 250595
+       }
+      }
+     ],
+     "NumberReads" : 27396415,
+     "Yield" : 8273717330,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4136858665,
+       "YieldQ30" : 3904366591,
+       "QualityScoreSum" : 149067970439,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4136858665,
+       "YieldQ30" : 3827090802,
+       "QualityScoreSum" : 147714416764,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A25PA1",
+     "SampleName" : "45NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AATGTTGC",
+       "MismatchCounts" : {
+        "0" : 29341550,
+        "1" : 375626
+       }
+      }
+     ],
+     "NumberReads" : 29717176,
+     "Yield" : 8974587152,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4487293576,
+       "YieldQ30" : 4235606318,
+       "QualityScoreSum" : 161720524212,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4487293576,
+       "YieldQ30" : 4193105955,
+       "QualityScoreSum" : 160986911623,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A26PA1",
+     "SampleName" : "27NovaSeq-000000PM-UtAv-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TGAAGAGA",
+       "MismatchCounts" : {
+        "0" : 31912195,
+        "1" : 271767
+       }
+      }
+     ],
+     "NumberReads" : 32183962,
+     "Yield" : 9719556524,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4859778262,
+       "YieldQ30" : 4588175112,
+       "QualityScoreSum" : 175153546385,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4859778262,
+       "YieldQ30" : 4503683675,
+       "QualityScoreSum" : 173658875766,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A27PA1",
+     "SampleName" : "44NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGATCGCA",
+       "MismatchCounts" : {
+        "0" : 31313929,
+        "1" : 247433
+       }
+      }
+     ],
+     "NumberReads" : 31561362,
+     "Yield" : 9531531324,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4765765662,
+       "YieldQ30" : 4492921297,
+       "QualityScoreSum" : 171653732120,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4765765662,
+       "YieldQ30" : 4430922576,
+       "QualityScoreSum" : 170551171629,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A28PA1",
+     "SampleName" : "81NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AAGAGATC",
+       "MismatchCounts" : {
+        "0" : 29875485,
+        "1" : 668640
+       }
+      }
+     ],
+     "NumberReads" : 30544125,
+     "Yield" : 9224325750,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4612162875,
+       "YieldQ30" : 4350997099,
+       "QualityScoreSum" : 166172789848,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4612162875,
+       "YieldQ30" : 4314570092,
+       "QualityScoreSum" : 165534953183,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A29PA1",
+     "SampleName" : "38NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CAACCACA",
+       "MismatchCounts" : {
+        "0" : 32708527,
+        "1" : 385594
+       }
+      }
+     ],
+     "NumberReads" : 33094121,
+     "Yield" : 9994424542,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4997212271,
+       "YieldQ30" : 4707593602,
+       "QualityScoreSum" : 179905515683,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4997212271,
+       "YieldQ30" : 4610365187,
+       "QualityScoreSum" : 178190822686,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A2PA1",
+     "SampleName" : "30NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GTCTGTCA",
+       "MismatchCounts" : {
+        "0" : 27115411,
+        "1" : 233685
+       }
+      }
+     ],
+     "NumberReads" : 27349096,
+     "Yield" : 8259426992,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4129713496,
+       "YieldQ30" : 3895883468,
+       "QualityScoreSum" : 148798787579,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4129713496,
+       "YieldQ30" : 3831212286,
+       "QualityScoreSum" : 147632276540,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A30PA1",
+     "SampleName" : "25NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TGGAACAA",
+       "MismatchCounts" : {
+        "0" : 32597088,
+        "1" : 371275
+       }
+      }
+     ],
+     "NumberReads" : 32968363,
+     "Yield" : 9956445626,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4978222813,
+       "YieldQ30" : 4691696309,
+       "QualityScoreSum" : 179282739924,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4978222813,
+       "YieldQ30" : 4622226454,
+       "QualityScoreSum" : 178040076682,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A31PA1",
+     "SampleName" : "35NovaSeq-SegOv-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCAGTTCA",
+       "MismatchCounts" : {
+        "0" : 28615363,
+        "1" : 218051
+       }
+      }
+     ],
+     "NumberReads" : 28833414,
+     "Yield" : 8707691028,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4353845514,
+       "YieldQ30" : 4108074025,
+       "QualityScoreSum" : 156877582550,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4353845514,
+       "YieldQ30" : 4070150128,
+       "QualityScoreSum" : 156228214438,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A32PA1",
+     "SampleName" : "77NovaSeq-PU-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TGGCTTCA",
+       "MismatchCounts" : {
+        "0" : 29659827,
+        "1" : 183609
+       }
+      }
+     ],
+     "NumberReads" : 29843436,
+     "Yield" : 9012717672,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4506358836,
+       "YieldQ30" : 4248519522,
+       "QualityScoreSum" : 162321982686,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4506358836,
+       "YieldQ30" : 4204572087,
+       "QualityScoreSum" : 161544021669,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A33PA1",
+     "SampleName" : "20NovaSeq-Linse-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CGACTGGA",
+       "MismatchCounts" : {
+        "0" : 30934202,
+        "1" : 380879
+       }
+      }
+     ],
+     "NumberReads" : 31315081,
+     "Yield" : 9457154462,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4728577231,
+       "YieldQ30" : 4327617880,
+       "QualityScoreSum" : 168095405795,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4728577231,
+       "YieldQ30" : 4231355779,
+       "QualityScoreSum" : 166257713554,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A34PA1",
+     "SampleName" : "59NovaSeq-Netthinne-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CAAGACTA",
+       "MismatchCounts" : {
+        "0" : 28911656,
+        "1" : 560126
+       }
+      }
+     ],
+     "NumberReads" : 29471782,
+     "Yield" : 8900478164,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4450239082,
+       "YieldQ30" : 4196689406,
+       "QualityScoreSum" : 160294965260,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4450239082,
+       "YieldQ30" : 4145142850,
+       "QualityScoreSum" : 159398744421,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A35PA1",
+     "SampleName" : "26NovaSeq-Netthinne-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCTCTATC",
+       "MismatchCounts" : {
+        "0" : 24663315,
+        "1" : 345667
+       }
+      }
+     ],
+     "NumberReads" : 25008982,
+     "Yield" : 7552712564,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3776356282,
+       "YieldQ30" : 3565691302,
+       "QualityScoreSum" : 136119797211,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3776356282,
+       "YieldQ30" : 3516836182,
+       "QualityScoreSum" : 135280666203,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A36PA1",
+     "SampleName" : "67NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACAGATTC",
+       "MismatchCounts" : {
+        "0" : 25753251,
+        "1" : 545309
+       }
+      }
+     ],
+     "NumberReads" : 26298560,
+     "Yield" : 7942165120,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3971082560,
+       "YieldQ30" : 3747556417,
+       "QualityScoreSum" : 143103150194,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3971082560,
+       "YieldQ30" : 3714805839,
+       "QualityScoreSum" : 142535961788,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A37PA1",
+     "SampleName" : "60NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CAAGGAGC",
+       "MismatchCounts" : {
+        "0" : 32768484,
+        "1" : 454963
+       }
+      }
+     ],
+     "NumberReads" : 33223447,
+     "Yield" : 10033480994,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 5016740497,
+       "YieldQ30" : 4732595076,
+       "QualityScoreSum" : 180751656855,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 5016740497,
+       "YieldQ30" : 4670681065,
+       "QualityScoreSum" : 179665977952,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A38PA1",
+     "SampleName" : "68NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TTCACGCA",
+       "MismatchCounts" : {
+        "0" : 31711093,
+        "1" : 207459
+       }
+      }
+     ],
+     "NumberReads" : 31918552,
+     "Yield" : 9639402704,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4819701352,
+       "YieldQ30" : 4544959295,
+       "QualityScoreSum" : 173617051575,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4819701352,
+       "YieldQ30" : 4496014854,
+       "QualityScoreSum" : 172772326084,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A39PA1",
+     "SampleName" : "43NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCTCCTGA",
+       "MismatchCounts" : {
+        "0" : 28650558,
+        "1" : 242748
+       }
+      }
+     ],
+     "NumberReads" : 28893306,
+     "Yield" : 8725778412,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4362889206,
+       "YieldQ30" : 4115512324,
+       "QualityScoreSum" : 157180318131,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4362889206,
+       "YieldQ30" : 4038435155,
+       "QualityScoreSum" : 155834209563,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A3PA1",
+     "SampleName" : "31NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CTAAGGTC",
+       "MismatchCounts" : {
+        "0" : 30088558,
+        "1" : 275614
+       }
+      }
+     ],
+     "NumberReads" : 30364172,
+     "Yield" : 9169979944,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4584989972,
+       "YieldQ30" : 4326097962,
+       "QualityScoreSum" : 165211925891,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4584989972,
+       "YieldQ30" : 4240014182,
+       "QualityScoreSum" : 163677736259,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A40PA1",
+     "SampleName" : "17NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TGGTGGTA",
+       "MismatchCounts" : {
+        "0" : 26160256,
+        "1" : 423526
+       }
+      }
+     ],
+     "NumberReads" : 26583782,
+     "Yield" : 8028302164,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4014151082,
+       "YieldQ30" : 3790925740,
+       "QualityScoreSum" : 144712163409,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4014151082,
+       "YieldQ30" : 3705980493,
+       "QualityScoreSum" : 143189894146,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A41PA1",
+     "SampleName" : "78NovaSeq-Hypogo-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AACAACCA",
+       "MismatchCounts" : {
+        "0" : 27716082,
+        "1" : 613698
+       }
+      }
+     ],
+     "NumberReads" : 28329780,
+     "Yield" : 8555593560,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4277796780,
+       "YieldQ30" : 4018400119,
+       "QualityScoreSum" : 153767609242,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4277796780,
+       "YieldQ30" : 3957472140,
+       "QualityScoreSum" : 152689207920,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A42PA1",
+     "SampleName" : "32NovaSeq-000000PK-Metabolsk-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AATCCGTC",
+       "MismatchCounts" : {
+        "0" : 28664445,
+        "1" : 261766
+       }
+      }
+     ],
+     "NumberReads" : 28926211,
+     "Yield" : 8735715722,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4367857861,
+       "YieldQ30" : 4122849211,
+       "QualityScoreSum" : 157407618526,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4367857861,
+       "YieldQ30" : 4013422628,
+       "QualityScoreSum" : 155461284245,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A43PA1",
+     "SampleName" : "29NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CACCTTAC",
+       "MismatchCounts" : {
+        "0" : 27065611,
+        "1" : 437493
+       }
+      }
+     ],
+     "NumberReads" : 27503104,
+     "Yield" : 8305937408,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4152968704,
+       "YieldQ30" : 3916754200,
+       "QualityScoreSum" : 149603221669,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4152968704,
+       "YieldQ30" : 3852816859,
+       "QualityScoreSum" : 148484574410,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A44PA1",
+     "SampleName" : "48NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AAGACGGA",
+       "MismatchCounts" : {
+        "0" : 33295616,
+        "1" : 445927
+       }
+      }
+     ],
+     "NumberReads" : 33741543,
+     "Yield" : 10189945986,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 5094972993,
+       "YieldQ30" : 4802523610,
+       "QualityScoreSum" : 183494801744,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 5094972993,
+       "YieldQ30" : 4517037870,
+       "QualityScoreSum" : 178243294186,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A45PA1",
+     "SampleName" : "52NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACACAGAA",
+       "MismatchCounts" : {
+        "0" : 29494586,
+        "1" : 432284
+       }
+      }
+     ],
+     "NumberReads" : 29926870,
+     "Yield" : 9037914740,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4518957370,
+       "YieldQ30" : 4257511589,
+       "QualityScoreSum" : 162688433630,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4518957370,
+       "YieldQ30" : 4185862325,
+       "QualityScoreSum" : 161420705100,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A46PA1",
+     "SampleName" : "13NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GAACAGGC",
+       "MismatchCounts" : {
+        "0" : 27553313,
+        "1" : 189453
+       }
+      }
+     ],
+     "NumberReads" : 27742766,
+     "Yield" : 8378315332,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4189157666,
+       "YieldQ30" : 3952450174,
+       "QualityScoreSum" : 150943111942,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4189157666,
+       "YieldQ30" : 3865011614,
+       "QualityScoreSum" : 149392111217,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A47PA1",
+     "SampleName" : "NA00000N53NovaSeq-Ciliopati-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AACCGAGA",
+       "MismatchCounts" : {
+        "0" : 29989334,
+        "1" : 301577
+       }
+      }
+     ],
+     "NumberReads" : 30290911,
+     "Yield" : 9147855122,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4573927561,
+       "YieldQ30" : 4309590754,
+       "QualityScoreSum" : 164682387858,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4573927561,
+       "YieldQ30" : 4221057870,
+       "QualityScoreSum" : 163099160457,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A48PA1",
+     "SampleName" : "86NovaSeq-000000PM-UtAv-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACAAGCTA",
+       "MismatchCounts" : {
+        "0" : 28050904,
+        "1" : 333249
+       }
+      }
+     ],
+     "NumberReads" : 28384153,
+     "Yield" : 8572014206,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4286007103,
+       "YieldQ30" : 4036063433,
+       "QualityScoreSum" : 154251507811,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4286007103,
+       "YieldQ30" : 3989607662,
+       "QualityScoreSum" : 153344757963,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A49PA1",
+     "SampleName" : "18NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ATGCCTAA",
+       "MismatchCounts" : {
+        "0" : 26342931,
+        "1" : 587789
+       }
+      }
+     ],
+     "NumberReads" : 26930720,
+     "Yield" : 8133077440,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4066538720,
+       "YieldQ30" : 3835631424,
+       "QualityScoreSum" : 146498015287,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4066538720,
+       "YieldQ30" : 3752349790,
+       "QualityScoreSum" : 145037775043,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A4PA1",
+     "SampleName" : "58NovaSeq-000000PK-UtAv-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CGACACAC",
+       "MismatchCounts" : {
+        "0" : 27628501,
+        "1" : 301722
+       }
+      }
+     ],
+     "NumberReads" : 27930223,
+     "Yield" : 8434927346,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4217463673,
+       "YieldQ30" : 3979297606,
+       "QualityScoreSum" : 151954109998,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4217463673,
+       "YieldQ30" : 3904607302,
+       "QualityScoreSum" : 150614892538,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A50PA1",
+     "SampleName" : "76NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GAATCTGA",
+       "MismatchCounts" : {
+        "0" : 24688719,
+        "1" : 391073
+       }
+      }
+     ],
+     "NumberReads" : 25079792,
+     "Yield" : 7574097184,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3787048592,
+       "YieldQ30" : 3573476789,
+       "QualityScoreSum" : 136458422361,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3787048592,
+       "YieldQ30" : 3535138543,
+       "QualityScoreSum" : 135796628739,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A51PA1",
+     "SampleName" : "69NovaSeq-Metabolsk-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AACGTGAT",
+       "MismatchCounts" : {
+        "0" : 32140882,
+        "1" : 509606
+       }
+      }
+     ],
+     "NumberReads" : 32650488,
+     "Yield" : 9860447376,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4930223688,
+       "YieldQ30" : 4654937541,
+       "QualityScoreSum" : 177713534736,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4930223688,
+       "YieldQ30" : 4602285553,
+       "QualityScoreSum" : 176807277910,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A52PA1",
+     "SampleName" : "80NovaSeq-Albinisme-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CACTTCGA",
+       "MismatchCounts" : {
+        "0" : 25111244,
+        "1" : 241625
+       }
+      }
+     ],
+     "NumberReads" : 25352869,
+     "Yield" : 7656566438,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3828283219,
+       "YieldQ30" : 3611090322,
+       "QualityScoreSum" : 137919798029,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3828283219,
+       "YieldQ30" : 3568584891,
+       "QualityScoreSum" : 137188878485,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A53PA1",
+     "SampleName" : "50NovaSeq-Albinisme-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GCCAAGAC",
+       "MismatchCounts" : {
+        "0" : 29304091,
+        "1" : 270477
+       }
+      }
+     ],
+     "NumberReads" : 29574568,
+     "Yield" : 8931519536,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4465759768,
+       "YieldQ30" : 4217330484,
+       "QualityScoreSum" : 160975668615,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4465759768,
+       "YieldQ30" : 4173583529,
+       "QualityScoreSum" : 160223508015,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A54PA1",
+     "SampleName" : "64NovaSeq-000000PK-UtAv-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GACTAGTA",
+       "MismatchCounts" : {
+        "0" : 26451584,
+        "1" : 340240
+       }
+      }
+     ],
+     "NumberReads" : 26791824,
+     "Yield" : 8091130848,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4045565424,
+       "YieldQ30" : 3812537227,
+       "QualityScoreSum" : 145685846583,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4045565424,
+       "YieldQ30" : 3750925769,
+       "QualityScoreSum" : 144601509500,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A55PA1",
+     "SampleName" : "34NovaSeq-Bindevev-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ATTGGCTC",
+       "MismatchCounts" : {
+        "0" : 25436175,
+        "1" : 255241
+       }
+      }
+     ],
+     "NumberReads" : 25691416,
+     "Yield" : 7758807632,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3879403816,
+       "YieldQ30" : 3660455134,
+       "QualityScoreSum" : 139792494342,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3879403816,
+       "YieldQ30" : 3617812689,
+       "QualityScoreSum" : 139055383601,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A56PA1",
+     "SampleName" : "15NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GATGAATC",
+       "MismatchCounts" : {
+        "0" : 23881476,
+        "1" : 380413
+       }
+      }
+     ],
+     "NumberReads" : 24261889,
+     "Yield" : 7327090478,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3663545239,
+       "YieldQ30" : 3456718728,
+       "QualityScoreSum" : 132007168882,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3663545239,
+       "YieldQ30" : 3428586123,
+       "QualityScoreSum" : 131529072089,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A57PA1",
+     "SampleName" : "54NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGCAGGAA",
+       "MismatchCounts" : {
+        "0" : 28216352,
+        "1" : 180557
+       }
+      }
+     ],
+     "NumberReads" : 28396909,
+     "Yield" : 8575866518,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4287933259,
+       "YieldQ30" : 4048972802,
+       "QualityScoreSum" : 154553352691,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4287933259,
+       "YieldQ30" : 3991253893,
+       "QualityScoreSum" : 153549269331,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A58PA1",
+     "SampleName" : "36NovaSeq-Mendel-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GAGCTGAA",
+       "MismatchCounts" : {
+        "0" : 28043854,
+        "1" : 322193
+       }
+      }
+     ],
+     "NumberReads" : 28366047,
+     "Yield" : 8566546194,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4283273097,
+       "YieldQ30" : 4039914444,
+       "QualityScoreSum" : 154307994264,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4283273097,
+       "YieldQ30" : 3975728373,
+       "QualityScoreSum" : 153182571712,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A59PA1",
+     "SampleName" : "62NovaSeq-000000PM-UtAv-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AAACATCG",
+       "MismatchCounts" : {
+        "0" : 25105318,
+        "1" : 265234
+       }
+      }
+     ],
+     "NumberReads" : 25370552,
+     "Yield" : 7661906704,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3830953352,
+       "YieldQ30" : 3614934715,
+       "QualityScoreSum" : 138036171808,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3830953352,
+       "YieldQ30" : 3573863583,
+       "QualityScoreSum" : 137331351023,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A5PA1",
+     "SampleName" : "47NovaSeq-000000PK-UtAv-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCGTGAGA",
+       "MismatchCounts" : {
+        "0" : 27769392,
+        "1" : 263454
+       }
+      }
+     ],
+     "NumberReads" : 28032846,
+     "Yield" : 8465919492,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4232959746,
+       "YieldQ30" : 3988695611,
+       "QualityScoreSum" : 152438295787,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4232959746,
+       "YieldQ30" : 3923866427,
+       "QualityScoreSum" : 151292104533,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A60PA1",
+     "SampleName" : "87NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GAGTTAGC",
+       "MismatchCounts" : {
+        "0" : 24996076,
+        "1" : 268762
+       }
+      }
+     ],
+     "NumberReads" : 25264838,
+     "Yield" : 7629981076,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3814990538,
+       "YieldQ30" : 3600963284,
+       "QualityScoreSum" : 137487139435,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3814990538,
+       "YieldQ30" : 3577326004,
+       "QualityScoreSum" : 137099073607,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A61PA1",
+     "SampleName" : "65NovaSeq-BevegForst-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CGAACTTA",
+       "MismatchCounts" : {
+        "0" : 26760516,
+        "1" : 356621
+       }
+      }
+     ],
+     "NumberReads" : 27117137,
+     "Yield" : 8189375374,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4094687687,
+       "YieldQ30" : 3861398765,
+       "QualityScoreSum" : 147493642883,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4094687687,
+       "YieldQ30" : 3813945078,
+       "QualityScoreSum" : 146676870931,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A62PA1",
+     "SampleName" : "46NovaSeq-Bindevev-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GATAGACA",
+       "MismatchCounts" : {
+        "0" : 26946868,
+        "1" : 245019
+       }
+      }
+     ],
+     "NumberReads" : 27191887,
+     "Yield" : 8211949874,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4105974937,
+       "YieldQ30" : 3873652128,
+       "QualityScoreSum" : 147929649800,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4105974937,
+       "YieldQ30" : 3830671219,
+       "QualityScoreSum" : 147192323486,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A63PA1",
+     "SampleName" : "21NovaSeq-Linse-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AAGGACAC",
+       "MismatchCounts" : {
+        "0" : 25002548,
+        "1" : 266120
+       }
+      }
+     ],
+     "NumberReads" : 25268668,
+     "Yield" : 7631137736,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3815568868,
+       "YieldQ30" : 3599203596,
+       "QualityScoreSum" : 137460952538,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3815568868,
+       "YieldQ30" : 3559171873,
+       "QualityScoreSum" : 136776414291,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A64PA1",
+     "SampleName" : "70NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GACAGTGC",
+       "MismatchCounts" : {
+        "0" : 29078548,
+        "1" : 461040
+       }
+      }
+     ],
+     "NumberReads" : 29539588,
+     "Yield" : 8920955576,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4460477788,
+       "YieldQ30" : 4202684066,
+       "QualityScoreSum" : 160617765387,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4460477788,
+       "YieldQ30" : 4167169594,
+       "QualityScoreSum" : 160010077770,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A65PA1",
+     "SampleName" : "23NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ATCATTCC",
+       "MismatchCounts" : {
+        "0" : 26815467,
+        "1" : 406632
+       }
+      }
+     ],
+     "NumberReads" : 27222099,
+     "Yield" : 8221073898,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4110536949,
+       "YieldQ30" : 3880091793,
+       "QualityScoreSum" : 148138216582,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4110536949,
+       "YieldQ30" : 3843498832,
+       "QualityScoreSum" : 147524341482,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A66PA1",
+     "SampleName" : "28NovaSeq-BevegForst-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GCCACATA",
+       "MismatchCounts" : {
+        "0" : 29570616,
+        "1" : 260311
+       }
+      }
+     ],
+     "NumberReads" : 29830927,
+     "Yield" : 9008939954,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4504469977,
+       "YieldQ30" : 4243362546,
+       "QualityScoreSum" : 162173800017,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4504469977,
+       "YieldQ30" : 4162924437,
+       "QualityScoreSum" : 160751631299,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A67PA1",
+     "SampleName" : "75NovaSeq-Hypogo-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACCACTGT",
+       "MismatchCounts" : {
+        "0" : 27678495,
+        "1" : 343181
+       }
+      }
+     ],
+     "NumberReads" : 28021676,
+     "Yield" : 8462546152,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4231273076,
+       "YieldQ30" : 3998290390,
+       "QualityScoreSum" : 152568291328,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4231273076,
+       "YieldQ30" : 3938257749,
+       "QualityScoreSum" : 151535843558,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A68PA1",
+     "SampleName" : "73NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CTGGCATA",
+       "MismatchCounts" : {
+        "0" : 33484616,
+        "1" : 284862
+       }
+      }
+     ],
+     "NumberReads" : 33769478,
+     "Yield" : 10198382356,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 5099191178,
+       "YieldQ30" : 4809438203,
+       "QualityScoreSum" : 183704180497,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 5099191178,
+       "YieldQ30" : 4686954483,
+       "QualityScoreSum" : 181546481919,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A69PA1",
+     "SampleName" : "49NovaSeq-Hypogo-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACCTCCAA",
+       "MismatchCounts" : {
+        "0" : 29044889,
+        "1" : 471867
+       }
+      }
+     ],
+     "NumberReads" : 29516756,
+     "Yield" : 8914060312,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4457030156,
+       "YieldQ30" : 4203916545,
+       "QualityScoreSum" : 160559408787,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4457030156,
+       "YieldQ30" : 4124808751,
+       "QualityScoreSum" : 159181684385,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A6PA1",
+     "SampleName" : "82NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GTGTTCTA",
+       "MismatchCounts" : {
+        "0" : 26401243,
+        "1" : 467383
+       }
+      }
+     ],
+     "NumberReads" : 26868626,
+     "Yield" : 8114325052,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4057162526,
+       "YieldQ30" : 3825446241,
+       "QualityScoreSum" : 146151632943,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4057162526,
+       "YieldQ30" : 3776533849,
+       "QualityScoreSum" : 145291333496,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A70PA1",
+     "SampleName" : "12NovaSeq-Nyrecyster-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GCGAGTAA",
+       "MismatchCounts" : {
+        "0" : 31040877,
+        "1" : 357168
+       }
+      }
+     ],
+     "NumberReads" : 31398045,
+     "Yield" : 9482209590,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4741104795,
+       "YieldQ30" : 4473114494,
+       "QualityScoreSum" : 170823189824,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4741104795,
+       "YieldQ30" : 4442877248,
+       "QualityScoreSum" : 170318648571,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A71PA1",
+     "SampleName" : "85NovaSeq-FremSegment-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACTATGCA",
+       "MismatchCounts" : {
+        "0" : 25580176,
+        "1" : 214626
+       }
+      }
+     ],
+     "NumberReads" : 25794802,
+     "Yield" : 7790030204,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3895015102,
+       "YieldQ30" : 3671870904,
+       "QualityScoreSum" : 140282121017,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3895015102,
+       "YieldQ30" : 3619270824,
+       "QualityScoreSum" : 139375444182,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A72PA1",
+     "SampleName" : "72NovaSeq-Bindevev-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CGGATTGC",
+       "MismatchCounts" : {
+        "0" : 25828659,
+        "1" : 338495
+       }
+      }
+     ],
+     "NumberReads" : 26167154,
+     "Yield" : 7902480508,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3951240254,
+       "YieldQ30" : 3730211355,
+       "QualityScoreSum" : 142408466152,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3951240254,
+       "YieldQ30" : 3709967685,
+       "QualityScoreSum" : 142087784759,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A73PA1",
+     "SampleName" : "83NovaSeq-Mendel-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AACTCACC",
+       "MismatchCounts" : {
+        "0" : 26649386,
+        "1" : 328242
+       }
+      }
+     ],
+     "NumberReads" : 26977628,
+     "Yield" : 8147243656,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4073621828,
+       "YieldQ30" : 3843171940,
+       "QualityScoreSum" : 146764260380,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4073621828,
+       "YieldQ30" : 3789596758,
+       "QualityScoreSum" : 145845582927,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A74PA1",
+     "SampleName" : "14NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GCTAACGA",
+       "MismatchCounts" : {
+        "0" : 31760593,
+        "1" : 267198
+       }
+      }
+     ],
+     "NumberReads" : 32027791,
+     "Yield" : 9672392882,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4836196441,
+       "YieldQ30" : 4564620485,
+       "QualityScoreSum" : 174280981956,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4836196441,
+       "YieldQ30" : 4525182305,
+       "QualityScoreSum" : 173613503015,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A75PA1",
+     "SampleName" : "11NovaSeq-BevegForsU00-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CAGATCTG",
+       "MismatchCounts" : {
+        "0" : 29426801,
+        "1" : 642228
+       }
+      }
+     ],
+     "NumberReads" : 30069029,
+     "Yield" : 9080846758,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4540423379,
+       "YieldQ30" : 4288169592,
+       "QualityScoreSum" : 163683298429,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4540423379,
+       "YieldQ30" : 4257423351,
+       "QualityScoreSum" : 163175286506,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A76PA1",
+     "SampleName" : "42NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ATCCTGTA",
+       "MismatchCounts" : {
+        "0" : 30245799,
+        "1" : 325895
+       }
+      }
+     ],
+     "NumberReads" : 30571694,
+     "Yield" : 9232651588,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4616325794,
+       "YieldQ30" : 4355514370,
+       "QualityScoreSum" : 166334584719,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4616325794,
+       "YieldQ30" : 4256957239,
+       "QualityScoreSum" : 164596229337,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A77PA1",
+     "SampleName" : "19NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CTGTAGCC",
+       "MismatchCounts" : {
+        "0" : 31254288,
+        "1" : 335077
+       }
+      }
+     ],
+     "NumberReads" : 31589365,
+     "Yield" : 9539988230,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4769994115,
+       "YieldQ30" : 4502978413,
+       "QualityScoreSum" : 171915642976,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4769994115,
+       "YieldQ30" : 4464626213,
+       "QualityScoreSum" : 171269389411,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A78PA1",
+     "SampleName" : "16NovaSeq-Linse-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GCTCGGTA",
+       "MismatchCounts" : {
+        "0" : 29317205,
+        "1" : 335035
+       }
+      }
+     ],
+     "NumberReads" : 29652240,
+     "Yield" : 8954976480,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4477488240,
+       "YieldQ30" : 4227241105,
+       "QualityScoreSum" : 161382368065,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4477488240,
+       "YieldQ30" : 4157616349,
+       "QualityScoreSum" : 160172554706,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A7PA1",
+     "SampleName" : "22NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CAGCGTTA",
+       "MismatchCounts" : {
+        "0" : 33114079,
+        "1" : 377965
+       }
+      }
+     ],
+     "NumberReads" : 33492044,
+     "Yield" : 10114597288,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 5057298644,
+       "YieldQ30" : 4772903886,
+       "QualityScoreSum" : 182241398976,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 5057298644,
+       "YieldQ30" : 4706745951,
+       "QualityScoreSum" : 181086024358,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A8PA1",
+     "SampleName" : "55NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TAGGATGA",
+       "MismatchCounts" : {
+        "0" : 27915781,
+        "1" : 223113
+       }
+      }
+     ],
+     "NumberReads" : 28138894,
+     "Yield" : 8497945988,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4248972994,
+       "YieldQ30" : 4017502661,
+       "QualityScoreSum" : 153256986580,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4248972994,
+       "YieldQ30" : 3975730882,
+       "QualityScoreSum" : 152541851536,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A9PA1",
+     "SampleName" : "84NovaSeq-PCD-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGTGGTCA",
+       "MismatchCounts" : {
+        "0" : 30370037,
+        "1" : 529692
+       }
+      }
+     ],
+     "NumberReads" : 30899729,
+     "Yield" : 9331718158,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4665859079,
+       "YieldQ30" : 4406146409,
+       "QualityScoreSum" : 168200677014,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4665859079,
+       "YieldQ30" : 4331976162,
+       "QualityScoreSum" : 166887294633,
+       "TrimmedBases" : 0
+      }
+     ]
+    }
+   ],
+   "Undetermined" : {
+    "NumberReads" : 75897884,
+    "Yield" : 22921160968,
+    "ReadMetrics" : [
+     {
+      "ReadNumber" : 1,
+      "Yield" : 11460580484,
+      "YieldQ30" : 9928854542,
+      "QualityScoreSum" : 394193100570,
+      "TrimmedBases" : 0
+     },
+     {
+      "ReadNumber" : 2,
+      "Yield" : 11460580484,
+      "YieldQ30" : 9607261691,
+      "QualityScoreSum" : 387418390345,
+      "TrimmedBases" : 0
+     }
+    ]
+   }
+  },
+  {
+   "LaneNumber" : 2,
+   "TotalClustersRaw" : 2880700416,
+   "TotalClustersPF" : 2328394928,
+   "Yield" : 703175268256,
+   "DemuxResults" : [
+    {
+     "SampleId" : "KIR2001A10PA1",
+     "SampleName" : "51NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACAGCAGA",
+       "MismatchCounts" : {
+        "0" : 29244038,
+        "1" : 304013
+       }
+      }
+     ],
+     "NumberReads" : 29548051,
+     "Yield" : 8923511402,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4461755701,
+       "YieldQ30" : 4199356578,
+       "QualityScoreSum" : 160566894991,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4461755701,
+       "YieldQ30" : 4105166830,
+       "QualityScoreSum" : 158873236389,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A11PA1",
+     "SampleName" : "24NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CAATGGAA",
+       "MismatchCounts" : {
+        "0" : 26292371,
+        "1" : 348048
+       }
+      }
+     ],
+     "NumberReads" : 26640419,
+     "Yield" : 8045406538,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4022703269,
+       "YieldQ30" : 3787897171,
+       "QualityScoreSum" : 144800647209,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4022703269,
+       "YieldQ30" : 3715820185,
+       "QualityScoreSum" : 143514789612,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A12PA1",
+     "SampleName" : "40NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGCACCTC",
+       "MismatchCounts" : {
+        "0" : 25506728,
+        "1" : 274260
+       }
+      }
+     ],
+     "NumberReads" : 25780988,
+     "Yield" : 7785858376,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3892929188,
+       "YieldQ30" : 3664027491,
+       "QualityScoreSum" : 140106144852,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3892929188,
+       "YieldQ30" : 3613708474,
+       "QualityScoreSum" : 139213893271,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A13PA1",
+     "SampleName" : "57NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CTCAATGA",
+       "MismatchCounts" : {
+        "0" : 30471950,
+        "1" : 206235
+       }
+      }
+     ],
+     "NumberReads" : 30678185,
+     "Yield" : 9264811870,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4632405935,
+       "YieldQ30" : 4364764329,
+       "QualityScoreSum" : 166793267489,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4632405935,
+       "YieldQ30" : 4294276741,
+       "QualityScoreSum" : 165540398825,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A14PA1",
+     "SampleName" : "74NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TCCGTCTA",
+       "MismatchCounts" : {
+        "0" : 31396668,
+        "1" : 285454
+       }
+      }
+     ],
+     "NumberReads" : 31682122,
+     "Yield" : 9568000844,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4784000422,
+       "YieldQ30" : 4508774204,
+       "QualityScoreSum" : 172293158136,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4784000422,
+       "YieldQ30" : 4437002015,
+       "QualityScoreSum" : 171014837620,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A15PA1",
+     "SampleName" : "66NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CATACCAA",
+       "MismatchCounts" : {
+        "0" : 29854053,
+        "1" : 312233
+       }
+      }
+     ],
+     "NumberReads" : 30166286,
+     "Yield" : 9110218372,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4555109186,
+       "YieldQ30" : 4288263550,
+       "QualityScoreSum" : 163930553350,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4555109186,
+       "YieldQ30" : 4236758884,
+       "QualityScoreSum" : 163029519237,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A16PA1",
+     "SampleName" : "39NovaSeq-000000PM-UtAv-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TATCAGCA",
+       "MismatchCounts" : {
+        "0" : 25829269,
+        "1" : 258160
+       }
+      }
+     ],
+     "NumberReads" : 26087429,
+     "Yield" : 7878403558,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3939201779,
+       "YieldQ30" : 3707238978,
+       "QualityScoreSum" : 141764073534,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3939201779,
+       "YieldQ30" : 3610409710,
+       "QualityScoreSum" : 139999435396,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A17PA1",
+     "SampleName" : "79NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ATAGCGAC",
+       "MismatchCounts" : {
+        "0" : 30670771,
+        "1" : 253659
+       }
+      }
+     ],
+     "NumberReads" : 30924430,
+     "Yield" : 9339177860,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4669588930,
+       "YieldQ30" : 4397598522,
+       "QualityScoreSum" : 168108726018,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4669588930,
+       "YieldQ30" : 4342574090,
+       "QualityScoreSum" : 167139840477,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A18PA1",
+     "SampleName" : "37NovaSeq-000000PK-UtAv-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACGCTCGA",
+       "MismatchCounts" : {
+        "0" : 27555847,
+        "1" : 201847
+       }
+      }
+     ],
+     "NumberReads" : 27757694,
+     "Yield" : 8382823588,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4191411794,
+       "YieldQ30" : 3946230828,
+       "QualityScoreSum" : 150866112047,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4191411794,
+       "YieldQ30" : 3902955407,
+       "QualityScoreSum" : 150114413327,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A19PA1",
+     "SampleName" : "61NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGGCTAAC",
+       "MismatchCounts" : {
+        "0" : 30567447,
+        "1" : 275930
+       }
+      }
+     ],
+     "NumberReads" : 30843377,
+     "Yield" : 9314699854,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4657349927,
+       "YieldQ30" : 4388551708,
+       "QualityScoreSum" : 167708639735,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4657349927,
+       "YieldQ30" : 4301823888,
+       "QualityScoreSum" : 166169875624,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A1PA1",
+     "SampleName" : "10NovaSeq-MigraForst-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACGTATCA",
+       "MismatchCounts" : {
+        "0" : 28091415,
+        "1" : 311310
+       }
+      }
+     ],
+     "NumberReads" : 28402725,
+     "Yield" : 8577622950,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4288811475,
+       "YieldQ30" : 4027468985,
+       "QualityScoreSum" : 154188233940,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4288811475,
+       "YieldQ30" : 3974010714,
+       "QualityScoreSum" : 153213749067,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A20PA1",
+     "SampleName" : "56NovaSeq-PU-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCATCCTC",
+       "MismatchCounts" : {
+        "0" : 31320108,
+        "1" : 444771
+       }
+      }
+     ],
+     "NumberReads" : 31764879,
+     "Yield" : 9592993458,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4796496729,
+       "YieldQ30" : 4519313491,
+       "QualityScoreSum" : 172717306886,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4796496729,
+       "YieldQ30" : 4475191581,
+       "QualityScoreSum" : 171965628832,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A21PA1",
+     "SampleName" : "41NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGATGTAC",
+       "MismatchCounts" : {
+        "0" : 33456071,
+        "1" : 491765
+       }
+      }
+     ],
+     "NumberReads" : 33947836,
+     "Yield" : 10252246472,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 5126123236,
+       "YieldQ30" : 4830742596,
+       "QualityScoreSum" : 184605464260,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 5126123236,
+       "YieldQ30" : 4789455783,
+       "QualityScoreSum" : 183898731607,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A22PA1",
+     "SampleName" : "33NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TCTTCACA",
+       "MismatchCounts" : {
+        "0" : 27781533,
+        "1" : 278849
+       }
+      }
+     ],
+     "NumberReads" : 28060382,
+     "Yield" : 8474235364,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4237117682,
+       "YieldQ30" : 3983783065,
+       "QualityScoreSum" : 152420440608,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4237117682,
+       "YieldQ30" : 3915697883,
+       "QualityScoreSum" : 151219130688,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A23PA1",
+     "SampleName" : "71NovaSeq-BevegForst-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCGAAGTA",
+       "MismatchCounts" : {
+        "0" : 27812634,
+        "1" : 205483
+       }
+      }
+     ],
+     "NumberReads" : 28018117,
+     "Yield" : 8461471334,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4230735667,
+       "YieldQ30" : 3984184437,
+       "QualityScoreSum" : 152293778770,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4230735667,
+       "YieldQ30" : 3936717606,
+       "QualityScoreSum" : 151457518583,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A24PA1",
+     "SampleName" : "63NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CGCATACA",
+       "MismatchCounts" : {
+        "0" : 27002454,
+        "1" : 253193
+       }
+      }
+     ],
+     "NumberReads" : 27255647,
+     "Yield" : 8231205394,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4115602697,
+       "YieldQ30" : 3877829654,
+       "QualityScoreSum" : 148185636209,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4115602697,
+       "YieldQ30" : 3799527646,
+       "QualityScoreSum" : 146805128494,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A25PA1",
+     "SampleName" : "45NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AATGTTGC",
+       "MismatchCounts" : {
+        "0" : 29170514,
+        "1" : 381296
+       }
+      }
+     ],
+     "NumberReads" : 29551810,
+     "Yield" : 8924646620,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4462323310,
+       "YieldQ30" : 4205007301,
+       "QualityScoreSum" : 160694217208,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4462323310,
+       "YieldQ30" : 4161798768,
+       "QualityScoreSum" : 159941206328,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A26PA1",
+     "SampleName" : "27NovaSeq-000000PM-UtAv-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TGAAGAGA",
+       "MismatchCounts" : {
+        "0" : 31749589,
+        "1" : 277363
+       }
+      }
+     ],
+     "NumberReads" : 32026952,
+     "Yield" : 9672139504,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4836069752,
+       "YieldQ30" : 4558163952,
+       "QualityScoreSum" : 174161320646,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4836069752,
+       "YieldQ30" : 4473052576,
+       "QualityScoreSum" : 172646498494,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A27PA1",
+     "SampleName" : "44NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGATCGCA",
+       "MismatchCounts" : {
+        "0" : 31114463,
+        "1" : 254674
+       }
+      }
+     ],
+     "NumberReads" : 31369137,
+     "Yield" : 9473479374,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4736739687,
+       "YieldQ30" : 4458028722,
+       "QualityScoreSum" : 170472144020,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4736739687,
+       "YieldQ30" : 4395383490,
+       "QualityScoreSum" : 169350161733,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A28PA1",
+     "SampleName" : "81NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AAGAGATC",
+       "MismatchCounts" : {
+        "0" : 29696793,
+        "1" : 664681
+       }
+      }
+     ],
+     "NumberReads" : 30361474,
+     "Yield" : 9169165148,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4584582574,
+       "YieldQ30" : 4317916013,
+       "QualityScoreSum" : 165051899640,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4584582574,
+       "YieldQ30" : 4280564175,
+       "QualityScoreSum" : 164391691568,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A29PA1",
+     "SampleName" : "38NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CAACCACA",
+       "MismatchCounts" : {
+        "0" : 32515520,
+        "1" : 388906
+       }
+      }
+     ],
+     "NumberReads" : 32904426,
+     "Yield" : 9937136652,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4968568326,
+       "YieldQ30" : 4672787641,
+       "QualityScoreSum" : 178733148155,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4968568326,
+       "YieldQ30" : 4574890354,
+       "QualityScoreSum" : 176994410108,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A2PA1",
+     "SampleName" : "30NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GTCTGTCA",
+       "MismatchCounts" : {
+        "0" : 26952138,
+        "1" : 236534
+       }
+      }
+     ],
+     "NumberReads" : 27188672,
+     "Yield" : 8210978944,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4105489472,
+       "YieldQ30" : 3866806411,
+       "QualityScoreSum" : 147813250917,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4105489472,
+       "YieldQ30" : 3801526206,
+       "QualityScoreSum" : 146629138466,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A30PA1",
+     "SampleName" : "25NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TGGAACAA",
+       "MismatchCounts" : {
+        "0" : 32419972,
+        "1" : 380031
+       }
+      }
+     ],
+     "NumberReads" : 32800003,
+     "Yield" : 9905600906,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4952800453,
+       "YieldQ30" : 4659729218,
+       "QualityScoreSum" : 178221857230,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4952800453,
+       "YieldQ30" : 4589817036,
+       "QualityScoreSum" : 176963062392,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A31PA1",
+     "SampleName" : "35NovaSeq-SegOv-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCAGTTCA",
+       "MismatchCounts" : {
+        "0" : 28470499,
+        "1" : 219951
+       }
+      }
+     ],
+     "NumberReads" : 28690450,
+     "Yield" : 8664515900,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4332257950,
+       "YieldQ30" : 4080978433,
+       "QualityScoreSum" : 155978226794,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4332257950,
+       "YieldQ30" : 4042187145,
+       "QualityScoreSum" : 155307100784,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A32PA1",
+     "SampleName" : "77NovaSeq-PU-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TGGCTTCA",
+       "MismatchCounts" : {
+        "0" : 29503711,
+        "1" : 187470
+       }
+      }
+     ],
+     "NumberReads" : 29691181,
+     "Yield" : 8966736662,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4483368331,
+       "YieldQ30" : 4219874791,
+       "QualityScoreSum" : 161368231456,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4483368331,
+       "YieldQ30" : 4175361153,
+       "QualityScoreSum" : 160573767437,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A33PA1",
+     "SampleName" : "20NovaSeq-Linse-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CGACTGGA",
+       "MismatchCounts" : {
+        "0" : 30655413,
+        "1" : 382446
+       }
+      }
+     ],
+     "NumberReads" : 31037859,
+     "Yield" : 9373433418,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4686716709,
+       "YieldQ30" : 4280938047,
+       "QualityScoreSum" : 166450851543,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4686716709,
+       "YieldQ30" : 4185921227,
+       "QualityScoreSum" : 164629653860,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A34PA1",
+     "SampleName" : "59NovaSeq-Netthinne-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CAAGACTA",
+       "MismatchCounts" : {
+        "0" : 28775915,
+        "1" : 564123
+       }
+      }
+     ],
+     "NumberReads" : 29340038,
+     "Yield" : 8860691476,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4430345738,
+       "YieldQ30" : 4170908564,
+       "QualityScoreSum" : 159451493818,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4430345738,
+       "YieldQ30" : 4118699410,
+       "QualityScoreSum" : 158536988918,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A35PA1",
+     "SampleName" : "26NovaSeq-Netthinne-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCTCTATC",
+       "MismatchCounts" : {
+        "0" : 24532666,
+        "1" : 353089
+       }
+      }
+     ],
+     "NumberReads" : 24885755,
+     "Yield" : 7515498010,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3757749005,
+       "YieldQ30" : 3542525070,
+       "QualityScoreSum" : 135349062118,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3757749005,
+       "YieldQ30" : 3493054452,
+       "QualityScoreSum" : 134491939247,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A36PA1",
+     "SampleName" : "67NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACAGATTC",
+       "MismatchCounts" : {
+        "0" : 25615819,
+        "1" : 541255
+       }
+      }
+     ],
+     "NumberReads" : 26157074,
+     "Yield" : 7899436348,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3949718174,
+       "YieldQ30" : 3721374101,
+       "QualityScoreSum" : 142224597825,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3949718174,
+       "YieldQ30" : 3687672283,
+       "QualityScoreSum" : 141634425270,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A37PA1",
+     "SampleName" : "60NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CAAGGAGC",
+       "MismatchCounts" : {
+        "0" : 32586568,
+        "1" : 456541
+       }
+      }
+     ],
+     "NumberReads" : 33043109,
+     "Yield" : 9979018918,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4989509459,
+       "YieldQ30" : 4699022525,
+       "QualityScoreSum" : 179628250292,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4989509459,
+       "YieldQ30" : 4636220140,
+       "QualityScoreSum" : 178519390403,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A38PA1",
+     "SampleName" : "68NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TTCACGCA",
+       "MismatchCounts" : {
+        "0" : 31542341,
+        "1" : 210068
+       }
+      }
+     ],
+     "NumberReads" : 31752409,
+     "Yield" : 9589227518,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4794613759,
+       "YieldQ30" : 4513617590,
+       "QualityScoreSum" : 172574538512,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4794613759,
+       "YieldQ30" : 4464130240,
+       "QualityScoreSum" : 171712767510,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A39PA1",
+     "SampleName" : "43NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCTCCTGA",
+       "MismatchCounts" : {
+        "0" : 28494756,
+        "1" : 245669
+       }
+      }
+     ],
+     "NumberReads" : 28740425,
+     "Yield" : 8679608350,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4339804175,
+       "YieldQ30" : 4087102390,
+       "QualityScoreSum" : 156229577555,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4339804175,
+       "YieldQ30" : 4009505113,
+       "QualityScoreSum" : 154865460802,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A3PA1",
+     "SampleName" : "31NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CTAAGGTC",
+       "MismatchCounts" : {
+        "0" : 29908294,
+        "1" : 279115
+       }
+      }
+     ],
+     "NumberReads" : 30187409,
+     "Yield" : 9116597518,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4558298759,
+       "YieldQ30" : 4293755871,
+       "QualityScoreSum" : 164121513441,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4558298759,
+       "YieldQ30" : 4206392419,
+       "QualityScoreSum" : 162554740093,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A40PA1",
+     "SampleName" : "17NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TGGTGGTA",
+       "MismatchCounts" : {
+        "0" : 26039036,
+        "1" : 432559
+       }
+      }
+     ],
+     "NumberReads" : 26471595,
+     "Yield" : 7994421690,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3997210845,
+       "YieldQ30" : 3768785712,
+       "QualityScoreSum" : 143990451891,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3997210845,
+       "YieldQ30" : 3683546208,
+       "QualityScoreSum" : 142454867503,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A41PA1",
+     "SampleName" : "78NovaSeq-Hypogo-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AACAACCA",
+       "MismatchCounts" : {
+        "0" : 27588411,
+        "1" : 617200
+       }
+      }
+     ],
+     "NumberReads" : 28205611,
+     "Yield" : 8518094522,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4259047261,
+       "YieldQ30" : 3993773609,
+       "QualityScoreSum" : 152965824389,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4259047261,
+       "YieldQ30" : 3932179620,
+       "QualityScoreSum" : 151867643809,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A42PA1",
+     "SampleName" : "32NovaSeq-000000PK-Metabolsk-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AATCCGTC",
+       "MismatchCounts" : {
+        "0" : 28491080,
+        "1" : 265883
+       }
+      }
+     ],
+     "NumberReads" : 28756963,
+     "Yield" : 8684602826,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4342301413,
+       "YieldQ30" : 4091896573,
+       "QualityScoreSum" : 156363072715,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4342301413,
+       "YieldQ30" : 3980738142,
+       "QualityScoreSum" : 154375667007,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A43PA1",
+     "SampleName" : "29NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CACCTTAC",
+       "MismatchCounts" : {
+        "0" : 26920154,
+        "1" : 438974
+       }
+      }
+     ],
+     "NumberReads" : 27359128,
+     "Yield" : 8262456656,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4131228328,
+       "YieldQ30" : 3889897410,
+       "QualityScoreSum" : 148705487536,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4131228328,
+       "YieldQ30" : 3825387691,
+       "QualityScoreSum" : 147569372578,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A44PA1",
+     "SampleName" : "48NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AAGACGGA",
+       "MismatchCounts" : {
+        "0" : 33055197,
+        "1" : 448186
+       }
+      }
+     ],
+     "NumberReads" : 33503383,
+     "Yield" : 10118021666,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 5059010833,
+       "YieldQ30" : 4760515590,
+       "QualityScoreSum" : 182054067996,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 5059010833,
+       "YieldQ30" : 4470870230,
+       "QualityScoreSum" : 176698417090,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A45PA1",
+     "SampleName" : "52NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACACAGAA",
+       "MismatchCounts" : {
+        "0" : 29342330,
+        "1" : 437161
+       }
+      }
+     ],
+     "NumberReads" : 29779491,
+     "Yield" : 8993406282,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4496703141,
+       "YieldQ30" : 4229588780,
+       "QualityScoreSum" : 161761471077,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4496703141,
+       "YieldQ30" : 4157426046,
+       "QualityScoreSum" : 160476288584,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A46PA1",
+     "SampleName" : "13NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GAACAGGC",
+       "MismatchCounts" : {
+        "0" : 27377431,
+        "1" : 190951
+       }
+      }
+     ],
+     "NumberReads" : 27568382,
+     "Yield" : 8325651364,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4162825682,
+       "YieldQ30" : 3920701564,
+       "QualityScoreSum" : 149869218488,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4162825682,
+       "YieldQ30" : 3832490314,
+       "QualityScoreSum" : 148295632885,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A47PA1",
+     "SampleName" : "NA00000N53NovaSeq-Ciliopati-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AACCGAGA",
+       "MismatchCounts" : {
+        "0" : 29836160,
+        "1" : 303139
+       }
+      }
+     ],
+     "NumberReads" : 30139299,
+     "Yield" : 9102068298,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4551034149,
+       "YieldQ30" : 4280893979,
+       "QualityScoreSum" : 163729800059,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4551034149,
+       "YieldQ30" : 4191701434,
+       "QualityScoreSum" : 162125434843,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A48PA1",
+     "SampleName" : "86NovaSeq-000000PM-UtAv-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACAAGCTA",
+       "MismatchCounts" : {
+        "0" : 27919578,
+        "1" : 335960
+       }
+      }
+     ],
+     "NumberReads" : 28255538,
+     "Yield" : 8533172476,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4266586238,
+       "YieldQ30" : 4011071158,
+       "QualityScoreSum" : 153430922837,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4266586238,
+       "YieldQ30" : 3964653688,
+       "QualityScoreSum" : 152523763777,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A49PA1",
+     "SampleName" : "18NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ATGCCTAA",
+       "MismatchCounts" : {
+        "0" : 26219278,
+        "1" : 586772
+       }
+      }
+     ],
+     "NumberReads" : 26806050,
+     "Yield" : 8095427100,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4047713550,
+       "YieldQ30" : 3811624957,
+       "QualityScoreSum" : 145707663923,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4047713550,
+       "YieldQ30" : 3727486276,
+       "QualityScoreSum" : 144222334426,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A4PA1",
+     "SampleName" : "58NovaSeq-000000PK-UtAv-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CGACACAC",
+       "MismatchCounts" : {
+        "0" : 27475990,
+        "1" : 304579
+       }
+      }
+     ],
+     "NumberReads" : 27780569,
+     "Yield" : 8389731838,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4194865919,
+       "YieldQ30" : 3951363940,
+       "QualityScoreSum" : 151020516140,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4194865919,
+       "YieldQ30" : 3875639449,
+       "QualityScoreSum" : 149654550783,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A50PA1",
+     "SampleName" : "76NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GAATCTGA",
+       "MismatchCounts" : {
+        "0" : 24562756,
+        "1" : 392113
+       }
+      }
+     ],
+     "NumberReads" : 24954869,
+     "Yield" : 7536370438,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3768185219,
+       "YieldQ30" : 3549750333,
+       "QualityScoreSum" : 135671663647,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3768185219,
+       "YieldQ30" : 3510386016,
+       "QualityScoreSum" : 134984646607,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A51PA1",
+     "SampleName" : "69NovaSeq-Metabolsk-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AACGTGAT",
+       "MismatchCounts" : {
+        "0" : 32002227,
+        "1" : 507113
+       }
+      }
+     ],
+     "NumberReads" : 32509340,
+     "Yield" : 9817820680,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4908910340,
+       "YieldQ30" : 4627246729,
+       "QualityScoreSum" : 176808750383,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4908910340,
+       "YieldQ30" : 4573601616,
+       "QualityScoreSum" : 175877983985,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A52PA1",
+     "SampleName" : "80NovaSeq-Albinisme-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CACTTCGA",
+       "MismatchCounts" : {
+        "0" : 24989401,
+        "1" : 244644
+       }
+      }
+     ],
+     "NumberReads" : 25234045,
+     "Yield" : 7620681590,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3810340795,
+       "YieldQ30" : 3588113649,
+       "QualityScoreSum" : 137163912884,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3810340795,
+       "YieldQ30" : 3544801245,
+       "QualityScoreSum" : 136411753700,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A53PA1",
+     "SampleName" : "50NovaSeq-Albinisme-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GCCAAGAC",
+       "MismatchCounts" : {
+        "0" : 29142300,
+        "1" : 273350
+       }
+      }
+     ],
+     "NumberReads" : 29415650,
+     "Yield" : 8883526300,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4441763150,
+       "YieldQ30" : 4187894925,
+       "QualityScoreSum" : 159988511997,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4441763150,
+       "YieldQ30" : 4142834870,
+       "QualityScoreSum" : 159205094690,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A54PA1",
+     "SampleName" : "64NovaSeq-000000PK-UtAv-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GACTAGTA",
+       "MismatchCounts" : {
+        "0" : 26309144,
+        "1" : 343808
+       }
+      }
+     ],
+     "NumberReads" : 26652952,
+     "Yield" : 8049191504,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4024595752,
+       "YieldQ30" : 3786700804,
+       "QualityScoreSum" : 144821130748,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4024595752,
+       "YieldQ30" : 3724182606,
+       "QualityScoreSum" : 143711987434,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A55PA1",
+     "SampleName" : "34NovaSeq-Bindevev-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ATTGGCTC",
+       "MismatchCounts" : {
+        "0" : 25290405,
+        "1" : 259262
+       }
+      }
+     ],
+     "NumberReads" : 25549667,
+     "Yield" : 7715999434,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3857999717,
+       "YieldQ30" : 3634123781,
+       "QualityScoreSum" : 138910464184,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3857999717,
+       "YieldQ30" : 3590569547,
+       "QualityScoreSum" : 138150908294,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A56PA1",
+     "SampleName" : "15NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GATGAATC",
+       "MismatchCounts" : {
+        "0" : 23751805,
+        "1" : 384746
+       }
+      }
+     ],
+     "NumberReads" : 24136551,
+     "Yield" : 7289238402,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3644619201,
+       "YieldQ30" : 3433172054,
+       "QualityScoreSum" : 131222436892,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3644619201,
+       "YieldQ30" : 3404076902,
+       "QualityScoreSum" : 130722172486,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A57PA1",
+     "SampleName" : "54NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGCAGGAA",
+       "MismatchCounts" : {
+        "0" : 28067233,
+        "1" : 183848
+       }
+      }
+     ],
+     "NumberReads" : 28251081,
+     "Yield" : 8531826462,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4265913231,
+       "YieldQ30" : 4021541742,
+       "QualityScoreSum" : 153640058019,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4265913231,
+       "YieldQ30" : 3963135527,
+       "QualityScoreSum" : 152616039239,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A58PA1",
+     "SampleName" : "36NovaSeq-Mendel-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GAGCTGAA",
+       "MismatchCounts" : {
+        "0" : 27892045,
+        "1" : 324235
+       }
+      }
+     ],
+     "NumberReads" : 28216280,
+     "Yield" : 8521316560,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4260658280,
+       "YieldQ30" : 4012045078,
+       "QualityScoreSum" : 153375399461,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4260658280,
+       "YieldQ30" : 3946825930,
+       "QualityScoreSum" : 152223231738,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A59PA1",
+     "SampleName" : "62NovaSeq-000000PM-UtAv-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AAACATCG",
+       "MismatchCounts" : {
+        "0" : 24961983,
+        "1" : 265882
+       }
+      }
+     ],
+     "NumberReads" : 25227865,
+     "Yield" : 7618815230,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3809407615,
+       "YieldQ30" : 3588484461,
+       "QualityScoreSum" : 137149373301,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3809407615,
+       "YieldQ30" : 3546425309,
+       "QualityScoreSum" : 136420042102,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A5PA1",
+     "SampleName" : "47NovaSeq-000000PK-UtAv-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CCGTGAGA",
+       "MismatchCounts" : {
+        "0" : 27622568,
+        "1" : 264114
+       }
+      }
+     ],
+     "NumberReads" : 27886682,
+     "Yield" : 8421777964,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4210888982,
+       "YieldQ30" : 3961195816,
+       "QualityScoreSum" : 151522009530,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4210888982,
+       "YieldQ30" : 3895803708,
+       "QualityScoreSum" : 150359116454,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A60PA1",
+     "SampleName" : "87NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GAGTTAGC",
+       "MismatchCounts" : {
+        "0" : 24856652,
+        "1" : 270861
+       }
+      }
+     ],
+     "NumberReads" : 25127513,
+     "Yield" : 7588508926,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3794254463,
+       "YieldQ30" : 3575368319,
+       "QualityScoreSum" : 136631552913,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3794254463,
+       "YieldQ30" : 3550780144,
+       "QualityScoreSum" : 136221161180,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A61PA1",
+     "SampleName" : "65NovaSeq-BevegForst-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CGAACTTA",
+       "MismatchCounts" : {
+        "0" : 26610004,
+        "1" : 365061
+       }
+      }
+     ],
+     "NumberReads" : 26975065,
+     "Yield" : 8146469630,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4073234815,
+       "YieldQ30" : 3834654215,
+       "QualityScoreSum" : 146603430298,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4073234815,
+       "YieldQ30" : 3786262160,
+       "QualityScoreSum" : 145762686980,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A62PA1",
+     "SampleName" : "46NovaSeq-Bindevev-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GATAGACA",
+       "MismatchCounts" : {
+        "0" : 26809291,
+        "1" : 249482
+       }
+      }
+     ],
+     "NumberReads" : 27058773,
+     "Yield" : 8171749446,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4085874723,
+       "YieldQ30" : 3848104512,
+       "QualityScoreSum" : 147086207281,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4085874723,
+       "YieldQ30" : 3804474990,
+       "QualityScoreSum" : 146331546787,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A63PA1",
+     "SampleName" : "21NovaSeq-Linse-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AAGGACAC",
+       "MismatchCounts" : {
+        "0" : 24868272,
+        "1" : 269506
+       }
+      }
+     ],
+     "NumberReads" : 25137778,
+     "Yield" : 7591608956,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3795804478,
+       "YieldQ30" : 3574440687,
+       "QualityScoreSum" : 136638535259,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3795804478,
+       "YieldQ30" : 3533791182,
+       "QualityScoreSum" : 135937327175,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A64PA1",
+     "SampleName" : "70NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GACAGTGC",
+       "MismatchCounts" : {
+        "0" : 28896741,
+        "1" : 461413
+       }
+      }
+     ],
+     "NumberReads" : 29358154,
+     "Yield" : 8866162508,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4433081254,
+       "YieldQ30" : 4169884991,
+       "QualityScoreSum" : 159504509012,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4433081254,
+       "YieldQ30" : 4132914950,
+       "QualityScoreSum" : 158864914980,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A65PA1",
+     "SampleName" : "23NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ATCATTCC",
+       "MismatchCounts" : {
+        "0" : 26652299,
+        "1" : 412120
+       }
+      }
+     ],
+     "NumberReads" : 27064419,
+     "Yield" : 8173454538,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4086727269,
+       "YieldQ30" : 3851276581,
+       "QualityScoreSum" : 147166120993,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4086727269,
+       "YieldQ30" : 3813927924,
+       "QualityScoreSum" : 146533577596,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A66PA1",
+     "SampleName" : "28NovaSeq-BevegForst-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GCCACATA",
+       "MismatchCounts" : {
+        "0" : 29388621,
+        "1" : 264602
+       }
+      }
+     ],
+     "NumberReads" : 29653223,
+     "Yield" : 8955273346,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4477636673,
+       "YieldQ30" : 4211324622,
+       "QualityScoreSum" : 161084599293,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4477636673,
+       "YieldQ30" : 4129792868,
+       "QualityScoreSum" : 159633826077,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A67PA1",
+     "SampleName" : "75NovaSeq-Hypogo-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACCACTGT",
+       "MismatchCounts" : {
+        "0" : 27561024,
+        "1" : 344775
+       }
+      }
+     ],
+     "NumberReads" : 27905799,
+     "Yield" : 8427551298,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4213775649,
+       "YieldQ30" : 3975151200,
+       "QualityScoreSum" : 151818504917,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4213775649,
+       "YieldQ30" : 3914329502,
+       "QualityScoreSum" : 150763777416,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A68PA1",
+     "SampleName" : "73NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CTGGCATA",
+       "MismatchCounts" : {
+        "0" : 33300750,
+        "1" : 290865
+       }
+      }
+     ],
+     "NumberReads" : 33591615,
+     "Yield" : 10144667730,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 5072333865,
+       "YieldQ30" : 4776285703,
+       "QualityScoreSum" : 182595537147,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 5072333865,
+       "YieldQ30" : 4652580434,
+       "QualityScoreSum" : 180402027440,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A69PA1",
+     "SampleName" : "49NovaSeq-Hypogo-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACCTCCAA",
+       "MismatchCounts" : {
+        "0" : 28897158,
+        "1" : 479655
+       }
+      }
+     ],
+     "NumberReads" : 29376813,
+     "Yield" : 8871797526,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4435898763,
+       "YieldQ30" : 4177064256,
+       "QualityScoreSum" : 159672907512,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4435898763,
+       "YieldQ30" : 4097186617,
+       "QualityScoreSum" : 158272763849,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A6PA1",
+     "SampleName" : "82NovaSeq-000000MK-TrioMor-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GTGTTCTA",
+       "MismatchCounts" : {
+        "0" : 26241590,
+        "1" : 473209
+       }
+      }
+     ],
+     "NumberReads" : 26714799,
+     "Yield" : 8067869298,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4033934649,
+       "YieldQ30" : 3797465607,
+       "QualityScoreSum" : 145205461982,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4033934649,
+       "YieldQ30" : 3747934098,
+       "QualityScoreSum" : 144328156873,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A70PA1",
+     "SampleName" : "12NovaSeq-Nyrecyster-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GCGAGTAA",
+       "MismatchCounts" : {
+        "0" : 30875897,
+        "1" : 361116
+       }
+      }
+     ],
+     "NumberReads" : 31237013,
+     "Yield" : 9433577926,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4716788963,
+       "YieldQ30" : 4442633536,
+       "QualityScoreSum" : 169810529258,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4716788963,
+       "YieldQ30" : 4410963512,
+       "QualityScoreSum" : 169274162948,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A71PA1",
+     "SampleName" : "85NovaSeq-FremSegment-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ACTATGCA",
+       "MismatchCounts" : {
+        "0" : 25434446,
+        "1" : 219150
+       }
+      }
+     ],
+     "NumberReads" : 25653596,
+     "Yield" : 7747385992,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3873692996,
+       "YieldQ30" : 3645627750,
+       "QualityScoreSum" : 139403448200,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3873692996,
+       "YieldQ30" : 3592543219,
+       "QualityScoreSum" : 138480751486,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A72PA1",
+     "SampleName" : "72NovaSeq-Bindevev-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CGGATTGC",
+       "MismatchCounts" : {
+        "0" : 25700246,
+        "1" : 338857
+       }
+      }
+     ],
+     "NumberReads" : 26039103,
+     "Yield" : 7863809106,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 3931904553,
+       "YieldQ30" : 3705751750,
+       "QualityScoreSum" : 141599862610,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 3931904553,
+       "YieldQ30" : 3684840129,
+       "QualityScoreSum" : 141262984166,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A73PA1",
+     "SampleName" : "83NovaSeq-Mendel-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AACTCACC",
+       "MismatchCounts" : {
+        "0" : 26502997,
+        "1" : 334955
+       }
+      }
+     ],
+     "NumberReads" : 26837952,
+     "Yield" : 8105061504,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4052530752,
+       "YieldQ30" : 3816904844,
+       "QualityScoreSum" : 145889931728,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4052530752,
+       "YieldQ30" : 3762502455,
+       "QualityScoreSum" : 144948304710,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A74PA1",
+     "SampleName" : "14NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GCTAACGA",
+       "MismatchCounts" : {
+        "0" : 31594597,
+        "1" : 268238
+       }
+      }
+     ],
+     "NumberReads" : 31862835,
+     "Yield" : 9622576170,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4811288085,
+       "YieldQ30" : 4533778768,
+       "QualityScoreSum" : 173251431549,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4811288085,
+       "YieldQ30" : 4493303068,
+       "QualityScoreSum" : 172558493644,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A75PA1",
+     "SampleName" : "11NovaSeq-BevegForsU00-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CAGATCTG",
+       "MismatchCounts" : {
+        "0" : 29289974,
+        "1" : 638769
+       }
+      }
+     ],
+     "NumberReads" : 29928743,
+     "Yield" : 9038480386,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4519240193,
+       "YieldQ30" : 4261190826,
+       "QualityScoreSum" : 162794497650,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4519240193,
+       "YieldQ30" : 4229082676,
+       "QualityScoreSum" : 162255869018,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A76PA1",
+     "SampleName" : "42NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "ATCCTGTA",
+       "MismatchCounts" : {
+        "0" : 30069900,
+        "1" : 334138
+       }
+      }
+     ],
+     "NumberReads" : 30404038,
+     "Yield" : 9182019476,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4591009738,
+       "YieldQ30" : 4324435668,
+       "QualityScoreSum" : 165292393953,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4591009738,
+       "YieldQ30" : 4225248339,
+       "QualityScoreSum" : 163531163882,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A77PA1",
+     "SampleName" : "19NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CTGTAGCC",
+       "MismatchCounts" : {
+        "0" : 31087271,
+        "1" : 338621
+       }
+      }
+     ],
+     "NumberReads" : 31425892,
+     "Yield" : 9490619384,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4745309692,
+       "YieldQ30" : 4472109976,
+       "QualityScoreSum" : 170889644002,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4745309692,
+       "YieldQ30" : 4432734550,
+       "QualityScoreSum" : 170218342785,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A78PA1",
+     "SampleName" : "16NovaSeq-Linse-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "GCTCGGTA",
+       "MismatchCounts" : {
+        "0" : 29153676,
+        "1" : 336490
+       }
+      }
+     ],
+     "NumberReads" : 29490166,
+     "Yield" : 8906030132,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4453015066,
+       "YieldQ30" : 4197319696,
+       "QualityScoreSum" : 160377673248,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4453015066,
+       "YieldQ30" : 4126883617,
+       "QualityScoreSum" : 159144606817,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A7PA1",
+     "SampleName" : "22NovaSeq-000000FM-TrioFar-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "CAGCGTTA",
+       "MismatchCounts" : {
+        "0" : 32961942,
+        "1" : 383578
+       }
+      }
+     ],
+     "NumberReads" : 33345520,
+     "Yield" : 10070347040,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 5035173520,
+       "YieldQ30" : 4744134427,
+       "QualityScoreSum" : 181301265671,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 5035173520,
+       "YieldQ30" : 4677192777,
+       "QualityScoreSum" : 180124027957,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A8PA1",
+     "SampleName" : "55NovaSeq-Immunsvikt-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "TAGGATGA",
+       "MismatchCounts" : {
+        "0" : 27766341,
+        "1" : 225496
+       }
+      }
+     ],
+     "NumberReads" : 27991837,
+     "Yield" : 8453534774,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4226767387,
+       "YieldQ30" : 3989874482,
+       "QualityScoreSum" : 152336676031,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4226767387,
+       "YieldQ30" : 3947892189,
+       "QualityScoreSum" : 151612385981,
+       "TrimmedBases" : 0
+      }
+     ]
+    },
+    {
+     "SampleId" : "KIR2001A9PA1",
+     "SampleName" : "84NovaSeq-PCD-KIT-Av0",
+     "IndexMetrics" : [
+      {
+       "IndexSequence" : "AGTGGTCA",
+       "MismatchCounts" : {
+        "0" : 30208282,
+        "1" : 533072
+       }
+      }
+     ],
+     "NumberReads" : 30741354,
+     "Yield" : 9283888908,
+     "ReadMetrics" : [
+      {
+       "ReadNumber" : 1,
+       "Yield" : 4641944454,
+       "YieldQ30" : 4376390647,
+       "QualityScoreSum" : 167209850687,
+       "TrimmedBases" : 0
+      },
+      {
+       "ReadNumber" : 2,
+       "Yield" : 4641944454,
+       "YieldQ30" : 4301643254,
+       "QualityScoreSum" : 165877794017,
+       "TrimmedBases" : 0
+      }
+     ]
+    }
+   ],
+   "Undetermined" : {
+    "NumberReads" : 75525187,
+    "Yield" : 22808606474,
+    "ReadMetrics" : [
+     {
+      "ReadNumber" : 1,
+      "Yield" : 11404303237,
+      "YieldQ30" : 9850747124,
+      "QualityScoreSum" : 391796845537,
+      "TrimmedBases" : 0
+     },
+     {
+      "ReadNumber" : 2,
+      "Yield" : 11404303237,
+      "YieldQ30" : 9526846662,
+      "QualityScoreSum" : 385034832983,
+      "TrimmedBases" : 0
+     }
+    ]
+   }
+  }
+ ],
+ "UnknownBarcodes" : [
+  {
+   "Lane" : 1,
+   "Barcodes" : {
+    "GGGGGGGG" : 48287580,
+    "GGGGGGGA" : 276200,
+    "NNNNNNNN" : 188240,
+    "CGGGGGGG" : 161960,
+    "GACTGGAA" : 134640,
+    "GGGGGGGC" : 128500,
+    "GAACTTAA" : 128140,
+    "AACCACAA" : 120960,
+    "ACTTCGAA" : 103460,
+    "CCTCTGAA" : 102080,
+    "CAACACAA" : 91160,
+    "ATGTTGCA" : 91160,
+    "CACTCGAA" : 90120,
+    "CACCACAA" : 87240,
+    "AAAAAAAA" : 87040,
+    "CGTGAGAA" : 86360,
+    "AGACGGAA" : 86040,
+    "CATCCTCA" : 84980,
+    "GGGGGGGT" : 82420,
+    "AAAAACAA" : 80160,
+    "GCTACGAA" : 75360,
+    "CTCCTGAA" : 74000,
+    "CAGTTCAA" : 73940,
+    "CAACTTAA" : 73600,
+    "GCAACGAA" : 72420,
+    "GCAGTAAA" : 72200,
+    "CCCCTGAA" : 71840,
+    "ATGGCTCA" : 70160,
+    "GTAACGAA" : 66440,
+    "AAAAAACA" : 65680,
+    "ATGAATCA" : 65040,
+    "GGAGTAAA" : 63540,
+    "AATGTGCA" : 63180,
+    "TCTCACAA" : 60840,
+    "AACAAAAA" : 59820,
+    "ACTATCAA" : 59440,
+    "GTCGGTAA" : 58780,
+    "CATTCGAA" : 58640,
+    "AAAACAAA" : 58520,
+    "TGGTGTAA" : 57180,
+    "AAAACACA" : 57180,
+    "CGACGGAA" : 56580,
+    "CGACTTAA" : 56340,
+    "CGAGTAAA" : 55880,
+    "TAGATGAA" : 55540,
+    "CAGGAGCA" : 55480,
+    "CAAGAGCA" : 55100,
+    "CGCTGGAA" : 54680,
+    "GCTCGTAA" : 54640,
+    "ACCGAGAA" : 53540,
+    "AATCGTCA" : 53340,
+    "CTAACGAA" : 53160,
+    "AGTATCAA" : 52500,
+    "CAAACAAA" : 52100,
+    "ACGATCAA" : 51100,
+    "CTGAGCCA" : 49120,
+    "AAACAAAA" : 48860,
+    "AGAGATCA" : 48660,
+    "CCTTCGAA" : 48400,
+    "ACAAAAAA" : 48300,
+    "GCGGTAAA" : 48080,
+    "GGGGGGTA" : 47780,
+    "AAAACCAA" : 47780,
+    "AAAAATCA" : 46020,
+    "TGGCATAA" : 45600,
+    "ACAACCAA" : 45220,
+    "AGGATGAA" : 45020,
+    "CCTCCGAA" : 44920,
+    "CGTATCAA" : 44840,
+    "ACAAACAA" : 44680,
+    "GATGATCA" : 44660,
+    "GCCGGTAA" : 44360,
+    "AAACATAA" : 44120,
+    "GTGAATCA" : 43560,
+    "AAGGAGCA" : 43220,
+    "CTTAGCCA" : 42880,
+    "CGTAGCCA" : 42020,
+    "CAAAAAAA" : 41880,
+    "ATCATCCA" : 41740,
+    "CGGGGGGA" : 41240,
+    "ACAACAAA" : 40980,
+    "CCACCTTA" : 40960,
+    "CCAGTCAA" : 40380,
+    "AACGAGAA" : 40140,
+    "CACCTACA" : 39760,
+    "CCAGCGTT" : 39700,
+    "CCGTAGAA" : 39660,
+    "AAAAATAA" : 39640,
+    "AAAAAGAA" : 39480,
+    "GACACACA" : 39400,
+    "CAAAAATA" : 39300,
+    "CAAAACAA" : 39260,
+    "AGGACACA" : 39260,
+    "GACAGGCA" : 38740,
+    "CACTTGAA" : 38220,
+    "CAACCCAA" : 38140,
+    "AGGCTACA" : 37860,
+    "NNNNNNNA" : 37640,
+    "AAGACTAA" : 37180,
+    "GCGATAAA" : 36880,
+    "AAGACACA" : 36640,
+    "GCTAAGAA" : 36220,
+    "CACCCTTA" : 36200,
+    "TCGTCTAA" : 35120,
+    "AACACAAA" : 34620,
+    "AACCAGAA" : 34160,
+    "AACACCAA" : 34160,
+    "TGTAGCCA" : 33980,
+    "AAACAACA" : 33880,
+    "ATCCGTAA" : 33860,
+    "CTGTGCCA" : 33740,
+    "AGATCTGA" : 33060,
+    "CTCGGTAA" : 32700,
+    "AAGTTGCA" : 32700,
+    "AAACGGAA" : 32700,
+    "CTGTACCA" : 32320,
+    "AATTTGCA" : 31980,
+    "ATGCCCTA" : 31800,
+    "GATAATCA" : 31360,
+    "ACGTTCAA" : 31020,
+    "ACAAATAA" : 30800,
+    "AATCCGCA" : 30780,
+    "CATGGAAA" : 30580,
+    "AACAATAA" : 30580,
+    "AGGCAACA" : 30520,
+    "CCTGAGAA" : 30220,
+    "ATCCGTCA" : 29760,
+    "CGGCATAA" : 29280,
+    "ACCAAAAA" : 29220,
+    "AAAACATA" : 29100,
+    "AATAAAAA" : 29020,
+    "TGGATGAA" : 28940,
+    "GGGGGGAA" : 28700,
+    "AACCGGAA" : 28640,
+    "TCATTCCA" : 28600,
+    "AAGCGGAA" : 28500,
+    "TCCGTTAA" : 28480,
+    "ATATTCCA" : 28460,
+    "AACATTAA" : 28140,
+    "CAAAAACA" : 27840,
+    "CACTTACA" : 27760,
+    "AACAAACC" : 27700,
+    "CTCATGAA" : 27600,
+    "ACAGCGAA" : 27200,
+    "GTGTCTAA" : 27100,
+    "CGAAGTAA" : 27000,
+    "TCACGCAA" : 26880,
+    "CCGGAGAA" : 26640,
+    "TGTGGTAA" : 26420,
+    "TCCGCTAA" : 26280,
+    "CCAAGACT" : 25980,
+    "AAAACTAA" : 25940,
+    "AATGGAAA" : 25920,
+    "ACAAAATA" : 25820,
+    "ACATTCCA" : 25780,
+    "AAAAGAAA" : 25600,
+    "AACTACAA" : 25560,
+    "CCCATCCT" : 25500,
+    "AACAAGAA" : 25400,
+    "ACCAACAA" : 25360,
+    "CCCGTGAG" : 25340,
+    "ACGTACAA" : 25200,
+    "ACAACATA" : 25000,
+    "AGCGTTAA" : 24940,
+    "AAAACGAA" : 24900,
+    "AGCACTCA" : 24880,
+    "GGGGGTGA" : 24860,
+    "AATGTTCA" : 24640,
+    "CTCTATCA" : 24560,
+    "AATACAAA" : 24520,
+    "AAACACAA" : 24420,
+    "AACAAAAC" : 24280,
+    "ACCACAGA" : 24140,
+    "TGGGGTAA" : 24060,
+    "AAACAAAC" : 23860,
+    "CACAATTA" : 23760,
+    "AAAAACTA" : 23700,
+    "CCAATGAA" : 23560,
+    "ATCCCTGT" : 23560,
+    "ATAGCACA" : 23480,
+    "GCAAGACA" : 23340,
+    "TCAATGAA" : 23020,
+    "AAAAAATA" : 23020,
+    "AACAAATA" : 22860,
+    "ACCACAAA" : 22840,
+    "ACATCAAA" : 22780,
+    "AAGAGGAA" : 22780,
+    "CGACAACA" : 22540,
+    "ACCCTCCA" : 22520,
+    "TGGACAAA" : 22380,
+    "AACAGAAA" : 22300,
+    "GCATACAA" : 22280,
+    "CGAATTAA" : 22240,
+    "CACAATAA" : 22140,
+    "TCTTACAA" : 22060,
+    "AATAACAA" : 22060,
+    "CTAAGGCA" : 22040,
+    "AAATATAA" : 21900,
+    "AACACACA" : 21840,
+    "AAACCAAA" : 21800,
+    "GGGGGTGG" : 21720,
+    "GGGGGGCA" : 21680,
+    "TAGGTGAA" : 21580,
+    "ACGCCGAA" : 21500,
+    "CACACACA" : 21480,
+    "GCTGGTAA" : 21440,
+    "CAACAAAA" : 21300,
+    "AAATCACA" : 21300,
+    "ACAAAACA" : 21220,
+    "AAGAAAAA" : 21200,
+    "GGGGGGTG" : 21180,
+    "ATTGCTCA" : 21000,
+    "GACTGTAA" : 20940,
+    "TAGGAGAA" : 20920,
+    "CCGCATAC" : 20900,
+    "CACATAAA" : 20900,
+    "ATTGGCCA" : 20880,
+    "ACGTCGAA" : 20800,
+    "GCACATAA" : 20760,
+    "AAAAGATA" : 20760,
+    "AAAATAAA" : 20680,
+    "AATCCTCA" : 20620,
+    "CGAACACA" : 20480,
+    "ACATGCAA" : 20400,
+    "AAGCAGAA" : 20320,
+    "AAAAAGCA" : 20260,
+    "CGACACCA" : 20220,
+    "CTAATGAA" : 20120,
+    "AACCGTCA" : 20000,
+    "ATCTTCCA" : 19960,
+    "CAGCCGTT" : 19900,
+    "AAATAAAA" : 19860,
+    "CCCTCTAT" : 19620,
+    "AAAAAAAC" : 19500,
+    "GACAGTAA" : 19440,
+    "CTTCACAA" : 19420,
+    "AACATACA" : 19300,
+    "AGCTAACA" : 19160,
+    "GTGTTTAA" : 19020,
+    "ATAACTAA" : 18980,
+    "AAACAACC" : 18940,
+    "NNNNNNNC" : 18900,
+    "GAGTAGCA" : 18800,
+    "AAAATCTA" : 18680,
+    "ACCTTACA" : 18560,
+    "CCAACATA" : 18500,
+    "AATAAGCA" : 18460,
+    "CCCAGTTC" : 18300,
+    "TTTCACAA" : 18280,
+    "CCTAAGGT" : 18280,
+    "ACTAAAAA" : 18280,
+    "TCTTTCAC" : 18260,
+    "CCGTCTAA" : 18140,
+    "ACATCACA" : 18120,
+    "AACACATA" : 18020,
+    "AAAAATAC" : 17940,
+    "AACATATA" : 17900,
+    "CAAAAAGA" : 17880,
+    "CAAAATGA" : 17860,
+    "AAAGAGAT" : 17860,
+    "AACTCAAA" : 17820,
+    "GAGTTGCA" : 17720,
+    "AACACAGA" : 17640,
+    "AAAACAGA" : 17620,
+    "ACAAGAAA" : 17580,
+    "AACCTTAA" : 17520,
+    "AAACATAC" : 17400,
+    "TCCCGTCT" : 17360,
+    "ATCAAAAA" : 17120,
+    "ACGAAAAA" : 17120,
+    "CCTCAATG" : 17020,
+    "AACATAAA" : 16980,
+    "AGAAACAA" : 16880,
+    "TGGTTCAA" : 16860,
+    "AACAATGA" : 16840,
+    "CCTCATCA" : 16740,
+    "CAAAGGAG" : 16720,
+    "ACGCTGAA" : 16640,
+    "CACAAAAA" : 16620,
+    "ACTAAACA" : 16620,
+    "TGGCTCAA" : 16600,
+    "ATCTGTAA" : 16580,
+    "CCCGAAGT" : 16480,
+    "AAAAATTA" : 16460,
+    "CGGGGGGT" : 16420,
+    "ACAATAAA" : 16380,
+    "AGCTGAAA" : 16360,
+    "CATGCCTA" : 16340,
+    "CCCTCCTG" : 16320,
+    "AAATCAAA" : 16260,
+    "GCCAATAA" : 16220,
+    "CATAAAAA" : 16220,
+    "CCGTGGAA" : 16060,
+    "CCAAAAAA" : 16020,
+    "ACACTGTA" : 16000,
+    "AAAATTAA" : 15980,
+    "AACCTAAA" : 15900,
+    "CACACATA" : 15700,
+    "ATGCAAAA" : 15660,
+    "AACACTGA" : 15640,
+    "CAAAATTA" : 15620,
+    "AAAACAAC" : 15620,
+    "GAACGGCA" : 15580,
+    "CATAAATA" : 15560,
+    "ATCAATCA" : 15560,
+    "GGGCGGTA" : 15480,
+    "AAGATTCA" : 15480,
+    "AAGGCACA" : 15460,
+    "GAATCGAA" : 15380,
+    "AACATCGA" : 15380,
+    "GATGAACA" : 15340,
+    "ACTCACCA" : 15300,
+    "GTCGTCAA" : 15280,
+    "ACCCCAAA" : 15180,
+    "TTTCACGC" : 15100,
+    "AAGAACAA" : 15100,
+    "GTCTGCAA" : 15060,
+    "AACCTGAA" : 15000,
+    "CCCAAAAA" : 14980,
+    "ACTTGCAA" : 14980,
+    "AACAAGTA" : 14920,
+    "CAAATACA" : 14840,
+    "CAAAGTAA" : 14840,
+    "AGAAAAAA" : 14840,
+    "AAAGAATA" : 14840,
+    "CGGATTTG" : 14820,
+    "AAATACAA" : 14820,
+    "AACTAAAA" : 14780,
+    "AGTGTCAA" : 14740,
+    "CCTGGCAT" : 14720,
+    "ATACCAAA" : 14720,
+    "CAAAAAAC" : 14700,
+    "AAAATTCA" : 14700,
+    "CCAAGGAG" : 14640,
+    "GGGGGGCC" : 14620,
+    "GAAACAGG" : 14500,
+    "CTATGCAA" : 14460,
+    "AAAATGAA" : 14460,
+    "AAATAACA" : 14420,
+    "TGGAAACA" : 14400,
+    "AGCACCCT" : 14400,
+    "ATTAGCGA" : 14380,
+    "TCTTCCAA" : 14340,
+    "CACCTTTA" : 14340,
+    "CAACAAAC" : 14340,
+    "ACCACGTA" : 14340,
+    "AAAACTCA" : 14300,
+    "AACACGCA" : 14280,
+    "GCCCAAGA" : 14240,
+    "CAAACATA" : 14200,
+    "CGAGTTAG" : 14180,
+    "ATATGCAA" : 14160,
+    "CACACAGA" : 14060,
+    "ATCAGCAA" : 14040,
+    "ACCACTTA" : 13940,
+    "AAGCAAAA" : 13880,
+    "AAAAATCC" : 13840,
+    "CCGGATTG" : 13820,
+    "CAAACATC" : 13800,
+    "ACCTGTAA" : 13760,
+    "CACCTTCA" : 13740,
+    "AATCAAAA" : 13720,
+    "ATAACGAA" : 13680,
+    "GAGTTTAG" : 13640,
+    "CAGACTAA" : 13620,
+    "AATACGTA" : 13620,
+    "CACAAATA" : 13560,
+    "ACCCACTG" : 13540,
+    "AAATCCAA" : 13500,
+    "CGCGTTAA" : 13480,
+    "AACAGATA" : 13480,
+    "ATTTGGCT" : 13420,
+    "CAATAATA" : 13380,
+    "CTAGGTCA" : 13340,
+    "ACAACTAA" : 13340,
+    "CCATACCA" : 13320,
+    "GGGCGGGA" : 13240,
+    "AAAACTTA" : 13240,
+    "TCTAAACA" : 13160,
+    "GCCCACAT" : 13160,
+    "AATCCCGT" : 13160,
+    "AAAAACAC" : 13160,
+    "CCAATGGA" : 13140,
+    "AACATAGA" : 13100,
+    "CAGATATA" : 13080,
+    "ATTCCTGT" : 13000,
+    "ACGAATAA" : 13000,
+    "AATCCTAA" : 12940,
+    "CCAGATCT" : 12920,
+    "CCTCCCTG" : 12900,
+    "CCCTATCA" : 12900,
+    "AAGAATAA" : 12900,
+    "AACATAAC" : 12900,
+    "AAAAGAGA" : 12900,
+    "CGACAGTG" : 12880,
+    "CAAATGAA" : 12880,
+    "AAAACGCA" : 12880,
+    "TACAGCAA" : 12800,
+    "AACGGATA" : 12780,
+    "AACACTAA" : 12740,
+    "ATCATTAA" : 12720,
+    "CTCAAGAA" : 12680,
+    "CACAAAGA" : 12680,
+    "CAATTGGA" : 12620,
+    "GACAGTCA" : 12600,
+    "ACACAAGA" : 12580,
+    "CAAGAAAA" : 12520,
+    "AAATAAAC" : 12460,
+    "GTGTTTCT" : 12400,
+    "CCAAATAA" : 12380,
+    "AGAAGTAA" : 12380,
+    "CCTCTACA" : 12360,
+    "CAAGACCT" : 12300,
+    "CAACAATA" : 12280,
+    "AACCTATA" : 12280,
+    "CAGCTTAA" : 12260,
+    "AAGATAAC" : 12260,
+    "GCCAAGCA" : 12240,
+    "CCATCCCT" : 12220,
+    "GGGGGTGT" : 12180,
+    "TAAAATCA" : 12160,
+    "AAAGACAA" : 12140,
+    "ATATCGAA" : 12100,
+    "AGCTCGAA" : 12100,
+    "AAACAATA" : 12100,
+    "ACGATAAA" : 12060,
+    "CGGGGGTA" : 12040,
+    "CCGAATAA" : 12020,
+    "GGGGGGTC" : 12000,
+    "AAACAGTA" : 12000,
+    "TGAGAGAA" : 11920,
+    "GCCCATAA" : 11920,
+    "ATAGCGCA" : 11880,
+    "CAGCAGAA" : 11840,
+    "ACCAACTA" : 11840,
+    "CAAAAGTA" : 11820,
+    "AACCAAAA" : 11820,
+    "CCGGGGGG" : 11800,
+    "TAATCACA" : 11780,
+    "GAGCGAAA" : 11760,
+    "AAGGACCA" : 11760,
+    "CTTGGCAT" : 11720,
+    "AACAAAGA" : 11720,
+    "CCTTCCTG" : 11700,
+    "AAAGCATA" : 11700,
+    "CCAAAATA" : 11680,
+    "AGGAAAAA" : 11680,
+    "AACAACAC" : 11680,
+    "AAATATCA" : 11660,
+    "AACTAACA" : 11640,
+    "AGTGGCAA" : 11580,
+    "AAACTCGA" : 11580,
+    "CCAAGTAA" : 11560,
+    "CAGGCGTT" : 11560,
+    "CAAAGAAA" : 11520,
+    "CTTCAATG" : 11500,
+    "CTCAAATA" : 11500,
+    "CGGTTGCA" : 11500,
+    "TTACGCAA" : 11480,
+    "CCAAACAC" : 11480,
+    "TCCAACAA" : 11460,
+    "AAACACAC" : 11440,
+    "CATCCTGT" : 11420,
+    "TAAACACA" : 11380,
+    "GAGAATCA" : 11380,
+    "CCTGTAGC" : 11380,
+    "CACATAGA" : 11380,
+    "CAAGGGCA" : 11380,
+    "GACCAGTG" : 11320,
+    "AACACTCA" : 11320,
+    "CTTAAGGT" : 11280,
+    "CCCTTACA" : 11260,
+    "ACGAGATA" : 11260,
+    "ACCAGAAA" : 11260,
+    "ACCAAACA" : 11260,
+    "AAAAAAGA" : 11240,
+    "AAACACTA" : 11220,
+    "GCTGTCAA" : 11200,
+    "CAAGGAAA" : 11180,
+    "TGAAGGAA" : 11160,
+    "GGATTGCA" : 11140,
+    "CAAATAAA" : 11120,
+    "AAGAATGA" : 11120,
+    "AACCATAA" : 11120,
+    "GACATGCA" : 11100,
+    "AATAGAAA" : 11100,
+    "AAAGAAAA" : 11100,
+    "ATCACAAA" : 11080,
+    "AAATAATA" : 11080,
+    "ACCAAGAA" : 11020,
+    "AACACAAC" : 11000,
+    "GGGCGGGC" : 10980,
+    "CGAACAGG" : 10980,
+    "CAAATATC" : 10980,
+    "ACGAACAA" : 10960,
+    "AAAATATA" : 10960,
+    "CAAGCGTT" : 10940,
+    "AATAACTA" : 10940,
+    "AAACAGCA" : 10940,
+    "ATCCTTGT" : 10900,
+    "CAATACAA" : 10880,
+    "AAGTAAAA" : 10880,
+    "AAAAAATC" : 10860,
+    "CAGCGGTT" : 10840,
+    "ACGCTTCG" : 10840,
+    "CAAGGACA" : 10820,
+    "AGAACTAA" : 10800,
+    "GACTGAAA" : 10760,
+    "CACATTAA" : 10760,
+    "ACACAATA" : 10740,
+    "CCTTATCA" : 10640,
+    "AACATGAA" : 10600,
+    "CGCTCGAA" : 10580,
+    "GACAAATA" : 10560,
+    "CCTAAAGA" : 10560,
+    "CGATCTGA" : 10540,
+    "AAACCTAA" : 10520,
+    "ACAAAGCA" : 10480,
+    "ACAAACCA" : 10480,
+    "ATAACGCA" : 10460,
+    "ATCCTTAA" : 10440,
+    "AAGAATCA" : 10420,
+    "AATATACA" : 10380,
+    "CCAACCAC" : 10360,
+    "GGGGTGGA" : 10340,
+    "AAATCAAC" : 10340,
+    "CCATCCCA" : 10320,
+    "AAAACTGA" : 10320,
+    "TTCCGTCT" : 10300,
+    "GACTATAA" : 10300,
+    "ATCAAGAA" : 10280,
+    "GAATCCTG" : 10260,
+    "CCACCTCA" : 10260,
+    "TATAAAAA" : 10220,
+    "ACAATCAA" : 10220,
+    "AAGATAAA" : 10220,
+    "AAAAAACC" : 10220,
+    "CAGAAATA" : 10180,
+    "AACATCTA" : 10140,
+    "GGCTGAAA" : 10100,
+    "CAAGGTCA" : 10100,
+    "AAAACGTA" : 10100,
+    "GAGTGAAA" : 10080,
+    "GAACAGCA" : 10080,
+    "CTGTTAGC" : 10060,
+    "AACGTTAA" : 10060,
+    "TAAAAAAA" : 10040,
+    "GTATCAAT" : 10040,
+    "CCAAAACA" : 10040,
+    "CAAAATAA" : 10040,
+    "AAGAAAAC" : 10040,
+    "ACAAAAGA" : 10020,
+    "AAACTGTA" : 10000,
+    "CCGACACA" : 9980,
+    "AAAGAAGA" : 9980,
+    "AAAACCTA" : 9980,
+    "AAGCATAA" : 9960,
+    "TATAAACA" : 9940,
+    "CATCCATA" : 9940,
+    "AAACGATA" : 9920,
+    "TTCAGCAA" : 9900,
+    "GCCAAACA" : 9900,
+    "CGAATCTG" : 9900,
+    "CAGAAGAA" : 9900,
+    "AAGATCTA" : 9880,
+    "CCGTTCAA" : 9860,
+    "AGCAAAAA" : 9860,
+    "ACGTGATA" : 9860,
+    "GGCTAACA" : 9840,
+    "GAAAAGTA" : 9840,
+    "CCTCCTTG" : 9840,
+    "AAGGAACA" : 9840,
+    "CAACTCAC" : 9820,
+    "ATGAAAAA" : 9820,
+    "AGCATAAA" : 9820,
+    "ACCAATAA" : 9800,
+    "GGGCGGGG" : 9780,
+    "AATCAGAA" : 9780,
+    "AATCAAAC" : 9780,
+    "ACCTAAAA" : 9740,
+    "TTGGCTCA" : 9700,
+    "GGGGGCGA" : 9700,
+    "GCAGGAAA" : 9680,
+    "ACAATATA" : 9680,
+    "ATAAATCA" : 9660,
+    "GGGTGAAA" : 9620,
+    "CATCAATA" : 9620,
+    "AGCACCCA" : 9600,
+    "AATACACA" : 9600,
+    "GAAAAAGA" : 9580,
+    "AATCATAA" : 9580,
+    "AACACGAA" : 9580,
+    "AAAAAGAC" : 9580,
+    "GAACCAGG" : 9560,
+    "CAACAACC" : 9540,
+    "AACAGTAA" : 9540,
+    "AAACCGAC" : 9540,
+    "AAAATACA" : 9540,
+    "TAGCGACA" : 9520,
+    "GCACCTCA" : 9520,
+    "CAAACTGA" : 9520,
+    "AACTCCAC" : 9520,
+    "AAATCGAA" : 9520,
+    "GGGTGGGA" : 9500,
+    "GATGTACA" : 9500,
+    "GGGGGCCA" : 9460,
+    "CCAAACAA" : 9460,
+    "ACAATACA" : 9460,
+    "GACAAGAA" : 9420,
+    "AAGCGACA" : 9420,
+    "AAAGAATC" : 9380,
+    "CACAATAC" : 9340,
+    "ATAAACAA" : 9320,
+    "CTCAAATG" : 9300,
+    "CAAATCTA" : 9300,
+    "AAGACAAA" : 9260,
+    "GCGGGGGA" : 9240,
+    "AACATTAC" : 9240,
+    "GGGGGTGC" : 9220,
+    "AACCAACC" : 9220,
+    "AAAACTAC" : 9220,
+    "CAGAACTA" : 9180,
+    "AACTAGAA" : 9160,
+    "TCTAACAA" : 9140,
+    "GGGGTCTA" : 9140,
+    "CGGGATTG" : 9140,
+    "CACCTCCA" : 9140,
+    "ATCACTAA" : 9120,
+    "AGGCTTAA" : 9100,
+    "AGCAACAA" : 9100,
+    "ACACGAAA" : 9100,
+    "CGATTGCA" : 9060,
+    "GTTCTGTC" : 9040,
+    "GAATTCTG" : 9040,
+    "CAGATATC" : 9040,
+    "ATCAATAA" : 9020,
+    "AAAAATGA" : 9020,
+    "TGGGCTTC" : 9000,
+    "CAGATGTA" : 9000,
+    "ACAAATCA" : 9000,
+    "AAAGGACA" : 9000,
+    "ACCAAGCT" : 8960,
+    "TAAAAGCA" : 8920,
+    "CCAAACTC" : 8920,
+    "ACCAATGA" : 8920,
+    "GACAATAA" : 8900,
+    "TGAAAGAA" : 8880,
+    "CCTCCTAT" : 8880,
+    "AAAAAGGA" : 8880,
+    "CCGTTGAG" : 8860,
+    "ACAACTCA" : 8860,
+    "CTCCAATG" : 8840,
+    "CAAAACTC" : 8840,
+    "ACATAAAA" : 8840,
+    "TTCTTCAC" : 8820,
+    "AGTGGGTC" : 8820,
+    "AACAGGCA" : 8820,
+    "AAACATTA" : 8820,
+    "CAATATCA" : 8800,
+    "CAAGGAAG" : 8800,
+    "AAAATTCC" : 8800,
+    "CGCCAAGA" : 8780,
+    "CAGTGGTC" : 8780,
+    "ACAATGAA" : 8780,
+    "TACAAGAA" : 8760,
+    "CTTGTAGC" : 8740,
+    "AATCATCA" : 8740,
+    "AATAATCA" : 8720,
+    "CAGATTCA" : 8700,
+    "ATCACGAA" : 8700,
+    "AGGGCTAA" : 8700,
+    "ACCAATCA" : 8700,
+    "CACATAAC" : 8680,
+    "TACAACAA" : 8660,
+    "GTGGTCAA" : 8660,
+    "AGCAGAAT" : 8660,
+    "AACCTCTA" : 8660,
+    "GAAGACAA" : 8640,
+    "AATAAACA" : 8640,
+    "AAACTGAA" : 8620,
+    "CATCATTC" : 8600,
+    "AAAACACC" : 8600,
+    "GAAAAAAA" : 8580,
+    "CTAAGGGT" : 8580,
+    "CACTGTAT" : 8540,
+    "CCAGTTTC" : 8500,
+    "AAAGTTAA" : 8500,
+    "CAGAGTAA" : 8480,
+    "AAACCGAA" : 8480,
+    "TCTACAAA" : 8460,
+    "ACAGTAAA" : 8440,
+    "GAATAATA" : 8420,
+    "CCACTGTA" : 8400,
+    "ACACATTA" : 8380,
+    "AAAACATC" : 8380,
+    "AACGACAA" : 8360,
+    "AACATCAA" : 8340,
+    "TAAGAGAA" : 8320,
+    "CACAAGCT" : 8280,
+    "ACTAATCA" : 8280,
+    "ACAACGAA" : 8260,
+    "GATATAAA" : 8240,
+    "CTGCATAA" : 8240,
+    "CGATAGAC" : 8240,
+    "CAAGCTAA" : 8240,
+    "ATCCTGGT" : 8240,
+    "ACAACTGA" : 8220,
+    "CAAATTAA" : 8200,
+    "ATAAATAC" : 8200,
+    "ACAAGAGA" : 8200,
+    "AACCCGAG" : 8200,
+    "CATATATC" : 8180,
+    "AAATAGAA" : 8180,
+    "AAAACGTC" : 8180,
+    "ACGTAAAA" : 8160,
+    "AAGATATA" : 8160,
+    "CCTCTTCA" : 8140,
+    "CAACTAAC" : 8140,
+    "GAGATAAA" : 8120,
+    "ACAGAATA" : 8120,
+    "AAGACATA" : 8120,
+    "TCCTCTAA" : 8100,
+    "AATTCCGT" : 8100,
+    "GCGAAACA" : 8080,
+    "GCCACTAA" : 8080,
+    "AACAATCC" : 8080,
+    "CAGATCGA" : 8060,
+    "AGAACATA" : 8060,
+    "AAACCATA" : 8060,
+    "ACAAGTAA" : 8040,
+    "GGGGGTAA" : 8020,
+    "AGTGGTTC" : 8020,
+    "AGAATACA" : 8020,
+    "AAACTAAC" : 8000,
+    "CAGATAAA" : 7980,
+    "CAATTAAA" : 7980,
+    "AACCTCAC" : 7980,
+    "NNNNNNCA" : 7960,
+    "CCAAACTA" : 7960,
+    "CAATAAAA" : 7960,
+    "CGCATAAC" : 7940,
+    "ATATCTAC" : 7940,
+    "ACAACACA" : 7940,
+    "ACATAACA" : 7920,
+    "AAAGTGAA" : 7920,
+    "CGAGCTGA" : 7900,
+    "ATCCATTC" : 7900,
+    "AATCACCA" : 7900,
+    "AAACAGAC" : 7900,
+    "ACTCTAAA" : 7880,
+    "ACAAGCCT" : 7880,
+    "AATAAATA" : 7880,
+    "AAATACTA" : 7880,
+    "NNNNNNTA" : 7860,
+    "GATGACAA" : 7860,
+    "GACAGTTG" : 7860,
+    "CCAACAAA" : 7860,
+    "CAGATCGC" : 7860,
+    "ACACCATA" : 7860,
+    "CAATCATA" : 7840,
+    "TCCGTTCT" : 7820,
+    "GGTGAATA" : 7820,
+    "AATTCAAA" : 7820,
+    "CCAAAATC" : 7800,
+    "AAATCTCA" : 7800,
+    "AAAATCAA" : 7800,
+    "NNNNNNGA" : 7780,
+    "AGATGTCA" : 7780,
+    "AGAATTAC" : 7780,
+    "ACATATAC" : 7780,
+    "AACTTGAA" : 7780,
+    "AATCACAA" : 7760,
+    "AAACTAGA" : 7740,
+    "AAGAACTA" : 7720,
+    "CAGAGATA" : 7700,
+    "CAAGGGAG" : 7700,
+    "ATAAATAA" : 7700,
+    "AGAAAGCA" : 7700,
+    "AACACATC" : 7700,
+    "AAAACGAC" : 7700,
+    "CACGTTAA" : 7680,
+    "CAACTATC" : 7660,
+    "AGAATAGA" : 7660,
+    "AAACTTAA" : 7660,
+    "GACCTAGT" : 7640,
+    "ACATCATA" : 7640,
+    "GGGCGGAA" : 7620,
+    "CCCAAATA" : 7600,
+    "ATAATTAA" : 7600,
+    "AGAAATCA" : 7600,
+    "GAAAAATA" : 7580,
+    "GAAAAACA" : 7580,
+    "ACAAAAAC" : 7580,
+    "GAAAGGCA" : 7560,
+    "ATCATAAA" : 7560,
+    "TTCCGCAA" : 7540,
+    "AATAAATC" : 7540,
+    "TGGCTTTC" : 7520,
+    "ATAATTAC" : 7520,
+    "AGAACGAA" : 7520,
+    "ACGAAACA" : 7520,
+    "ACGCCTCG" : 7500,
+    "CAAAACGA" : 7480,
+    "AAGTACAA" : 7480,
+    "CTCAATTG" : 7460,
+    "GATGAAAA" : 7440,
+    "CAAACTAA" : 7440,
+    "AATAAGAA" : 7420,
+    "GCGAAAAA" : 7380,
+    "ACCGCTCG" : 7380,
+    "AACAATTA" : 7380,
+    "CAGACAAA" : 7360,
+    "ACTAATAA" : 7360,
+    "GAATCTTG" : 7340,
+    "ATGCTAAA" : 7340,
+    "AATATATC" : 7340,
+    "AAACTATA" : 7340,
+    "GAGCCTGA" : 7320,
+    "AACAATAC" : 7320,
+    "CCAATAAA" : 7300,
+    "CAAAAGAA" : 7300,
+    "ACAAATAC" : 7300,
+    "AAGCTAAA" : 7300,
+    "AAAAGGAA" : 7280,
+    "AAAACCTC" : 7280,
+    "GCCAAAAA" : 7260,
+    "CCTTCTAT" : 7260,
+    "CAATCAAA" : 7240,
+    "TAAATAAA" : 7220,
+    "GCTAAACA" : 7220,
+    "AAAATAGA" : 7220,
+    "GAAAATAA" : 7200,
+    "ACAACTTA" : 7200,
+    "ACAACCTC" : 7200,
+    "AATTAAAA" : 7200,
+    "GTCTTGTC" : 7180,
+    "GCCAAAGA" : 7180,
+    "CTGGGCAT" : 7180,
+    "CATTGGCT" : 7180,
+    "ACCATCAA" : 7160,
+    "TATAACAA" : 7140,
+    "CAGAATAA" : 7140,
+    "ACATATAA" : 7140,
+    "AAATATTA" : 7140,
+    "AAAGAAAC" : 7140,
+    "CAAGAGAT" : 7120,
+    "ACCAAATA" : 7120,
+    "AAAAGTAA" : 7120,
+    "GCTAAAAA" : 7100,
+    "CAAAGGTA" : 7080,
+    "AAGCTTAA" : 7080,
+    "AAACCAGA" : 7080,
+    "GATAACTA" : 7060,
+    "CGGGGGGC" : 7060,
+    "ATGCGACA" : 7060,
+    "AAATCAGA" : 7060,
+    "GATAACAA" : 7040,
+    "CTATCAGC" : 7040,
+    "ACCACCTG" : 7040,
+    "ACACAAAC" : 7040,
+    "GTTGTCAA" : 7020,
+    "CGCATTAC" : 7020,
+    "ACTAGCAA" : 7020,
+    "TAGAAAAA" : 7000,
+    "AACATACC" : 7000,
+    "AAACAGTC" : 7000,
+    "CATAACCA" : 6980,
+    "ACCAAAAC" : 6980,
+    "AAGGAAAA" : 6980,
+    "CGGATGCA" : 6960,
+    "CAGGCTAA" : 6960,
+    "AAAGATAC" : 6960,
+    "AAACTACA" : 6960,
+    "GGGGGGAC" : 6940,
+    "CACTAATA" : 6940,
+    "AAAATGCA" : 6940,
+    "GACGTGCA" : 6920,
+    "AAGAAGTA" : 6900,
+    "AAGAAATA" : 6900,
+    "GACACAAA" : 6880,
+    "ATCAATTA" : 6880,
+    "ATAACAAA" : 6880,
+    "CGCAAAAA" : 6860,
+    "CCAACTAA" : 6860,
+    "ACTACACA" : 6860,
+    "ACAATTAA" : 6860,
+    "AAAAGTAC" : 6860,
+    "GGTGTATC" : 6840,
+    "ATTGGGCT" : 6840,
+    "ATTGGCCT" : 6840,
+    "AATCATTC" : 6840,
+    "GAAACTTA" : 6820,
+    "CCAATTAA" : 6820,
+    "CCAAAAAC" : 6820,
+    "CACCACTG" : 6820,
+    "GAAAACTA" : 6800,
+    "CGACTAGT" : 6800,
+    "ACAGAAAT" : 6800,
+    "AATCTTAA" : 6800,
+    "GAAAACGA" : 6780,
+    "ATGAACAA" : 6780,
+    "ACGATAGA" : 6780,
+    "AATGTATC" : 6780,
+    "AACTATAA" : 6780,
+    "GGTGTATA" : 6760,
+    "ACAAAATC" : 6760,
+    "AGAATTAA" : 6740,
+    "TCCAAAAA" : 6720,
+    "ATAACATA" : 6720,
+    "AAGAGTTA" : 6720,
+    "ATAGGACA" : 6700,
+    "AAACTCAC" : 6700,
+    "CACAGAAA" : 6680,
+    "AATATGAA" : 6680,
+    "AAGTGGTC" : 6680,
+    "AAAAGACA" : 6680,
+    "GGGGCCCA" : 6660,
+    "CCTCAATA" : 6660,
+    "CACATCTA" : 6640,
+    "AGCATTAA" : 6640,
+    "AATGAAAC" : 6640,
+    "TATCCAGC" : 6620,
+    "GATTAGAC" : 6600,
+    "GAAATCTG" : 6600,
+    "ACAAATTA" : 6600,
+    "AACTTCAA" : 6600,
+    "CTAAAGGT" : 6580,
+    "CATCAATC" : 6580,
+    "ATCATGAA" : 6580,
+    "ACCTTCCA" : 6580,
+    "AATATCAA" : 6580,
+    "GAAAATGA" : 6560,
+    "ACTAACAA" : 6560,
+    "ACCACTAA" : 6560,
+    "ACAATTCA" : 6560,
+    "AACTTCAC" : 6560,
+    "GGGGGCCC" : 6540,
+    "CCCATAAA" : 6540,
+    "CCAACCTA" : 6540,
+    "CACAGTAA" : 6540,
+    "AAATCCGT" : 6540,
+    "CACGCTCG" : 6520,
+    "AATATAAA" : 6520,
+    "AAAGAGAA" : 6520,
+    "TTATCAGC" : 6500,
+    "GACTTAGT" : 6500,
+    "AGCCTAAA" : 6500,
+    "TAAAAATA" : 6480,
+    "CTCAAAAA" : 6480,
+    "CACAAGTA" : 6480,
+    "ATAGCCGA" : 6480,
+    "AATCAATC" : 6480,
+    "ATTGCCTA" : 6460,
+    "ATATACAA" : 6460,
+    "AAAATAAC" : 6460,
+    "CCTCTTAT" : 6440,
+    "CAAAACAC" : 6440,
+    "TATACACA" : 6420,
+    "GAGCTTGA" : 6420,
+    "CTAACATA" : 6420,
+    "CACAAACA" : 6420,
+    "ACTTATGC" : 6420,
+    "ACAGGCAG" : 6400,
+    "ATAATAAC" : 6380,
+    "AAGAAGAA" : 6380,
+    "AAATGTAA" : 6380,
+    "TGGTTGGT" : 6360,
+    "TCAAAAAA" : 6360,
+    "TACAATAA" : 6360,
+    "GTCTGTTC" : 6360,
+    "ACCAGCAG" : 6360,
+    "CAGCACCT" : 6340,
+    "ACGATCTA" : 6340,
+    "ACCACTTG" : 6340,
+    "AACCTAAC" : 6340,
+    "ACTAGTAA" : 6320,
+    "AAAATTAC" : 6320,
+    "TCAACACA" : 6300,
+    "GGGGTGGG" : 6300,
+    "GCCACCAT" : 6300,
+    "CCATTCAA" : 6300,
+    "CAATTCAA" : 6300,
+    "CAAAGATC" : 6300,
+    "AACTTCTA" : 6300,
+    "GAAGTTAG" : 6280,
+    "ATATCAAA" : 6280,
+    "ACATACAA" : 6280,
+    "GGTTCTAA" : 6260,
+    "CAATCAGA" : 6260,
+    "CAACCTGA" : 6260,
+    "CAAACCTC" : 6260,
+    "ATCAAGCA" : 6260,
+    "ATAAGTAC" : 6260,
+    "AGACAAAC" : 6260,
+    "AACTATCA" : 6260,
+    "TATTAACA" : 6240,
+    "NNNNNNAA" : 6220,
+    "GGAGTTAG" : 6220,
+    "ATAAGATA" : 6220,
+    "AGTTGGTC" : 6220
+   }
+  },
+  {
+   "Lane" : 2,
+   "Barcodes" : {
+    "GGGGGGGG" : 47872100,
+    "GGGGGGGA" : 270400,
+    "CGGGGGGG" : 157180,
+    "GACTGGAA" : 135560,
+    "GAACTTAA" : 129600,
+    "NNNNNNNN" : 119800,
+    "GGGGGGGC" : 119460,
+    "AACCACAA" : 117180,
+    "CCTCTGAA" : 103660,
+    "ACTTCGAA" : 103200,
+    "ATGTTGCA" : 89840,
+    "CAACACAA" : 89080,
+    "AAAAAAAA" : 87900,
+    "CACCACAA" : 86960,
+    "CACTCGAA" : 86580,
+    "CATCCTCA" : 85660,
+    "AGACGGAA" : 85640,
+    "CGTGAGAA" : 85580,
+    "GGGGGGGT" : 85400,
+    "AAAAACAA" : 80660,
+    "GCTACGAA" : 76040,
+    "CTCCTGAA" : 74860,
+    "CAACTTAA" : 72980,
+    "CCCCTGAA" : 72300,
+    "GCAGTAAA" : 71120,
+    "GCAACGAA" : 71080,
+    "CAGTTCAA" : 70700,
+    "ATGGCTCA" : 68240,
+    "GTAACGAA" : 67840,
+    "AAAAAACA" : 67580,
+    "GGAGTAAA" : 65340,
+    "ATGAATCA" : 64220,
+    "TCTCACAA" : 64160,
+    "AACAAAAA" : 61940,
+    "AATGTGCA" : 61700,
+    "AAAACACA" : 59880,
+    "ACTATCAA" : 59240,
+    "GTCGGTAA" : 59100,
+    "TGGTGTAA" : 58760,
+    "AAAACAAA" : 58580,
+    "CGCTGGAA" : 56560,
+    "CGACTTAA" : 55220,
+    "CGAGTAAA" : 55080,
+    "CATTCGAA" : 54820,
+    "CAAACAAA" : 54560,
+    "CAAGAGCA" : 54280,
+    "TAGATGAA" : 54100,
+    "GCTCGTAA" : 54080,
+    "CGACGGAA" : 54020,
+    "CAGGAGCA" : 53840,
+    "ACCGAGAA" : 53140,
+    "AATCGTCA" : 52380,
+    "CTAACGAA" : 52260,
+    "ACGATCAA" : 50540,
+    "AGTATCAA" : 50300,
+    "AAACAAAA" : 50280,
+    "ACAAAAAA" : 50160,
+    "AAAACCAA" : 49080,
+    "CTGAGCCA" : 48900,
+    "AGAGATCA" : 48140,
+    "GCGGTAAA" : 47640,
+    "ACAAACAA" : 47340,
+    "GGGGGGTA" : 46640,
+    "ACAACCAA" : 46460,
+    "AAAAATCA" : 46360,
+    "GATGATCA" : 45860,
+    "TGGCATAA" : 45740,
+    "CCTTCGAA" : 45340,
+    "AGGATGAA" : 45000,
+    "CTTAGCCA" : 44960,
+    "CGTATCAA" : 44840,
+    "CCTCCGAA" : 44780,
+    "GCCGGTAA" : 44760,
+    "AAGGAGCA" : 43960,
+    "ATCATCCA" : 43560,
+    "AAACATAA" : 43020,
+    "CAAAAAAA" : 42800,
+    "CCAGTCAA" : 41780,
+    "GTGAATCA" : 41240,
+    "CCAGCGTT" : 40920,
+    "CGTAGCCA" : 40700,
+    "CGGGGGGA" : 40660,
+    "AACGAGAA" : 40320,
+    "CAAAACAA" : 40240,
+    "ACAACAAA" : 40160,
+    "CCACCTTA" : 39880,
+    "GACAGGCA" : 39700,
+    "CAAAAATA" : 39660,
+    "AAAAAGAA" : 39540,
+    "CAACCCAA" : 38680,
+    "AGGACACA" : 38540,
+    "GACACACA" : 38400,
+    "CACTTGAA" : 38340,
+    "GCGATAAA" : 38300,
+    "AGGCTACA" : 38120,
+    "AAAAATAA" : 38080,
+    "CCGTAGAA" : 37820,
+    "CACCTACA" : 37280,
+    "AAGACACA" : 36900,
+    "GCTAAGAA" : 36820,
+    "AACACAAA" : 36120,
+    "TCGTCTAA" : 36060,
+    "AAGACTAA" : 35900,
+    "CACCCTTA" : 35540,
+    "AACCAGAA" : 35220,
+    "CTGTGCCA" : 34640,
+    "TGTAGCCA" : 34360,
+    "AACACCAA" : 33860,
+    "AAACAACA" : 33820,
+    "AGATCTGA" : 33340,
+    "AAGTTGCA" : 32780,
+    "CTCGGTAA" : 32760,
+    "ATCCGTAA" : 32460,
+    "AATTTGCA" : 32300,
+    "GATAATCA" : 32260,
+    "NNNNNNNA" : 32160,
+    "CTGTACCA" : 31980,
+    "CATGGAAA" : 31620,
+    "AATAAAAA" : 31400,
+    "AAACGGAA" : 31260,
+    "AACAATAA" : 30940,
+    "ATGCCCTA" : 30900,
+    "ACGTTCAA" : 30680,
+    "ACAAATAA" : 30460,
+    "CCTGAGAA" : 30340,
+    "AGGCAACA" : 30340,
+    "AAAACATA" : 30220,
+    "AACCGGAA" : 30020,
+    "AATCCGCA" : 29660,
+    "AAGCGGAA" : 29520,
+    "ACCAAAAA" : 29440,
+    "TGGATGAA" : 29360,
+    "ATCCGTCA" : 29260,
+    "ATATTCCA" : 28820,
+    "CGGCATAA" : 28620,
+    "CACTTACA" : 28340,
+    "CTCATGAA" : 28320,
+    "TCCGTTAA" : 28180,
+    "CCGGAGAA" : 28180,
+    "AACAAACC" : 28120,
+    "TCATTCCA" : 27520,
+    "AACTACAA" : 27480,
+    "CGAAGTAA" : 27160,
+    "CAAAAACA" : 27140,
+    "AACATTAA" : 27100,
+    "TGTGGTAA" : 27080,
+    "ACAGCGAA" : 26780,
+    "GGGGGGAA" : 26720,
+    "TCACGCAA" : 26660,
+    "AATGTTCA" : 26500,
+    "AAAACTAA" : 26420,
+    "CCCGTGAG" : 26280,
+    "CCAAGACT" : 26120,
+    "AAAAGAAA" : 25600,
+    "AACAAGAA" : 25400,
+    "GTGTCTAA" : 25300,
+    "ACAACATA" : 25180,
+    "ACCAACAA" : 25160,
+    "CCAATGAA" : 25140,
+    "ACAAAATA" : 25140,
+    "AATGGAAA" : 25020,
+    "GGGGGTGA" : 24960,
+    "AAACACAA" : 24880,
+    "AGCACTCA" : 24820,
+    "ACATTCCA" : 24820,
+    "AGCGTTAA" : 24660,
+    "AAACAAAC" : 24600,
+    "ACGTACAA" : 24540,
+    "TCAATGAA" : 24480,
+    "ACCACAGA" : 24420,
+    "ATCCCTGT" : 24300,
+    "CTCTATCA" : 24060,
+    "TCCGCTAA" : 24040,
+    "CACAATTA" : 23800,
+    "TGGACAAA" : 23660,
+    "AACAAAAC" : 23600,
+    "CCCATCCT" : 23480,
+    "TGGGGTAA" : 23460,
+    "GCACATAA" : 23440,
+    "AATACAAA" : 23360,
+    "AAGAGGAA" : 23240,
+    "GGGGGGCA" : 23220,
+    "AAAAACTA" : 23220,
+    "GCAAGACA" : 23140,
+    "TCTTACAA" : 23120,
+    "CGACAACA" : 23100,
+    "ACATCAAA" : 22900,
+    "AAACCAAA" : 22880,
+    "AATAACAA" : 22820,
+    "CTAAGGCA" : 22760,
+    "ACCCTCCA" : 22760,
+    "ACGCCGAA" : 22720,
+    "AAAACGAA" : 22720,
+    "AAAAAATA" : 22700,
+    "ATAGCACA" : 22660,
+    "AACAAATA" : 22640,
+    "TAGGTGAA" : 22480,
+    "AAATATAA" : 22480,
+    "CACATAAA" : 22400,
+    "GCATACAA" : 22120,
+    "GGGGGGTG" : 22100,
+    "CAACAAAA" : 22040,
+    "GCTGGTAA" : 21900,
+    "CCGCATAC" : 21800,
+    "AACAGAAA" : 21760,
+    "CACAATAA" : 21740,
+    "AACACACA" : 21740,
+    "AAGAAAAA" : 21700,
+    "AAATCACA" : 21700,
+    "AAAAGATA" : 21700,
+    "ACGTCGAA" : 21480,
+    "ACAAAACA" : 21460,
+    "ATTGCTCA" : 21340,
+    "ACCACAAA" : 21340,
+    "CACACACA" : 21120,
+    "CGAATTAA" : 21080,
+    "AAAATAAA" : 21060,
+    "GACTGTAA" : 21040,
+    "TAGGAGAA" : 20900,
+    "AAATAAAA" : 20860,
+    "GACAGTAA" : 20740,
+    "AAAAAAAC" : 20680,
+    "AAAAAGCA" : 20560,
+    "ACAAGAAA" : 20160,
+    "AATCCTCA" : 20140,
+    "GGGGGTGG" : 20100,
+    "CGACACCA" : 19960,
+    "AACCGTCA" : 19940,
+    "ACATGCAA" : 19920,
+    "ATTGGCCA" : 19860,
+    "AAGCAGAA" : 19780,
+    "CCAACATA" : 19700,
+    "GAGTAGCA" : 19640,
+    "ATCTTCCA" : 19440,
+    "CTTCACAA" : 19300,
+    "CAGCCGTT" : 19280,
+    "AACATACA" : 19140,
+    "AAAACAGA" : 19140,
+    "CGAACACA" : 19060,
+    "CTAATGAA" : 18880,
+    "TTTCACAA" : 18820,
+    "ATAACTAA" : 18720,
+    "ACCTTACA" : 18720,
+    "AAAGAGAT" : 18700,
+    "CCCAGTTC" : 18660,
+    "CCGTCTAA" : 18600,
+    "CCCTCTAT" : 18580,
+    "AGCTAACA" : 18580,
+    "AAAATCTA" : 18520,
+    "ACATCACA" : 18360,
+    "AAACAACC" : 18360,
+    "AAAAATAC" : 18280,
+    "ATCAAAAA" : 18220,
+    "AACATATA" : 18100,
+    "AACACAGA" : 18100,
+    "TCTTTCAC" : 18040,
+    "GTGTTTAA" : 18040,
+    "AACTCAAA" : 18020,
+    "AACATCGA" : 18020,
+    "ACTAAAAA" : 17980,
+    "CAAAATGA" : 17940,
+    "AGAAACAA" : 17900,
+    "CCGTGGAA" : 17880,
+    "CCTAAGGT" : 17800,
+    "CCTCAATG" : 17720,
+    "AACACTGA" : 17720,
+    "AATAAGCA" : 17460,
+    "AACCTTAA" : 17460,
+    "CCTCATCA" : 17420,
+    "ACAATAAA" : 17420,
+    "CAAAAAGA" : 17340,
+    "AACACATA" : 17300,
+    "CAAAGGAG" : 17220,
+    "ACTAAACA" : 17120,
+    "TCCCGTCT" : 17100,
+    "CATGCCTA" : 16860,
+    "ATCTGTAA" : 16860,
+    "AACAATGA" : 16820,
+    "AAACATAC" : 16780,
+    "NNNNNNNC" : 16760,
+    "CATAAAAA" : 16740,
+    "GAGTTGCA" : 16560,
+    "CCCTCCTG" : 16480,
+    "ACACTGTA" : 16480,
+    "AAAAATTA" : 16260,
+    "CGGGGGGT" : 16240,
+    "AACATAAA" : 16240,
+    "ACGCTGAA" : 16220,
+    "GCCAATAA" : 16180,
+    "ACGAAAAA" : 16160,
+    "AAGATTCA" : 16100,
+    "CATAAATA" : 16020,
+    "AAGAACAA" : 16020,
+    "CAAATACA" : 16000,
+    "AAATCAAA" : 16000,
+    "ACCCCAAA" : 15980,
+    "AAAATTAA" : 15920,
+    "CCCGAAGT" : 15900,
+    "AACCTAAA" : 15900,
+    "AACAAGTA" : 15900,
+    "GGGCGGTA" : 15880,
+    "ATGCAAAA" : 15840,
+    "ATCAATCA" : 15840,
+    "CACACATA" : 15820,
+    "AGCTGAAA" : 15660,
+    "CAAAATTA" : 15640,
+    "GAACGGCA" : 15580,
+    "GTCTGCAA" : 15560,
+    "AGCACCCT" : 15560,
+    "TGGCTCAA" : 15540,
+    "GAATCGAA" : 15480,
+    "AAAGAATA" : 15440,
+    "TTTCACGC" : 15420,
+    "AAAACAAC" : 15400,
+    "AACCTGAA" : 15300,
+    "CCAAAAAA" : 15200,
+    "CAAAAAAC" : 15180,
+    "CACAAAAA" : 15140,
+    "CCCAAAAA" : 15120,
+    "CAAACATA" : 15040,
+    "ACTTGCAA" : 14980,
+    "GTCGTCAA" : 14940,
+    "CAAAGTAA" : 14880,
+    "CCATACCA" : 14840,
+    "CACCTTTA" : 14780,
+    "CTATGCAA" : 14720,
+    "ACTCACCA" : 14720,
+    "AAATACAA" : 14720,
+    "GATGAACA" : 14680,
+    "TGGTTCAA" : 14560,
+    "CAAACATC" : 14560,
+    "AAGGCACA" : 14540,
+    "TCTTCCAA" : 14500,
+    "ACCACGTA" : 14480,
+    "AACTAAAA" : 14420,
+    "AAAAATCC" : 14420,
+    "GAGTTTAG" : 14400,
+    "GCCCAAGA" : 14380,
+    "AAAATTCA" : 14320,
+    "AATCAAAA" : 14300,
+    "ATACCAAA" : 14240,
+    "AGTGTCAA" : 14200,
+    "ACCACTTA" : 14140,
+    "AGAAAAAA" : 14120,
+    "ACAACTAA" : 14120,
+    "CCTGGCAT" : 14100,
+    "CACCTTCA" : 14100,
+    "TGGAAACA" : 14080,
+    "CAGATATA" : 14040,
+    "CAACAAAC" : 14040,
+    "ATAACGAA" : 14020,
+    "CGAGTTAG" : 14000,
+    "ATTCCTGT" : 13960,
+    "CGACAGTG" : 13940,
+    "CAAATGAA" : 13920,
+    "ACCTGTAA" : 13900,
+    "AAATAACA" : 13860,
+    "GGGGGGCC" : 13840,
+    "CGGATTTG" : 13840,
+    "GAAACAGG" : 13760,
+    "CCAAATAA" : 13760,
+    "CACACAGA" : 13740,
+    "ATATGCAA" : 13740,
+    "AACGGATA" : 13740,
+    "GCCCACAT" : 13700,
+    "CCAAGGAG" : 13660,
+    "CTAGGTCA" : 13640,
+    "CACAAATA" : 13620,
+    "AATCCCGT" : 13580,
+    "AAAATGAA" : 13580,
+    "AAGCAAAA" : 13560,
+    "TCTAAACA" : 13540,
+    "TACAGCAA" : 13540,
+    "AACATAAC" : 13520,
+    "CAATAATA" : 13480,
+    "ATCAGCAA" : 13480,
+    "ACCCACTG" : 13480,
+    "ACGAATAA" : 13460,
+    "CACAAAGA" : 13380,
+    "ACACAAGA" : 13380,
+    "CGCGTTAA" : 13360,
+    "AACAGATA" : 13320,
+    "GTGTTTCT" : 13240,
+    "AACACGCA" : 13180,
+    "AAAACTTA" : 13180,
+    "AGAAGTAA" : 13120,
+    "AATACGTA" : 13100,
+    "CCGGATTG" : 13080,
+    "AAAAACAC" : 13040,
+    "TGAGAGAA" : 13020,
+    "AAATAAAC" : 13000,
+    "AAAACTCA" : 13000,
+    "ATTAGCGA" : 12920,
+    "AACATAGA" : 12900,
+    "AAATCCAA" : 12880,
+    "CTTGGCAT" : 12640,
+    "AACAACAC" : 12600,
+    "ATTTGGCT" : 12580,
+    "CTCAAGAA" : 12560,
+    "CCCTATCA" : 12520,
+    "CAGACTAA" : 12520,
+    "CCAATGGA" : 12460,
+    "AAACAGTA" : 12460,
+    "CCAAAATA" : 12440,
+    "CCAAGTAA" : 12420,
+    "ATCATTAA" : 12420,
+    "GAGCGAAA" : 12400,
+    "AAGAATGA" : 12380,
+    "TAAAATCA" : 12360,
+    "CGGGGGTA" : 12320,
+    "CCAGATCT" : 12320,
+    "CAAGAAAA" : 12300,
+    "CCTCCCTG" : 12280,
+    "GACAGTCA" : 12260,
+    "AAGAATAA" : 12260,
+    "CAGCTTAA" : 12220,
+    "CAATTGGA" : 12200,
+    "AAAAGAGA" : 12200,
+    "AAAACGCA" : 12200,
+    "ACCAGAAA" : 12180,
+    "CCTCTACA" : 12160,
+    "CAACAATA" : 12140,
+    "TAAACACA" : 12100,
+    "GCCAAGCA" : 12000,
+    "AACCAAAA" : 12000,
+    "GGATTGCA" : 11980,
+    "AAACACTA" : 11980,
+    "AAATAATA" : 11960,
+    "GTATCAAT" : 11920,
+    "CCAAACAC" : 11920,
+    "AGCTCGAA" : 11920,
+    "ACGAACAA" : 11900,
+    "AAGATAAC" : 11900,
+    "CCGGGGGG" : 11860,
+    "AAATATCA" : 11860,
+    "GGGGGTGT" : 11840,
+    "GACTATAA" : 11840,
+    "AATCCTAA" : 11820,
+    "CCTTCCTG" : 11800,
+    "AACCATAA" : 11800,
+    "CCGAATAA" : 11780,
+    "AACAAAGA" : 11780,
+    "AAACAATA" : 11780,
+    "CAAAGAAA" : 11760,
+    "ATCACAAA" : 11760,
+    "AACCTATA" : 11760,
+    "GGGGGGTC" : 11700,
+    "TAATCACA" : 11680,
+    "ATAACGCA" : 11680,
+    "GCCCATAA" : 11660,
+    "GACAAATA" : 11640,
+    "AAACAGCA" : 11620,
+    "CCTTATCA" : 11560,
+    "CCATCCCT" : 11560,
+    "ATATCGAA" : 11560,
+    "AGTGGCAA" : 11560,
+    "ACCAACTA" : 11540,
+    "AACATGAA" : 11540,
+    "AACACTAA" : 11540,
+    "CAAAAGTA" : 11520,
+    "CAAGCGTT" : 11500,
+    "AGGAAAAA" : 11500,
+    "AACACTCA" : 11500,
+    "AACACAAC" : 11500,
+    "CAATACAA" : 11480,
+    "CCCTTACA" : 11440,
+    "CAAGGACA" : 11440,
+    "CAAATAAA" : 11440,
+    "AAAGACAA" : 11400,
+    "CGCTCGAA" : 11380,
+    "AATAACTA" : 11380,
+    "CCAACCAC" : 11340,
+    "CGGTTGCA" : 11300,
+    "CACATAGA" : 11300,
+    "CAAGGGCA" : 11300,
+    "ACGATAAA" : 11300,
+    "ACCAAGAA" : 11280,
+    "AATAGAAA" : 11280,
+    "AAAACTGA" : 11280,
+    "GGGCGGGA" : 11240,
+    "AACATCTA" : 11220,
+    "AAAAAATC" : 11220,
+    "TCCAACAA" : 11200,
+    "GATGTACA" : 11140,
+    "AAACACAC" : 11140,
+    "GAGAATCA" : 11120,
+    "AAAGCATA" : 11120,
+    "TTACGCAA" : 11080,
+    "AAACTCGA" : 11080,
+    "ATAGCGCA" : 11060,
+    "CACATTAA" : 11040,
+    "AACTAACA" : 11040,
+    "AAATCAAC" : 11040,
+    "GCTGTCAA" : 10980,
+    "GCCAAACA" : 10980,
+    "CTTCAATG" : 10980,
+    "AGCACCCA" : 10980,
+    "ACGCTTCG" : 10980,
+    "ACGAGATA" : 10980,
+    "TATAAAAA" : 10940,
+    "GAGTGAAA" : 10920,
+    "CTTAAGGT" : 10900,
+    "CTCAAATA" : 10900,
+    "CAGCGGTT" : 10900,
+    "CAAATATC" : 10900,
+    "ATCCTTGT" : 10900,
+    "CCTGTAGC" : 10880,
+    "ATGAAAAA" : 10860,
+    "TAGCGACA" : 10840,
+    "AAAATATA" : 10840,
+    "GACCAGTG" : 10820,
+    "AGCATAAA" : 10820,
+    "GGCTGAAA" : 10800,
+    "TGAAGGAA" : 10780,
+    "CCATCCCA" : 10780,
+    "ACCAAACA" : 10780,
+    "ACAAACCA" : 10780,
+    "AAGGACCA" : 10780,
+    "AAAAAAGA" : 10760,
+    "AAGAATCA" : 10740,
+    "AACACGAA" : 10740,
+    "TTCCGTCT" : 10720,
+    "AAAGAAAA" : 10680,
+    "AAGATAAA" : 10640,
+    "AAACGATA" : 10640,
+    "AAACCTAA" : 10640,
+    "CAAGGAAA" : 10600,
+    "GGGCGGGC" : 10580,
+    "GACAAGAA" : 10560,
+    "ACCAATGA" : 10560,
+    "AAGCATAA" : 10520,
+    "AAAGAATC" : 10520,
+    "ACACAATA" : 10480,
+    "CCACCTCA" : 10460,
+    "AATATACA" : 10460,
+    "AGCAACAA" : 10400,
+    "GACTGAAA" : 10380,
+    "CCGACACA" : 10380,
+    "TATAAACA" : 10360,
+    "CAGGCGTT" : 10340,
+    "ATCCTTAA" : 10340,
+    "AACTCCAC" : 10340,
+    "AAAAAACC" : 10340,
+    "ACAAAGCA" : 10300,
+    "TTCAGCAA" : 10280,
+    "GACATGCA" : 10280,
+    "CAAGGTCA" : 10280,
+    "TTGGCTCA" : 10260,
+    "GGCTAACA" : 10260,
+    "GAACAGCA" : 10260,
+    "CAAGACCT" : 10260,
+    "GAATCCTG" : 10220,
+    "CCGTTCAA" : 10220,
+    "AGAACTAA" : 10220,
+    "CCTAAAGA" : 10200,
+    "ACAAAAGA" : 10180,
+    "GCAGGAAA" : 10140,
+    "CAGCAGAA" : 10120,
+    "AACGTTAA" : 10120,
+    "AAAACCTA" : 10120,
+    "CGATCTGA" : 10100,
+    "ACAATATA" : 10080,
+    "AACATTAC" : 10080,
+    "AAAACGTA" : 10080,
+    "CGAACAGG" : 10060,
+    "AGCAAAAA" : 10060,
+    "AAACTGTA" : 10060,
+    "CTGTTAGC" : 10040,
+    "CCAAAACA" : 10040,
+    "CATCAATA" : 10040,
+    "GAAAAAGA" : 10020,
+    "AAAAAGAC" : 9980,
+    "TAAAAGCA" : 9940,
+    "TAAAAAAA" : 9940,
+    "CAAACTGA" : 9940,
+    "AAGTAAAA" : 9940,
+    "GGGGTGGA" : 9920,
+    "ACACGAAA" : 9900,
+    "CAGAAGAA" : 9860,
+    "ACAATACA" : 9840,
+    "AAAACTAC" : 9840,
+    "AAAATACA" : 9820,
+    "GAAAAGTA" : 9800,
+    "CCAAACAA" : 9800,
+    "CAAAATAA" : 9800,
+    "ATCAAGAA" : 9800,
+    "ACCTAAAA" : 9800,
+    "AATCATAA" : 9800,
+    "AAATAGAA" : 9800,
+    "GAACCAGG" : 9780,
+    "CAGAACTA" : 9780,
+    "CAACAACC" : 9780,
+    "ACAATCAA" : 9760,
+    "ACAACTCA" : 9720,
+    "AACTAGAA" : 9720,
+    "CATCCTGT" : 9700,
+    "CACCTCCA" : 9700,
+    "AGGCTTAA" : 9700,
+    "AAAACATC" : 9680,
+    "CGAATCTG" : 9640,
+    "AATCAGAA" : 9640,
+    "GGGGGCCA" : 9620,
+    "AAAATTCC" : 9620,
+    "AAGATCTA" : 9600,
+    "CTTGTAGC" : 9580,
+    "AAGATATA" : 9580,
+    "AATCATCA" : 9560,
+    "AAATCGAA" : 9540,
+    "CAACTCAC" : 9520,
+    "CATCCATA" : 9500,
+    "GGGCGGGG" : 9480,
+    "ATAAACAA" : 9460,
+    "ACAATGAA" : 9460,
+    "AAACCGAC" : 9460,
+    "AATACACA" : 9440,
+    "ACAAATCA" : 9420,
+    "TTCTTCAC" : 9400,
+    "AGTGGGTC" : 9380,
+    "CAAATCTA" : 9360,
+    "AACAGTAA" : 9360,
+    "AGGGCTAA" : 9320,
+    "TGGGCTTC" : 9300,
+    "GGGGTCTA" : 9300,
+    "AAGGAACA" : 9300,
+    "TACAACAA" : 9280,
+    "GAAAAAAA" : 9240,
+    "CACAATAC" : 9220,
+    "AAGAAAAC" : 9220,
+    "CAACTAAC" : 9200,
+    "GCACCTCA" : 9180,
+    "AACCAACC" : 9180,
+    "ACAACACA" : 9140,
+    "AATCAAAC" : 9140,
+    "GGGGGCGA" : 9120,
+    "GGGTGAAA" : 9080,
+    "GACAATAA" : 9080,
+    "AAAGAAGA" : 9080,
+    "CGGGATTG" : 9060,
+    "AGCAGAAT" : 9060,
+    "ACCAAGCT" : 9040,
+    "TACAAGAA" : 9020,
+    "AAACCATA" : 9020,
+    "GGGTGGGA" : 9000,
+    "ACCAATAA" : 9000,
+    "GTTCTGTC" : 8980,
+    "ATCACGAA" : 8960,
+    "AAGCGACA" : 8940,
+    "CTAAGGGT" : 8920,
+    "AATAATCA" : 8920,
+    "CGATTGCA" : 8900,
+    "AGAATACA" : 8900,
+    "AATAAACA" : 8900,
+    "CTCAAATG" : 8880,
+    "CAGATGTA" : 8880,
+    "CAATATCA" : 8880,
+    "AAAAAGGA" : 8880,
+    "ACAACGAA" : 8860,
+    "GATATAAA" : 8840,
+    "AAGACATA" : 8820,
+    "AAACTGAA" : 8820,
+    "CAGAAATA" : 8800,
+    "CACATAAC" : 8780,
+    "GAATAATA" : 8760,
+    "AACAATCC" : 8760,
+    "GAAGACAA" : 8740,
+    "GTGGTCAA" : 8720,
+    "ACGTGATA" : 8720,
+    "AAGCTAAA" : 8720,
+    "CCTCCTTG" : 8700,
+    "AAAGTGAA" : 8700,
+    "ATCAATAA" : 8680,
+    "GAATTCTG" : 8660,
+    "CCACTGTA" : 8660,
+    "CTCCAATG" : 8640,
+    "AAGACAAA" : 8640,
+    "CAGATATC" : 8620,
+    "CAGATTCA" : 8600,
+    "CAATCATA" : 8600,
+    "CCGTTGAG" : 8580,
+    "ATCACTAA" : 8580,
+    "ACATAAAA" : 8560,
+    "AATCACAA" : 8540,
+    "ATAAATAC" : 8520,
+    "GGGGGTGC" : 8500,
+    "CAATAAAA" : 8500,
+    "ACCAATCA" : 8500,
+    "AACCTCAC" : 8500,
+    "AAATCTCA" : 8500,
+    "AAAACGTC" : 8500,
+    "CGCCAAGA" : 8480,
+    "CAAGGAAG" : 8480,
+    "ATAAATCA" : 8480,
+    "TCTACAAA" : 8440,
+    "AAGAAATA" : 8440,
+    "CAGATCGA" : 8420,
+    "CAAAAGAA" : 8420,
+    "AAACATTA" : 8420,
+    "CAGTGGTC" : 8400,
+    "CCAATAAA" : 8380,
+    "AAAACACC" : 8380,
+    "CACTGTAT" : 8360,
+    "TAAGAGAA" : 8340,
+    "ACACCATA" : 8340,
+    "AACCTCTA" : 8340,
+    "TCTAACAA" : 8320,
+    "CAAAACGA" : 8320,
+    "CAGAGTAA" : 8300,
+    "ATCCTGGT" : 8300,
+    "AATCACCA" : 8300,
+    "CAACTATC" : 8280,
+    "ACATATAA" : 8260,
+    "ACAACTGA" : 8260,
+    "AACATCAA" : 8260,
+    "CACAAGCT" : 8220,
+    "AGTGGTTC" : 8220,
+    "ACTCTAAA" : 8220,
+    "GCGGGGGA" : 8200,
+    "CAAATTAA" : 8200,
+    "ATATCTAC" : 8200,
+    "CCAAACTC" : 8180,
+    "AATTAAAA" : 8180,
+    "CAAAGGTA" : 8160,
+    "ACAAGCCT" : 8160,
+    "AAAAATGA" : 8160,
+    "CCTCTTCA" : 8140,
+    "CATATATC" : 8120,
+    "CAGAGATA" : 8120,
+    "ACAAGTAA" : 8120,
+    "AATTCCGT" : 8100,
+    "AAATACTA" : 8100,
+    "CCAGTTTC" : 8080,
+    "AATAAATA" : 8080,
+    "AGAACGAA" : 8060,
+    "AAACTAAC" : 8060,
+    "GGGCGGAA" : 8040,
+    "GATGAAAA" : 8040,
+    "AAAGTTAA" : 8020,
+    "CCAAAATC" : 8000,
+    "AACAGGCA" : 8000,
+    "CTGCATAA" : 7980,
+    "AAAGGACA" : 7980,
+    "TGAAAGAA" : 7960,
+    "CTCAATTG" : 7960,
+    "CCAACAAA" : 7960,
+    "AAAGAAAC" : 7960,
+    "CTGGGCAT" : 7940,
+    "CCTCCTAT" : 7940,
+    "ACACATTA" : 7940,
+    "ACAGAATA" : 7920,
+    "AATATATC" : 7920,
+    "GAGATAAA" : 7900,
+    "CGAGCTGA" : 7900,
+    "ACAAGAGA" : 7900,
+    "CGCATAAC" : 7880,
+    "AGAACATA" : 7880,
+    "GGGGGTAA" : 7860,
+    "CAGATAAA" : 7860,
+    "ATCCATTC" : 7860,
+    "CAAACTAA" : 7840,
+    "CATCATTC" : 7820,
+    "ACTAATCA" : 7820,
+    "AAACCGAA" : 7820,
+    "AAAATCAA" : 7820,
+    "CCAAACTA" : 7800,
+    "ATAAATAA" : 7800,
+    "ACCAAATA" : 7800,
+    "AAACCAGA" : 7780,
+    "TAAATAAA" : 7760,
+    "CCAATTAA" : 7760,
+    "GACCTAGT" : 7740,
+    "AAAACGAC" : 7740,
+    "GTTGTCAA" : 7720,
+    "CATAACCA" : 7720,
+    "AATTCAAA" : 7720,
+    "GGGGGCCC" : 7700,
+    "CGGATGCA" : 7700,
+    "ATCATAAA" : 7700,
+    "ACAAATAC" : 7700,
+    "AAAACCTC" : 7700,
+    "CAGATCGC" : 7680,
+    "CAAGCTAA" : 7680,
+    "ACAACTTA" : 7680,
+    "AACTTGAA" : 7680,
+    "AACGACAA" : 7680,
+    "AACACATC" : 7680,
+    "AAACTATA" : 7680,
+    "AAAAGGAA" : 7680,
+    "TCCTCTAA" : 7660,
+    "TCCAAAAA" : 7660,
+    "GACAGTTG" : 7660,
+    "CACTAATA" : 7660,
+    "GATGACAA" : 7640,
+    "GAAAAATA" : 7640,
+    "AAACTTAA" : 7640,
+    "TTCCGCAA" : 7620,
+    "ATAATTAA" : 7620,
+    "AGAATAGA" : 7620,
+    "ACAACCTC" : 7620,
+    "AATAAGAA" : 7620,
+    "AGACGCAA" : 7600,
+    "AAACTAGA" : 7600,
+    "GCGAAACA" : 7580,
+    "GCCACTAA" : 7580,
+    "CTATCAGC" : 7580,
+    "GGTGAATA" : 7560,
+    "GACACAAA" : 7560,
+    "GAAAGGCA" : 7560,
+    "CCAACCTA" : 7560,
+    "ACCGCTCG" : 7560,
+    "ACATCATA" : 7560,
+    "AAGAACTA" : 7560,
+    "AAAAGTAC" : 7560,
+    "GCCAAAGA" : 7540,
+    "CCATTCAA" : 7520,
+    "ACAGTAAA" : 7520,
+    "CGATAGAC" : 7500,
+    "AGAAAGCA" : 7500,
+    "ACCAAAAC" : 7500,
+    "CGCATTAC" : 7480,
+    "ACATATAC" : 7480,
+    "AACAATAC" : 7480,
+    "CCCAAATA" : 7460,
+    "CAAAACTC" : 7460,
+    "GAAAAACA" : 7440,
+    "CAGACAAA" : 7440,
+    "GCTAAAAA" : 7420,
+    "AACATACC" : 7420,
+    "GCTAAACA" : 7380,
+    "ATAATTAC" : 7380,
+    "AGAAATCA" : 7360,
+    "AAAATAGA" : 7360,
+    "ACCATCAA" : 7320,
+    "TGGCTTTC" : 7300,
+    "ACGCCTCG" : 7300,
+    "ATCATGAA" : 7280,
+    "AGATGTCA" : 7280,
+    "ACAATTCA" : 7280,
+    "AAGGAAAA" : 7280,
+    "TAGAAAAA" : 7260,
+    "CGACTAGT" : 7260,
+    "CAATTAAA" : 7260,
+    "GCGAAAAA" : 7240,
+    "CCTTCTAT" : 7240,
+    "CATTGGCT" : 7240,
+    "CAGAATAA" : 7220,
+    "ACCTTCCA" : 7220,
+    "CACGTTAA" : 7200,
+    "AGCATTAA" : 7200,
+    "AAATATTA" : 7180,
+    "AAACAGTC" : 7180,
+    "GATAACAA" : 7160,
+    "GAAAATAA" : 7160,
+    "CATCAATC" : 7160,
+    "ACTAACAA" : 7160,
+    "AATAAATC" : 7160,
+    "CGCCACAT" : 7140,
+    "ACAAAAAC" : 7120,
+    "AACCCGAG" : 7120,
+    "CCCATAAA" : 7100,
+    "CACATCTA" : 7100,
+    "GCCAAAAA" : 7080,
+    "GAAAATGA" : 7080,
+    "CTAAAGGT" : 7080,
+    "TCAACACA" : 7060,
+    "GATAACTA" : 7060,
+    "GAAAACGA" : 7060,
+    "ATGCTAAA" : 7060,
+    "AATGTATC" : 7060,
+    "ACTAGCAA" : 7040,
+    "ACGTAAAA" : 7040,
+    "AATGAAAC" : 7040,
+    "AACAATTA" : 7040,
+    "AAACAGAC" : 7040,
+    "GGTGTATA" : 7000,
+    "AATCATTC" : 7000,
+    "AAGAAGTA" : 7000,
+    "AACCTAAC" : 7000,
+    "GAATCTTG" : 6980,
+    "CAAGGGAG" : 6980,
+    "ATAACATA" : 6980,
+    "AAAATGCA" : 6980,
+    "GAGCCTGA" : 6960,
+    "CACAGTAA" : 6960,
+    "ATATACAA" : 6960,
+    "AGCCTAAA" : 6960,
+    "AAGTACAA" : 6960,
+    "ATTGGGCT" : 6940,
+    "ACATAACA" : 6940,
+    "GGGGTGGG" : 6920,
+    "CGCAAAAA" : 6920,
+    "CAATCAAA" : 6920,
+    "ACGATAGA" : 6920,
+    "ACCACTAA" : 6920,
+    "AAGCTTAA" : 6920,
+    "CAAGAGAT" : 6900,
+    "AATATCAA" : 6900,
+    "AAATCTAA" : 6900,
+    "AAATCCGT" : 6900,
+    "CCTCAATA" : 6880,
+    "ATAATAAC" : 6880,
+    "ACAAAATC" : 6880,
+    "CCTCTTAT" : 6840,
+    "CCAACTAA" : 6840,
+    "ACCAGCAG" : 6840,
+    "GAAAACTA" : 6820,
+    "ATTGGCCT" : 6820,
+    "AAACTCAC" : 6800,
+    "GAAACTTA" : 6780,
+    "CACTACTA" : 6780,
+    "CACAAGTA" : 6780,
+    "CAAAACAC" : 6780,
+    "AGTTGGTC" : 6780,
+    "AAAGATAC" : 6780,
+    "AAAATTAC" : 6780,
+    "CAGGCTAA" : 6760,
+    "AAAGATAA" : 6760,
+    "CACAAACA" : 6740,
+    "CAATCAGA" : 6740,
+    "GGGGGGAC" : 6720,
+    "CCAAAAAC" : 6720,
+    "ATCAATTA" : 6720,
+    "AGAATTAA" : 6700,
+    "AACTTCAC" : 6700,
+    "ATGCGACA" : 6680,
+    "ACTTATGC" : 6680,
+    "TCAAAAAA" : 6660,
+    "GAAATCTG" : 6660,
+    "ATAGGACA" : 6660,
+    "AAATCAGA" : 6640,
+    "CACAGAAA" : 6620,
+    "ACGAAACA" : 6620,
+    "ACAATTAA" : 6620,
+    "AAAAGTAA" : 6620,
+    "GTCTTGTC" : 6580,
+    "GAGCTTGA" : 6580,
+    "AAGAGAAA" : 6580,
+    "TCCGTTCT" : 6560,
+    "CGGGGGGC" : 6560,
+    "AGAATTAC" : 6560,
+    "GACGTGCA" : 6540,
+    "CAACCCAC" : 6540,
+    "TATAACAA" : 6520,
+    "CACCACTG" : 6520,
+    "ACCACCTG" : 6520,
+    "GGGTGGGG" : 6500,
+    "CAGCACCT" : 6500,
+    "ACTAATAA" : 6500,
+    "GACTTAGT" : 6480,
+    "AACATTCA" : 6480,
+    "AATCATGA" : 6460,
+    "ATGGCCTA" : 6420,
+    "AAAGAGAA" : 6420,
+    "AAACTACA" : 6400,
+    "AAAAGAAC" : 6400,
+    "GAAGTTAG" : 6380,
+    "CTCAAAAA" : 6380,
+    "ACAAATTA" : 6380,
+    "AACTATCA" : 6380,
+    "GGTGTATC" : 6360,
+    "CCATCTCA" : 6360,
+    "CACAGCAG" : 6360,
+    "CAAACCTC" : 6360,
+    "ATCATAAC" : 6360,
+    "GTCTGTTC" : 6340,
+    "GATTAGAC" : 6340,
+    "CTAAAATA" : 6340,
+    "AACTAAAC" : 6340,
+    "AGCACCAA" : 6320,
+    "TACAATAA" : 6300,
+    "CGTCTGTC" : 6300,
+    "TATACACA" : 6280,
+    "GAGATTAA" : 6280,
+    "GACATTAA" : 6280,
+    "CATAAATC" : 6280,
+    "CAATAATC" : 6280,
+    "ATCAAGCA" : 6280,
+    "ATAACCTC" : 6280,
+    "AACTCCCA" : 6280,
+    "GGTTCTAA" : 6260,
+    "AAGTGGTC" : 6260,
+    "ATAACAAA" : 6240,
+    "ACAGATAA" : 6240,
+    "AATCTTAA" : 6240,
+    "CAACGATA" : 6220,
+    "TCAACAAA" : 6200,
+    "AGTGTACA" : 6180,
+    "GCCACCAT" : 6160,
+    "CACAACTA" : 6160,
+    "ACATTTAA" : 6160,
+    "ACACAAAC" : 6160,
+    "TACAAAAA" : 6140,
+    "GGGGCCCA" : 6140,
+    "CATAACTA" : 6140,
+    "CACGCTCG" : 6140,
+    "CAAATCGA" : 6140,
+    "ACACTTCA" : 6140,
+    "AAAAAGTA" : 6140,
+    "TAAAAATA" : 6120,
+    "CTCCGTCT" : 6120,
+    "AAAATAAC" : 6120
+   }
+  }
+ ]
+}

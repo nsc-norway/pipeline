@@ -403,6 +403,16 @@ class Test60DemultiplexStats(TaskTestCase):
                 self.check_files_with_reference(self.qualitycontrol,
                         "files/fasit/60_demultiplex_stats/nsq")
 
+    def test_dx_stats_novs2standard(self):
+        testargs = ["script", "."]
+        with patch.object(sys, 'argv', testargs):
+            with self.qc_dir(self.NOVRUN) as tempdir:
+                with chdir(tempdir):
+                    self.module.main(self.task)
+                self.task.success_finish.assert_called_once()
+                self.check_files_with_reference(self.qualitycontrol,
+                        "files/fasit/60_demultiplex_stats/novs2standard")
+
 
 class Test60Emails(TaskTestCase):
     module = __import__("60_emails")
@@ -432,7 +442,7 @@ class Test60Emails(TaskTestCase):
                 self.module.main(self.task)
                 self.task.success_finish.assert_called_once()
                 self.check_files_with_reference(os.path.join(self.qualitycontrol, "Delivery"),
-                        "files/fasit/60_emails/nsq/")
+                        "files/fasit/60_emails/novs2standard/")
 
 
 class Test60Reports(TaskTestCase):
@@ -469,6 +479,22 @@ class Test60Reports(TaskTestCase):
                         pdfpaths.append(qcpath)
         self.reports_general_tester(projects, self.NSRUN, pdfpaths)
 
+    def test_reports_novs2standard(self):
+        with open("files/samples/novs2standard.json") as jsonfile:
+            projects = json.load(jsonfile)
+        pdfpaths = []
+        for project in projects:
+            if not project['is_undetermined']:
+                pdir = str(project['proj_dir'])
+                for s in project['samples']:
+                    for f in s['files']:
+                        fname = str(os.path.basename(f['path']))
+                        sname = "Sample_" + str(s['name'])
+                        qcpath = str(os.path.join(pdir, sname, self.NOVRUN + "." + str(f['lane']) + "." + 
+                            re.sub(r"fastq\.gz$", "qc.pdf", fname)))
+                        pdfpaths.append(qcpath)
+        self.reports_general_tester(projects, self.NOVRUN, pdfpaths)
+
     @patch('os.rename')
     def reports_general_tester(self, projects, run_id, pdfpaths, os_rename):
         with self.qc_dir(run_id) as tempdir:
@@ -501,6 +527,9 @@ class Test70MultiQC(TaskTestCase):
 
     def test_multiqc_nsq(self):
         self.multiqc_general_tester("files/samples/nsqctest.json", self.NSRUN)
+
+    def test_multiqc_novs2standard(self):
+        self.multiqc_general_tester("files/samples/novs2standard.json", self.NOVRUN)
 
     def multiqc_general_tester(self, json_path, run_id):
         with open(json_path) as jsonfile:
