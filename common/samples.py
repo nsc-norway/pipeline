@@ -345,12 +345,13 @@ def parse_sample_sheet(sample_sheet):
 
 ################# FILE STRUCTURE #################
 def get_project_dir(run_id, project_name):
-    if utilities.get_instrument_by_runid(run_id).startswith('hiseq'):
-        return get_hiseq_project_dir(run_id, project_name)
+    instrument = utilities.get_instrument_by_runid(run_id)
+    if instrument.startswith('hiseq') or instrument == "novaseq":
+        return get_dual_fc_instrument_project_dir(run_id, project_name)
     else:
         return get_ne_mi_project_dir(run_id, project_name)
 
-def get_hiseq_project_dir(run_id, project_name):
+def get_dual_fc_instrument_project_dir(run_id, project_name):
     """Gets project directory name, prefixed by date and flowcell index"""
     date_machine_flowcell = re.match(r"([\d]+_[^_]+)_[\d]+_([AB])", run_id)
     project_prefix = date_machine_flowcell.group(1) + "." + date_machine_flowcell.group(2) + "."
