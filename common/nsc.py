@@ -1,8 +1,9 @@
 # NSC-specific configuration
-
+from __future__ import print_function
 from genologics.lims import *
 import getpass
 import os
+import sys
 
 # Configure prod or dev
 TAG="dev"
@@ -11,7 +12,7 @@ try:
     with open("/etc/pipeline-site") as f: 
         SITE = f.read().strip()
 except IOError:
-    print "Warning: unknown site, you may set the site in /etc/pipeline-site"
+    print("Warning: unknown site, you may set the site in /etc/pipeline-site", file=sys.stderr)
     SITE = None
 
 ### Configuration for all sites, for production and dev ###
