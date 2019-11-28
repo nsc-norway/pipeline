@@ -113,7 +113,7 @@ def post_stats(lims, process, projects, demultiplex_stats, lane_metrics, lane_st
             update_artifacts.add(lane_analyte)
         stats = lane_stats.get(lane)
         if stats and stats.occupancy: # Attempt to get occupancy, None if not supported
-            lane_analyte.udf['% Occupied wells'] = stats.occupancy
+            lane_analyte.udf['% Occupied Wells'] = stats.occupancy
             update_artifacts.add(lane_analyte)
     #print "Updating"
     lims.put_batch(update_artifacts)
