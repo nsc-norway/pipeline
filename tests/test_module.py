@@ -259,6 +259,18 @@ class TestTaskFramework(unittest.TestCase):
             task.running()
             self.assertEquals(projects_to_dicts(task.projects), correct_projects)
 
+    def test_sample_sheet_parsing_novs2xp(self):
+        with open("files/samples/novs2xp.json") as jsonfile:
+            correct_projects = json.load(jsonfile)
+        task = taskmgr.Task("SsParseNovS2Xp", "TEST_DESCRIPTION", ["work_dir", "sample_sheet"]) 
+        RUN_DIR = "files/runs/191126_A00943_0006_BHMMNJDMXX"
+        testargs = ["script", RUN_DIR,
+                "--sample-sheet=files/runs/191126_A00943_0006_BHMMNJDMXX/DemultiplexingSampleSheet.csv"]
+        with patch.object(sys, 'argv', testargs):
+            task.__enter__()
+            task.running()
+            self.assertEquals(projects_to_dicts(task.projects), correct_projects)
+
 # 2. Test of the individual "Task" scipts
 
 class Test10CopyRun(TaskTestCase):
