@@ -167,7 +167,10 @@ def main(process_id, sample_sheet_file):
         threads = THREADS_OVERRIDE.get(instrument)
         if threads is not None:
             process.udf[nsc.THREADS_UDF] = threads
-
+        if instrument == "novaseq":
+            if next(iter(process.all_inputs())).location[0].type.name == "Library Tube":
+                # NovaSeq Standard workflow: Don't split the lanes
+                process.udf['No lane splitting'] = True
         logging.debug('Saved settings in the process')
 
     else:
