@@ -123,7 +123,7 @@ elif SITE == "ous":
     # Data processing/analysis programs
     #BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
     BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.20.0/nscinstallbin/bin/bcl2fastq"
-    FASTQC="/data/common/tools/nscbin/fastqc"
+    FASTQC="/data/common/tools/fastQC/FastQC_v0.11.8/fastqc"
     FASTDUP="/data/common/tools/nscbin/fastdup"
     BASEURI="https://ous-lims.sequencing.uio.no"
 
