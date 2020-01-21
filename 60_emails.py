@@ -112,17 +112,16 @@ def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned, oc
     occupied_cols = ["Occupied"] if occupancy else []
     # A different table is used depending on the sequencer type: Does it have lanes? Does it have patterned FC?
     if print_lane_number:
-        if patterned:
-            header = ["Lane", "Project", "PF cluster no", "PF ratio", "SeqDuplicates", "Undetermined"] + \
-                    phix_cols + [">=Q30"] + occupied_cols + ["MaxReadsSam", "MinReadsSam", "Quality"]
-        else:
-            header = ["Lane", "Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)",
-                    "PF cluster density(/mm2)", "Undetermined"] + phix_cols + [">=Q30", 
-                    "MaxReadsSam", "MinReadsSam", "Quality"]
+        header = ["Lane"]
+    else:
+        header = []
+    if patterned:
+        header += ["Project", "PF cluster no", "PF ratio", "SeqDuplicates", "Undetermined"] + \
+                phix_cols + [">=Q30"] + occupied_cols + ["MaxReadsSam", "MinReadsSam", "Quality"]
     else:
         header = ["Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)",
-                "PF cluster density(/mm2)", "Undetermined"] + phix_cols + [
-                ">=Q30"] + occupied_cols + ["MaxReadsSam", "MinReadsSam", "Quality"]
+                "PF cluster density(/mm2)", "Undetermined"] + phix_cols + [">=Q30", 
+                "MaxReadsSam", "MinReadsSam", "Quality"]
 
     # assumes 1 project per lane, and undetermined
     # Dict: lane ID => (lane object, project object)
@@ -306,7 +305,7 @@ class RunParameters(object):
         cys = process.udf.get('Read 2 Cycles')
         if cys:
             self.cycles.append(("R2", cys))
-        pars = ["Chemistry", "Run Mode", "Chemistry Version"]
+        pars = ["Chemistry", "Run Mode", "Chemistry Version", "Flow Cell Mode"]
         self.run_mode_field = None
         for par in pars:
             p = process.udf.get(par)
