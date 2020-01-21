@@ -84,7 +84,7 @@ def main(task):
     else:
         jinja_env = Environment(loader=FileSystemLoader(template_dir),
                 autoescape=select_autoescape(['html','xml']))
-    print_lane_number = instrument.startswith('hiseq') or instrument == "novaseq"
+    print_lane_number = not task.no_lane_splitting and instrument != "miseq"
     occupancy = instrument == "novaseq"
     write_html_and_email_files(jinja_env, task.process, task.bc_dir, delivery_dir, run_id, projects,
             print_lane_number, lane_stats, software_versions, patterned, occupancy)
@@ -109,14 +109,12 @@ def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned, oc
                 or [1]
                 )
     phix_cols = ["AlignPhixR{}".format(read) for read in range(1, phix_n_cols+1)]
+    occupied_cols = ["Occupied"] if occupancy else []
     # A different table is used depending on the sequencer type: Does it have lanes? Does it have patterned FC?
     if print_lane_number:
         if patterned:
             header = ["Lane", "Project", "PF cluster no", "PF ratio", "SeqDuplicates", "Undetermined"] + \
-                    phix_cols + [">=Q30"]
-            if occupancy:
-                header += ["Occupied"]
-            header += ["MaxReadsSam", "MinReadsSam", "Quality"]
+                    phix_cols + [">=Q30"] + occupied_cols + ["MaxReadsSam", "MinReadsSam", "Quality"]
         else:
             header = ["Lane", "Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)",
                     "PF cluster density(/mm2)", "Undetermined"] + phix_cols + [">=Q30", 
@@ -124,7 +122,7 @@ def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned, oc
     else:
         header = ["Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)",
                 "PF cluster density(/mm2)", "Undetermined"] + phix_cols + [
-                ">=Q30", "MaxReadsSam", "MinReadsSam", "Quality"]
+                ">=Q30"] + occupied_cols + ["MaxReadsSam", "MinReadsSam", "Quality"]
 
     # assumes 1 project per lane, and undetermined
     # Dict: lane ID => (lane object, project object)
