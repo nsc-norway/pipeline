@@ -29,6 +29,7 @@ Here is an overview of your data files and the number of fragments that were seq
 {% for (file, frags, rel_frags) in project_data.file_fragments_table %}
 {{ "{:35}".format(file) }}{{ "\t{0:12,}".format(frags) }} fragments{% endfor %}
 
+
 ----- Bioinformatic analyses ----{% if project_data.lims.internal_bc_demultiplexing_16s %}
 We have analysed the data using our pipeline based on QIIME 2. The tar file in your delivery contains both the raw data, demultiplexed data and the QIIME 2 analysis results. Please see the attached report file for more information.
 {% else %}
