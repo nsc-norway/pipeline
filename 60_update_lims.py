@@ -194,9 +194,11 @@ def get_lane(process, lane):
     
     Returns None if no such lane."""
     for input in process.all_inputs():
-        if (lane == 1 or lane == "X") and input.location[1] == 'A:1': # Use A:1 for NextSeq, MiSeq
+        if lane == 1 and input.location[1] == 'A:1': # Use A:1 for NextSeq, MiSeq
             return input
-        elif input.location[1] == '%d:1' % lane:
+        elif lane == "X":
+            return input
+        elif input.location[1] == '{}:1'.format(lane):
             return input
 
 
