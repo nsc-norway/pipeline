@@ -305,7 +305,7 @@ class RunParameters(object):
         cys = process.udf.get('Read 2 Cycles')
         if cys:
             self.cycles.append(("R2", cys))
-        pars = ["Chemistry", "Run Mode", "Chemistry Version", "Flow Cell Mode"]
+        pars = ["Chemistry", "Run Mode", "Chemistry Version", "Loading Workflow Type", "Flow Cell Mode"]
         self.run_mode_field = None
         for par in pars:
             p = process.udf.get(par)
