@@ -37,6 +37,7 @@ class TaskTestCase(unittest.TestCase):
     NSRUN = "180502_NS500336_0001_AHTJFWBGX5"
     NOVRUN = "191119_A00943_0005_AHMNCHDMXX"
     NOVS2MERGEDRUN = "191119_A00943_0005_AMERGDLANS"
+    NS2PROJECTSRUN = "200214_NS500336_0399_AH3H7WAFX2"
 
     def setUp(self):
         self.task =  taskmgr.Task(
@@ -66,6 +67,10 @@ class TaskTestCase(unittest.TestCase):
 
     @contextmanager
     def qc_dir(self, run_id):
+        """Set up a temporary directory to test QC scripts.
+        
+        The run (run_id) should exist in files/runs, and contain bcl2fastq stats."""
+
         self.tempparent = tempfile.mkdtemp()
         self.tempdir = os.path.join(self.tempparent, run_id)
         self.basecalls = os.path.join(self.tempdir, "Data", "Intensities", "BaseCalls")
@@ -487,6 +492,15 @@ class Test60Emails(TaskTestCase):
                 self.task.success_finish.assert_called_once()
                 self.check_files_with_reference(os.path.join(self.qualitycontrol, "Delivery"),
                         "files/fasit/60_emails/nsq/")
+
+    def test_emails_ns2projects(self):
+        with self.qc_dir(self.NS2PROJECTSRUN) as tempdir:
+            testargs = ["script", tempdir]
+            with patch.object(sys, 'argv', testargs):
+                self.module.main(self.task)
+                self.task.success_finish.assert_called_once()
+                self.check_files_with_reference(os.path.join(self.qualitycontrol, "Delivery"),
+                        "files/fasit/60_emails/ns2projects/")
 
     def test_emails_novs2standard(self):
         with self.qc_dir(self.NOVRUN) as tempdir:

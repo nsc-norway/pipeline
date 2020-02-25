@@ -2,6 +2,7 @@ import os
 import glob
 import re
 import gzip
+from collections import Counter
 
 from genologics.lims import *
 
@@ -37,7 +38,7 @@ class Sample(object):
     """
 
     def __init__(self, sample_index, sample_id, name, sample_dir, files, description=None):
-        self.sample_index = sample_index
+        self.sample_index = sample_index # NOTE: This is not the index sequence, but the position in sample sheet
         self.sample_id = sample_id
         self.name = name
         self.sample_dir = sample_dir
@@ -258,13 +259,26 @@ def add_stats(projects, run_stats):
     FastqFile objects in the tree structure produced by the above 
     function.
     """
-
+    # Samples with identical names, even if in different projects, are renamed with a
+    # suffix _Sn (where n is the sample sheet data row number) in the stats files.
+    multiple_identical_name = set(
+        name
+        for name, count in
+        Counter(sample.name for project in projects for sample in project.samples).items()
+        if count > 1
+    )
     for project in projects:
         for sample in project.samples:
+            if sample.name in multiple_identical_name:
+                sample_name = "{}_S{}".format(sample.name, sample.sample_index)
+            else:
+                sample_name = sample.name
             for f in sample.files:
-                stats = run_stats.get((f.lane, project.name, sample.name, f.i_read))
+                stats = run_stats.get((f.lane, project.name, sample_name, f.i_read))
                 if stats:
                     f.stats = stats
+                else:
+                    print("no stats for " + str((f.lane, project.name, sample_name, f.i_read)))
 
 
 def flag_empty_files(projects, run_dir):
