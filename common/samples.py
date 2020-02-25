@@ -259,26 +259,36 @@ def add_stats(projects, run_stats):
     FastqFile objects in the tree structure produced by the above 
     function.
     """
-    # Samples with identical names, even if in different projects, are renamed with a
-    # suffix _Sn (where n is the sample sheet data row number) in the stats files.
+    # Samples with:
+    # * identical names
+    # * on same lane
+    # * even if in different projects;
+    # ...are renamed with a suffix _Sn in the stats files (where n is the
+    # sample sheet data row number) .
     multiple_identical_name = set(
-        name
-        for name, count in
-        Counter(sample.name for project in projects for sample in project.samples).items()
+        name_lane
+        for name_lane, count in
+            Counter((sample.name, file.lane)
+                for project in projects
+                for sample in project.samples
+                for file in sample.files
+                if file.i_read == 1
+                ).items()
         if count > 1
     )
     for project in projects:
         for sample in project.samples:
-            if sample.name in multiple_identical_name:
-                sample_name = "{}_S{}".format(sample.name, sample.sample_index)
-            else:
-                sample_name = sample.name
             for f in sample.files:
+                if (sample.name, f.lane) in multiple_identical_name:
+                    sample_name = "{}_S{}".format(sample.name, sample.sample_index)
+                else:
+                    sample_name = sample.name
                 stats = run_stats.get((f.lane, project.name, sample_name, f.i_read))
                 if stats:
                     f.stats = stats
-                else:
-                    print("no stats for " + str((f.lane, project.name, sample_name, f.i_read)))
+                #else:
+                #    print("Warning: no stats for (lane, project, sample, read) = "
+                #            + str((f.lane, project.name, sample_name, f.i_read)))
 
 
 def flag_empty_files(projects, run_dir):
