@@ -43,6 +43,8 @@ def get_from_interop(run_dir, merge_lanes=False):
 
     read_count = summary.size()
     lane_count = summary.lane_count()
+    if lane_count == 0:
+        raise RuntimeError("InterOp data appears to be corrupted: the number of lanes is zero.")
     result = {}
     raw_density, pf_density, occu_pct_sum = 0, 0, 0
     phix_pct = [] # We report PhiX % per read R1 / R2 (non-index)
