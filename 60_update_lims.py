@@ -173,7 +173,8 @@ def get_resultfile(lims, process, lane, input_limsid, read):
     # Find the result file corresponding to this artifact
     for i, o in process.input_output_maps:
         input = i['uri']
-        if input.location[1] in ['{0}:1'.format(lane), 'A:1']: # Use A:1 for NextSeq, MiSeq
+        if input.location[1] in ['{0}:1'.format(lane), 'A:1'] or input.location[0].type_name == "Library Tube":
+                            # Use A:1 for NextSeq, MiSeq; Library Tube for NovaSeq Standard workflow
             if o['output-type'] == "ResultFile" and o['output-generation-type'] == "PerReagentLabel":
                 output = o['uri']
                 # The constant FASTQ_OUTPUT corresponds to the name configured in
