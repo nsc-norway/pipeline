@@ -1,0 +1,7 @@
+BCL to FASTQ file converter
+bcl2fastq v2.20.0.422
+Copyright (c) 2007-2017 Illumina, Inc.
+
+2019-11-22 14:56:14 [7f276ed42780] Command-line invocation: /data/common/tools/bcl2fastq/bcl2fastq2-v2.20.0/nscinstallbin/bin/bcl2fastq --runfolder-dir 191119_A00943_0005_AHMNCHDMXX/ --sample-sheet demultiplexed/191119_A00943_0005_AHMNCHDMXX/DemultiplexingSampleSheet.csv --output-dir demultiplexed/191119_A00943_0005_AHMNCHDMXX/Data/Intensities/BaseCalls -r 4 -p 64 -w 4 
+2019-11-22 14:56:14 [7f276ed42780] INFO: Minimum log level: INFO
+2019-11-22 16:49:53 [7f276ed42780] Processing completed with 0 errors and 0 warnings.

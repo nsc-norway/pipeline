@@ -4,7 +4,7 @@ import sys
 import requests
 from collections import defaultdict
 from genologics.lims import *
-from common import nsc, taskmgr, stats, utilities
+from common import nsc, taskmgr, stats, utilities, lane_info
 
 TASK_NAME = "60. LIMS stats"
 TASK_DESCRIPTION = """Post demultiplexing stats to LIMS (doesn't make an effort
@@ -44,17 +44,25 @@ def main(task):
             aggregate_reads = True,
             suffix=task.suffix
             )
+    # Get lane stats and lane metrics
+    # Here, lane stats refers to the data from lane_info module, containing primarily
+    # the well occupancy percentage. Lane metrics is based on superDUPr and contains the
+    # duplication rate.
+    try:
+        lane_stats = lane_info.get_from_interop(task.work_dir, task.no_lane_splitting)
+    except lane_info.NotSupportedException:
+        lane_stats = {}
     qc_dir = os.path.join(task.bc_dir, "QualityControl" + task.suffix)
-    if task.instrument in ['hiseq4k', 'hiseqx']:
+    if task.instrument in ['hiseq4k', 'hiseqx', 'novaseq']:
         stats.add_duplication_results(qc_dir, projects)
         lane_metrics = get_lane_metrics(projects)
     else:
         lane_metrics = {}
-    post_stats(task.lims, task.process, projects, run_stats, lane_metrics)
+    post_stats(task.lims, task.process, projects, run_stats, lane_metrics, lane_stats)
     task.success_finish()
 
 
-def post_stats(lims, process, projects, demultiplex_stats, lane_metrics):
+def post_stats(lims, process, projects, demultiplex_stats, lane_metrics, lane_stats):
     """Find the resultfiles in the LIMS and post the demultiplexing
     stats.
     """ 
@@ -103,7 +111,10 @@ def post_stats(lims, process, projects, demultiplex_stats, lane_metrics):
             lane_analyte = get_lane(process, lane)
             lane_analyte.udf['% Sequencing Duplicates'] = duplicates
             update_artifacts.add(lane_analyte)
-
+        stats = lane_stats.get(lane)
+        if stats and stats.occupancy: # Attempt to get occupancy, None if not supported
+            lane_analyte.udf['% Occupied Wells'] = stats.occupancy
+            update_artifacts.add(lane_analyte)
     #print "Updating"
     lims.put_batch(update_artifacts)
 
@@ -162,7 +173,8 @@ def get_resultfile(lims, process, lane, input_limsid, read):
     # Find the result file corresponding to this artifact
     for i, o in process.input_output_maps:
         input = i['uri']
-        if input.location[1] in ['{0}:1'.format(lane), 'A:1']: # Use A:1 for NextSeq, MiSeq
+        if input.location[1] in ['{0}:1'.format(lane), 'A:1'] or input.location[0].type_name == "Library Tube":
+                            # Use A:1 for NextSeq, MiSeq; Library Tube for NovaSeq Standard workflow
             if o['output-type'] == "ResultFile" and o['output-generation-type'] == "PerReagentLabel":
                 output = o['uri']
                 # The constant FASTQ_OUTPUT corresponds to the name configured in
@@ -183,9 +195,11 @@ def get_lane(process, lane):
     
     Returns None if no such lane."""
     for input in process.all_inputs():
-        if (lane == 1 or lane == "X") and input.location[1] == 'A:1': # Use A:1 for NextSeq, MiSeq
+        if lane == 1 and input.location[1] == 'A:1': # Use A:1 for NextSeq, MiSeq
             return input
-        elif input.location[1] == '%d:1' % lane:
+        elif lane == "X":
+            return input
+        elif input.location[1] == '{}:1'.format(lane):
             return input
 
 

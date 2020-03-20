@@ -1,0 +1,121 @@
+Dear Diagnostics,
+
+Samples/Libraries submitted under Diag-TestNovaSeq-2019-18-11 to NSC, Ullevål has been sequenced and are now ready for pick-up. You will therefore be billed for this service.
+
+
+------ Data collection ------
+You can pick up the data in a portable hard drive (please notice the size of the data  is approximately 2 GB).
+
+NOTE: UNKNOWN DELIVERY METHOD
+
+
+------ Data output ------
+Here is an overview of your data files and the number of fragments that were sequenced:
+
+Sample 1                           	  56,989,752 fragments
+Sample 2                           	  59,997,772 fragments
+Sample 3                           	  62,635,058 fragments
+Sample 4                           	  55,311,148 fragments
+Sample 5                           	  63,890,626 fragments
+Sample 6                           	  48,398,440 fragments
+Sample 7                           	  59,142,406 fragments
+Sample 8                           	  53,055,377 fragments
+Sample 9                           	  53,736,770 fragments
+Sample 10                          	  63,015,257 fragments
+Sample 11                          	  62,352,940 fragments
+Sample 12                          	  50,406,446 fragments
+Sample 13                          	  66,837,564 fragments
+Sample 14                          	  54,286,518 fragments
+Sample 15                          	  53,418,656 fragments
+Sample 16                          	  65,768,366 fragments
+Sample 17                          	  49,894,737 fragments
+Sample 18                          	  64,210,914 fragments
+Sample 19                          	  59,484,150 fragments
+Sample 20                          	  54,862,232 fragments
+Sample 21                          	  54,537,768 fragments
+Sample 22                          	  60,551,581 fragments
+Sample 23                          	  57,683,174 fragments
+Sample 24                          	  56,265,952 fragments
+Sample 25                          	  51,241,083 fragments
+Sample 26                          	  57,523,864 fragments
+Sample 27                          	  56,582,327 fragments
+Sample 28                          	  55,654,020 fragments
+Sample 29                          	  65,998,547 fragments
+Sample 30                          	  52,308,471 fragments
+Sample 31                          	  51,698,557 fragments
+Sample 32                          	  68,098,965 fragments
+Sample 33                          	  60,975,732 fragments
+Sample 34                          	  57,633,731 fragments
+Sample 35                          	  62,930,499 fragments
+Sample 36                          	  59,268,986 fragments
+Sample 37                          	  54,250,660 fragments
+Sample 38                          	  55,919,528 fragments
+Sample 39                          	  67,244,926 fragments
+Sample 40                          	  58,893,569 fragments
+Sample 41                          	  58,990,218 fragments
+Sample 42                          	  59,232,570 fragments
+Sample 43                          	  59,706,361 fragments
+Sample 44                          	  60,430,210 fragments
+Sample 45                          	  56,647,990 fragments
+Sample 46                          	  56,130,731 fragments
+Sample 47                          	  63,694,407 fragments
+Sample 48                          	  61,509,122 fragments
+Sample 49                          	  55,710,792 fragments
+Sample 50                          	  58,811,820 fragments
+Sample 51                          	  66,266,556 fragments
+Sample 52                          	  61,836,496 fragments
+Sample 53                          	  50,598,417 fragments
+Sample 54                          	  54,652,062 fragments
+Sample 55                          	  53,444,776 fragments
+Sample 56                          	  54,092,202 fragments
+Sample 57                          	  60,479,535 fragments
+Sample 58                          	  52,455,634 fragments
+Sample 59                          	  63,670,961 fragments
+Sample 60                          	  65,159,828 fragments
+Sample 61                          	  58,897,742 fragments
+Sample 62                          	  56,183,577 fragments
+Sample 63                          	  52,206,257 fragments
+Sample 64                          	  67,361,093 fragments
+Sample 65                          	  63,537,663 fragments
+Sample 66                          	  55,927,475 fragments
+Sample 67                          	  50,034,661 fragments
+Sample 68                          	  59,534,617 fragments
+Sample 69                          	  56,535,391 fragments
+Sample 70                          	  62,012,339 fragments
+Sample 71                          	  50,586,914 fragments
+Sample 72                          	  60,905,599 fragments
+Sample 73                          	  53,583,425 fragments
+Sample 74                          	  53,815,580 fragments
+Sample 75                          	  61,641,083 fragments
+Sample 76                          	  51,448,398 fragments
+Sample 77                          	  56,639,691 fragments
+Sample 78                          	  50,392,351 fragments
+
+
+----- Bioinformatic analyses ----
+Data alignment/analysis can be ordered as a service. For further details: http://www.sequencing.uio.no/services/bioinformatics/
+
+
+If you have any questions, don't hesitate to get in touch. 
+
+
+Regards
+Arvind Sundaram / Marius Bjørnstad
+
+Bioinformatician(s)
+Norwegian Sequencing Centre (https://www.sequencing.uio.no) / Part of NorSeq (https://www.norseq.org/)
+Oslo University Hospital, Ullevål, Oslo, Norway
+
+
+*********************************************************************************************************************
+Understanding the data: http://www.sequencing.uio.no/services/data-delivery/
+
+------- Acknowledgement -------
+The Norwegian Sequencing Centre (NSC) operates as a core facility and you will therefore not be billed for the labour costs incurred. However, you are requested to acknowledge the support you have received from the bodies funding the NSC. Please use the following text in articles or reports relating to this sequence data:
+"The sequencing service was provided by the Norwegian Sequencing Centre (www.sequencing.uio.no), a national technology platform hosted by the University of Oslo and supported by the "Functional Genomics" and "Infrastructure" programs of the Research Council of Norway and the Southeastern Regional Health Authorities".
+
+-----Terms, conditions and usage-----
+Data storage policy: https://www.sequencing.uio.no/services/data-delivery/#toc4
+Data security:  https://www.sequencing.uio.no/services/data-delivery/#toc3
+*********************************************************************************************************************
+

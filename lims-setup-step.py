@@ -67,11 +67,17 @@ else:
                 "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Delivery and triggers",
                 "Close when finished"
                 ],
+            "novaseq": [
+                "Auto 10. Copy run", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
+                "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Delivery and triggers",
+                "Close when finished"
+                ],
             }
     THREADS_OVERRIDE = {
             "hiseq": 64,
             "hiseqx": 64,
             "hiseq4k": 64,
+            "novaseq": 64,
             "miseq": 16,
             "nextseq": 64
             }
@@ -86,7 +92,7 @@ def get_sample_sheet_data(cluster_proc, fcid):
         o = io[1]
         if o['output-type'] == 'ResultFile' and o['output-generation-type'] == 'PerAllInputs':
             name = o['uri'].name
-            if name == 'SampleSheet csv' or name == "bcl2fastq Sample Sheet" or name == "HiSeq 3000-4000 Sample Sheet":
+            if name == 'SampleSheet csv' or name == "bcl2fastq Sample Sheet" or name == "HiSeq 3000-4000 Sample Sheet" or name == "Sample Sheet":
                 files = []
                 if len(o['uri'].files) == 1:
                     f = o['uri'].files[0]
@@ -161,7 +167,10 @@ def main(process_id, sample_sheet_file):
         threads = THREADS_OVERRIDE.get(instrument)
         if threads is not None:
             process.udf[nsc.THREADS_UDF] = threads
-
+        if instrument == "novaseq":
+            if next(iter(process.all_inputs())).location[0].type.name == "Library Tube":
+                # NovaSeq Standard workflow: Don't split the lanes
+                process.udf['No lane splitting'] = True
         logging.debug('Saved settings in the process')
 
     else:

@@ -1,6 +1,10 @@
 #!/bin/bash
 
-# Create fastq files in new dir with one byte gziped
+# Use: create_fq.sh SOURCE_RUN_PATH DEST_RUN_PATH
+
+# Create fastq files in new dir with as byte gziped files, with names based on
+# files in SOURCE_RUN_PATH. The paths to the root of the run folders can be
+# used.
 
 set -e
 

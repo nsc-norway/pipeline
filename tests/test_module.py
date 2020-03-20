@@ -5,13 +5,13 @@ import json
 import tempfile
 import os
 import re
+import gzip
 import subprocess
 import string
 import random
 import shutil
 import glob
 from contextlib import contextmanager
-import illuminate
 sys.path.append('..')
 
 from common import nsc
@@ -35,7 +35,9 @@ class TaskTestCase(unittest.TestCase):
 
     H4RUN = "180502_E00401_0001_BQCTEST"
     NSRUN = "180502_NS500336_0001_AHTJFWBGX5"
-
+    NOVRUN = "191119_A00943_0005_AHMNCHDMXX"
+    NOVS2MERGEDRUN = "191119_A00943_0005_AMERGDLANS"
+    NS2PROJECTSRUN = "200214_NS500336_0399_AH3H7WAFX2"
 
     def setUp(self):
         self.task =  taskmgr.Task(
@@ -65,11 +67,22 @@ class TaskTestCase(unittest.TestCase):
 
     @contextmanager
     def qc_dir(self, run_id):
+        """Set up a temporary directory to test QC scripts.
+        
+        The run (run_id) should exist in files/runs, and contain bcl2fastq stats."""
+
         self.tempparent = tempfile.mkdtemp()
         self.tempdir = os.path.join(self.tempparent, run_id)
         self.basecalls = os.path.join(self.tempdir, "Data", "Intensities", "BaseCalls")
         self.qualitycontrol = os.path.join(self.basecalls, "QualityControl")
         shutil.copytree(os.path.join("files/runs", run_id), self.tempdir)
+        # For NovaSeq we have to compress the ConversionStats.xml file, because it is very large
+        conversion_stats_file = os.path.join(self.basecalls, "Stats", "ConversionStats.xml")
+        compressed_file  = conversion_stats_file + ".gz"
+        if os.path.exists(compressed_file):
+            with gzip.open(compressed_file) as inf:
+                with open(conversion_stats_file, "w") as outf:
+                    outf.write(inf.read())
         do_cleanup = False
         try:
             yield self.tempdir
@@ -227,7 +240,41 @@ class TestTaskFramework(unittest.TestCase):
             task.running()
             self.assertEquals(projects_to_dicts(task.projects), correct_projects)
 
+    def test_sample_sheet_parsing_novs2std_nonmerged(self):
+        with open("files/samples/novs2standard.json") as jsonfile:
+            correct_projects = json.load(jsonfile)
+        task = taskmgr.Task("SsParseNovS2Std", "TEST_DESCRIPTION", ["work_dir", "sample_sheet"]) 
+        RUN_DIR = "files/runs/191119_A00943_0005_AHMNCHDMXX"
+        testargs = ["script", RUN_DIR,
+                "--sample-sheet=files/runs/191119_A00943_0005_AHMNCHDMXX/DemultiplexingSampleSheet.csv"]
+        with patch.object(sys, 'argv', testargs):
+            task.__enter__()
+            task.running()
+            self.assertEquals(projects_to_dicts(task.projects), correct_projects)
 
+    def test_sample_sheet_parsing_novs2std_merged(self):
+        with open("files/samples/novs2standard-merged.json") as jsonfile:
+            correct_projects = json.load(jsonfile)
+        task = taskmgr.Task("SsParseNovS2Std", "TEST_DESCRIPTION", ["work_dir", "sample_sheet"]) 
+        RUN_DIR = "files/runs/191119_A00943_0005_AMERGDLANS"
+        testargs = ["script", RUN_DIR,
+                "--sample-sheet=files/runs/191119_A00943_0005_AMERGDLANS/DemultiplexingSampleSheet.csv"]
+        with patch.object(sys, 'argv', testargs):
+            task.__enter__()
+            task.running()
+            self.assertEquals(projects_to_dicts(task.projects), correct_projects)
+
+    def test_sample_sheet_parsing_novs2xp(self):
+        with open("files/samples/novs2xp.json") as jsonfile:
+            correct_projects = json.load(jsonfile)
+        task = taskmgr.Task("SsParseNovS2Xp", "TEST_DESCRIPTION", ["work_dir", "sample_sheet"]) 
+        RUN_DIR = "files/runs/191126_A00943_0006_BHMMNJDMXX"
+        testargs = ["script", RUN_DIR,
+                "--sample-sheet=files/runs/191126_A00943_0006_BHMMNJDMXX/DemultiplexingSampleSheet.csv"]
+        with patch.object(sys, 'argv', testargs):
+            task.__enter__()
+            task.running()
+            self.assertEquals(projects_to_dicts(task.projects), correct_projects)
 
 # 2. Test of the individual "Task" scipts
 
@@ -274,6 +321,21 @@ class Test20PrepareSampleSheet(TaskTestCase):
         old_samplesheet = open(INPUT_SAMPLE_SHEET).read()
         new_samplesheet = open(os.path.join(self.tempdir, "DemultiplexingSampleSheet.csv")).read()
         self.assertEquals(old_samplesheet, new_samplesheet)
+
+    def test_novaseq_samplesheet_edited(self):
+        """Testing that the script replaced underscores with dashes."""
+
+        RUN_ID = "191119_A00943_0005_AHMNCHDMXX"
+        INPUT_SAMPLE_SHEET = "files/samplesheet/NV0000001-LIB.csv"
+        self.make_tempdir(RUN_ID)
+        shutil.copy(INPUT_SAMPLE_SHEET, os.path.join(self.tempdir, "SampleSheet.csv"))
+        testargs = ["script", self.tempdir]
+        with patch.object(sys, 'argv', testargs):
+            self.module.main(self.task)
+            self.task.success_finish.assert_called_once()
+        correct_samplesheet = open("files/fasit/20_prepare_sample_sheet/novaseq-standard-fixed.csv").read()
+        new_samplesheet = open(os.path.join(self.tempdir, "DemultiplexingSampleSheet.csv")).read()
+        self.assertEquals(correct_samplesheet, new_samplesheet)
 
 
 class Test30Demultiplexing(TaskTestCase):
@@ -389,6 +451,26 @@ class Test60DemultiplexStats(TaskTestCase):
                 self.check_files_with_reference(self.qualitycontrol,
                         "files/fasit/60_demultiplex_stats/nsq")
 
+    def test_dx_stats_novs2standard(self):
+        testargs = ["script", "."]
+        with patch.object(sys, 'argv', testargs):
+            with self.qc_dir(self.NOVRUN) as tempdir:
+                with chdir(tempdir):
+                    self.module.main(self.task)
+                self.task.success_finish.assert_called_once()
+                self.check_files_with_reference(self.qualitycontrol,
+                        "files/fasit/60_demultiplex_stats/novs2standard")
+
+    def test_dx_stats_novs2standard_merged(self):
+        testargs = ["script", "."]
+        with patch.object(sys, 'argv', testargs):
+            with self.qc_dir(self.NOVS2MERGEDRUN) as tempdir:
+                with chdir(tempdir):
+                    self.module.main(self.task)
+                self.task.success_finish.assert_called_once()
+                self.check_files_with_reference(self.qualitycontrol,
+                        "files/fasit/60_demultiplex_stats/novs2standard-merged")
+
 
 class Test60Emails(TaskTestCase):
     module = __import__("60_emails")
@@ -410,6 +492,33 @@ class Test60Emails(TaskTestCase):
                 self.task.success_finish.assert_called_once()
                 self.check_files_with_reference(os.path.join(self.qualitycontrol, "Delivery"),
                         "files/fasit/60_emails/nsq/")
+
+    def test_emails_ns2projects(self):
+        with self.qc_dir(self.NS2PROJECTSRUN) as tempdir:
+            testargs = ["script", tempdir]
+            with patch.object(sys, 'argv', testargs):
+                self.module.main(self.task)
+                self.task.success_finish.assert_called_once()
+                self.check_files_with_reference(os.path.join(self.qualitycontrol, "Delivery"),
+                        "files/fasit/60_emails/ns2projects/")
+
+    def test_emails_novs2standard(self):
+        with self.qc_dir(self.NOVRUN) as tempdir:
+            testargs = ["script", tempdir]
+            with patch.object(sys, 'argv', testargs):
+                self.module.main(self.task)
+                self.task.success_finish.assert_called_once()
+                self.check_files_with_reference(os.path.join(self.qualitycontrol, "Delivery"),
+                        "files/fasit/60_emails/novs2standard/")
+
+    def test_emails_novs2standard_merged(self):
+        with self.qc_dir(self.NOVS2MERGEDRUN) as tempdir:
+            testargs = ["script", tempdir]
+            with patch.object(sys, 'argv', testargs):
+                self.module.main(self.task)
+                self.task.success_finish.assert_called_once()
+                self.check_files_with_reference(os.path.join(self.qualitycontrol, "Delivery"),
+                        "files/fasit/60_emails/novs2standard-merged/")
 
 
 class Test60Reports(TaskTestCase):
@@ -446,6 +555,38 @@ class Test60Reports(TaskTestCase):
                         pdfpaths.append(qcpath)
         self.reports_general_tester(projects, self.NSRUN, pdfpaths)
 
+    def test_reports_novs2standard(self):
+        with open("files/samples/novs2standard.json") as jsonfile:
+            projects = json.load(jsonfile)
+        pdfpaths = []
+        for project in projects:
+            if not project['is_undetermined']:
+                pdir = str(project['proj_dir'])
+                for s in project['samples']:
+                    for f in s['files']:
+                        fname = str(os.path.basename(f['path']))
+                        sname = "Sample_" + str(s['name'])
+                        qcpath = str(os.path.join(pdir, sname, self.NOVRUN + "." + str(f['lane']) + "." + 
+                            re.sub(r"fastq\.gz$", "qc.pdf", fname)))
+                        pdfpaths.append(qcpath)
+        self.reports_general_tester(projects, self.NOVRUN, pdfpaths)
+
+    def test_reports_novs2standard_merged(self):
+        with open("files/samples/novs2standard-merged.json") as jsonfile:
+            projects = json.load(jsonfile)
+        pdfpaths = []
+        for project in projects:
+            if not project['is_undetermined']:
+                pdir = str(project['proj_dir'])
+                for s in project['samples']:
+                    for f in s['files']:
+                        fname = str(os.path.basename(f['path']))
+                        sname = "Sample_" + str(s['name'])
+                        qcpath = str(os.path.join(pdir, sname, self.NOVS2MERGEDRUN + "." + 
+                            re.sub(r"fastq\.gz$", "qc.pdf", fname)))
+                        pdfpaths.append(qcpath)
+        self.reports_general_tester(projects, self.NOVS2MERGEDRUN, pdfpaths)
+
     @patch('os.rename')
     def reports_general_tester(self, projects, run_id, pdfpaths, os_rename):
         with self.qc_dir(run_id) as tempdir:
@@ -460,7 +601,8 @@ class Test60Reports(TaskTestCase):
                         cwd=os.path.join(self.qualitycontrol, 'pdf'), stdin=ANY, stdout=ANY))
                 sub_call.assert_has_calls(calls, any_order=True)
                 os_rename.assert_has_calls(
-                    call(ANY, os.path.join(self.basecalls, pdfpath)) for pdfpath in pdfpaths
+                    [call(ANY, os.path.join(self.basecalls, pdfpath)) for pdfpath in pdfpaths],
+                    any_order=True
                     )
                 self.task.success_finish.assert_called_once()
 
@@ -478,6 +620,12 @@ class Test70MultiQC(TaskTestCase):
 
     def test_multiqc_nsq(self):
         self.multiqc_general_tester("files/samples/nsqctest.json", self.NSRUN)
+
+    def test_multiqc_novs2standard(self):
+        self.multiqc_general_tester("files/samples/novs2standard.json", self.NOVRUN)
+
+    def test_multiqc_novs2standard_merged(self):
+        self.multiqc_general_tester("files/samples/novs2standard-merged.json", self.NOVRUN)
 
     def multiqc_general_tester(self, json_path, run_id):
         with open(json_path) as jsonfile:
@@ -589,6 +737,10 @@ class Test90PrepareDelivery(TaskTestCase):
     def test_diag_delivery_h4k(self):
         self.diag_delivery_check(self.H4RUN, "files/samples/hi4000.json",
                 "files/fasit/90_prepare_delivery/diag/h4k")
+
+    # Delivery check is a bit difficult for NovaSeq S2 Standard, because the test dataset
+    # has a project name with Diag-, triggering unconditionally the Diagnostics delivery
+    # method. Not tested.
 
     def hdd_delivery_check(self, run_id, jsonpath):
         with open(jsonpath) as jsonfile:

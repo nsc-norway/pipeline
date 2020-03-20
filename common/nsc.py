@@ -1,8 +1,9 @@
 # NSC-specific configuration
-
+from __future__ import print_function
 from genologics.lims import *
 import getpass
 import os
+import sys
 
 # Configure prod or dev
 TAG="dev"
@@ -11,7 +12,7 @@ try:
     with open("/etc/pipeline-site") as f: 
         SITE = f.read().strip()
 except IOError:
-    print "Warning: unknown site, you may set the site in /etc/pipeline-site"
+    print("Warning: unknown site, you may set the site in /etc/pipeline-site", file=sys.stderr)
     SITE = None
 
 ### Configuration for all sites, for production and dev ###
@@ -64,7 +65,7 @@ FASTQ_OUTPUT = "{sample_name}"
 SEQ_PROCESSES=[
         ('hiseqx', 'Illumina Sequencing (HiSeq X) 1.0'),
         ('hiseq4k', 'Illumina Sequencing (HiSeq 3000/4000) 1.0'),
-        ('hiseq', 'Illumina Sequencing (Illumina SBS) 5.0'),
+        ('novaseq', 'AUTOMATED - NovaSeq Run (NovaSeq 6000 v3.0)'),
         ('nextseq', 'NextSeq Run (NextSeq) 1.0'),
         ('miseq', 'MiSeq Run (MiSeq) 5.0'),
         ('miseq', 'MiSeq Run (MiSeq v1.0)')
@@ -122,7 +123,7 @@ elif SITE == "ous":
     # Data processing/analysis programs
     #BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
     BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.20.0/nscinstallbin/bin/bcl2fastq"
-    FASTQC="/data/common/tools/nscbin/fastqc"
+    FASTQC="/data/common/tools/fastQC/FastQC_v0.11.8/fastqc"
     FASTDUP="/data/common/tools/nscbin/fastdup"
     BASEURI="https://ous-lims.sequencing.uio.no"
 

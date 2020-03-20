@@ -9,113 +9,83 @@ from xml.etree import ElementTree
 from genologics.lims import *
 
 class LaneStats(object):
-    def __init__(self, cluster_den_raw, cluster_den_pf, pf_ratio, phix):
+    def __init__(self, cluster_den_raw, cluster_den_pf, pf_ratio, phix=None, occupancy=None):
         self.cluster_den_raw = cluster_den_raw
         self.cluster_den_pf = cluster_den_pf
         self.pf_ratio = pf_ratio
         self.phix = phix
+        self.occupancy = occupancy
 
 class NotSupportedException(Exception):
     pass
-
-def get_lane_cluster_density(path):
-    """Get cluster density for lanes from report files in Data/reports.
-
-    Returns a dict indexed by the 1-based lane number."""
-
-    with open(path) as f:
-        # Discard up to and including Lane
-        while not next(f).startswith("Lane\t"):
-            pass
-
-        lane_sum = defaultdict(int)
-        lane_ntile = defaultdict(int)
-        for l in f:
-            cell = l.split("\t")
-            lane_sum[int(cell[0])] += float(cell[2])
-            lane_ntile[int(cell[0])] += 1
-
-        return dict((i+1, lane_sum[i] / lane_ntile[i]) for i in lane_sum.keys())
-
-
-def get_from_files(run_dir, instrument, expand_lanes=False):
-    """Returns a dict indexed by lane number with values of cluster density tuples. Each
-    tuple contains the raw cluster density, the PF cluster density and the PF ratio (this
-    is redundant information, but various methods provide various values, so keeping all
-    for maximum accuracy).
-    
-    Returns:
-     { lane_id => (raw_density, pf_density, pf_ratio) }
-
-    Returns merged (average) lane stats for NextSeq.
-    """
-    lanes = {}
-
-    if instrument == "miseq" or instrument == "hiseq":
-        # MiSeq has the Data/reports info, like HiSeq, getting clu. density from files
-        pf_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane PF.txt")
-        lane_pf = get_lane_cluster_density(pf_path)
-        raw_path = os.path.join(run_dir, "Data", "reports", "NumClusters By Lane.txt")
-        lane_raw = get_lane_cluster_density(raw_path)
-        for l in sorted(lane_raw.keys()):
-            lanes[l] = LaneStats(lane_raw[l], lane_pf[l], lane_pf[l] / lane_raw[l], None)
-
-    elif instrument == "nextseq":
-        run_completion = ElementTree.parse(
-                os.path.join(run_dir, "RunCompletionStatus.xml")).getroot()
-        clus_den = float(run_completion.find("ClusterDensity").text)
-        pf_ratio = float(run_completion.find("ClustersPassingFilter").text) / 100.0
-        # For merged files:
-        if expand_lanes:
-            lane_ids = [1,2,3,4]
-        else:
-            lane_ids = ["X"]
-
-        lanes = dict(
-                (lane_id, LaneStats(clus_den, clus_den * pf_ratio, pf_ratio, None))
-                for lane_id in lane_ids
-                )
-    else:
-        # HiSeq 3000/4000/X Lane statistics is not implemented here. 
-        raise NotSupportedException("Cannot get lane statistics from files, for {0}.".format(instrument))
-
-    return lanes
-
 
 def get_from_interop(run_dir, merge_lanes=False):
     """Get cluster density and PF ratio from the "InterOp" files. (binary
     run statistics format)
 
-    Uses the Illuminate library to parse the files. This creates a Pandas dataframe,
-    from which the relevant metrics are easily obtained.
+    Uses the interop library from Illumina to parse the files.
     """
 
     try:
-        import illuminate
+        from interop import py_interop_run_metrics, py_interop_run, py_interop_summary
     except ImportError as e:
-        raise NotSupportedException("Could not import illuminate library", e)
+        raise NotSupportedException("Could not import the interop library (Illumina)", e)
 
-    dataset = illuminate.InteropDataset(run_dir)
-    df = dataset.TileMetrics().df
+    # Setup code: This specifies necessary files to load for summary metrics
+    valid_to_load = py_interop_run.uchar_vector(py_interop_run.MetricCount, 0)
+    py_interop_run_metrics.list_summary_metrics_to_load(valid_to_load)
+    valid_to_load[py_interop_run.ExtendedTile] = 1
+    run_metrics = py_interop_run_metrics.run_metrics()
+    run_metrics.read(run_dir, valid_to_load)
+    summary = py_interop_summary.run_summary()
+    py_interop_summary.summarize_run_metrics(run_metrics, summary)
+    extended_tile_metrics = run_metrics.extended_tile_metric_set()
+
+    read_count = summary.size()
+    lane_count = summary.lane_count()
+    if lane_count == 0:
+        raise RuntimeError("InterOp data appears to be corrupted: the number of lanes is zero.")
+    result = {}
+    raw_density, pf_density, occu_pct_sum = 0, 0, 0
+    phix_pct = [] # We report PhiX % per read R1 / R2 (non-index)
+    for lane in range(lane_count):
+        nonindex_read_count = 0
+        if not merge_lanes:
+            raw_density, pf_density, occu_pct_sum = 0, 0, 0
+            phix_pct = []
+        for read in range(read_count):
+            read_data = summary.at(read)
+            if not read_data.read().is_index():
+                data = read_data.at(lane)
+                raw_density += data.density().mean()
+                pf_density += data.density_pf().mean()
+                if nonindex_read_count >= len(phix_pct):
+                    phix_pct.append(data.percent_aligned().mean())
+                else:
+                    phix_pct[nonindex_read_count] += data.percent_aligned().mean() * 1.0
+                nonindex_read_count += 1
+        occupancy_lane_metrics = extended_tile_metrics.metrics_for_lane(data.lane())
+        if not occupancy_lane_metrics.empty():
+            occu_pct_sum += sum(occupancy_lane_metrics[i].percent_occupied() for i in
+                                    range(occupancy_lane_metrics.size())) \
+                                            / occupancy_lane_metrics.size()
+        if not merge_lanes:
+            result[data.lane()] = LaneStats(
+                        raw_density / nonindex_read_count,
+                        pf_density / nonindex_read_count,
+                        pf_density / max(1, raw_density),
+                        phix_pct,
+                        occu_pct_sum
+                        )
     if merge_lanes:
-        means = df[df.code.isin((100,101,300))].groupby(by=df.code).mean()
-    else:
-        means = df[df.code.isin((100,101,300))].groupby(by=(df.lane,df.code)).mean()
-
-    raw = means[means.code==100].value.values
-    pf = means[means.code==101].value.values
-    phix = means[means.code==300].value.values / 100.0
-
-    if phix.size == 0:
-        phix = [0] * len(raw)
-
-    if merge_lanes:
-        lanes = dict([("X", LaneStats(raw[0], pf[0], pf[0] / max(raw[0], 1), phix[0]))])
-    else:
-        lane_id = means[means.code==100]['lane'].values.astype('uint64')
-        lanes = dict(zip(lane_id, (LaneStats(*args) for args in zip(raw, pf, pf/raw, phix))))
-
-    return lanes
+        result["X"] = LaneStats(
+                    raw_density / (lane_count * nonindex_read_count),
+                    pf_density / (lane_count * nonindex_read_count),
+                    pf_density / max(1, raw_density),
+                    [phix_r / lane_count for phix_r in phix_pct],
+                    occu_pct_sum / lane_count
+                    )
+    return result
 
 
 def get_r1r2_udf(artifact, udf_base_name, transform=lambda x: x):
@@ -124,13 +94,24 @@ def get_r1r2_udf(artifact, udf_base_name, transform=lambda x: x):
     if (udf_base_name + " R1") in  artifact.udf:
         denominator += 1.0
         value += artifact.udf.get(udf_base_name + " R1")
-    if (udf_base_name + " R1") in  artifact.udf:
+    if (udf_base_name + " R2") in  artifact.udf:
         denominator += 1.0
-        value += artifact.udf.get(udf_base_name + " R1")
+        value += artifact.udf.get(udf_base_name + " R2")
     if denominator == 0.0:
         return None
     else:
         return transform(value / denominator)
+
+
+def get_r1r2_udf_list(artifact, udf_base_name):
+    result = []
+    if (udf_base_name + " R1") in  artifact.udf:
+        result.append(artifact.udf.get(udf_base_name + " R1"))
+    if (udf_base_name + " R2") in  artifact.udf:
+        var = artifact.udf.get(udf_base_name + " R2")
+        if var is not None:
+            result.append(var)
+    return result or None
 
 
 def get_from_lims(process, instrument, expand_lanes=None):
@@ -163,8 +144,8 @@ def get_from_lims(process, instrument, expand_lanes=None):
             else:
                 density_pf_1000 = None
             # The following UDFs are divided by 100 only if a value is found (otherwise: None)
-            pf_ratio = get_r1r2_udf(lane, '%PF', lambda x: x/100)
-            phix = get_r1r2_udf(lane, '% Aligned', lambda x: x/100)
+            pf_ratio = get_r1r2_udf(lane, '%PF')
+            phix = get_r1r2_udf_list(lane, '% Aligned')
             
             lanes[lane_id] = LaneStats(density_raw_1000 * 1000.0, density_pf_1000 * 1000.0, pf_ratio, phix)
 

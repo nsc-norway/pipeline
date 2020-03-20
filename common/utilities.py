@@ -58,6 +58,8 @@ def get_instrument_by_runid(run_id):
         return 'hiseqx'
     elif re.match(r"\d{6}_[JK]", run_id):
         return 'hiseq4k'
+    elif re.match(r"\d{6}_A", run_id):
+        return 'novaseq'
     elif re.match(r"\d{6}_[A-Z0-9]", run_id):
         return 'hiseq'
     else:
@@ -98,6 +100,8 @@ def get_rta_version(run_dir):
         xmltree = ElementTree.parse(os.path.join(run_dir, 'runParameters.xml'))
     run_parameters = xmltree.getroot()
     rta_ver_element = run_parameters.find("RTAVersion")
+    if rta_ver_element == None:
+        rta_ver_element = run_parameters.find("RtaVersion")
     if rta_ver_element == None:
         rta_ver_element = run_parameters.find("Setup").find("RTAVersion")
     return rta_ver_element.text 
@@ -231,6 +235,8 @@ def display_int(val):
     upgrading to Python 2.7"""
     if val is None:
         return "-"
+    elif sys.version_info >= (2,7):
+        return "{:,.0f}".format(val)
     else:
         return locale.format("%d", round(val), grouping=True)
 

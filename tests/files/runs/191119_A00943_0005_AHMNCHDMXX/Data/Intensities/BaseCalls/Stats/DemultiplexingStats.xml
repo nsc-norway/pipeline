@@ -1,0 +1,2101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Stats>
+  <Flowcell flowcell-id="HMNCHDMXX">
+    <Project name="default">
+      <Sample name="Undetermined">
+        <Barcode name="unknown">
+          <Lane number="1">
+            <BarcodeCount>75897884</BarcodeCount>
+            <PerfectBarcodeCount>75897884</PerfectBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>75525187</BarcodeCount>
+            <PerfectBarcodeCount>75525187</PerfectBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>75897884</BarcodeCount>
+            <PerfectBarcodeCount>75897884</PerfectBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>75525187</BarcodeCount>
+            <PerfectBarcodeCount>75525187</PerfectBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="all">
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>75897884</BarcodeCount>
+            <PerfectBarcodeCount>75897884</PerfectBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>75525187</BarcodeCount>
+            <PerfectBarcodeCount>75525187</PerfectBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+    </Project>
+    <Project name="Diag-TestNovaSeq-2019-18-11">
+      <Sample name="10NovaSeq-MigraForst-KIT-Av0">
+        <Barcode name="ACGTATCA">
+          <Lane number="1">
+            <BarcodeCount>28587027</BarcodeCount>
+            <PerfectBarcodeCount>28277874</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>309153</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28402725</BarcodeCount>
+            <PerfectBarcodeCount>28091415</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>311310</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>28587027</BarcodeCount>
+            <PerfectBarcodeCount>28277874</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>309153</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28402725</BarcodeCount>
+            <PerfectBarcodeCount>28091415</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>311310</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="11NovaSeq-BevegForsU00-KIT-Av0">
+        <Barcode name="CAGATCTG">
+          <Lane number="1">
+            <BarcodeCount>30069029</BarcodeCount>
+            <PerfectBarcodeCount>29426801</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>642228</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29928743</BarcodeCount>
+            <PerfectBarcodeCount>29289974</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>638769</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>30069029</BarcodeCount>
+            <PerfectBarcodeCount>29426801</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>642228</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29928743</BarcodeCount>
+            <PerfectBarcodeCount>29289974</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>638769</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="12NovaSeq-Nyrecyster-KIT-Av0">
+        <Barcode name="GCGAGTAA">
+          <Lane number="1">
+            <BarcodeCount>31398045</BarcodeCount>
+            <PerfectBarcodeCount>31040877</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>357168</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>31237013</BarcodeCount>
+            <PerfectBarcodeCount>30875897</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>361116</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>31398045</BarcodeCount>
+            <PerfectBarcodeCount>31040877</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>357168</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>31237013</BarcodeCount>
+            <PerfectBarcodeCount>30875897</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>361116</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="13NovaSeq-000000MK-TrioMor-KIT-Av0">
+        <Barcode name="GAACAGGC">
+          <Lane number="1">
+            <BarcodeCount>27742766</BarcodeCount>
+            <PerfectBarcodeCount>27553313</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>189453</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27568382</BarcodeCount>
+            <PerfectBarcodeCount>27377431</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>190951</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>27742766</BarcodeCount>
+            <PerfectBarcodeCount>27553313</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>189453</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27568382</BarcodeCount>
+            <PerfectBarcodeCount>27377431</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>190951</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="14NovaSeq-000000FM-TrioFar-KIT-Av0">
+        <Barcode name="GCTAACGA">
+          <Lane number="1">
+            <BarcodeCount>32027791</BarcodeCount>
+            <PerfectBarcodeCount>31760593</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>267198</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>31862835</BarcodeCount>
+            <PerfectBarcodeCount>31594597</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>268238</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>32027791</BarcodeCount>
+            <PerfectBarcodeCount>31760593</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>267198</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>31862835</BarcodeCount>
+            <PerfectBarcodeCount>31594597</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>268238</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="15NovaSeq-000000MK-TrioMor-KIT-Av0">
+        <Barcode name="GATGAATC">
+          <Lane number="1">
+            <BarcodeCount>24261889</BarcodeCount>
+            <PerfectBarcodeCount>23881476</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>380413</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>24136551</BarcodeCount>
+            <PerfectBarcodeCount>23751805</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>384746</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>24261889</BarcodeCount>
+            <PerfectBarcodeCount>23881476</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>380413</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>24136551</BarcodeCount>
+            <PerfectBarcodeCount>23751805</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>384746</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="16NovaSeq-Linse-KIT-Av0">
+        <Barcode name="GCTCGGTA">
+          <Lane number="1">
+            <BarcodeCount>29652240</BarcodeCount>
+            <PerfectBarcodeCount>29317205</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>335035</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29490166</BarcodeCount>
+            <PerfectBarcodeCount>29153676</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>336490</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>29652240</BarcodeCount>
+            <PerfectBarcodeCount>29317205</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>335035</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29490166</BarcodeCount>
+            <PerfectBarcodeCount>29153676</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>336490</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="17NovaSeq-000000FM-TrioFar-KIT-Av0">
+        <Barcode name="TGGTGGTA">
+          <Lane number="1">
+            <BarcodeCount>26583782</BarcodeCount>
+            <PerfectBarcodeCount>26160256</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>423526</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26471595</BarcodeCount>
+            <PerfectBarcodeCount>26039036</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>432559</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>26583782</BarcodeCount>
+            <PerfectBarcodeCount>26160256</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>423526</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26471595</BarcodeCount>
+            <PerfectBarcodeCount>26039036</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>432559</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="18NovaSeq-000000MK-TrioMor-KIT-Av0">
+        <Barcode name="ATGCCTAA">
+          <Lane number="1">
+            <BarcodeCount>26930720</BarcodeCount>
+            <PerfectBarcodeCount>26342931</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>587789</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26806050</BarcodeCount>
+            <PerfectBarcodeCount>26219278</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>586772</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>26930720</BarcodeCount>
+            <PerfectBarcodeCount>26342931</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>587789</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26806050</BarcodeCount>
+            <PerfectBarcodeCount>26219278</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>586772</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="19NovaSeq-Immunsvikt-KIT-Av0">
+        <Barcode name="CTGTAGCC">
+          <Lane number="1">
+            <BarcodeCount>31589365</BarcodeCount>
+            <PerfectBarcodeCount>31254288</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>335077</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>31425892</BarcodeCount>
+            <PerfectBarcodeCount>31087271</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>338621</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>31589365</BarcodeCount>
+            <PerfectBarcodeCount>31254288</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>335077</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>31425892</BarcodeCount>
+            <PerfectBarcodeCount>31087271</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>338621</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="20NovaSeq-Linse-KIT-Av0">
+        <Barcode name="CGACTGGA">
+          <Lane number="1">
+            <BarcodeCount>31315081</BarcodeCount>
+            <PerfectBarcodeCount>30934202</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>380879</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>31037859</BarcodeCount>
+            <PerfectBarcodeCount>30655413</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>382446</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>31315081</BarcodeCount>
+            <PerfectBarcodeCount>30934202</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>380879</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>31037859</BarcodeCount>
+            <PerfectBarcodeCount>30655413</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>382446</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="21NovaSeq-Linse-KIT-Av0">
+        <Barcode name="AAGGACAC">
+          <Lane number="1">
+            <BarcodeCount>25268668</BarcodeCount>
+            <PerfectBarcodeCount>25002548</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>266120</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>25137778</BarcodeCount>
+            <PerfectBarcodeCount>24868272</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>269506</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>25268668</BarcodeCount>
+            <PerfectBarcodeCount>25002548</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>266120</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>25137778</BarcodeCount>
+            <PerfectBarcodeCount>24868272</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>269506</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="22NovaSeq-000000FM-TrioFar-KIT-Av0">
+        <Barcode name="CAGCGTTA">
+          <Lane number="1">
+            <BarcodeCount>33492044</BarcodeCount>
+            <PerfectBarcodeCount>33114079</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>377965</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>33345520</BarcodeCount>
+            <PerfectBarcodeCount>32961942</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>383578</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>33492044</BarcodeCount>
+            <PerfectBarcodeCount>33114079</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>377965</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>33345520</BarcodeCount>
+            <PerfectBarcodeCount>32961942</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>383578</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="23NovaSeq-000000FM-TrioFar-KIT-Av0">
+        <Barcode name="ATCATTCC">
+          <Lane number="1">
+            <BarcodeCount>27222099</BarcodeCount>
+            <PerfectBarcodeCount>26815467</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>406632</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27064419</BarcodeCount>
+            <PerfectBarcodeCount>26652299</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>412120</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>27222099</BarcodeCount>
+            <PerfectBarcodeCount>26815467</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>406632</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27064419</BarcodeCount>
+            <PerfectBarcodeCount>26652299</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>412120</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="24NovaSeq-000000FM-TrioFar-KIT-Av0">
+        <Barcode name="CAATGGAA">
+          <Lane number="1">
+            <BarcodeCount>26778237</BarcodeCount>
+            <PerfectBarcodeCount>26433064</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>345173</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26640419</BarcodeCount>
+            <PerfectBarcodeCount>26292371</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>348048</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>26778237</BarcodeCount>
+            <PerfectBarcodeCount>26433064</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>345173</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26640419</BarcodeCount>
+            <PerfectBarcodeCount>26292371</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>348048</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="25NovaSeq-Immunsvikt-KIT-Av0">
+        <Barcode name="TGGAACAA">
+          <Lane number="1">
+            <BarcodeCount>32968363</BarcodeCount>
+            <PerfectBarcodeCount>32597088</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>371275</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>32800003</BarcodeCount>
+            <PerfectBarcodeCount>32419972</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>380031</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>32968363</BarcodeCount>
+            <PerfectBarcodeCount>32597088</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>371275</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>32800003</BarcodeCount>
+            <PerfectBarcodeCount>32419972</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>380031</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="26NovaSeq-Netthinne-KIT-Av0">
+        <Barcode name="CCTCTATC">
+          <Lane number="1">
+            <BarcodeCount>25008982</BarcodeCount>
+            <PerfectBarcodeCount>24663315</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>345667</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>24885755</BarcodeCount>
+            <PerfectBarcodeCount>24532666</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>353089</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>25008982</BarcodeCount>
+            <PerfectBarcodeCount>24663315</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>345667</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>24885755</BarcodeCount>
+            <PerfectBarcodeCount>24532666</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>353089</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="27NovaSeq-000000PM-UtAv-KIT-Av0">
+        <Barcode name="TGAAGAGA">
+          <Lane number="1">
+            <BarcodeCount>32183962</BarcodeCount>
+            <PerfectBarcodeCount>31912195</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>271767</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>32026952</BarcodeCount>
+            <PerfectBarcodeCount>31749589</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>277363</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>32183962</BarcodeCount>
+            <PerfectBarcodeCount>31912195</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>271767</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>32026952</BarcodeCount>
+            <PerfectBarcodeCount>31749589</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>277363</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="28NovaSeq-BevegForst-KIT-Av0">
+        <Barcode name="GCCACATA">
+          <Lane number="1">
+            <BarcodeCount>29830927</BarcodeCount>
+            <PerfectBarcodeCount>29570616</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>260311</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29653223</BarcodeCount>
+            <PerfectBarcodeCount>29388621</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>264602</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>29830927</BarcodeCount>
+            <PerfectBarcodeCount>29570616</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>260311</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29653223</BarcodeCount>
+            <PerfectBarcodeCount>29388621</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>264602</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="29NovaSeq-000000FM-TrioFar-KIT-Av0">
+        <Barcode name="CACCTTAC">
+          <Lane number="1">
+            <BarcodeCount>27503104</BarcodeCount>
+            <PerfectBarcodeCount>27065611</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>437493</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27359128</BarcodeCount>
+            <PerfectBarcodeCount>26920154</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>438974</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>27503104</BarcodeCount>
+            <PerfectBarcodeCount>27065611</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>437493</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27359128</BarcodeCount>
+            <PerfectBarcodeCount>26920154</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>438974</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="30NovaSeq-000000FM-TrioFar-KIT-Av0">
+        <Barcode name="GTCTGTCA">
+          <Lane number="1">
+            <BarcodeCount>27349096</BarcodeCount>
+            <PerfectBarcodeCount>27115411</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>233685</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27188672</BarcodeCount>
+            <PerfectBarcodeCount>26952138</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>236534</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>27349096</BarcodeCount>
+            <PerfectBarcodeCount>27115411</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>233685</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27188672</BarcodeCount>
+            <PerfectBarcodeCount>26952138</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>236534</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="31NovaSeq-000000MK-TrioMor-KIT-Av0">
+        <Barcode name="CTAAGGTC">
+          <Lane number="1">
+            <BarcodeCount>30364172</BarcodeCount>
+            <PerfectBarcodeCount>30088558</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>275614</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>30187409</BarcodeCount>
+            <PerfectBarcodeCount>29908294</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>279115</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>30364172</BarcodeCount>
+            <PerfectBarcodeCount>30088558</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>275614</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>30187409</BarcodeCount>
+            <PerfectBarcodeCount>29908294</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>279115</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="32NovaSeq-000000PK-Metabolsk-KIT-Av0">
+        <Barcode name="AATCCGTC">
+          <Lane number="1">
+            <BarcodeCount>28926211</BarcodeCount>
+            <PerfectBarcodeCount>28664445</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>261766</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28756963</BarcodeCount>
+            <PerfectBarcodeCount>28491080</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>265883</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>28926211</BarcodeCount>
+            <PerfectBarcodeCount>28664445</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>261766</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28756963</BarcodeCount>
+            <PerfectBarcodeCount>28491080</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>265883</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="33NovaSeq-Immunsvikt-KIT-Av0">
+        <Barcode name="TCTTCACA">
+          <Lane number="1">
+            <BarcodeCount>28205570</BarcodeCount>
+            <PerfectBarcodeCount>27931024</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>274546</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28060382</BarcodeCount>
+            <PerfectBarcodeCount>27781533</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>278849</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>28205570</BarcodeCount>
+            <PerfectBarcodeCount>27931024</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>274546</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28060382</BarcodeCount>
+            <PerfectBarcodeCount>27781533</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>278849</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="34NovaSeq-Bindevev-KIT-Av0">
+        <Barcode name="ATTGGCTC">
+          <Lane number="1">
+            <BarcodeCount>25691416</BarcodeCount>
+            <PerfectBarcodeCount>25436175</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>255241</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>25549667</BarcodeCount>
+            <PerfectBarcodeCount>25290405</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>259262</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>25691416</BarcodeCount>
+            <PerfectBarcodeCount>25436175</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>255241</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>25549667</BarcodeCount>
+            <PerfectBarcodeCount>25290405</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>259262</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="35NovaSeq-SegOv-KIT-Av0">
+        <Barcode name="CCAGTTCA">
+          <Lane number="1">
+            <BarcodeCount>28833414</BarcodeCount>
+            <PerfectBarcodeCount>28615363</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>218051</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28690450</BarcodeCount>
+            <PerfectBarcodeCount>28470499</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>219951</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>28833414</BarcodeCount>
+            <PerfectBarcodeCount>28615363</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>218051</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28690450</BarcodeCount>
+            <PerfectBarcodeCount>28470499</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>219951</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="36NovaSeq-Mendel-KIT-Av0">
+        <Barcode name="GAGCTGAA">
+          <Lane number="1">
+            <BarcodeCount>28366047</BarcodeCount>
+            <PerfectBarcodeCount>28043854</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>322193</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28216280</BarcodeCount>
+            <PerfectBarcodeCount>27892045</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>324235</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>28366047</BarcodeCount>
+            <PerfectBarcodeCount>28043854</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>322193</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28216280</BarcodeCount>
+            <PerfectBarcodeCount>27892045</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>324235</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="37NovaSeq-000000PK-UtAv-KIT-Av0">
+        <Barcode name="ACGCTCGA">
+          <Lane number="1">
+            <BarcodeCount>27896326</BarcodeCount>
+            <PerfectBarcodeCount>27695937</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>200389</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27757694</BarcodeCount>
+            <PerfectBarcodeCount>27555847</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>201847</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>27896326</BarcodeCount>
+            <PerfectBarcodeCount>27695937</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>200389</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27757694</BarcodeCount>
+            <PerfectBarcodeCount>27555847</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>201847</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="38NovaSeq-Immunsvikt-KIT-Av0">
+        <Barcode name="CAACCACA">
+          <Lane number="1">
+            <BarcodeCount>33094121</BarcodeCount>
+            <PerfectBarcodeCount>32708527</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>385594</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>32904426</BarcodeCount>
+            <PerfectBarcodeCount>32515520</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>388906</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>33094121</BarcodeCount>
+            <PerfectBarcodeCount>32708527</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>385594</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>32904426</BarcodeCount>
+            <PerfectBarcodeCount>32515520</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>388906</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="39NovaSeq-000000PM-UtAv-KIT-Av0">
+        <Barcode name="TATCAGCA">
+          <Lane number="1">
+            <BarcodeCount>26221042</BarcodeCount>
+            <PerfectBarcodeCount>25965942</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>255100</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26087429</BarcodeCount>
+            <PerfectBarcodeCount>25829269</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>258160</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>26221042</BarcodeCount>
+            <PerfectBarcodeCount>25965942</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>255100</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26087429</BarcodeCount>
+            <PerfectBarcodeCount>25829269</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>258160</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="40NovaSeq-000000MK-TrioMor-KIT-Av0">
+        <Barcode name="AGCACCTC">
+          <Lane number="1">
+            <BarcodeCount>25917569</BarcodeCount>
+            <PerfectBarcodeCount>25650484</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>267085</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>25780988</BarcodeCount>
+            <PerfectBarcodeCount>25506728</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>274260</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>25917569</BarcodeCount>
+            <PerfectBarcodeCount>25650484</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>267085</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>25780988</BarcodeCount>
+            <PerfectBarcodeCount>25506728</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>274260</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="41NovaSeq-Immunsvikt-KIT-Av0">
+        <Barcode name="AGATGTAC">
+          <Lane number="1">
+            <BarcodeCount>34151129</BarcodeCount>
+            <PerfectBarcodeCount>33668018</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>483111</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>33947836</BarcodeCount>
+            <PerfectBarcodeCount>33456071</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>491765</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>34151129</BarcodeCount>
+            <PerfectBarcodeCount>33668018</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>483111</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>33947836</BarcodeCount>
+            <PerfectBarcodeCount>33456071</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>491765</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="42NovaSeq-Immunsvikt-KIT-Av0">
+        <Barcode name="ATCCTGTA">
+          <Lane number="1">
+            <BarcodeCount>30571694</BarcodeCount>
+            <PerfectBarcodeCount>30245799</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>325895</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>30404038</BarcodeCount>
+            <PerfectBarcodeCount>30069900</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>334138</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>30571694</BarcodeCount>
+            <PerfectBarcodeCount>30245799</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>325895</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>30404038</BarcodeCount>
+            <PerfectBarcodeCount>30069900</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>334138</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="43NovaSeq-000000MK-TrioMor-KIT-Av0">
+        <Barcode name="CCTCCTGA">
+          <Lane number="1">
+            <BarcodeCount>28893306</BarcodeCount>
+            <PerfectBarcodeCount>28650558</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>242748</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28740425</BarcodeCount>
+            <PerfectBarcodeCount>28494756</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>245669</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>28893306</BarcodeCount>
+            <PerfectBarcodeCount>28650558</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>242748</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28740425</BarcodeCount>
+            <PerfectBarcodeCount>28494756</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>245669</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="44NovaSeq-000000FM-TrioFar-KIT-Av0">
+        <Barcode name="AGATCGCA">
+          <Lane number="1">
+            <BarcodeCount>31561362</BarcodeCount>
+            <PerfectBarcodeCount>31313929</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>247433</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>31369137</BarcodeCount>
+            <PerfectBarcodeCount>31114463</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>254674</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>31561362</BarcodeCount>
+            <PerfectBarcodeCount>31313929</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>247433</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>31369137</BarcodeCount>
+            <PerfectBarcodeCount>31114463</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>254674</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="45NovaSeq-000000MK-TrioMor-KIT-Av0">
+        <Barcode name="AATGTTGC">
+          <Lane number="1">
+            <BarcodeCount>29717176</BarcodeCount>
+            <PerfectBarcodeCount>29341550</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>375626</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29551810</BarcodeCount>
+            <PerfectBarcodeCount>29170514</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>381296</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>29717176</BarcodeCount>
+            <PerfectBarcodeCount>29341550</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>375626</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29551810</BarcodeCount>
+            <PerfectBarcodeCount>29170514</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>381296</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="46NovaSeq-Bindevev-KIT-Av0">
+        <Barcode name="GATAGACA">
+          <Lane number="1">
+            <BarcodeCount>27191887</BarcodeCount>
+            <PerfectBarcodeCount>26946868</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>245019</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27058773</BarcodeCount>
+            <PerfectBarcodeCount>26809291</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>249482</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>27191887</BarcodeCount>
+            <PerfectBarcodeCount>26946868</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>245019</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27058773</BarcodeCount>
+            <PerfectBarcodeCount>26809291</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>249482</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="47NovaSeq-000000PK-UtAv-KIT-Av0">
+        <Barcode name="CCGTGAGA">
+          <Lane number="1">
+            <BarcodeCount>28032846</BarcodeCount>
+            <PerfectBarcodeCount>27769392</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>263454</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27886682</BarcodeCount>
+            <PerfectBarcodeCount>27622568</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>264114</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>28032846</BarcodeCount>
+            <PerfectBarcodeCount>27769392</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>263454</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27886682</BarcodeCount>
+            <PerfectBarcodeCount>27622568</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>264114</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="48NovaSeq-000000MK-TrioMor-KIT-Av0">
+        <Barcode name="AAGACGGA">
+          <Lane number="1">
+            <BarcodeCount>33741543</BarcodeCount>
+            <PerfectBarcodeCount>33295616</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>445927</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>33503383</BarcodeCount>
+            <PerfectBarcodeCount>33055197</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>448186</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>33741543</BarcodeCount>
+            <PerfectBarcodeCount>33295616</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>445927</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>33503383</BarcodeCount>
+            <PerfectBarcodeCount>33055197</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>448186</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="49NovaSeq-Hypogo-KIT-Av0">
+        <Barcode name="ACCTCCAA">
+          <Lane number="1">
+            <BarcodeCount>29516756</BarcodeCount>
+            <PerfectBarcodeCount>29044889</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>471867</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29376813</BarcodeCount>
+            <PerfectBarcodeCount>28897158</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>479655</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>29516756</BarcodeCount>
+            <PerfectBarcodeCount>29044889</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>471867</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29376813</BarcodeCount>
+            <PerfectBarcodeCount>28897158</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>479655</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="50NovaSeq-Albinisme-KIT-Av0">
+        <Barcode name="GCCAAGAC">
+          <Lane number="1">
+            <BarcodeCount>29574568</BarcodeCount>
+            <PerfectBarcodeCount>29304091</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>270477</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29415650</BarcodeCount>
+            <PerfectBarcodeCount>29142300</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>273350</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>29574568</BarcodeCount>
+            <PerfectBarcodeCount>29304091</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>270477</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29415650</BarcodeCount>
+            <PerfectBarcodeCount>29142300</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>273350</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="51NovaSeq-000000MK-TrioMor-KIT-Av0">
+        <Barcode name="ACAGCAGA">
+          <Lane number="1">
+            <BarcodeCount>29684519</BarcodeCount>
+            <PerfectBarcodeCount>29384650</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>299869</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29548051</BarcodeCount>
+            <PerfectBarcodeCount>29244038</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>304013</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>29684519</BarcodeCount>
+            <PerfectBarcodeCount>29384650</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>299869</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29548051</BarcodeCount>
+            <PerfectBarcodeCount>29244038</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>304013</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="52NovaSeq-000000FM-TrioFar-KIT-Av0">
+        <Barcode name="ACACAGAA">
+          <Lane number="1">
+            <BarcodeCount>29926870</BarcodeCount>
+            <PerfectBarcodeCount>29494586</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>432284</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29779491</BarcodeCount>
+            <PerfectBarcodeCount>29342330</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>437161</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>29926870</BarcodeCount>
+            <PerfectBarcodeCount>29494586</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>432284</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29779491</BarcodeCount>
+            <PerfectBarcodeCount>29342330</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>437161</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="NA00000N53NovaSeq-Ciliopati-KIT-Av0">
+        <Barcode name="AACCGAGA">
+          <Lane number="1">
+            <BarcodeCount>30290911</BarcodeCount>
+            <PerfectBarcodeCount>29989334</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>301577</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>30139299</BarcodeCount>
+            <PerfectBarcodeCount>29836160</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>303139</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>30290911</BarcodeCount>
+            <PerfectBarcodeCount>29989334</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>301577</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>30139299</BarcodeCount>
+            <PerfectBarcodeCount>29836160</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>303139</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="54NovaSeq-000000FM-TrioFar-KIT-Av0">
+        <Barcode name="AGCAGGAA">
+          <Lane number="1">
+            <BarcodeCount>28396909</BarcodeCount>
+            <PerfectBarcodeCount>28216352</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>180557</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28251081</BarcodeCount>
+            <PerfectBarcodeCount>28067233</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>183848</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>28396909</BarcodeCount>
+            <PerfectBarcodeCount>28216352</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>180557</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28251081</BarcodeCount>
+            <PerfectBarcodeCount>28067233</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>183848</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="55NovaSeq-Immunsvikt-KIT-Av0">
+        <Barcode name="TAGGATGA">
+          <Lane number="1">
+            <BarcodeCount>28138894</BarcodeCount>
+            <PerfectBarcodeCount>27915781</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>223113</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27991837</BarcodeCount>
+            <PerfectBarcodeCount>27766341</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>225496</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>28138894</BarcodeCount>
+            <PerfectBarcodeCount>27915781</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>223113</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27991837</BarcodeCount>
+            <PerfectBarcodeCount>27766341</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>225496</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="56NovaSeq-PU-KIT-Av0">
+        <Barcode name="CCATCCTC">
+          <Lane number="1">
+            <BarcodeCount>31929528</BarcodeCount>
+            <PerfectBarcodeCount>31495523</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>434005</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>31764879</BarcodeCount>
+            <PerfectBarcodeCount>31320108</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>444771</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>31929528</BarcodeCount>
+            <PerfectBarcodeCount>31495523</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>434005</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>31764879</BarcodeCount>
+            <PerfectBarcodeCount>31320108</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>444771</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="57NovaSeq-000000FM-TrioFar-KIT-Av0">
+        <Barcode name="CTCAATGA">
+          <Lane number="1">
+            <BarcodeCount>30830937</BarcodeCount>
+            <PerfectBarcodeCount>30627716</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>203221</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>30678185</BarcodeCount>
+            <PerfectBarcodeCount>30471950</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>206235</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>30830937</BarcodeCount>
+            <PerfectBarcodeCount>30627716</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>203221</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>30678185</BarcodeCount>
+            <PerfectBarcodeCount>30471950</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>206235</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="58NovaSeq-000000PK-UtAv-KIT-Av0">
+        <Barcode name="CGACACAC">
+          <Lane number="1">
+            <BarcodeCount>27930223</BarcodeCount>
+            <PerfectBarcodeCount>27628501</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>301722</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27780569</BarcodeCount>
+            <PerfectBarcodeCount>27475990</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>304579</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>27930223</BarcodeCount>
+            <PerfectBarcodeCount>27628501</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>301722</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27780569</BarcodeCount>
+            <PerfectBarcodeCount>27475990</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>304579</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="59NovaSeq-Netthinne-KIT-Av0">
+        <Barcode name="CAAGACTA">
+          <Lane number="1">
+            <BarcodeCount>29471782</BarcodeCount>
+            <PerfectBarcodeCount>28911656</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>560126</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29340038</BarcodeCount>
+            <PerfectBarcodeCount>28775915</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>564123</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>29471782</BarcodeCount>
+            <PerfectBarcodeCount>28911656</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>560126</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29340038</BarcodeCount>
+            <PerfectBarcodeCount>28775915</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>564123</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="60NovaSeq-000000FM-TrioFar-KIT-Av0">
+        <Barcode name="CAAGGAGC">
+          <Lane number="1">
+            <BarcodeCount>33223447</BarcodeCount>
+            <PerfectBarcodeCount>32768484</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>454963</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>33043109</BarcodeCount>
+            <PerfectBarcodeCount>32586568</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>456541</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>33223447</BarcodeCount>
+            <PerfectBarcodeCount>32768484</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>454963</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>33043109</BarcodeCount>
+            <PerfectBarcodeCount>32586568</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>456541</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="61NovaSeq-Immunsvikt-KIT-Av0">
+        <Barcode name="AGGCTAAC">
+          <Lane number="1">
+            <BarcodeCount>30993119</BarcodeCount>
+            <PerfectBarcodeCount>30719604</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>273515</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>30843377</BarcodeCount>
+            <PerfectBarcodeCount>30567447</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>275930</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>30993119</BarcodeCount>
+            <PerfectBarcodeCount>30719604</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>273515</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>30843377</BarcodeCount>
+            <PerfectBarcodeCount>30567447</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>275930</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="62NovaSeq-000000PM-UtAv-KIT-Av0">
+        <Barcode name="AAACATCG">
+          <Lane number="1">
+            <BarcodeCount>25370552</BarcodeCount>
+            <PerfectBarcodeCount>25105318</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>265234</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>25227865</BarcodeCount>
+            <PerfectBarcodeCount>24961983</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>265882</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>25370552</BarcodeCount>
+            <PerfectBarcodeCount>25105318</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>265234</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>25227865</BarcodeCount>
+            <PerfectBarcodeCount>24961983</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>265882</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="63NovaSeq-Immunsvikt-KIT-Av0">
+        <Barcode name="CGCATACA">
+          <Lane number="1">
+            <BarcodeCount>27396415</BarcodeCount>
+            <PerfectBarcodeCount>27145820</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>250595</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27255647</BarcodeCount>
+            <PerfectBarcodeCount>27002454</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>253193</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>27396415</BarcodeCount>
+            <PerfectBarcodeCount>27145820</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>250595</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27255647</BarcodeCount>
+            <PerfectBarcodeCount>27002454</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>253193</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="64NovaSeq-000000PK-UtAv-KIT-Av0">
+        <Barcode name="GACTAGTA">
+          <Lane number="1">
+            <BarcodeCount>26791824</BarcodeCount>
+            <PerfectBarcodeCount>26451584</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>340240</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26652952</BarcodeCount>
+            <PerfectBarcodeCount>26309144</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>343808</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>26791824</BarcodeCount>
+            <PerfectBarcodeCount>26451584</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>340240</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26652952</BarcodeCount>
+            <PerfectBarcodeCount>26309144</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>343808</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="65NovaSeq-BevegForst-KIT-Av0">
+        <Barcode name="CGAACTTA">
+          <Lane number="1">
+            <BarcodeCount>27117137</BarcodeCount>
+            <PerfectBarcodeCount>26760516</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>356621</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26975065</BarcodeCount>
+            <PerfectBarcodeCount>26610004</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>365061</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>27117137</BarcodeCount>
+            <PerfectBarcodeCount>26760516</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>356621</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26975065</BarcodeCount>
+            <PerfectBarcodeCount>26610004</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>365061</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="66NovaSeq-000000FM-TrioFar-KIT-Av0">
+        <Barcode name="CATACCAA">
+          <Lane number="1">
+            <BarcodeCount>30313249</BarcodeCount>
+            <PerfectBarcodeCount>30007524</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>305725</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>30166286</BarcodeCount>
+            <PerfectBarcodeCount>29854053</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>312233</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>30313249</BarcodeCount>
+            <PerfectBarcodeCount>30007524</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>305725</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>30166286</BarcodeCount>
+            <PerfectBarcodeCount>29854053</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>312233</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="67NovaSeq-Immunsvikt-KIT-Av0">
+        <Barcode name="ACAGATTC">
+          <Lane number="1">
+            <BarcodeCount>26298560</BarcodeCount>
+            <PerfectBarcodeCount>25753251</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>545309</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26157074</BarcodeCount>
+            <PerfectBarcodeCount>25615819</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>541255</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>26298560</BarcodeCount>
+            <PerfectBarcodeCount>25753251</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>545309</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26157074</BarcodeCount>
+            <PerfectBarcodeCount>25615819</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>541255</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="68NovaSeq-000000MK-TrioMor-KIT-Av0">
+        <Barcode name="TTCACGCA">
+          <Lane number="1">
+            <BarcodeCount>31918552</BarcodeCount>
+            <PerfectBarcodeCount>31711093</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>207459</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>31752409</BarcodeCount>
+            <PerfectBarcodeCount>31542341</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>210068</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>31918552</BarcodeCount>
+            <PerfectBarcodeCount>31711093</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>207459</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>31752409</BarcodeCount>
+            <PerfectBarcodeCount>31542341</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>210068</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="69NovaSeq-Metabolsk-KIT-Av0">
+        <Barcode name="AACGTGAT">
+          <Lane number="1">
+            <BarcodeCount>32650488</BarcodeCount>
+            <PerfectBarcodeCount>32140882</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>509606</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>32509340</BarcodeCount>
+            <PerfectBarcodeCount>32002227</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>507113</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>32650488</BarcodeCount>
+            <PerfectBarcodeCount>32140882</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>509606</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>32509340</BarcodeCount>
+            <PerfectBarcodeCount>32002227</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>507113</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="70NovaSeq-000000MK-TrioMor-KIT-Av0">
+        <Barcode name="GACAGTGC">
+          <Lane number="1">
+            <BarcodeCount>29539588</BarcodeCount>
+            <PerfectBarcodeCount>29078548</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>461040</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29358154</BarcodeCount>
+            <PerfectBarcodeCount>28896741</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>461413</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>29539588</BarcodeCount>
+            <PerfectBarcodeCount>29078548</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>461040</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29358154</BarcodeCount>
+            <PerfectBarcodeCount>28896741</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>461413</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="71NovaSeq-BevegForst-KIT-Av0">
+        <Barcode name="CCGAAGTA">
+          <Lane number="1">
+            <BarcodeCount>28165460</BarcodeCount>
+            <PerfectBarcodeCount>27963193</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>202267</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28018117</BarcodeCount>
+            <PerfectBarcodeCount>27812634</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>205483</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>28165460</BarcodeCount>
+            <PerfectBarcodeCount>27963193</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>202267</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28018117</BarcodeCount>
+            <PerfectBarcodeCount>27812634</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>205483</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="72NovaSeq-Bindevev-KIT-Av0">
+        <Barcode name="CGGATTGC">
+          <Lane number="1">
+            <BarcodeCount>26167154</BarcodeCount>
+            <PerfectBarcodeCount>25828659</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>338495</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26039103</BarcodeCount>
+            <PerfectBarcodeCount>25700246</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>338857</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>26167154</BarcodeCount>
+            <PerfectBarcodeCount>25828659</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>338495</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26039103</BarcodeCount>
+            <PerfectBarcodeCount>25700246</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>338857</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="73NovaSeq-000000MK-TrioMor-KIT-Av0">
+        <Barcode name="CTGGCATA">
+          <Lane number="1">
+            <BarcodeCount>33769478</BarcodeCount>
+            <PerfectBarcodeCount>33484616</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>284862</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>33591615</BarcodeCount>
+            <PerfectBarcodeCount>33300750</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>290865</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>33769478</BarcodeCount>
+            <PerfectBarcodeCount>33484616</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>284862</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>33591615</BarcodeCount>
+            <PerfectBarcodeCount>33300750</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>290865</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="74NovaSeq-Immunsvikt-KIT-Av0">
+        <Barcode name="TCCGTCTA">
+          <Lane number="1">
+            <BarcodeCount>31855541</BarcodeCount>
+            <PerfectBarcodeCount>31574566</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>280975</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>31682122</BarcodeCount>
+            <PerfectBarcodeCount>31396668</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>285454</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>31855541</BarcodeCount>
+            <PerfectBarcodeCount>31574566</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>280975</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>31682122</BarcodeCount>
+            <PerfectBarcodeCount>31396668</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>285454</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="75NovaSeq-Hypogo-KIT-Av0">
+        <Barcode name="ACCACTGT">
+          <Lane number="1">
+            <BarcodeCount>28021676</BarcodeCount>
+            <PerfectBarcodeCount>27678495</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>343181</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27905799</BarcodeCount>
+            <PerfectBarcodeCount>27561024</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>344775</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>28021676</BarcodeCount>
+            <PerfectBarcodeCount>27678495</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>343181</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>27905799</BarcodeCount>
+            <PerfectBarcodeCount>27561024</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>344775</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="76NovaSeq-000000FM-TrioFar-KIT-Av0">
+        <Barcode name="GAATCTGA">
+          <Lane number="1">
+            <BarcodeCount>25079792</BarcodeCount>
+            <PerfectBarcodeCount>24688719</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>391073</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>24954869</BarcodeCount>
+            <PerfectBarcodeCount>24562756</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>392113</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>25079792</BarcodeCount>
+            <PerfectBarcodeCount>24688719</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>391073</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>24954869</BarcodeCount>
+            <PerfectBarcodeCount>24562756</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>392113</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="77NovaSeq-PU-KIT-Av0">
+        <Barcode name="TGGCTTCA">
+          <Lane number="1">
+            <BarcodeCount>29843436</BarcodeCount>
+            <PerfectBarcodeCount>29659827</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>183609</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29691181</BarcodeCount>
+            <PerfectBarcodeCount>29503711</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>187470</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>29843436</BarcodeCount>
+            <PerfectBarcodeCount>29659827</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>183609</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>29691181</BarcodeCount>
+            <PerfectBarcodeCount>29503711</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>187470</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="78NovaSeq-Hypogo-KIT-Av0">
+        <Barcode name="AACAACCA">
+          <Lane number="1">
+            <BarcodeCount>28329780</BarcodeCount>
+            <PerfectBarcodeCount>27716082</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>613698</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28205611</BarcodeCount>
+            <PerfectBarcodeCount>27588411</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>617200</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>28329780</BarcodeCount>
+            <PerfectBarcodeCount>27716082</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>613698</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28205611</BarcodeCount>
+            <PerfectBarcodeCount>27588411</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>617200</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="79NovaSeq-000000MK-TrioMor-KIT-Av0">
+        <Barcode name="ATAGCGAC">
+          <Lane number="1">
+            <BarcodeCount>31087909</BarcodeCount>
+            <PerfectBarcodeCount>30837593</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>250316</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>30924430</BarcodeCount>
+            <PerfectBarcodeCount>30670771</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>253659</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>31087909</BarcodeCount>
+            <PerfectBarcodeCount>30837593</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>250316</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>30924430</BarcodeCount>
+            <PerfectBarcodeCount>30670771</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>253659</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="80NovaSeq-Albinisme-KIT-Av0">
+        <Barcode name="CACTTCGA">
+          <Lane number="1">
+            <BarcodeCount>25352869</BarcodeCount>
+            <PerfectBarcodeCount>25111244</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>241625</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>25234045</BarcodeCount>
+            <PerfectBarcodeCount>24989401</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>244644</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>25352869</BarcodeCount>
+            <PerfectBarcodeCount>25111244</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>241625</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>25234045</BarcodeCount>
+            <PerfectBarcodeCount>24989401</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>244644</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="81NovaSeq-Immunsvikt-KIT-Av0">
+        <Barcode name="AAGAGATC">
+          <Lane number="1">
+            <BarcodeCount>30544125</BarcodeCount>
+            <PerfectBarcodeCount>29875485</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>668640</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>30361474</BarcodeCount>
+            <PerfectBarcodeCount>29696793</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>664681</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>30544125</BarcodeCount>
+            <PerfectBarcodeCount>29875485</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>668640</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>30361474</BarcodeCount>
+            <PerfectBarcodeCount>29696793</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>664681</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="82NovaSeq-000000MK-TrioMor-KIT-Av0">
+        <Barcode name="GTGTTCTA">
+          <Lane number="1">
+            <BarcodeCount>26868626</BarcodeCount>
+            <PerfectBarcodeCount>26401243</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>467383</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26714799</BarcodeCount>
+            <PerfectBarcodeCount>26241590</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>473209</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>26868626</BarcodeCount>
+            <PerfectBarcodeCount>26401243</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>467383</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26714799</BarcodeCount>
+            <PerfectBarcodeCount>26241590</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>473209</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="83NovaSeq-Mendel-KIT-Av0">
+        <Barcode name="AACTCACC">
+          <Lane number="1">
+            <BarcodeCount>26977628</BarcodeCount>
+            <PerfectBarcodeCount>26649386</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>328242</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26837952</BarcodeCount>
+            <PerfectBarcodeCount>26502997</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>334955</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>26977628</BarcodeCount>
+            <PerfectBarcodeCount>26649386</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>328242</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>26837952</BarcodeCount>
+            <PerfectBarcodeCount>26502997</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>334955</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="84NovaSeq-PCD-KIT-Av0">
+        <Barcode name="AGTGGTCA">
+          <Lane number="1">
+            <BarcodeCount>30899729</BarcodeCount>
+            <PerfectBarcodeCount>30370037</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>529692</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>30741354</BarcodeCount>
+            <PerfectBarcodeCount>30208282</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>533072</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>30899729</BarcodeCount>
+            <PerfectBarcodeCount>30370037</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>529692</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>30741354</BarcodeCount>
+            <PerfectBarcodeCount>30208282</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>533072</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="85NovaSeq-FremSegment-KIT-Av0">
+        <Barcode name="ACTATGCA">
+          <Lane number="1">
+            <BarcodeCount>25794802</BarcodeCount>
+            <PerfectBarcodeCount>25580176</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>214626</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>25653596</BarcodeCount>
+            <PerfectBarcodeCount>25434446</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>219150</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>25794802</BarcodeCount>
+            <PerfectBarcodeCount>25580176</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>214626</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>25653596</BarcodeCount>
+            <PerfectBarcodeCount>25434446</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>219150</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="86NovaSeq-000000PM-UtAv-KIT-Av0">
+        <Barcode name="ACAAGCTA">
+          <Lane number="1">
+            <BarcodeCount>28384153</BarcodeCount>
+            <PerfectBarcodeCount>28050904</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>333249</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28255538</BarcodeCount>
+            <PerfectBarcodeCount>27919578</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>335960</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>28384153</BarcodeCount>
+            <PerfectBarcodeCount>28050904</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>333249</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>28255538</BarcodeCount>
+            <PerfectBarcodeCount>27919578</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>335960</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="87NovaSeq-Immunsvikt-KIT-Av0">
+        <Barcode name="GAGTTAGC">
+          <Lane number="1">
+            <BarcodeCount>25264838</BarcodeCount>
+            <PerfectBarcodeCount>24996076</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>268762</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>25127513</BarcodeCount>
+            <PerfectBarcodeCount>24856652</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>270861</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>25264838</BarcodeCount>
+            <PerfectBarcodeCount>24996076</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>268762</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>25127513</BarcodeCount>
+            <PerfectBarcodeCount>24856652</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>270861</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+      <Sample name="all">
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>2264851872</BarcodeCount>
+            <PerfectBarcodeCount>2238393253</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>26458619</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>2252869741</BarcodeCount>
+            <PerfectBarcodeCount>2226142811</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>26726930</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+    </Project>
+    <Project name="all">
+      <Sample name="all">
+        <Barcode name="all">
+          <Lane number="1">
+            <BarcodeCount>2340749756</BarcodeCount>
+            <PerfectBarcodeCount>2314291137</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>26458619</OneMismatchBarcodeCount>
+          </Lane>
+          <Lane number="2">
+            <BarcodeCount>2328394928</BarcodeCount>
+            <PerfectBarcodeCount>2301667998</PerfectBarcodeCount>
+            <OneMismatchBarcodeCount>26726930</OneMismatchBarcodeCount>
+          </Lane>
+        </Barcode>
+      </Sample>
+    </Project>
+  </Flowcell>
+</Stats>

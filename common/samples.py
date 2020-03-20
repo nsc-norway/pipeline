@@ -2,6 +2,7 @@ import os
 import glob
 import re
 import gzip
+from collections import Counter
 
 from genologics.lims import *
 
@@ -37,7 +38,7 @@ class Sample(object):
     """
 
     def __init__(self, sample_index, sample_id, name, sample_dir, files, description=None):
-        self.sample_index = sample_index
+        self.sample_index = sample_index # NOTE: This is not the index sequence, but the position in sample sheet
         self.sample_id = sample_id
         self.name = name
         self.sample_dir = sample_dir
@@ -123,11 +124,10 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
         # whole entry
         if merged_lanes:
             file_lanes = set("X")
+        elif 'lane' in entry:
+            file_lanes =  set( (int(entry['lane']),) )
         else:
-            try:
-                file_lanes =  set( (int(entry['lane']),) )
-            except KeyError:
-                file_lanes = set(expand_lanes)
+            file_lanes = set(expand_lanes)
 
         if only_process_lanes_set:
             file_lanes &= only_process_lanes_set
@@ -239,7 +239,19 @@ def check_files_merged_lanes(run_dir):
     elif unmerged_exists and not merged_exists:
         return False
     else:
-        raise RuntimeError("Unable to determine if lanes were merged (no-lane-splitting option)")
+        raise ValueError("Unable to determine if lanes were merged (no-lane-splitting option)."
+               "Make sure there is at least one FASTQ file.")
+
+def get_lane_numbers_from_fastq_files(run_dir):
+    """This function identifies the lane numbers. Useful for the "expand_lanes" option
+    used when the sample sheet does not have lane number. This assumes that the lanes
+    """
+
+    basecalls_dir = os.path.join(run_dir, "Data", "Intensities", "BaseCalls")
+    files = glob.glob(basecalls_dir + "Undetermined_S0_L00*_R1_001.fastq.gz")
+    files += glob.glob(basecalls_dir + "/*/*_S1_L00*_R1_001.fastq.gz")
+    files += glob.glob(basecalls_dir + "/*/*/*_S1_L00*_R1_001.fastq.gz")
+    return set(int(re.search(r"_L00(\d)_", os.path.basename(file)).group(1)) for file in files)
 
 
 def add_stats(projects, run_stats):
@@ -247,13 +259,36 @@ def add_stats(projects, run_stats):
     FastqFile objects in the tree structure produced by the above 
     function.
     """
-
+    # Samples with:
+    # * identical names
+    # * on same lane
+    # * even if in different projects;
+    # ...are renamed with a suffix _Sn in the stats files (where n is the
+    # sample sheet data row number) .
+    multiple_identical_name = set(
+        name_lane
+        for name_lane, count in
+            Counter((sample.name, file.lane)
+                for project in projects
+                for sample in project.samples
+                for file in sample.files
+                if file.i_read == 1
+                ).items()
+        if count > 1
+    )
     for project in projects:
         for sample in project.samples:
             for f in sample.files:
-                stats = run_stats.get((f.lane, project.name, sample.name, f.i_read))
+                if (sample.name, f.lane) in multiple_identical_name:
+                    sample_name = "{}_S{}".format(sample.name, sample.sample_index)
+                else:
+                    sample_name = sample.name
+                stats = run_stats.get((f.lane, project.name, sample_name, f.i_read))
                 if stats:
                     f.stats = stats
+                #else:
+                #    print("Warning: no stats for (lane, project, sample, read) = "
+                #            + str((f.lane, project.name, sample_name, f.i_read)))
 
 
 def flag_empty_files(projects, run_dir):
@@ -334,12 +369,13 @@ def parse_sample_sheet(sample_sheet):
 
 ################# FILE STRUCTURE #################
 def get_project_dir(run_id, project_name):
-    if utilities.get_instrument_by_runid(run_id).startswith('hiseq'):
-        return get_hiseq_project_dir(run_id, project_name)
+    instrument = utilities.get_instrument_by_runid(run_id)
+    if instrument.startswith('hiseq') or instrument == "novaseq":
+        return get_dual_fc_instrument_project_dir(run_id, project_name)
     else:
         return get_ne_mi_project_dir(run_id, project_name)
 
-def get_hiseq_project_dir(run_id, project_name):
+def get_dual_fc_instrument_project_dir(run_id, project_name):
     """Gets project directory name, prefixed by date and flowcell index"""
     date_machine_flowcell = re.match(r"([\d]+_[^_]+)_[\d]+_([AB])", run_id)
     project_prefix = date_machine_flowcell.group(1) + "." + date_machine_flowcell.group(2) + "."
@@ -354,7 +390,7 @@ def get_ne_mi_project_dir(run_id, project_name):
 
 
 def get_sample_dir(instrument, sample_name):
-    if instrument in ['hiseq', 'hiseq4k', 'hiseqx']:
+    if instrument in ['hiseq', 'hiseq4k', 'hiseqx', 'novaseq']:
         return "Sample_" + sample_name
     else:
         return None

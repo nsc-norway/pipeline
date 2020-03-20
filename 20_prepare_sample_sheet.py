@@ -119,6 +119,11 @@ def main(task):
                 sample_sheet = reverse_complement_index2(sample_sheet)
         else:
             task.info("Not in LIMS mode, don't know if we should reverse index2, leaving it as on Sample Sheet.")
+    # NovaSeq sample sheet generator will replace some invalid characters with _. Including -
+    # which is copiously used in our conventions. We bluntly translate all _ back to -, without
+    # knowing for sure if they started as - or not.
+    if instrument == "novaseq":
+        sample_sheet = replace_underscores(sample_sheet)
 
     if task.lanes:
         sample_sheet = filter_lanes(sample_sheet, task.lanes)
@@ -168,6 +173,25 @@ def reverse_complement_index2(original_data):
                 [",".join(cells) for cells in data]
                 )
     except StopIteration: # index2 column not found
+        return original_data
+
+
+def replace_underscores(original_data):
+    original_lines = [l.strip("\r\n") for l in original_data.splitlines()]
+    data_start = next(i for i, d in enumerate(original_lines) if re.match(r"\[Data\],*$", d))
+    data = [l.split(",") for l in original_lines[data_start+1:] if l.strip() != ""]
+    try:
+        sample_col = next(i for i, c in enumerate(data[0]) if c.lower() == "sample_name")
+        project_col = next(i for i, c in enumerate(data[0]) if c.lower() == "sample_project")
+        for row in data[1:]:
+            row[sample_col] = row[sample_col].replace("_", "-")
+            row[project_col] = row[project_col].replace("_", "-")
+
+        return "\r\n".join(
+                original_lines[0:data_start+1] +\
+                [",".join(cells) for cells in data]
+                ) + "\r\n"
+    except StopIteration: # sample name or project name column not found
         return original_data
 
 

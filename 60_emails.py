@@ -47,7 +47,7 @@ def main(task):
         if task.process: # lims mode
             lane_stats = lane_info.get_from_lims(task.process, instrument, expand_lanes)
         else:
-            lane_stats = lane_info.get_from_files(work_dir, instrument, expand_lanes)
+            task.fail("Unable to get the lane statistics from InterOp files, make sure interop library is installed.")
     projects = task.projects
     run_stats = stats.get_stats(
             instrument,
@@ -57,7 +57,8 @@ def main(task):
             suffix=task.suffix
             )
     samples.add_stats(projects, run_stats)
-    if task.instrument in ["hiseq4k", "hiseqx"]:
+    patterned = task.instrument in ["hiseqx", "hiseq4k", "novaseq"]
+    if patterned:
         stats.add_duplication_results(qc_dir, projects)
     samples.flag_empty_files(projects, work_dir)
 
@@ -68,7 +69,6 @@ def main(task):
             fname = delivery_dir + "/Email_for_" + project.name + ".xls"
             write_sample_info_table(fname, run_id, project)
 
-    patterned = instrument in ["hiseqx", "hiseq4k"]
     software_versions = [
             ("RTA", utilities.get_rta_version(work_dir))
             ]
@@ -84,14 +84,15 @@ def main(task):
     else:
         jinja_env = Environment(loader=FileSystemLoader(template_dir),
                 autoescape=select_autoescape(['html','xml']))
+    print_lane_number = not task.no_lane_splitting and instrument != "miseq"
+    occupancy = instrument == "novaseq"
     write_html_and_email_files(jinja_env, task.process, task.bc_dir, delivery_dir, run_id, projects,
-            instrument.startswith('hiseq'),
-            lane_stats, software_versions, patterned)
+            print_lane_number, lane_stats, software_versions, patterned, occupancy)
 
     task.success_finish()
 
 
-def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned):
+def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned, occupancy):
     """This function gets per-lane statistics based on a provided lane_stats object and 
     projects. projects is the normal project list, with each project containing a list
     of samples, then files. This function will reconstruct some stats, like Q30, from the file-based
@@ -102,19 +103,25 @@ def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned):
     For now it returns formatted strings for numeric values. This makes the logic in the
     template very simple, but we should consider moving the formatting to the template."""
 
+    # PhiX column for each of read 1, read 2:
+    phix_n_cols = max( 
+                [len(lane.phix) for lane in lane_stats.values() if lane]
+                or [1]
+                )
+    phix_cols = ["AlignPhixR{}".format(read) for read in range(1, phix_n_cols+1)]
+    occupied_cols = ["Occupied"] if occupancy else []
     # A different table is used depending on the sequencer type: Does it have lanes? Does it have patterned FC?
     if print_lane_number:
-        if patterned:
-            header = ["Lane", "Project", "PF cluster no", "PF ratio", "SeqDuplicates", "Undetermined",
-                    "AlignedPhiX", ">=Q30", "MaxReadsSam", "MinReadsSam", "Quality"]
-        else:
-            header = ["Lane", "Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)",
-                    "PF cluster density(/mm2)", "Undetermined", "AlignedPhiX", ">=Q30", 
-                    "MaxReadsSam", "MinReadsSam", "Quality"]
+        header = ["Lane"]
+    else:
+        header = []
+    if patterned:
+        header += ["Project", "PF cluster no", "PF ratio", "SeqDuplicates", "Undetermined"] + \
+                phix_cols + [">=Q30"] + occupied_cols + ["MaxReadsSam", "MinReadsSam", "Quality"]
     else:
         header = ["Project", "PF cluster no", "PF ratio", "Raw cluster density(/mm2)",
-                "PF cluster density(/mm2)", "Undetermined", "AlignedPhiX",
-                ">=Q30", "MaxReadsSam", "MinReadsSam", "Quality"]
+                "PF cluster density(/mm2)", "Undetermined"] + phix_cols + [">=Q30", 
+                "MaxReadsSam", "MinReadsSam", "Quality"]
 
     # assumes 1 project per lane, and undetermined
     # Dict: lane ID => (lane object, project object)
@@ -175,12 +182,19 @@ def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned):
         if lane.phix is None:
             row.append(("-", "center"))
         else:
-            row.append(("%4.2f%%" % (lane.phix * 100.0), "number"))
+            for phixval in lane.phix:
+                row.append(("%4.2f%%" % phixval, "number"))
 
         norm = sum(f.stats['# Reads PF'] for f in all_lane_files if not f.empty)
         q30sum = sum(f.stats['% Bases >=Q30']*f.stats['# Reads PF'] for f in all_nonempty_files)
         q30pct = q30sum * 1.0 / max(norm, 1)
         row.append(("%4.2f%%" % q30pct, "number"))
+
+        if occupancy:
+            if lane.occupancy:
+                row.append(("%4.2f%%" % lane.occupancy, "number"))
+            else:
+                row.append(("-", "center"))
 
         all_sample_reads = [
                 f.stats['# Reads PF'] if not f.empty else 0
@@ -291,7 +305,7 @@ class RunParameters(object):
         cys = process.udf.get('Read 2 Cycles')
         if cys:
             self.cycles.append(("R2", cys))
-        pars = ["Chemistry", "Run Mode", "Chemistry Version"]
+        pars = ["Chemistry", "Run Mode", "Chemistry Version", "Loading Workflow Type", "Flow Cell Mode"]
         self.run_mode_field = None
         for par in pars:
             p = process.udf.get(par)
@@ -310,7 +324,7 @@ def get_data_size(bc_dir, project):
 
 
 def write_html_and_email_files(jinja_env, process, bc_dir, delivery_dir, run_id, projects, print_lane_number,
-        lane_stats, software_versions, patterned):
+        lane_stats, software_versions, patterned, occupancy):
     """Stats summary file for emails, etc."""
 
     project_datas = []
@@ -331,7 +345,7 @@ def write_html_and_email_files(jinja_env, process, bc_dir, delivery_dir, run_id,
             lims_project = lims_projects.get(project.name)
             project_datas.append(ProjectData(project, lims_project, seq_process))
 
-    lane_header, lane_data = get_lane_summary_data(projects, print_lane_number, lane_stats, patterned)
+    lane_header, lane_data = get_lane_summary_data(projects, print_lane_number, lane_stats, patterned, occupancy)
     if process:
         run_parameters = RunParameters(run_id, seq_process)
     else:

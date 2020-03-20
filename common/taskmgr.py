@@ -195,6 +195,8 @@ class Task(object):
                 expand_lanes = [1,2,3,4]
             elif instr == "miseq":
                 expand_lanes = [1]
+            elif instr == "novaseq":
+                expand_lanes = samples.get_lane_numbers_from_fastq_files(self.work_dir)
             else:
                 expand_lanes = None
 
@@ -221,7 +223,11 @@ class Task(object):
         if self.process:
             return utilities.get_udf(self.process, nsc.NO_LANE_SPLITTING_UDF, False)
         else:
-            return samples.check_files_merged_lanes(self.work_dir)
+            try:
+                return samples.check_files_merged_lanes(self.work_dir)
+            except ValueError as e:
+                self.warn(str(e))
+                return False
     
     @property
     def lanes(self):

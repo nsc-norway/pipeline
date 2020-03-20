@@ -345,3 +345,14 @@ def add_duplication_results(qc_dir, projects):
                     except IOError:
                         pass
 
+### Command-line mode: dump run stats
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) != 2:
+            print "Use: dump_stats.py RUN_DIR"
+            sys.exit(1)
+
+    run_folder = sys.argv[1]
+    run_id = os.path.basename(run_folder)
+    instrument = utilities.get_instrument_by_runid(run_id)
+    print get_stats(instrument, run_folder)

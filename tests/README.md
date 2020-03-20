@@ -60,11 +60,11 @@ tests will fail:
 Furthermore, this Python library is required in order to test the gathering
 of run statistics:
 
-  * `illuminate`
+  * `interop`
 
-(illuminate is not a strict runtime dependency of the pipeline, since it can
-get stats from text files and from LIMS also. Due to the targeted nature of the
-tests, illuminate is absolutely required for running the tests)
+(interop is not a strict runtime dependency of the pipeline, since it can
+get stats from LIMS also. Due to the targeted nature of the
+tests, interop is absolutely required for running the tests)
 
 
 ### Running the tests ###
@@ -174,7 +174,8 @@ json files can be generated using the script `tools/dump_projects_json.py`.
 #### Updating other reference files ####
 
 Most files can be updated more directly, by copying the newly produced file into the
-location under files/.
+location under files/fasit. The path of a failed reference file is usually evident from the
+output.
 
 Set the environment variable DEBUG=true to produce a new set of outputs even if the
 test does not fail (e.g. in case new files are added, but existing files remain).

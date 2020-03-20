@@ -13,9 +13,8 @@ with open(sys.argv[1]) as f:
                 fiels[1+lane_offset] = id_name[fiels[lane_offset]]
             except KeyError:
                 data = fiels[1+lane_offset].split("-")
-                fiels[1+lane_offset] = data[0]
-                for d in data[1:]:
-                    fiels[1+lane_offset] += "-" + "".join(random.choice(alpha) for a in d)
+                if len(data) > 1: # Identify sample names as entries containing hyphen
+                    fiels[1+lane_offset] = "-".join("".join(random.choice(alpha) for a in d) for d in data)
                 id_name[fiels[lane_offset]] = fiels[1+lane_offset]
         print ",".join(fiels),
 
