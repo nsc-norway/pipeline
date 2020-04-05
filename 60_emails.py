@@ -3,6 +3,7 @@ import os
 import re
 import operator
 import shutil
+from xml.etree import ElementTree
 from math import ceil
 from jinja2 import Environment, FileSystemLoader
 try:
@@ -86,8 +87,9 @@ def main(task):
                 autoescape=select_autoescape(['html','xml']))
     print_lane_number = not task.no_lane_splitting and instrument != "miseq"
     occupancy = instrument == "novaseq"
-    write_html_and_email_files(jinja_env, task.process, task.bc_dir, delivery_dir, run_id, projects,
-            print_lane_number, lane_stats, software_versions, patterned, occupancy)
+    write_html_and_email_files(jinja_env, task.process, work_dir, task.bc_dir, delivery_dir,
+            run_id, projects, print_lane_number, lane_stats, software_versions, patterned,
+            occupancy)
 
     task.success_finish()
 
@@ -287,31 +289,53 @@ class RunParameters(object):
     """Get run parameters (LIMS based). Gets the information from the sequencing
     step."""
 
-    def __init__(self, run_id, process):
+    def __init__(self, run_id, process, run_dir):
         self.instrument_type = utilities.get_instrument_by_runid(run_id)
-        self.instrument_name = process.udf.get('Instrument Name')
         id_part = re.match(r"\d\d\d\d\d\d_([^_]+)_", run_id)
         if id_part:
             self.instrument_id = id_part.group(1)
         else:
             self.instrument_id = None
-        self.cycles = [("R1", process.udf.get('Read 1 Cycles'))]
-        cys = process.udf.get('Index 1 Read Cycles')
-        if cys:
-            self.cycles.append(("I1", cys))
-        cys = process.udf.get('Index 2 Read Cycles')
-        if cys:
-            self.cycles.append(("I2", cys))
-        cys = process.udf.get('Read 2 Cycles')
-        if cys:
-            self.cycles.append(("R2", cys))
-        pars = ["Chemistry", "Run Mode", "Chemistry Version", "Loading Workflow Type", "Flow Cell Mode"]
-        self.run_mode_field = None
-        for par in pars:
-            p = process.udf.get(par)
-            if p:
-                self.run_mode_field = par
-                self.run_mode_value = p
+        self.cycles = None
+        if process:
+            self.instrument_name = process.udf.get('Instrument Name')
+            r1_cycles = process.udf.get('Read 1 Cycles')
+            if r1_cycles:
+                self.cycles = [("R1", r1_cycles)]
+                cys = process.udf.get('Index 1 Read Cycles')
+                if cys:
+                    self.cycles.append(("I1", cys))
+                cys = process.udf.get('Index 2 Read Cycles')
+                if cys:
+                    self.cycles.append(("I2", cys))
+                cys = process.udf.get('Read 2 Cycles')
+                if cys:
+                    self.cycles.append(("R2", cys))
+            pars = ["Chemistry", "Run Mode", "Chemistry Version", "Loading Workflow Type", "Flow Cell Mode"]
+            self.run_mode_field = None
+            for par in pars:
+                p = process.udf.get(par)
+                if p:
+                    self.run_mode_field = par
+                    self.run_mode_value = p
+        if not self.cycles: # No UDF for cycles
+            self.cycles = []
+            try:
+                xmltree = ElementTree.parse(
+                    os.path.join(run_dir, "RunInfo.xml")
+                )
+                reads = xmltree.findall("./Run/Reads/Read")
+                indexread = 0
+                dataread = 0
+                for read in sorted(reads, key=lambda r: int(r.attrib['Number'])):
+                    if read.attrib['IsIndexedRead'] == 'Y':
+                        indexread += 1
+                        self.cycles.append(("I{}".format(indexread), int(read.attrib['NumCycles'])))
+                    else:
+                        dataread += 1
+                        self.cycles.append(("R{}".format(dataread), int(read.attrib['NumCycles'])))
+            except:
+                self.cycles.append(["?"])
 
 
 def get_data_size(bc_dir, project):
@@ -323,8 +347,8 @@ def get_data_size(bc_dir, project):
     return size
 
 
-def write_html_and_email_files(jinja_env, process, bc_dir, delivery_dir, run_id, projects, print_lane_number,
-        lane_stats, software_versions, patterned, occupancy):
+def write_html_and_email_files(jinja_env, process, run_dir, bc_dir, delivery_dir, run_id,
+        projects, print_lane_number, lane_stats, software_versions, patterned, occupancy):
     """Stats summary file for emails, etc."""
 
     project_datas = []
@@ -346,11 +370,8 @@ def write_html_and_email_files(jinja_env, process, bc_dir, delivery_dir, run_id,
             project_datas.append(ProjectData(project, lims_project, seq_process))
 
     lane_header, lane_data = get_lane_summary_data(projects, print_lane_number, lane_stats, patterned, occupancy)
-    if process:
-        run_parameters = RunParameters(run_id, seq_process)
-    else:
-        run_parameters = None
-
+    run_parameters = RunParameters(run_id, seq_process, run_dir)
+    
     with open(delivery_dir + "/Emails_for_" + run_id + ".html", 'w') as out:
         doc_content = jinja_env.get_template('run_emails.html').render(
                                 run_id=run_id, lane_data=lane_data, lane_header=lane_header,
