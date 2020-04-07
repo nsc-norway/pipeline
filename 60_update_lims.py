@@ -106,15 +106,16 @@ def post_stats(lims, process, projects, demultiplex_stats, lane_metrics, lane_st
                 update_artifacts.add(lane_analyte)
 
     for lane, metric in lane_metrics.items():
-        duplicates = metric.get('% Sequencing Duplicates', None)
-        if duplicates is not None:
-            lane_analyte = get_lane(process, lane)
-            lane_analyte.udf['% Sequencing Duplicates'] = duplicates
-            update_artifacts.add(lane_analyte)
-        stats = lane_stats.get(lane)
-        if stats and stats.occupancy: # Attempt to get occupancy, None if not supported
-            lane_analyte.udf['% Occupied Wells'] = stats.occupancy
-            update_artifacts.add(lane_analyte)
+        lane_analyte = get_lane(process, lane)
+        if lane_analyte:
+            duplicates = metric.get('% Sequencing Duplicates', None)
+            if duplicates is not None:
+                lane_analyte.udf['% Sequencing Duplicates'] = duplicates
+                update_artifacts.add(lane_analyte)
+            stats = lane_stats.get(lane)
+            if stats and stats.occupancy: # Attempt to get occupancy, None if not supported
+                lane_analyte.udf['% Occupied Wells'] = stats.occupancy
+                update_artifacts.add(lane_analyte)
     #print "Updating"
     lims.put_batch(update_artifacts)
 
