@@ -32,7 +32,7 @@ def main(task):
 
     for project in projects:
         project_qc_dir = os.path.join(output_dir, project.name or "Undetermined")
-        subprocess.call([nsc.MULTIQC, "-q", "-f", "."], cwd=project_qc_dir)
+        subprocess.call(nsc.MULTIQC + ["-q", "-f", "."], cwd=project_qc_dir)
 
     task.success_finish()
 

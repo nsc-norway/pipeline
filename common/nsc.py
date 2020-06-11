@@ -98,7 +98,7 @@ LIMS_SERVER=None
 
 ### Common / default program paths ###
 # MultiQC: Use default path
-MULTIQC = "multiqc"
+MULTIQC = ["multiqc"]
 
 ### Default configuration parameters ###
 # The -d option is required for bcl2fastq versions < 2.19
@@ -113,7 +113,7 @@ if SITE and SITE.startswith("cees"):
     FASTQC="/opt/FastQC/fastqc"
     FASTDUP="/opt/nsc/bin/fastdup"
     if SITE == "cees-sensitive":
-        MULTIQC = "/opt/rh/python27/root/usr/bin/multiqc"
+        MULTIQC = ["/opt/rh/python27/root/usr/bin/multiqc"]
     BASEURI="https://cees-lims.sequencing.uio.no"
 
     REMOTE_MODE = "local"
