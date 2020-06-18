@@ -125,7 +125,7 @@ elif SITE == "ous":
     BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.20.0/nscinstallbin/bin/bcl2fastq"
     FASTQC="/data/common/tools/fastQC/FastQC_v0.11.8/fastqc"
     FASTDUP="/data/common/tools/nscbin/fastdup"
-    MULTIQC = ["singularity", "run", "/data....."]
+    MULTIQC = ["/data/common/tools/multiqc/multiqc_1.9--pyh9f0ad1d_0.sif", "multiqc"]
     BASEURI="https://ous-lims.sequencing.uio.no"
 
     REMOTE_MODE = "srun"

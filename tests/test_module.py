@@ -635,13 +635,13 @@ class Test70MultiQC(TaskTestCase):
             with patch.object(sys, 'argv', testargs), patch('subprocess.call') as sub_call:
                 self.module.main(self.task)
                 calls = [
-                        call(['multiqc', '-q', '-f', 'Stats/'], cwd=self.basecalls)
+                        call(nsc.MULTIQC + ['-q', '-f', 'Stats/'], cwd=self.basecalls)
                         ]
                 for project in projects:
                     if project['is_undetermined']:
                         project['name'] = "Undetermined"
                     calls.append(
-                        call(['multiqc', '-q', '-f', '.'], cwd=os.path.join(self.qualitycontrol, project['name']))
+                        call(nsc.MULTIQC + ['-q', '-f', '.'], cwd=os.path.join(self.qualitycontrol, project['name']))
                         )
                 sub_call.assert_has_calls(calls, any_order=True)
                 self.task.success_finish.assert_called_once()
