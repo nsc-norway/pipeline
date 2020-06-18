@@ -103,8 +103,7 @@ def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
     print "Calling bcl2fastq with:", " ".join(args)
     rcode = remote.run_command(
             args, task, "bcl2fastq2", time="1-0", logfile=log_path,
-            cpus=n_threads, mem="15G", bandwidth=str(n_threads*28)+"M",
-            comment=comment
+            cpus=n_threads, mem="15G", comment=comment
             )
 
     # LIMS only:

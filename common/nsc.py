@@ -132,16 +132,7 @@ elif SITE == "ous":
     DEFAULT_DELIVERY_MODE="User HDD"
 
     # * Command line to run slurm *
-
-    # sbatch commands for "scheduler mode". Sudo mode is not supported.
-    SBATCH_ARGLIST=["/usr/bin/sbatch", "--partition=prod", "--qos=prod"]
-    
-    # Args for jobs which mainly do I/O on the secondary storage, not processing
-    # Set a higher than default priority to make sure they run in preference of 
-    # jobs that can run anywhere. (Now less relevant, storage access is the same
-    # from all nodes)
-    SRUN_STORAGE_JOB_ARGS=["--nice=10"]
-
+    SBATCH_ARGLIST=["/usr/bin/sbatch", "--partition=main", "--qos=high"]
     SQUEUE=["/usr/bin/squeue"]
 
 else:

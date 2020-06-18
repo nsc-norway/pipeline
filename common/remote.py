@@ -16,9 +16,8 @@ local_job_id = 1
 
 def srun_command(
         args, task, jobname, jobtime, logfile,
-        cpus_per_task=1, mem=1024, bandwidth=0, cwd=None,
-        stdout=None, srun_user_args=[],
-        storage_job=False, comment=None
+        cpus_per_task=1, mem=1024,
+        cwd=None, stdout=None, srun_user_args=[], comment=None
         ):
     sbatch_other_args = [
             '--job-name=' + jobname,
@@ -26,20 +25,12 @@ def srun_command(
             '--time=' + jobtime,
             '--mem=' + str(mem)
             ] + srun_user_args
-    if bandwidth != 0:
-        sbatch_other_args.append('--gres=rsc:' + str(bandwidth))
-    elif storage_job:
-	# TODO this is no longer true with 10Gbps net, should always specify bandwidth
-        sbatch_other_args.append('--gres=rsc:1G')
     logpath = os.path.realpath(logfile)
     if stdout:
         stdoutpath = os.path.realpath(stdout)
         sbatch_other_args += ['--output=' + stdoutpath, '--error=' + logpath]
     else:
         sbatch_other_args += ['--output=' + logpath, '--error=' + logpath]
-
-    if storage_job:
-        sbatch_other_args += nsc.SRUN_STORAGE_JOB_ARGS
 
     if comment:
         sbatch_other_args += ['--comment=' + comment]
@@ -86,7 +77,7 @@ def local_command(args, logfile, cwd=None, stdout=None):
 
 def run_command(
         args, task, jobname, time, logfile=None,
-        cpus=1, mem=1024, bandwidth=0, cwd=None,
+        cpus=1, mem=1024, cwd=None,
         stdout=None, srun_user_args=[],
         storage_job=False, comment=None
         ):
@@ -94,7 +85,7 @@ def run_command(
         logfile = task.logfile(jobname)
     if nsc.REMOTE_MODE == "srun":
         return srun_command(
-            args, task, jobname, time, logfile, cpus, mem, bandwidth, cwd,
+            args, task, jobname, time, logfile, cpus, mem, cwd,
             stdout, srun_user_args, storage_job, comment
             )
     elif nsc.REMOTE_MODE == "local": 
@@ -129,7 +120,6 @@ class SlurmArrayJob(object):
         self.cpus_per_task = 1
         self.max_simultaneous = None
         self.mem_per_task = 1024
-        self.bandwidth_per_task = 0
         self.cwd = None
         self.comment = None
 
@@ -147,8 +137,6 @@ class SlurmArrayJob(object):
             os.write(handle, "#SBATCH --cpus-per-task={0}\n".format(self.cpus_per_task))
         if self.mem_per_task:
             os.write(handle, "#SBATCH --mem={0}\n".format(self.mem_per_task))
-        if self.bandwidth_per_task != 0:
-            os.write(handle, "#SBATCH --gres=rsc:{0}\n".format(self.bandwidth_per_task))
         if self.comment:
             os.write(handle, "#SBATCH --comment=\"{0}\"\n".format(self.comment))
 
@@ -226,7 +214,6 @@ class LocalArrayJob(object):
         self.is_finished = False
         self.mem_per_task = 1024
         self.cpus_per_task = 1
-        self.bandwidth_per_task = 0
         self.jobname = jobname
         self.comment = None
 

@@ -83,7 +83,6 @@ def main(task):
             fqc_log_path.replace(".txt", ".%a.txt"))
     fqc.mem_per_task = 1900
     fqc.cpus_per_task = 1
-    fqc.bandwidth_per_task = "20M" # Odin: "50M"
     fqc.comment = run_id
     jobs = []
 
@@ -103,7 +102,6 @@ def main(task):
                 dup_log_path.replace(".txt", ".%a.txt"))
         dup.mem_per_task = 500
         dup.cpus_per_task = 1
-        dup.bandwidth_per_task = "30M" # Odin: 160M
         dup.comment = run_id
         jobs = [fqc, dup]
     else:

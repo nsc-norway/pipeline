@@ -51,8 +51,8 @@ def main(task):
                         if paths:
                             rcode = rcode | remote.run_command(
                                     [nsc.MD5DEEP, '-rl', '-j' + str(n_threads)] + paths, task, "md5deep",
-                                    time="08:00:00", cpus=n_threads, mem="2048M", bandwidth=str(n_threads*1200) + "M",
-                                    storage_job=True, cwd=os.path.join(bc_dir, project.proj_dir),
+                                    time="08:00:00", cpus=n_threads, mem="2048M",
+                                    cwd=os.path.join(bc_dir, project.proj_dir),
                                     stdout=partial_stdout, comment=run_id
                                     )
                         else:
