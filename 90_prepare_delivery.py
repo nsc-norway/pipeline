@@ -131,7 +131,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
         raise RuntimeError("Destination directory '" + dest_dir + "' already exists in vali")
     args = ["/bin/cp", "-r", project_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
     log_path = task.logfile("cp-" + project.name)
-    rcode = remote.run_command(args, task, "delivery_diag", "04:00:00", storage_job=True, srun_user_args=['--nodelist=vali'], logfile=log_path, comment=task.run_id)
+    rcode = remote.run_command(args, task, "delivery_diag", "04:00:00", srun_user_args=['--nodelist=vali'], logfile=log_path, comment=task.run_id)
     if rcode != 0:
         raise RuntimeError("Copying files to diagnostics failed, cp returned an error")
 
@@ -230,7 +230,7 @@ def copy_sav_files(task, dest_dir, srun_user_args=[]):
     rsync_cmd = [nsc.RSYNC, '-r']
     rsync_cmd += sav_include_paths
     rsync_cmd += [os.path.join(dest_dir, task.run_id) + "/"]
-    rcode = remote.run_command(rsync_cmd, task, "rsync_sav_files", time="01:00", storage_job=True,
+    rcode = remote.run_command(rsync_cmd, task, "rsync_sav_files", time="01:00",
             srun_user_args=srun_user_args, cwd=task.work_dir, comment=task.run_id)
     # Rsync error code is ignored, failure here is not fatal.
 
@@ -251,7 +251,7 @@ def delivery_harddrive(project_name, source_path):
     #log_path = task.logfile("rsync-" + project_name)
     #args = [nsc.RSYNC, '-rlt', '--chmod=ug+rwX,o-rwx'] # chmod 660
     #args += [source_path.rstrip("/"), nsc.DELIVERY_DIR]
-    #rcode = remote.run_command(args, task,  "delivery_hdd", "04:00:00", storage_job=True, logfile=log_path)
+    #rcode = remote.run_command(args, task,  "delivery_hdd", "04:00:00", logfile=log_path)
     #if rcode != 0:
     #    raise RuntimeError("Copying files to loki failed, rsync returned an error")
 
@@ -299,19 +299,17 @@ def delivery_norstore(process, project_name, source_path, task):
     rcode = remote.run_command(
             args, task, "tar", "04:00:00",
             cwd=os.path.dirname(source_path),
-            storage_job=True, comment=task.run_id
+            comment=task.run_id
             ) # dirname = parent dir
     if rcode != 0:
         raise RuntimeError('Failed to run "tar" to prepare for Norstore delivery')
 
     md5_path = os.path.join(save_path + "/md5sum.txt")
     # would use normal md5sum, but we have md5deep as a dependency already
-    # rudimentary test indicates that md5deep only uses one thread when processing
-    # a single file, so just requesting one core, and a "storage job"
     rcode = remote.run_command(
             [nsc.MD5DEEP, "-l", "-j1", tarname], task,
             "md5deep_tar", "08:00:00", cwd=save_path, stdout=md5_path,
-            storage_job=True, comment=task.run_id
+            comment=task.run_id
             )
     if rcode != 0:
         raise RuntimeError("Failed to compute checksum for tar file for Norstore, "+

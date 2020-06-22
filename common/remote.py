@@ -16,8 +16,8 @@ local_job_id = 1
 
 def srun_command(
         args, task, jobname, jobtime, logfile,
-        cpus_per_task=1, mem=1024,
-        cwd=None, stdout=None, srun_user_args=[], comment=None
+        cpus_per_task=1, mem=1024, cwd=None, stdout=None, 
+        srun_user_args=[], comment=None
         ):
     sbatch_other_args = [
             '--job-name=' + jobname,
@@ -77,16 +77,15 @@ def local_command(args, logfile, cwd=None, stdout=None):
 
 def run_command(
         args, task, jobname, time, logfile=None,
-        cpus=1, mem=1024, cwd=None,
-        stdout=None, srun_user_args=[],
-        storage_job=False, comment=None
+        cpus=1, mem=1024, cwd=None, stdout=None,
+        srun_user_args=[], comment=None
         ):
     if not logfile:
         logfile = task.logfile(jobname)
     if nsc.REMOTE_MODE == "srun":
         return srun_command(
             args, task, jobname, time, logfile, cpus, mem, cwd,
-            stdout, srun_user_args, storage_job, comment
+            stdout, srun_user_args, comment
             )
     elif nsc.REMOTE_MODE == "local": 
         return local_command(args, logfile, cwd, stdout)

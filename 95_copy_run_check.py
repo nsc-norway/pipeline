@@ -72,7 +72,7 @@ work_dir argument.""")
 
     rc = remote.run_command(
             args, task, "copy_run_again", "00:05:00", logfile=logfile, 
-            storage_job=True, comment=runid
+            comment=runid
             )
     
     if rc == 0:

@@ -104,8 +104,7 @@ work_dir argument.""")
 
     logfile = task.logfile("rsync")
     rc = remote.run_command(
-            args, task, "rsync", "02:00:00", storage_job=True, logfile=logfile,
-            comment=run_id
+            args, task, "rsync", "02:00:00", logfile=logfile, comment=run_id
             )
     
     if rc == 0:
