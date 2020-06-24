@@ -343,6 +343,7 @@ def parse_sample_sheet(sample_sheet):
     data: list of samples
     """
 
+    if not sample_sheet: raise ValueError("No sample sheet provided (Demultiplexing Sample Sheet)")
     # Will contain ['', Header 1, Data 1, Header 2, Data 2] where "header" are the 
     # things in []s
     sections = re.split(r"(\[\w+\])[,\r\n]+", sample_sheet)
