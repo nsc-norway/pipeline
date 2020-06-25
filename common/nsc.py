@@ -124,7 +124,7 @@ elif SITE == "ous":
     #BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
     BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.20.0/nscinstallbin/bin/bcl2fastq"
     FASTQC="/data/common/tools/fastQC/FastQC_v0.11.8/fastqc"
-    FASTDUP="/data/common/tools/nscbin/fastdup"
+    FASTDUP="/data/common/tools/nscbin/suprDUPr"
     MULTIQC = ["/data/common/tools/multiqc/multiqc_1.9--pyh9f0ad1d_0.sif", "multiqc"]
     BASEURI="https://ous-lims.sequencing.uio.no"
 
@@ -139,7 +139,7 @@ else:
     BCL2FASTQ2="bcl2fastq"
     FASTQC="fastqc"
     REMOTE_MODE="local"
-    FASTDUP="fastdup"
+    FASTDUP="suprDUPr"
 
 FASTDUP_ARGLIST=[FASTDUP, "-s", "10", "-e", "60"]
 
