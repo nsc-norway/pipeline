@@ -165,7 +165,7 @@ def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned, oc
             row.append((utilities.display_int(lane.cluster_den_pf), "number"))
 
         if patterned:
-            dupsum = sum(f.stats['fastdup reads with duplicate']
+            dupsum = sum(f.stats.get('fastdup reads with duplicate', 0)
                     for f in all_nonempty_files if f.i_read == 1)
             try:
                 duppct = dupsum * 100.0 / cluster_no
