@@ -6,7 +6,7 @@ import os
 import sys
 
 # Configure prod or dev
-TAG="dev"
+TAG="prod"
 
 try:
     with open("/etc/pipeline-site") as f: 
@@ -112,6 +112,7 @@ if SITE and SITE.startswith("cees"):
     BCL2FASTQ2="/usr/local/bin/bcl2fastq"
     FASTQC="/opt/FastQC/fastqc"
     FASTDUP="/opt/nsc/bin/fastdup"
+    SUPRDUPR=False
     if SITE == "cees-sensitive":
         MULTIQC = ["/opt/rh/python27/root/usr/bin/multiqc"]
     BASEURI="https://cees-lims.sequencing.uio.no"
@@ -124,7 +125,8 @@ elif SITE == "ous":
     #BCL2FASTQ2="/data/common/tools/nscbin/bcl2fastq"
     BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.20.0/nscinstallbin/bin/bcl2fastq"
     FASTQC="/data/common/tools/fastQC/FastQC_v0.11.8/fastqc"
-    FASTDUP="/data/common/tools/nscbin/suprDUPr"
+    FASTDUP=False
+    SUPRDUPR=["/data/common/tools/suprDUPr/v1.3/suprDUPr", "-s", "10", "-e", "60"]
     MULTIQC = ["/data/common/tools/multiqc/multiqc_1.9--pyh9f0ad1d_0.sif", "multiqc"]
     BASEURI="https://ous-lims.sequencing.uio.no"
 
@@ -140,6 +142,7 @@ else:
     FASTQC="fastqc"
     REMOTE_MODE="local"
     FASTDUP="suprDUPr"
+    SUPRDUPR=False
 
 FASTDUP_ARGLIST=[FASTDUP, "-s", "10", "-e", "60"]
 
