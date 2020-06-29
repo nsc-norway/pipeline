@@ -97,7 +97,15 @@ def main(task):
     except IndexError:
         pass
 
-    if task.instrument in ["hiseqx", "hiseq4k", "novaseq"] and nsc.FASTDUP != None:
+    # Find the number of cycles in read 1. If there are fewer than 60 cycles, suprDUPr won't work and
+    # produces junk outputs, so we skip it.
+    xmltree = ElementTree.parse(os.path.join(run_dir, "RunInfo.xml"))
+    reads = xmltree.findall("./Run/Reads/Read")
+    r1_cycles = 151 # Dummy default value
+    for read in reads:
+        if read.atrib['Number'] == "1"
+            r1_cycles = int(read.attrib['NumCycles'])
+    if task.instrument in ["hiseqx", "hiseq4k", "novaseq"] and nsc.FASTDUP != None and r1_cycles > 60:
         dup = remote.ArrayJob(dup_commands, "fastdup", "6:00:00", 
                 dup_log_path.replace(".txt", ".%a.txt"))
         dup.mem_per_task = 500
