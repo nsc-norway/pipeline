@@ -171,7 +171,7 @@ elif SITE == "ous":
     if TAG == "prod":
         SECONDARY_STORAGE="/data/runScratch.boston/demultiplexed"         # location of demultiplexed files
         DELIVERY_DIR="/data/runScratch.boston/demultiplexed/delivery"     # used by prepare-delivery after QC
-        DIAGNOSTICS_DELIVERY = "/data/diag/nscDelivery"
+        DIAGNOSTICS_DELIVERY = "/boston/diag/nscDelivery"
         TRIGGER_DIR="/data/runScratch.boston/scripts/trigger"
         LIMS_SERVER="ous-lims"
 
