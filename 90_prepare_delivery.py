@@ -233,7 +233,7 @@ def copy_sav_files(task, dest_dir, srun_user_args=[]):
     rsync_cmd = [nsc.RSYNC, '-r']
     rsync_cmd += sav_include_paths
     rsync_cmd += [os.path.join(dest_dir, task.run_id) + "/"]
-    rcode = remote.run_command(rsync_cmd, task, "rsync_sav_files", time="01:00",
+    rcode = remote.run_command(rsync_cmd, task, "rsync_sav_files", time="1:00:00",
             srun_user_args=srun_user_args, cwd=task.work_dir, comment=task.run_id)
     # Rsync error code is ignored, failure here is not fatal.
 
