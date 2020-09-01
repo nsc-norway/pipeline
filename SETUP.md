@@ -4,17 +4,41 @@ Setting up the demultiplexing / QC scripts: There are many moving pieces, possib
 servers. The workflow is managed by a cron job, and the commands are executed via the Clarity 
 LIMS external command function.
 
-## Server
+## Pipeline executor server
 
-The following packages are used on the server:
+This is the server running the scripts in this repository. Use the OS version: CentOS 7.
+
+The server setup on the OUS site is automated in the Ansible role `nsc-pipeline-host`. See readme file.
+
+This section attempts to describe the setup in general.
+
+### Dependency packages
+
+Required yum packages:
+
+- `python-pip`
+- `python2-mock`
+- python2-requests ---? TBC
+
+Also, a package is needed from the current version of the Clarity repository. The current Clarity repo should be in `/etc/yum.repos.d/` on the Clarity LIMS server. Make sure to get the version corresponding to the running version of the LIMS. Copy the repo file to the same location on the pipeline runner server.
+
+- `BaseSpaceLIMS-AutomationWorker`
 
 Pip (use pip install):
 
+- Jinja2
+- interop
 requests
 genologics (May use a separate checked out directory, not pip)
 
-Optional packages (pip):
-illuminate -- for lane statistics when not running in LIMS
+
+### Install and configure Clarity automation worker
+
+
+
+### 
+
+###
 
 
 ## Compute nodes
