@@ -75,7 +75,8 @@ drwx------  37 paalmbj  staff  1184 Sep  2 09:36 pipeline
 ```
 Go into `pipeline/deploy` and run the appropriate `auto-*.sh` script for the site. It will ask for
 the SSH password to the server. Back on the pipeline server, make sure the group has R/W access to
-the new files: (for example, biolinux2) `chmod -R g+rwX /opt/nsc/{pipeline,genologics}`.
+the new files: (for example, biolinux2) `chmod -R g+rwX /opt/nsc/{pipeline,genologics}`. The 
+deployment script doesn't set the correct permissions as of now.
 
 
 ### Security module
@@ -118,7 +119,7 @@ should be `ous` or `cees`, depending on the site.
 
 #### A) Special servers
 
-For biolinux2 and the OUS servers, the password for the Clarity user by name of apiuser is stored
+For biolinux2 and the OUS servers, the password for the Clarity user apiuser is stored
 in a text file. The location is referred to in `common/nsc.py`, `get_lims` function.
 
 
@@ -208,10 +209,12 @@ SUPRDUPR=False
 
 These files should be readable from the compute nodes.
 
+
 ### bcl2fastq
 
 Get from Illumina. For biolinux2 use RPM install, which will put the binary in 
 /usr/local/bin
+
 
 ### FastQC
 
