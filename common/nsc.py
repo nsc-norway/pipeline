@@ -84,7 +84,6 @@ RUN_LOG_DIR="DemultiplexLogs"
 
 # System programs
 RSYNC="/usr/bin/rsync"
-MD5DEEP="/usr/bin/md5deep"
 PDFLATEX="/usr/bin/pdflatex"
 
 
@@ -110,13 +109,15 @@ OPEN_EMAILS_SCRIPT = "/data/runScratch.boston/scripts/Open_emails.command"
 if SITE and SITE.startswith("cees"):
     # Data processing/analysis programs
     BCL2FASTQ2="/usr/local/bin/bcl2fastq"
-    FASTQC="/opt/FastQC/fastqc"
-    FASTDUP="/opt/nsc/bin/fastdup"
-    SUPRDUPR=False
+    FASTQC="/opt/fastqc/FastQC_v0.11.9/fastqc"
+    FASTDUP=False
+    SUPRDUPR=["/opt/suprDUPr/v1.3/suprDUPr", "-s", "10", "-e", "60"]
     if SITE == "cees-sensitive":
         MULTIQC = ["/opt/rh/python27/root/usr/bin/multiqc"]
+    else:
+        MULTIQC = ["/opt/multiqc_1.9--pyh9f0ad1d_0.sif", "multiqc"]
+    MD5DEEP=["singularity", "run", "-B", "/storage/nscdata/runsIllumina", "/opt/md5deep.sif", "md5sum"]
     BASEURI="https://cees-lims.sequencing.uio.no"
-
     REMOTE_MODE = "local"
     DEFAULT_DELIVERY_MODE="Norstore"
 
@@ -128,6 +129,7 @@ elif SITE == "ous":
     FASTDUP=False
     SUPRDUPR=["/data/common/tools/suprDUPr/v1.3/suprDUPr", "-s", "10", "-e", "60"]
     MULTIQC = ["/data/common/tools/multiqc/multiqc_1.9--pyh9f0ad1d_0.sif", "multiqc"]
+    MD5DEEP=["/usr/bin/md5deep"]
     BASEURI="https://ous-lims.sequencing.uio.no"
 
     REMOTE_MODE = "srun"
