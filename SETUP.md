@@ -218,7 +218,8 @@ Get from Illumina. For biolinux2 use RPM install, which will put the binary in
 
 ### FastQC
 
-Download the FastQC zip file and unpack it somewhere.
+Download the FastQC zip file and unpack it somewhere. Make the fastqc binary file 
+executable and readable by all.
 
 FastQC depends on java. Install a java command to run it:
 ```
