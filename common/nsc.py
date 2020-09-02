@@ -210,10 +210,7 @@ def get_lims(server_id=None):
 
         elif server_id == "cees-lims":
             url = "https://cees-lims.sequencing.uio.no"
-            # This could be cleaned up. Only need one file, I don't know which one.
-            pw_file = "/opt/gls/clarity/users/glsai/apiuser-password.txt"
-            if not os.path.exists(pw_file):
-                pw_file = "/opt/nsc/conf/apiuser-password.txt"
+            pw_file = "/opt/nsc/conf/apiuser-password.txt"
 
         elif server_id == "x-lims":
             url = "https://x-lims.sequencing.uio.no"
