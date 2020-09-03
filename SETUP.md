@@ -25,7 +25,7 @@ Required yum packages:
 - `python2-mock` (depends on `python2`, `python2-pip`, which are also needed)
 - `python2-requests`
 - `python2-jinja2`
-- `texlive-latex`
+- `texlive`
 
 
 Also, a package is needed from the current version of the Clarity repository. The current Clarity repo should be in `/etc/yum.repos.d/` on the Clarity LIMS server. Make sure to get the version corresponding to the running version of the LIMS. Copy the repo file to the same location on the pipeline runner server.

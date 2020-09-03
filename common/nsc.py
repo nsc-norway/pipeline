@@ -111,7 +111,7 @@ if SITE and SITE.startswith("cees"):
     BCL2FASTQ2="/usr/local/bin/bcl2fastq"
     FASTQC="/opt/fastqc/FastQC_v0.11.9/fastqc"
     FASTDUP=False
-    SUPRDUPR=["/opt/suprDUPr/v1.3/suprDUPr", "-s", "10", "-e", "60"]
+    SUPRDUPR=["/opt/suprDUPr/v1.3/suprDUPr", "-1", "-s", "10", "-e", "60"]
     if SITE == "cees-sensitive":
         MULTIQC = ["/opt/rh/python27/root/usr/bin/multiqc"]
     else:
@@ -127,7 +127,7 @@ elif SITE == "ous":
     BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.20.0/nscinstallbin/bin/bcl2fastq"
     FASTQC="/data/common/tools/fastQC/FastQC_v0.11.8/fastqc"
     FASTDUP=False
-    SUPRDUPR=["/data/common/tools/suprDUPr/v1.3/suprDUPr", "-s", "10", "-e", "60"]
+    SUPRDUPR=["/data/common/tools/suprDUPr/v1.3/suprDUPr", "-1", "-s", "10", "-e", "60"]
     MULTIQC = ["/data/common/tools/multiqc/multiqc_1.9--pyh9f0ad1d_0.sif", "multiqc"]
     MD5DEEP=["/usr/bin/md5deep"]
     BASEURI="https://ous-lims.sequencing.uio.no"
