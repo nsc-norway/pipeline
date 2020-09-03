@@ -25,7 +25,7 @@ def main(task):
     projects = task.projects
 
     # Create for bcl2fastq stats only
-    subprocess.call(nsc.MULTIQC + ["-q", "-f", "Stats/"], cwd=bc_dir)
+    subprocess.call(nsc.MULTIQC + ["-q", "-f", "Stats" + task.suffix + "/"], cwd=bc_dir)
 
     # Per-project fastqc multiqc reports
     output_dir = os.path.join(bc_dir, "QualityControl" + task.suffix)
