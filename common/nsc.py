@@ -84,7 +84,6 @@ RUN_LOG_DIR="DemultiplexLogs"
 
 # System programs
 RSYNC="/usr/bin/rsync"
-MD5DEEP="/usr/bin/md5deep"
 PDFLATEX="/usr/bin/pdflatex"
 
 
@@ -110,13 +109,15 @@ OPEN_EMAILS_SCRIPT = "/data/runScratch.boston/scripts/Open_emails.command"
 if SITE and SITE.startswith("cees"):
     # Data processing/analysis programs
     BCL2FASTQ2="/usr/local/bin/bcl2fastq"
-    FASTQC="/opt/FastQC/fastqc"
-    FASTDUP="/opt/nsc/bin/fastdup"
-    SUPRDUPR=False
+    FASTQC="/opt/fastqc/FastQC_v0.11.9/fastqc"
+    FASTDUP=False
+    SUPRDUPR=["/opt/suprDUPr/v1.3/suprDUPr", "-1", "-s", "10", "-e", "60"]
     if SITE == "cees-sensitive":
         MULTIQC = ["/opt/rh/python27/root/usr/bin/multiqc"]
+    else:
+        MULTIQC = ["singularity", "run", "-B", "/storage/nscdata/runsIllumina:/storage/nscdata/runsIllumina", "/opt/multiqc_1.9--pyh9f0ad1d_0.sif", "multiqc"]
+    MD5DEEP=["singularity", "run", "-B", "/storage/nscdata/runsIllumina:/storage/nscdata/runsIllumina", "/opt/md5deep.sif", "md5deep"]
     BASEURI="https://cees-lims.sequencing.uio.no"
-
     REMOTE_MODE = "local"
     DEFAULT_DELIVERY_MODE="Norstore"
 
@@ -126,8 +127,9 @@ elif SITE == "ous":
     BCL2FASTQ2="/data/common/tools/bcl2fastq/bcl2fastq2-v2.20.0/nscinstallbin/bin/bcl2fastq"
     FASTQC="/data/common/tools/fastQC/FastQC_v0.11.8/fastqc"
     FASTDUP=False
-    SUPRDUPR=["/data/common/tools/suprDUPr/v1.3/suprDUPr", "-s", "10", "-e", "60"]
+    SUPRDUPR=["/data/common/tools/suprDUPr/v1.3/suprDUPr", "-1", "-s", "10", "-e", "60"]
     MULTIQC = ["/data/common/tools/multiqc/multiqc_1.9--pyh9f0ad1d_0.sif", "multiqc"]
+    MD5DEEP=["/usr/bin/md5deep"]
     BASEURI="https://ous-lims.sequencing.uio.no"
 
     REMOTE_MODE = "srun"
@@ -208,10 +210,7 @@ def get_lims(server_id=None):
 
         elif server_id == "cees-lims":
             url = "https://cees-lims.sequencing.uio.no"
-            # This could be cleaned up. Only need one file, I don't know which one.
-            pw_file = "/opt/gls/clarity/users/glsai/apiuser-password.txt"
-            if not os.path.exists(pw_file):
-                pw_file = "/opt/nsc/conf/apiuser-password.txt"
+            pw_file = "/opt/nsc/conf/apiuser-password.txt"
 
         elif server_id == "x-lims":
             url = "https://x-lims.sequencing.uio.no"
