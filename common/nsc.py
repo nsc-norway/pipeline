@@ -68,7 +68,7 @@ SEQ_PROCESSES=[
         ('novaseq', 'AUTOMATED - NovaSeq Run NSC 3.0'),
         ('nextseq', 'NextSeq 500/550 Run NSC 3.0'),
         ('miseq', 'MiSeq Run (MiSeq) 5.0'),
-        ('miseq', 'MiSeq Run (MiSeq v1.0)')
+        #('miseq', 'MiSeq Run (MiSeq v1.0)')
         ]
 
 DEMULTIPLEXING_QC_PROCESS = "Demultiplexing and QC NSC 2.0"
