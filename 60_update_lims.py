@@ -86,6 +86,19 @@ def post_stats(lims, process, projects, demultiplex_stats, lane_metrics, lane_st
                             if any(f.lane == lane for f in sample.files):
                                 limsid = sample.limsid
                                 sample_index = sample.sample_index
+            # When there are multiple samples with the same namem, possibly in different projects,
+            # the sample gets a name with a suffix "_S<ID>" in the stats file. The following branch
+            # should only run in the subordinate case when there is no exact match (to avoid improper
+            # matches of samples with _S in the name).
+            if not limsid and '_S' in sample_name:
+                for tproject in projects:
+                    if tproject.name == project:
+                        for sample in tproject.samples:
+                            if "{}_S{}".format(sample.name, sample.sample_index) == sample_name:
+                                if any(f.lane == lane for f in sample.files):
+                                    limsid = sample.limsid
+                                    sample_index = sample.sample_index
+            
             if limsid is None:
                 continue # Skip unknown samples / project
             resultfile = get_resultfile(lims, process, lane, limsid, 1)
@@ -97,7 +110,7 @@ def post_stats(lims, process, projects, demultiplex_stats, lane_metrics, lane_st
                         pass
                 resultfile.udf['Sample sheet position'] = sample_index
                 update_artifacts.add(resultfile)
-            
+
 
         else: # Undetermined: sample_name = None in demultiplex_stats
             lane_analyte = get_lane(process, lane)
@@ -145,26 +158,20 @@ def get_resultfile(lims, process, lane, input_limsid, read):
     The correct output artifact is identified by two criteria: 
      - The output must come from an input which matches the lane number. I.e. the input
        must be in the correct position in the flowcell in the LIMS.
-     - The name of the output must match a pattern, potentially including the 
-       following:
-        * The name of the submitted sample in the LIMS
-        * The read number (1 or 2 for paired end read)
-       The name of the submitted sample for comparison is retrieved by querying the
-       LIMS for the input_limsid, and using the sample which is associated with this
-       LIMS ID.
+     - The output is assumed to have just one associated Sample in LIMS, and that
+       sample's ID must match the provided LIMS-ID. The argument input_limsid may
+       alternatively 
 
-    Returns the associated result file, If the file can't be found, in general an 
-    error is thrown (relying on underlying functions to throw, like HTTPError).
+    Returns the associated "result file" artifact or None if it cannot be found.
     """
 
     try:
         input_sample = Artifact(lims, id=input_limsid).samples[0]
     except requests.exceptions.HTTPError as e:
         # If the sample is not pooled, we may get the Sample LIMSID in the 
-        # sample sheet, not the Analyte LIMSID. So we request the sample 
-        # with this ID.
-        # Would only do this for 404, but there is no e.response.status_code
-        # (that is, e.response is None)
+        # sample sheet, not the Artifact LIMSID. So if the input_limsid doesn't
+        # work as a Artifact, we request the sample with this ID (and failing that,
+        # give up).
         input_sample = Sample(lims, id=input_limsid)
         try:
             input_sample.get()
@@ -178,18 +185,10 @@ def get_resultfile(lims, process, lane, input_limsid, read):
                             # Use A:1 for NextSeq, MiSeq; Library Tube for NovaSeq Standard workflow
             if o['output-type'] == "ResultFile" and o['output-generation-type'] == "PerReagentLabel":
                 output = o['uri']
-                # The constant FASTQ_OUTPUT corresponds to the name configured in
-                # the LIMS process type for the ResultFiles representing the "measurements", 
-                # i.e. the demultiplexing stats. It will be something like
-                # "{SubmittedSampleName}" to indicate that each sample will be named 
-                # after the corresponding submitted sample.
-                if output.name == nsc.FASTQ_OUTPUT.format(
-                        lane=lane,
-                        sample_name=input_sample.name.encode('utf-8'),
-                        read=read
-                        ):
+                # Match the output based on LIMS-ID.
+                if output.samples[0].id == input_sample.id:
                     return output
-
+                    
 
 def get_lane(process, lane):
     """Get the input corresponding to a given lane ID. 

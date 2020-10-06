@@ -59,7 +59,6 @@ SAMPLE_SHEET = "Demultiplexing sample sheet"
 # Output files
 BCL2FASTQ_LOG = "bcl2fastq log"
 FASTQC_LOG = "fastqc log"
-FASTQ_OUTPUT = "{sample_name}"
 
 # Sequencing processes
 SEQ_PROCESSES=[
