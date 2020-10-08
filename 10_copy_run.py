@@ -9,6 +9,7 @@
 
 import os
 import sys
+import time
 
 from genologics.lims import *
 from common import nsc, utilities, remote, taskmgr
@@ -101,6 +102,11 @@ work_dir argument.""")
             pass
         else:
             raise
+
+    if instrument in ["nextseq", "novaseq"]:
+        while not os.path.exists(os.path.join(source, "CopyComplete.txt")):
+            task.info("Waiting for CopyComplete.txt...")
+            time.sleep(60)
 
     logfile = task.logfile("rsync")
     rc = remote.run_command(

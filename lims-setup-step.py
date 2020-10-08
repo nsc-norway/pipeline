@@ -77,14 +77,14 @@ else:
             "hiseq": 64,
             "hiseqx": 64,
             "hiseq4k": 64,
-            "novaseq": 64,
+            "novaseq": 110,
             "miseq": 16,
             "nextseq": 64
             }
 
 
 def get_sample_sheet_data(cluster_proc, fcid):
-    """Gets the sample sheet from the clustering- or "...load samples" process"""
+    """Gets the sample sheet from the clustering- or denature/dilute/load process"""
 
     outputs = cluster_proc.all_outputs(unique=True)
     for io in cluster_proc.input_output_maps:
@@ -92,7 +92,7 @@ def get_sample_sheet_data(cluster_proc, fcid):
         o = io[1]
         if o['output-type'] == 'ResultFile' and o['output-generation-type'] == 'PerAllInputs':
             name = o['uri'].name
-            if name == 'SampleSheet csv' or name == "bcl2fastq Sample Sheet" or name == "HiSeq 3000-4000 Sample Sheet" or name == "Sample Sheet":
+            if name == 'SampleSheet csv' or name == "bcl2fastq Sample Sheet" or name == "HiSeq 3000-4000 Sample Sheet" or name == "Sample Sheet" or name == "bcl2fastq SampleSheet":
                 files = []
                 if len(o['uri'].files) == 1:
                     f = o['uri'].files[0]

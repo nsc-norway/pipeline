@@ -677,7 +677,7 @@ class Test80md5sum(TaskTestCase):
                                 files.append(fpath)
                                 files.append(ANY)
                         calls.append(
-                            call(['/usr/bin/md5deep', '-rl', '-j5'] + files,
+                            call(nsc.MD5DEEP + ['-rl', '-j5'] + files,
                                 cwd=os.path.join(self.basecalls, project['proj_dir']),
                                 stderr=ANY, stdout=ANY)
                             )
@@ -785,7 +785,7 @@ class Test90PrepareDelivery(TaskTestCase):
                                    proj_dir], cwd=self.basecalls, stderr=ANY, stdout=ANY) 
                                 )
                         expected_calls.append(
-                               call(['/usr/bin/md5deep', '-l', '-j1', tar_name],
+                               call(nsc.MD5DEEP + ['-l', '-j1', tar_name],
                                    cwd=deliv_project_dir, stderr=ANY, stdout=ANY) 
                                 )
                 self.check_files_with_reference(deliv_test_dir, ref_dir)
