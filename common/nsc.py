@@ -144,6 +144,7 @@ else:
     REMOTE_MODE="local"
     FASTDUP="suprDUPr"
     SUPRDUPR=False
+    MD5=["md5deep", "-rl", "-j5"]
 
 FASTDUP_ARGLIST=[FASTDUP, "-s", "10", "-e", "60"]
 
