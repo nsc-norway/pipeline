@@ -310,7 +310,7 @@ def delivery_norstore(process, project_name, source_path, task):
     md5_path = os.path.join(save_path + "/md5sum.txt")
     # would use normal md5sum, but we have md5deep as a dependency already
     rcode = remote.run_command(
-            nsc.MD5DEEP + ["-l", "-j1", tarname], task,
+            nsc.MD5 + [tarname], task,
             "md5deep_tar", "08:00:00", cwd=save_path, stdout=md5_path,
             comment=task.run_id
             )

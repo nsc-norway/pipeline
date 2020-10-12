@@ -115,7 +115,7 @@ if SITE and SITE.startswith("cees"):
         MULTIQC = ["/opt/rh/python27/root/usr/bin/multiqc"]
     else:
         MULTIQC = ["singularity", "run", "-B", "/storage/nscdata/runsIllumina:/storage/nscdata/runsIllumina", "/opt/multiqc_1.9--pyh9f0ad1d_0.sif", "multiqc"]
-    MD5DEEP=["md5sum"]
+    MD5=["md5sum"]
     BASEURI="https://cees-lims.sequencing.uio.no"
     REMOTE_MODE = "local"
     DEFAULT_DELIVERY_MODE="Norstore"
@@ -128,7 +128,7 @@ elif SITE == "ous":
     FASTDUP=False
     SUPRDUPR=["/data/common/tools/suprDUPr/v1.3/suprDUPr", "-1", "-s", "10", "-e", "60"]
     MULTIQC = ["/data/common/tools/multiqc/multiqc_1.9--pyh9f0ad1d_0.sif", "multiqc"]
-    MD5DEEP=["/usr/bin/md5deep"]
+    MD5=["/usr/bin/md5deep", "-rl", "-j5"]
     BASEURI="https://ous-lims.sequencing.uio.no"
 
     REMOTE_MODE = "srun"
