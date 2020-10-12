@@ -115,7 +115,7 @@ if SITE and SITE.startswith("cees"):
         MULTIQC = ["/opt/rh/python27/root/usr/bin/multiqc"]
     else:
         MULTIQC = ["singularity", "run", "-B", "/storage/nscdata/runsIllumina:/storage/nscdata/runsIllumina", "/opt/multiqc_1.9--pyh9f0ad1d_0.sif", "multiqc"]
-    MD5DEEP=["singularity", "run", "-B", "/storage/nscdata/runsIllumina:/storage/nscdata/runsIllumina", "/opt/md5deep.sif", "md5deep"]
+    MD5DEEP=["md5sum"]
     BASEURI="https://cees-lims.sequencing.uio.no"
     REMOTE_MODE = "local"
     DEFAULT_DELIVERY_MODE="Norstore"
