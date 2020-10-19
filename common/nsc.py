@@ -59,16 +59,15 @@ SAMPLE_SHEET = "Demultiplexing sample sheet"
 # Output files
 BCL2FASTQ_LOG = "bcl2fastq log"
 FASTQC_LOG = "fastqc log"
-FASTQ_OUTPUT = "{sample_name}"
 
 # Sequencing processes
 SEQ_PROCESSES=[
         ('hiseqx', 'Illumina Sequencing (HiSeq X) 1.0'),
         ('hiseq4k', 'Illumina Sequencing (HiSeq 3000/4000) 1.0'),
-        ('novaseq', 'AUTOMATED - NovaSeq Run (NovaSeq 6000 v3.0)'),
-        ('nextseq', 'NextSeq Run (NextSeq) 1.0'),
+        ('novaseq', 'AUTOMATED - NovaSeq Run NSC 3.0'),
+        ('nextseq', 'NextSeq 500/550 Run NSC 3.0'),
         ('miseq', 'MiSeq Run (MiSeq) 5.0'),
-        ('miseq', 'MiSeq Run (MiSeq v1.0)')
+        #('miseq', 'MiSeq Run (MiSeq v1.0)')
         ]
 
 DEMULTIPLEXING_QC_PROCESS = "Demultiplexing and QC NSC 2.0"
@@ -116,7 +115,7 @@ if SITE and SITE.startswith("cees"):
         MULTIQC = ["/opt/rh/python27/root/usr/bin/multiqc"]
     else:
         MULTIQC = ["singularity", "run", "-B", "/storage/nscdata/runsIllumina:/storage/nscdata/runsIllumina", "/opt/multiqc_1.9--pyh9f0ad1d_0.sif", "multiqc"]
-    MD5DEEP=["singularity", "run", "-B", "/storage/nscdata/runsIllumina:/storage/nscdata/runsIllumina", "/opt/md5deep.sif", "md5deep"]
+    MD5=["md5sum"]
     BASEURI="https://cees-lims.sequencing.uio.no"
     REMOTE_MODE = "local"
     DEFAULT_DELIVERY_MODE="Norstore"
@@ -129,7 +128,7 @@ elif SITE == "ous":
     FASTDUP=False
     SUPRDUPR=["/data/common/tools/suprDUPr/v1.3/suprDUPr", "-1", "-s", "10", "-e", "60"]
     MULTIQC = ["/data/common/tools/multiqc/multiqc_1.9--pyh9f0ad1d_0.sif", "multiqc"]
-    MD5DEEP=["/usr/bin/md5deep"]
+    MD5=["/usr/bin/md5deep", "-rl", "-j5"]
     BASEURI="https://ous-lims.sequencing.uio.no"
 
     REMOTE_MODE = "srun"
@@ -145,6 +144,7 @@ else:
     REMOTE_MODE="local"
     FASTDUP="suprDUPr"
     SUPRDUPR=False
+    MD5=["md5deep", "-rl", "-j5"]
 
 FASTDUP_ARGLIST=[FASTDUP, "-s", "10", "-e", "60"]
 
