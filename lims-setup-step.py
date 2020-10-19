@@ -32,7 +32,7 @@ if nsc.SITE == "cees":
                 "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Delivery and triggers", "Close when finished"
                 ],
             "hiseq4k": [
-                "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
+                "Auto 10. Delay", "Auto 20. Prepare SampleSheet", "Auto 30. Demultiplexing",
                 "Auto 40. Move fastq files", "Auto 50-80. QC", "Auto 90. Delivery and triggers", "Close when finished"
                 ]
             }
