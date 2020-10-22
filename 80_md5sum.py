@@ -50,7 +50,7 @@ def main(task):
                         partial_stdout = os.path.join(bc_dir, project.proj_dir, "md5sum_{}.txt".format(i))
                         if paths:
                             rcode = rcode | remote.run_command(
-                                    nsc.MD5DEEP + ['-rl', '-j' + str(n_threads)] + paths, task, "md5deep",
+                                    nsc.MD5 + paths, task, "md5deep",
                                     time="08:00:00", cpus=n_threads, mem="2048M",
                                     cwd=os.path.join(bc_dir, project.proj_dir),
                                     stdout=partial_stdout, comment=run_id
