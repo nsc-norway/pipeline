@@ -121,7 +121,7 @@ def delivery_16s(task, project, lims_project, delivery_method, basecalls_dir, pr
     subprocess.call(["/data/runScratch.boston/scripts/run-16s-pipeline.sh", project_path])
 
 
-def delivery_diag(task, project, basecalls_dir, project_path):
+def delivery_diag_link(task, project, basecalls_dir, project_path):
     """Special delivery method for diagnostics at OUS"""
 
     dest_dir = os.path.join(
@@ -129,42 +129,25 @@ def delivery_diag(task, project, basecalls_dir, project_path):
             os.path.basename(project_path)
             )
 
-    # This was changed from rsync to cp for performance reasons. cp is about 3 times as fast.
     if os.path.exists(dest_dir):
-        raise RuntimeError("Destination directory '" + dest_dir + "' already exists in vali")
-    args = ["/bin/cp", "-r", project_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
-    log_path = task.logfile("cp-" + project.name)
-    rcode = remote.run_command(args, task, "delivery_diag", "04:00:00", srun_user_args=['--nodelist=vali'], logfile=log_path, comment=task.run_id)
-    if rcode != 0:
-        raise RuntimeError("Copying files to diagnostics failed, cp returned an error")
+        raise RuntimeError("Destination directory '" + dest_dir + "' already exists")
+    args = ["cp", "-rl", project_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
+    subprocess.check_call(args)
 
-    # Now copy quality control data
-    # General args for rsync to automatically set correct permissions
-    rsync_args = [nsc.RSYNC, '-rltW', '--chmod=ug+rwX,o-rwx'] # chmod 770/660
+    # Now link quality control data
+    # General args for copy/link/move command
+    cp_args = ['cp', '-rl']
 
     # Diagnostics wants the QC info in a particular format (file names, etc.). Do not
     # change without consultiing with them. 
     source_qc_dir = os.path.join(basecalls_dir, "QualityControl" + task.suffix)
 
     qc_dir = os.path.join(dest_dir, "QualityControl")
+    os.mkdir(qc_dir)
 
-    while not os.path.exists(qc_dir):
-        try:
-            os.mkdir(qc_dir)
-        except OSError:
-            task.info("Waiting for directory {0} to appear on remote filesystem...".format(
-                os.path.basename(project_path)))
-            time.sleep(30) # Try again after a delay. Seems to be a timing issue related to running on different nodes.
-
-    # When moving to bcl2fastq2 diag. have to decide how they extract the QC metrics.
-    # For now we give them the full Reports and Stats for the whole run. Later we
-    # should only give the relevant lanes.
     for subdir in ["Stats" + task.suffix, "Reports" + task.suffix]:
         source = os.path.join(basecalls_dir, subdir)
-        subprocess.call(rsync_args + [source, dest_dir])
-
-    # Copy the QualityControl files
-    copy_sav_files(task, dest_dir, ['--nodelist=vali'])
+        subprocess.call(cp_args + [source, dest_dir])
 
     # The locations of the fastqc directories are defined by the get_fastqc_dir() 
     # function in the samples module. These directories will then be moved to a 
@@ -186,7 +169,7 @@ def delivery_diag(task, project, basecalls_dir, project_path):
                 dest = os.path.join(sample_dir, fdp_name)
                 if os.path.exists(dest):
                     shutil.rmtree(dest)
-                subprocess.check_call(rsync_args + [source, dest])
+                subprocess.check_call(cp_args + [source, dest])
 
         for f in sample.files:
             source = os.path.join(source_qc_dir, samples.get_fastqc_dir(project, sample, f) + "/")
@@ -195,11 +178,10 @@ def delivery_diag(task, project, basecalls_dir, project_path):
                 dest = os.path.join(sample_dir, fqc_name)
                 if os.path.exists(dest):
                     shutil.rmtree(dest)
-                subprocess.check_call(rsync_args + [source, dest])
+                subprocess.check_call(cp_args + [source, dest])
 
     # Get the demultiplex stats for diag. We generate a HTML file in the same 
     # format as that used by the first version of bcl2fastq.
-
     fcid = utilities.get_fcid_by_runid(task.run_id)
     bcl2fastq_version = utilities.get_bcl2fastq2_version(task.process, task.work_dir)
     undetermined_project = next(p for p in task.projects if p.is_undetermined)
@@ -210,7 +192,8 @@ def delivery_diag(task, project, basecalls_dir, project_path):
     with open(os.path.join(dest_dir, "Demultiplex_Stats.htm"), 'w') as f:
         f.write(demultiplex_stats_content)
 
-    subprocess.check_call(["/bin/chmod", "-R", "ug+rwX,o-rwx", os.path.join(nsc.DIAGNOSTICS_DELIVERY, dest_dir)])
+    subprocess.check_call(["chmod", "-R", "ug+rwX,o-rwx", os.path.join(nsc.DIAGNOSTICS_DELIVERY, dest_dir)])
+    subprocess.check_call(["chgrp", "-R", "ous-diag-delv", os.path.join(nsc.DIAGNOSTICS_DELIVERY, dest_dir)])
 
 
 def copy_sav_files(task, dest_dir, srun_user_args=[]):
@@ -371,8 +354,8 @@ def main(task):
             task.info("Running 16S delivery for " + project.name + "...")
             delivery_16s(task, project, lims_project, delivery_type, task.bc_dir, project_path)
         elif project_type == "Diagnostics" or delivery_type == "Transfer to diagnostics":
-            task.info("Copying " + project.name + " to diagnostics...")
-            delivery_diag(task, project, task.bc_dir, project_path)
+            task.info("Linking " + project.name + " to diagnostics...")
+            delivery_diag_link(task, project, task.bc_dir, project_path)
         elif project_type == "Immunology":
             delivery_external_user(task, lims_project, project_path, "/data/runScratch.boston/imm_data")
         elif project_type == "Microbiology":
