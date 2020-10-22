@@ -19,6 +19,7 @@ from genologics.lims import *
 from common import nsc
 # Small hack to use old pipeline host for 90_prepare_delivery
 nsc.SBATCH_ARGLIST=["/usr/bin/sbatch", "--partition=prod", "--qos=prod"]
+nsc.DIAGNOSTICS_DELIVERY = "/data/diag/nscDelivery"
 from common import utilities, taskmgr, remote, samples
 
 TASK_NAME = "90. Prepare delivery"
