@@ -22,8 +22,8 @@ nsc.SBATCH_ARGLIST=["/usr/bin/sbatch", "--partition=prod", "--qos=prod"]
 nsc.DIAGNOSTICS_DELIVERY = "/data/diag/nscDelivery"
 from common import utilities, taskmgr, remote, samples
 
-TASK_NAME = "90. Prepare delivery"
-TASK_DESCRIPTION = """Prepare for delivery."""
+TASK_NAME = "91. Prepare delivery"
+TASK_DESCRIPTION = """Prepare for delivery (vali)."""
 TASK_ARGS = ['work_dir', 'sample_sheet', 'lanes']
 
 if nsc.TAG == "prod":
