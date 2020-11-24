@@ -127,15 +127,17 @@ def delivery_diag_link(task, project, basecalls_dir, project_path):
             os.path.basename(project_path)
             )
 
-    if os.path.exists(dest_dir):
-        raise RuntimeError("Destination directory '" + dest_dir + "' already exists")
-    args = ["cp", "-rl", project_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
-    subprocess.check_call(args)
-
-    # Now link quality control data
-    # General args for copy/link/move command
     cp_args = ['cp', '-rl']
 
+    if os.path.exists(dest_dir):
+        raise RuntimeError("Destination directory '" + dest_dir + "' already exists")
+    args = cp_args + [project_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
+    subprocess.check_call(args)
+
+    # Now copy quality control data. Make real copy, not links for qc files, as we change
+    # the permissions of the transferred data independently of the source files in the NSC
+    # area.
+    cp_copy_args = ['cp', '-r']
     # Diagnostics wants the QC info in a particular format (file names, etc.). Do not
     # change without consultiing with them. 
     source_qc_dir = os.path.join(basecalls_dir, "QualityControl" + task.suffix)
@@ -145,7 +147,7 @@ def delivery_diag_link(task, project, basecalls_dir, project_path):
 
     for subdir in ["Stats" + task.suffix, "Reports" + task.suffix]:
         source = os.path.join(basecalls_dir, subdir)
-        subprocess.call(cp_args + [source, dest_dir])
+        subprocess.call(cp_copy_args + [source, dest_dir])
 
     # The locations of the fastqc directories are defined by the get_fastqc_dir() 
     # function in the samples module. These directories will then be moved to a 
