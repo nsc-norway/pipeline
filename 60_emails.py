@@ -433,7 +433,7 @@ def write_html_and_email_files(jinja_env, process, run_dir, bc_dir, delivery_dir
     if not os.path.exists(script_file):
         try:
             shutil.copyfile(nsc.OPEN_EMAILS_SCRIPT, script_file)
-        else:
+        except:
             pass # Missing script file is not a problem
             
 
