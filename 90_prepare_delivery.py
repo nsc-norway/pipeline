@@ -116,7 +116,7 @@ def delivery_16s(task, project, lims_project, delivery_method, basecalls_dir, pr
     lims_info = utilities.LimsInfo(lims_project, seq_process)
     #if lims_info.total_number_of_lanes == 1 + lims_info.status_map('COMPLETED', 0):
         # All runs have been completed for this project
-    subprocess.call(["/data/runScratch.boston/scripts/run-16s-pipeline.sh", project_path])
+    subprocess.call(["/data/runScratch.boston/scripts/run-16s-sbatch.sh", project_path])
 
 
 def delivery_diag_link(task, project, basecalls_dir, project_path):
