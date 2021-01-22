@@ -89,7 +89,7 @@ def main(task):
                                     )
     
 
-    fqc = remote.ArrayJob(fqc_commands, "fastqc", "1-0",
+    fqc = remote.ArrayJob(fqc_commands, "fastqc", "2-0",
             fqc_log_path.replace(".txt", ".%a.txt"))
     fqc.mem_per_task = 1900
     fqc.cpus_per_task = 1
@@ -116,7 +116,7 @@ def main(task):
         if read.attrib['Number'] == "1":
             r1_cycles = int(read.attrib['NumCycles'])
     if task.instrument in ["hiseqx", "hiseq4k", "novaseq"] and nsc.FASTDUP != None and r1_cycles > 60:
-        dup = remote.ArrayJob(dup_commands, "suprDUPr", "6:00:00", 
+        dup = remote.ArrayJob(dup_commands, "suprDUPr", "1-0", 
                 dup_log_path.replace(".txt", ".%a.txt"))
         dup.mem_per_task = 500
         dup.cpus_per_task = 1
