@@ -307,6 +307,49 @@ def delivery_norstore(process, project_name, source_path, task):
         task.warn("Password generation failed: " + str(e))
 
 
+def covid19_seq_delivery(task, project, project_path):
+    task.info("Preparing data and scripts for {}...".format(project.name))
+    fhi_covid_delivery_dir = "/data/runScratch.boston/test/fhi"
+    proj_dir_base = os.path.basename(project_path)
+    output_path = os.path.join(fhi_covid_delivery_dir, proj_dir_base)
+    subprocess.check_call(["/bin/cp", "-rl", project_path, output_path])
+    write_pe_sample_list(project, os.path.join(output_path, "samplelist.csv"), fhi_covid_delivery_dir)
+    script = """nextflow run /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/viralrecon/main.nf \
+                    -with-singularity /data/runScratch.boston/analysis/pipelines/container-images/nfcore_viralrecon_1.1.0.sif \
+                    -profile singularity \
+                    --input samplelist.csv \
+                    --protocol amplicon \
+                    --amplicon_bed /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/util/amplicon.bed \
+                    --amplicon_fasta /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/util/amplicon.fasta \
+                    --fasta /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/util/NC_045512.2.fasta \
+                    --skip_kraken2 \
+                    --skip_assembly \
+                    --skip_fastqc
+"""
+    script_file = os.path.join(output_path, "script.sh")
+    open(script_file, "w").write(script)
+    task.info("Running analysis for {}...".format(project.name))
+    log_file = open(os.path.join(output_path, "log-nextflow.txt"), "w")
+    subprocess.check_call(["bash", script_file], cwd=output_path, stdout=log_file, stderr=log_file)
+    shutil.rmtree(os.path.join(output_path, "work"))
+
+
+def write_pe_sample_list(project, output_sample_list_path, input_files_basedir=None):
+    with open(output_sample_list_path, "w") as of:
+        of.write("sample,fastq_1,fastq_2\n")
+        for sample in project.samples:
+            for file in sample.files:
+                if file.i_read == 1:
+                    fpath = file.path
+                    if input_files_basedir:
+                        fpath = os.path.join(input_files_basedir, fpath)
+                    of.write("{},{},{}\n".format(
+                        sample.name,
+                        fpath,
+                        re.sub(r"_R1_001.fastq.gz$", "_R2_001.fastq.gz", fpath)
+                    ))
+
+
 def main(task):
     task.running()
 
@@ -349,7 +392,6 @@ def main(task):
         else:
             task.warn("Project " + project.name + " is missing delivery information!")
             continue
-
         if project_16s: # Only supported for LIMS mode...
             task.info("Running 16S delivery for " + project.name + "...")
             delivery_16s(task, project, lims_project, delivery_type, task.bc_dir, project_path)
@@ -360,6 +402,10 @@ def main(task):
             delivery_external_user(task, lims_project, project_path, "/data/runScratch.boston/imm_data")
         elif project_type == "Microbiology":
             delivery_external_user(task, lims_project, project_path, "/data/runScratch.boston/mik_data")
+        elif project_type == "FHI-Covid19" or project.name == "CovidTest-2021-01-25_Manual":
+            covid19_seq_delivery(task, project, project_path)
+        elif project_type == "MIK-Covid19":
+            covid19_seq_delivery(task, project, project_path)
         elif delivery_type in ["User HDD", "New HDD", "TSD project"]:
             task.info("Hard-linking " + project.name + " to delivery area...")
             delivery_harddrive(project.name, project_path)
