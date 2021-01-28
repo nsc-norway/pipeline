@@ -307,10 +307,20 @@ def delivery_norstore(process, project_name, source_path, task):
         task.warn("Password generation failed: " + str(e))
 
 
-def covid19_seq_delivery(task, project, project_path):
+def covid19_seq_delivery(task, project, lims_project, lims_samples, project_path):
     task.info("Preparing data and scripts for {}...".format(project.name))
+    
     fhi_covid_delivery_dir = "/data/runScratch.boston/test/fhi"
-    proj_dir_base = os.path.basename(project_path)
+    
+    #### PROJECT-RELATED PARAMETERS #####
+    primers_file = get_primers_file_path(task, lims_samples)
+    proj_dir_name = os.path.basename(project_path)
+
+
+    #### SAMPLE LIST ####
+    covid_seq_write_sample_list(task, project, lims_project, lims_samples, "todo_path")
+
+    #### RUN VIRALRECON ####
     output_path = os.path.join(fhi_covid_delivery_dir, proj_dir_base)
     subprocess.check_call(["/bin/cp", "-rl", project_path, output_path])
     write_pe_sample_list(project, os.path.join(output_path, "samplelist.csv"), fhi_covid_delivery_dir)
@@ -319,35 +329,82 @@ def covid19_seq_delivery(task, project, project_path):
                     -profile singularity \
                     --input samplelist.csv \
                     --protocol amplicon \
-                    --amplicon_bed /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/util/amplicon.bed \
-                    --amplicon_fasta /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/util/amplicon.fasta \
+                    --amplicon_bed {} \
                     --fasta /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/util/NC_045512.2.fasta \
                     --skip_kraken2 \
                     --skip_assembly \
                     --skip_fastqc
-"""
+""".format(primers_file)
     script_file = os.path.join(output_path, "script.sh")
     open(script_file, "w").write(script)
     task.info("Running analysis for {}...".format(project.name))
     log_file = open(os.path.join(output_path, "log-nextflow.txt"), "w")
-    subprocess.check_call(["bash", script_file], cwd=output_path, stdout=log_file, stderr=log_file)
-    shutil.rmtree(os.path.join(output_path, "work"))
+    #subprocess.check_call(["bash", script_file], cwd=output_path, stdout=log_file, stderr=log_file)
+    
+
+    #### RUN LOCAL SCRIPTS ####
+    ## TODO
 
 
-def write_pe_sample_list(project, output_sample_list_path, input_files_basedir=None):
+def get_primers_file_path(task, lims_samples):
+    """Ensure all samples have the same prep type, and return primers file"""
+
+    prep_protocols = set(s.udf.get('Sample prep NSC') for s in lims_samples)
+    if len(prep_protocols) != 1 or not next(iter(prep_protocols)):
+        task.fail("Require exactly one Sample prep, found: ()".format(list(prep_protocols)))
+    
+    primer_files = {
+        'Swift SNAP':   '/boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline/local/primers/swift_snap.bed',
+        'NimaGen':      '/boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline/local/primers/nimagen.bed'
+    }
+    sample_prep = next(iter(prep_protocols))
+    try:
+        return primer_files[sample_prep]
+    except KeyError:
+        task.fail("Primers file not known for prep '{}'.".format(sample_prep))
+
+
+def covid_seq_write_sample_list(task, project, lims_project, lims_samples, output_sample_list_path):
+    """Create sample table, used to drive the nextflow-based analysis pipelines."""
+
+    lims_sample_map = dict((s.name, s) for s in lims_samples)
     with open(output_sample_list_path, "w") as of:
-        of.write("sample,fastq_1,fastq_2\n")
+        
+        # Primary details contains tuples of (name,r1path,r2path)
+        primary_details_rows = []
+        # Supplementary information is stored in one dict per row
+        supplementary_details_rows = []
+
+        # Project/Run/etc details
+        common_details = {
+            'SeqRunId':     task.run_id,
+            'ProjectName':  project.name
+        }
         for sample in project.samples:
+            lims_sample = lims_sample_map.get(sample.name)
+
+            # Define sample-level details (shared between all lanes)
+            sample_details = {}
+            if lims_project and lims_sample:
+                sample_details['Protocol'] = lims_sample.udf.get('Sample prep NSC', 'UNKNOWN')
+                sample_details['Well'] = lims_sample.artifact.location[1].replace(":", "")
+                sample_details['OrigCtValue'] = lims_sample.udf.get('Org. Ct value', 0.0)
+
+            # Loop over read 1 files -- usually one, but may have multiple lanes
+            # Multiple runs is not supported here
             for file in sample.files:
                 if file.i_read == 1:
-                    fpath = file.path
-                    if input_files_basedir:
-                        fpath = os.path.join(input_files_basedir, fpath)
-                    of.write("{},{},{}\n".format(
-                        sample.name,
-                        fpath,
-                        re.sub(r"_R1_001.fastq.gz$", "_R2_001.fastq.gz", fpath)
+                    r1path = file.path
+                    r2path = re.sub(r"_R1_001.fastq.gz$", "_R2_001.fastq.gz", r1path)
+                    primary_details_rows.append((sample.name, r1path, r2path))
+                    supplementary_details_rows.append(dict(
+                        common_details.items() + sample_details.items()
                     ))
+        
+        suppl_headers = list(sorted(supplementary_details_rows[0]))
+        of.write("sample,fastq_1,fastq_2," + ",".join(suppl_headers) + "\n")
+        for pri, sup in zip(primary_details_rows, supplementary_details_rows):
+            of.write(",".join(list(pri) + [sup[x] for x in suppl_headers]) + "\n")
 
 
 def main(task):
@@ -359,7 +416,7 @@ def main(task):
 
     if task.process:
         inputs = task.process.all_inputs(unique=True, resolve=True)
-        l_samples = (sample for i in inputs for sample in i.samples)
+        l_samples = task.lims.get_batch(set(sample for i in inputs for sample in i.samples))
         lims_projects = dict(
                 (utilities.get_sample_sheet_proj_name(sample.project.name), sample.project)
                 for sample in l_samples
@@ -402,10 +459,12 @@ def main(task):
             delivery_external_user(task, lims_project, project_path, "/data/runScratch.boston/imm_data")
         elif project_type == "Microbiology":
             delivery_external_user(task, lims_project, project_path, "/data/runScratch.boston/mik_data")
-        elif project_type == "FHI-Covid19" or project.name == "CovidTest-2021-01-25_Manual":
-            covid19_seq_delivery(task, project, project_path)
+        elif project_type == "FHI-Covid19": # Implicitly requires LIMS mode (or we wouldn't have project_type)
+            lims_samples = [s for s in l_samples if s.project == lims_project]
+            covid19_seq_delivery(task, project, lims_project, lims_samples, project_path)
         elif project_type == "MIK-Covid19":
-            covid19_seq_delivery(task, project, project_path)
+            lims_samples = [s for s in l_samples if s.project == lims_project]
+            covid19_seq_delivery(task, project, lims_project, lims_samples, project_path)
         elif delivery_type in ["User HDD", "New HDD", "TSD project"]:
             task.info("Hard-linking " + project.name + " to delivery area...")
             delivery_harddrive(project.name, project_path)
