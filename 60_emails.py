@@ -246,6 +246,9 @@ class ProjectData(object):
                 lims_project and
                 lims_project.udf.get('Project type') == "Diagnostics"
                 )
+        self.censor_sample_names = self.diag_project or (
+            lims_project and lims_project.udf.get('Project type') in ["FHI-Covid19", "MIK-Covid19"]
+        )
         files = sorted(
                 ((s,fi) for s in project.samples for fi in s.files),
                 key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
@@ -264,7 +267,7 @@ class ProjectData(object):
 
         diag_sample_counter = 1
         for s,f in files:
-            if self.diag_project:
+            if self.censor_sample_names:
                 if f.i_read == 1:
                     sample = "Sample {0}".format(diag_sample_counter)
                     diag_sample_counter += 1
@@ -465,7 +468,7 @@ def get_email_recipient_info(run_id, project_datas):
                 nsamples = project_data.nsamples
                 )
         email_content_file = "email_content/{}.txt".format(project_data.dir)
-        if project_data.diag_project:
+        if project_data.censor_sample_names:
             email_attachment = ""
         else:
             email_attachment = "email_content/" + project_data.dir + "_multiqc.html"
