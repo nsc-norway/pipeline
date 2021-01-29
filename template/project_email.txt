@@ -18,7 +18,6 @@ You can pick up the data in a portable hard drive (please notice the size of the
 The data have been transferred to a new hard drive and are ready for pick-up.
 {% elif project_data.lims.delivery_method == "Transfer to diagnostics" %}
 Data has been transferred to /data/diag/nscDelivery folder in vali.
-{% else %}
 {% elif project_data.lims.delivery_method in ["FHI-Covid19", "MIK-Covid19"] %}
 Data will be transferred as per current procedures.
 {% else %}
