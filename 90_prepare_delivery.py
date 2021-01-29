@@ -307,43 +307,59 @@ def delivery_norstore(process, project_name, source_path, task):
         task.warn("Password generation failed: " + str(e))
 
 
-def covid19_seq_delivery(task, project, lims_project, lims_samples, project_path):
+def covid19_seq_delivery(task, project, lims_project, lims_process, lims_samples, project_path, delivery_base_dir):
     task.info("Preparing data and scripts for {}...".format(project.name))
-    
-    fhi_covid_delivery_dir = "/data/runScratch.boston/test/fhi"
     
     #### PROJECT-RELATED PARAMETERS #####
     primers_file = get_primers_file_path(task, lims_samples)
     proj_dir_name = os.path.basename(project_path)
+    output_path = os.path.join(delivery_base_dir, project.name)
 
+    os.mkdir(output_path)
+
+    reference_genome = "NC_045512.2.fasta"
+    viralrecon_version = "1.1.0"
 
     #### SAMPLE LIST ####
-    covid_seq_write_sample_list(task, project, lims_project, lims_samples, "todo_path")
+    covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_samples, reference_genome, viralrecon_version,
+                         os.path.join(output_path, "sampleList.csv"),
+                         os.path.join(output_path, "extendedSampleList.csv"))
 
-    #### RUN VIRALRECON ####
-    output_path = os.path.join(fhi_covid_delivery_dir, proj_dir_base)
+    #### RUN viralrecon ####
     subprocess.check_call(["/bin/cp", "-rl", project_path, output_path])
-    write_pe_sample_list(project, os.path.join(output_path, "samplelist.csv"), fhi_covid_delivery_dir)
-    script = """nextflow run /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/viralrecon/main.nf \
-                    -with-singularity /data/runScratch.boston/analysis/pipelines/container-images/nfcore_viralrecon_1.1.0.sif \
-                    -profile singularity \
-                    --input samplelist.csv \
-                    --protocol amplicon \
-                    --amplicon_bed {} \
-                    --fasta /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/util/NC_045512.2.fasta \
-                    --skip_kraken2 \
-                    --skip_assembly \
-                    --skip_fastqc
-""".format(primers_file)
-    script_file = os.path.join(output_path, "script.sh")
-    open(script_file, "w").write(script)
-    task.info("Running analysis for {}...".format(project.name))
-    log_file = open(os.path.join(output_path, "log-nextflow.txt"), "w")
-    #subprocess.check_call(["bash", script_file], cwd=output_path, stdout=log_file, stderr=log_file)
+    script1 = """/data/common/tools/nscbin/nextflow run /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/viralrecon/main.nf \\
+                    -with-singularity /data/runScratch.boston/analysis/pipelines/2021_covid19/container-images/nfcore_viralrecon_{}.sif \\
+                    -profile singularity \\
+                    --input sampleList.csv \\
+                    --protocol amplicon \\
+                    --amplicon_bed {} \\
+                    --fasta /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/util/{} \\
+                    --skip_kraken2 \\
+                    --skip_assembly \\
+                    --max_memory '256.GB' \\
+                    --max_cpus 110 \\
+                    -resume
+""".format(viralrecon_version, primers_file, reference_genome)
     
+    script2 = """/data/common/tools/nscbin/nextflow run /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/pangolin/main.nf \\
+                    -with-singularity /data/runScratch.boston/analysis/pipelines/2021_covid19/container-images/pangolin_nsc_20210129.sif \\
+                    --viralrecon_folder "{}" \\
+                    --samplelist extendedSampleList.csv \\
+                    -resume
+    """.format(output_path)
 
-    #### RUN LOCAL SCRIPTS ####
-    ## TODO
+    script_file = os.path.join(output_path, "script.sh")
+    log_file = os.path.join(output_path, "log.txt")
+    open(script_file, "w").write(script1 + script2)
+    task.info("Starting analysis for {}...".format(project.name))
+    subprocess.check_call(
+            ["sbatch",
+                    "-J", "C_" + project.name,
+                    "-o", log_file,
+                    "--mem", "16G",
+                    "--cpus-per-task", "4",
+                    "--wrap", "bash " + script_file],
+            cwd=output_path)
 
 
 def get_primers_file_path(task, lims_samples):
@@ -354,8 +370,8 @@ def get_primers_file_path(task, lims_samples):
         task.fail("Require exactly one Sample prep, found: ()".format(list(prep_protocols)))
     
     primer_files = {
-        'Swift SNAP':   '/boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline/local/primers/swift_snap.bed',
-        'NimaGen':      '/boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline/local/primers/nimagen.bed'
+        'Swift SNAP':   '/boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline/util/swift_primers.bed',
+        'NimaGen':      '/boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline/util/nimagen_amplicons.bed'
     }
     sample_prep = next(iter(prep_protocols))
     try:
@@ -363,48 +379,105 @@ def get_primers_file_path(task, lims_samples):
     except KeyError:
         task.fail("Primers file not known for prep '{}'.".format(sample_prep))
 
+def get_read_lengths(lims_demux_process, lims_lane):
+    if task.instrument == "novaseq":
+        pp = lims_lane.parent_process
+        return "-".join(str(x) for x in [
+            pp.udf.get('Read 1 Cycles'),
+            pp.udf.get('Index Read 1'),
+            pp.udf.get('Index Read 2'),
+            pp.udf.get('Read 2 Cycles'),
+        ])
+    else:
+        sp = utilities.get_sequencing_process(lims_demux_process)
+        return "-".join(str(x) for x in [
+            sp.udf.get('Read 1 Cycles'),
+            sp.udf.get('Index 1 Read Cycles'),
+            sp.udf.get('Index 2 Read Cycles'),
+            sp.udf.get('Read 2 Cycles'),
+        ])
 
-def covid_seq_write_sample_list(task, project, lims_project, lims_samples, output_sample_list_path):
+def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_samples, reference_genome, viralrecon_version,
+                output_sample_list_path, output_ext_sample_list_path):
     """Create sample table, used to drive the nextflow-based analysis pipelines."""
 
+    lims_demux_io = [(i['uri'], o['uri']) for i, o in lims_process.input_output_maps
+                    if o['output-type'] == "ResultFile" and o['output-generation-type'] == "PerReagentLabel"]
+
     lims_sample_map = dict((s.name, s) for s in lims_samples)
+        
+    # Primary details contains tuples of (name,r1path,r2path,well)
+    primary_details_rows = []
+
+    # Supplementary information is stored in one list of tuples per row, each row just like
+    # common_details below
+    supplementary_details_rows = []
+
+    # Project/Run/etc details
+    common_details = [
+        ('ProjectName',  project.name),
+        ('ProjectSubmitDate', lims_project.open_date),
+        ('SeqRunId',     task.run_id),
+        ('SequencerType', task.instrument),
+        ('ReadLength', get_read_lengths(lims_process, lims_demux_io[0][0])),
+        ('DataAnalysisDate', datetime.date.today()),
+        ('UtilVersion', subprocess.check_output(
+                        ['git', 'describe', '--tags', '--dirty'],
+                        cwd="/data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/util"
+                        ).strip()),
+        ('ReferenceGenome', reference_genome),
+        ('viralreconVersion', viralrecon_version),
+        ('PostConsensusWorkflowVersion', subprocess.check_output(
+                        ['git', 'describe', '--tags', '--dirty'],
+                        cwd="/data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/pangolin"
+                        ).strip())
+    ]
+    for sample in project.samples:
+        # Multiple runs is not supported here
+        r1files = [file for file in sample.files if file.i_read == 1]
+        if len(r1files) != 1: task.fail("Only supports 1 file pair per sample.")
+
+        lims_sample = lims_sample_map.get(sample.name)
+        # Find LIMS demultiplexing information
+        lims_demux_pairs = [(i,o) for i, o in lims_demux_io if o.samples[0].id == lims_sample.id]
+        if len(lims_demux_pairs) != 1:
+            task.fail("Found {} input/output pairs in lims demux step for sample {}, expected 1.".format(
+                len(lims_demux_pairs)),
+                lims_sample.name
+                )
+        lims_lane, lims_demuxfile = lims_demux_pairs[0]
+
+        # Define sample-level details (shared between all lanes)
+        sample_details = [
+            ('Well',            lims_sample.artifact.location[1].replace(":", "")),
+            ('Protocol',        lims_sample.udf.get('Sample prep NSC', 'UNKNOWN')),
+            ('OrigCtValue',     lims_sample.udf.get('Org. Ct value', 0.0)),
+            ('Q30Percent',      lims_demuxfile.udf.get('% Bases >=Q30', '')),
+            ('ClustersPFPercent', lims_lane.udf.get("%PF R1") or lims_lane.location[0].udf.get("%PF R1", '')),
+            ('ClustersRaw',     lims_lane.udf.get("Clusters Raw R1") or lims_lane.location[0].udf.get("Clusters Raw R1", '')),
+            ('PhiXSpikedIn',    lims_lane.udf.get("PhiX %", '')),
+        ]
+        r1path = r1files[0].path
+        r2path = re.sub(r"_R1_001.fastq.gz$", "_R2_001.fastq.gz", r1path)
+        primary_details_rows.append((sample.name, r1path, r2path))
+        supplementary_details_rows.append(sample_details)
+
+    headers = [header for header, value in (common_details + supplementary_details_rows[0])]
+    string_data_rows_cells = [
+                    list(pri) + 
+                    [str(value) for header, value in common_details] + 
+                    [str(value) for header, value in sup]
+                    for pri, sup in zip(primary_details_rows, supplementary_details_rows)
+    ]
     with open(output_sample_list_path, "w") as of:
-        
-        # Primary details contains tuples of (name,r1path,r2path)
-        primary_details_rows = []
-        # Supplementary information is stored in one dict per row
-        supplementary_details_rows = []
-
-        # Project/Run/etc details
-        common_details = {
-            'SeqRunId':     task.run_id,
-            'ProjectName':  project.name
-        }
-        for sample in project.samples:
-            lims_sample = lims_sample_map.get(sample.name)
-
-            # Define sample-level details (shared between all lanes)
-            sample_details = {}
-            if lims_project and lims_sample:
-                sample_details['Protocol'] = lims_sample.udf.get('Sample prep NSC', 'UNKNOWN')
-                sample_details['Well'] = lims_sample.artifact.location[1].replace(":", "")
-                sample_details['OrigCtValue'] = lims_sample.udf.get('Org. Ct value', 0.0)
-
-            # Loop over read 1 files -- usually one, but may have multiple lanes
-            # Multiple runs is not supported here
-            for file in sample.files:
-                if file.i_read == 1:
-                    r1path = file.path
-                    r2path = re.sub(r"_R1_001.fastq.gz$", "_R2_001.fastq.gz", r1path)
-                    primary_details_rows.append((sample.name, r1path, r2path))
-                    supplementary_details_rows.append(dict(
-                        common_details.items() + sample_details.items()
-                    ))
-        
-        suppl_headers = list(sorted(supplementary_details_rows[0]))
-        of.write("sample,fastq_1,fastq_2," + ",".join(suppl_headers) + "\n")
-        for pri, sup in zip(primary_details_rows, supplementary_details_rows):
-            of.write(",".join(list(pri) + [sup[x] for x in suppl_headers]) + "\n")
+        of.write("sample,fastq_1,fastq_2\n")
+        for pv in primary_details_rows:
+            of.write(",".join(pv) + "\n")
+    
+    with open(output_ext_sample_list_path, "w") as of:
+        of.write("sample,fastq_1,fastq_2," + ",".join(headers) + "\n")
+        for row_cells in string_data_rows_cells:
+            of.write(",".join(row_cells) + "\n")
 
 
 def main(task):
@@ -461,10 +534,10 @@ def main(task):
             delivery_external_user(task, lims_project, project_path, "/data/runScratch.boston/mik_data")
         elif project_type == "FHI-Covid19": # Implicitly requires LIMS mode (or we wouldn't have project_type)
             lims_samples = [s for s in l_samples if s.project == lims_project]
-            covid19_seq_delivery(task, project, lims_project, lims_samples, project_path)
+            covid19_seq_delivery(task, project, lims_project, task.process, lims_samples, project_path, nsc.DELIVERY_DIR)
         elif project_type == "MIK-Covid19":
             lims_samples = [s for s in l_samples if s.project == lims_project]
-            covid19_seq_delivery(task, project, lims_project, lims_samples, project_path)
+            covid19_seq_delivery(task, project, lims_project, task.process, lims_samples, project_path)
         elif delivery_type in ["User HDD", "New HDD", "TSD project"]:
             task.info("Hard-linking " + project.name + " to delivery area...")
             delivery_harddrive(project.name, project_path)
