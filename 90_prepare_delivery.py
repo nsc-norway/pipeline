@@ -371,7 +371,7 @@ def get_primers_file_path(task, lims_samples):
     
     primer_files = {
         'Swift SNAP':   '/boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline/util/swift_primers.bed',
-        'NimaGen':      '/boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline/util/nimagen_amplicons.bed'
+        'NimaGen':      '/boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline/util/nimagen_primers.bed'
     }
     sample_prep = next(iter(prep_protocols))
     try:
