@@ -3,13 +3,12 @@
 
 import sys
 import os
-from datetime import date
+from datetime import datetime
 from genologics.lims import *
 from common import nsc, taskmgr
 
 TASK_NAME = '99. Mark "processed"'
-TASK_DESCRIPTION = """Move original run folder into processed/ directory
-                    on primary storage, since we are done with it."""
+TASK_DESCRIPTION = """Tasks to run when demultiplexing step is closed in LIMS."""
 TASK_ARGS = ['src_dir', 'lanes']
 
 
@@ -28,7 +27,13 @@ def main(task):
         #        task.src_dir,
         #        os.path.join(nsc.PRIMARY_STORAGE, "processed", task.run_id)
         #        )
-
+    if task.process:
+        inputs = task.process.all_inputs(unique=True, resolve=True)
+        lims_samples = task.lims.get_batch(set(sample for i in inputs for sample in i.samples))
+        for lims_project in set(sample.project for sample in lims_samples):
+            if lims_project.udf.get('Project type') in ['FHI-Covid19', 'MIK-Covid19']:
+                lims_project.closedate = datetime.now()
+                lims_project.put()
     task.success_finish()
 
 
