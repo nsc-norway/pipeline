@@ -451,7 +451,7 @@ def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_
         sample_details = [
             ('Well',            lims_sample.artifact.location[1].replace(":", "")),
             ('Protocol',        lims_sample.udf.get('Sample prep NSC', 'UNKNOWN')),
-            ('OrigCtValue',     lims_sample.udf.get('Org. Ct value', 0.0)),
+            ('OrigCtValue',     lims_sample.udf.get('Org. Ct value', 'NA')),
             ('Q30Percent',      lims_demuxfile.udf.get('% Bases >=Q30', '')),
             ('ClustersPFPercent', lims_lane.udf.get("%PF R1") or lims_lane.location[0].udf.get("%PF R1", '')),
             ('ClustersRaw',     lims_lane.udf.get("Clusters Raw R1") or lims_lane.location[0].udf.get("Clusters Raw R1", '')),
