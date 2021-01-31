@@ -7,6 +7,8 @@ import sys
 
 # Configure prod or dev
 TAG="dev"
+# Version string to be set by deployment scripts
+VERSION="dev"
 
 try:
     with open("/etc/pipeline-site") as f: 

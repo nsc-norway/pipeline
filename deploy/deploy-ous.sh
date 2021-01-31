@@ -33,7 +33,7 @@ do
 	# pipeline specific
 	deploy_dir=$installation/pipeline
 	TEMP=`mktemp`
-	sed 's/^TAG="dev"$/TAG="prod"/' $deploy_dir/common/nsc.py > $TEMP
+	sed 's/^TAG="dev"$/TAG="prod"/' $deploy_dir/common/nsc.py | sed "s/^VERSION=.*/VERSION='$1'/" > $TEMP
 	cp $TEMP $deploy_dir/common/nsc.py
 	rm $TEMP
 done

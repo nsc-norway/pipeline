@@ -71,7 +71,8 @@ def main(task):
             write_sample_info_table(fname, run_id, project)
 
     software_versions = [
-            ("RTA", utilities.get_rta_version(work_dir))
+            ("RTA", utilities.get_rta_version(work_dir)),
+            ("DemuxScripts", nsc.VERSION)
             ]
     try:
         bcl2fastq_version = utilities.get_bcl2fastq2_version(task.process, work_dir)
