@@ -307,7 +307,7 @@ def delivery_norstore(process, project_name, source_path, task):
         task.warn("Password generation failed: " + str(e))
 
 
-def covid19_seq_delivery(task, project, lims_project, lims_process, lims_samples, project_path, delivery_base_dir):
+def fhi_mik_seq_delivery(task, project, lims_project, lims_process, lims_samples, project_path, delivery_base_dir):
     task.info("Preparing data and scripts for {}...".format(project.name))
     
     #### PROJECT-RELATED PARAMETERS #####
@@ -534,10 +534,10 @@ def main(task):
             delivery_external_user(task, lims_project, project_path, "/data/runScratch.boston/mik_data")
         elif project_type == "FHI-Covid19": # Implicitly requires LIMS mode (or we wouldn't have project_type)
             lims_samples = [s for s in l_samples if s.project == lims_project]
-            covid19_seq_delivery(task, project, lims_project, task.process, lims_samples, project_path, nsc.DELIVERY_DIR)
+            fhi_mik_seq_delivery(task, project, lims_project, task.process, lims_samples, project_path, nsc.DELIVERY_DIR)
         elif project_type == "MIK-Covid19":
             lims_samples = [s for s in l_samples if s.project == lims_project]
-            covid19_seq_delivery(task, project, lims_project, task.process, lims_samples, project_path)
+            fhi_mik_seq_delivery(task, project, lims_project, task.process, lims_samples, project_path, nsc.DELIVERY_DIR)
         elif delivery_type in ["User HDD", "New HDD", "TSD project"]:
             task.info("Hard-linking " + project.name + " to delivery area...")
             delivery_harddrive(project.name, project_path)
