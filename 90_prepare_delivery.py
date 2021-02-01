@@ -336,6 +336,7 @@ def fhi_mik_seq_delivery(task, project, lims_project, lims_process, lims_samples
                     --fasta /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/util/{} \\
                     --skip_kraken2 \\
                     --skip_assembly \\
+                    --custom_config_base /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/util \\
                     --max_memory '256.GB' \\
                     --max_cpus 110 \\
                     -resume
