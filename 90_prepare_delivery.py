@@ -343,7 +343,7 @@ def fhi_mik_seq_delivery(task, project, lims_project, lims_process, lims_samples
 """.format(viralrecon_version, primers_file, reference_genome)
     
     script2 = """/data/common/tools/nscbin/nextflow run /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/pangolin/main.nf \\
-                    -with-singularity /data/runScratch.boston/analysis/pipelines/2021_covid19/container-images/pangolin_nsc_20210129.sif \\
+                    -with-singularity /data/runScratch.boston/analysis/pipelines/2021_covid19/container-images/pangolin.sif \\
                     --viralrecon_folder "{}" \\
                     --samplelist extendedSampleList.csv \\
                     -resume
