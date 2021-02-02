@@ -349,9 +349,20 @@ def fhi_mik_seq_delivery(task, project, lims_project, lims_process, lims_samples
                     -resume
     """.format(output_path)
 
+    script3 = """/data/common/tools/nscbin/nextflow run /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/ivar-nextclade/main.nf \\
+                    --fasta "{}" \\
+                    --viralrecon_folder "{}" \\
+                    --samplelist extendedSampleList.csv \\
+                    -resume
+    """.format(reference_genome, output_path)
+    
+    # Correct the permissions on this file, it's too restrictive
+    script4 = """chmod 664 results/pipeline_info/pipeline_dag.dot
+    """
+
     script_file = os.path.join(output_path, "script.sh")
     log_file = os.path.join(output_path, "log.txt")
-    open(script_file, "w").write(script1 + script2)
+    open(script_file, "w").write(script1 + script2 + script3 + script4)
     task.info("Starting analysis for {}...".format(project.name))
     subprocess.check_call(
             ["sbatch",
@@ -372,7 +383,7 @@ def get_primers_file_path(task, lims_samples):
     
     primer_files = {
         'Swift SNAP':   '/boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline/util/swift_primers.bed',
-        'NimaGen':      '/boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline/util/nimagen_primers.bed'
+        'NimaGen':      '/boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline/util/nimagen_primers_v2.bed'
     }
     sample_prep = next(iter(prep_protocols))
     try:
@@ -535,10 +546,10 @@ def main(task):
             delivery_external_user(task, lims_project, project_path, "/data/runScratch.boston/mik_data")
         elif project_type == "FHI-Covid19": # Implicitly requires LIMS mode (or we wouldn't have project_type)
             lims_samples = [s for s in l_samples if s.project == lims_project]
-            fhi_mik_seq_delivery(task, project, lims_project, task.process, lims_samples, project_path, nsc.DELIVERY_DIR)
+            fhi_mik_seq_delivery(task, project, lims_project, task.process, lims_samples, project_path, "/data/runScratch.boston/analysis/covid")
         elif project_type == "MIK-Covid19":
             lims_samples = [s for s in l_samples if s.project == lims_project]
-            fhi_mik_seq_delivery(task, project, lims_project, task.process, lims_samples, project_path, nsc.DELIVERY_DIR)
+            fhi_mik_seq_delivery(task, project, lims_project, task.process, lims_samples, project_path, "/data/runScratch.boston/analysis/covid")
         elif delivery_type in ["User HDD", "New HDD", "TSD project"]:
             task.info("Hard-linking " + project.name + " to delivery area...")
             delivery_harddrive(project.name, project_path)
