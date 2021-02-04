@@ -332,8 +332,8 @@ def fhi_mik_seq_delivery(task, project, lims_project, lims_process, lims_samples
                     -profile singularity \\
                     --input sampleList.csv \\
                     --protocol amplicon \\
-                    --amplicon_bed {} \\
-                    --fasta /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/util/{} \\
+                    --amplicon_bed "{}" \\
+                    --fasta "/data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/util/{}" \\
                     --skip_kraken2 \\
                     --skip_assembly \\
                     --custom_config_base /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/util \\
@@ -464,10 +464,11 @@ def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_
             ('Well',            lims_sample.artifact.location[1].replace(":", "")),
             ('Protocol',        lims_sample.udf.get('Sample prep NSC', 'UNKNOWN')),
             ('OrigCtValue',     lims_sample.udf.get('Org. Ct value', 'NA')),
-            ('Q30Percent',      lims_demuxfile.udf.get('% Bases >=Q30', '')),
-            ('ClustersPFPercent', lims_lane.udf.get("%PF R1") or lims_lane.location[0].udf.get("%PF R1", '')),
-            ('ClustersRaw',     lims_lane.udf.get("Clusters Raw R1") or lims_lane.location[0].udf.get("Clusters Raw R1", '')),
-            ('PhiXSpikedIn',    lims_lane.udf.get("PhiX %", '')),
+            ('NumReadsSample',      lims_demuxfile.udf.get('# Reads PF', '')),
+            ('Q30PercentSample',      lims_demuxfile.udf.get('% Bases >=Q30', '')),
+            ('ClustersPFPercentRun', lims_lane.udf.get("%PF R1") or lims_lane.location[0].udf.get("%PF R1", '')),
+            ('ClustersRawRun',     lims_lane.udf.get("Clusters Raw R1") or lims_lane.location[0].udf.get("Clusters Raw R1", '')),
+            ('PhiXSpikedInLane',    lims_lane.udf.get("PhiX %", '')),
         ]
         r1path = r1files[0].path
         r2path = re.sub(r"_R1_001.fastq.gz$", "_R2_001.fastq.gz", r1path)
