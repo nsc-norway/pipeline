@@ -391,23 +391,6 @@ def get_primers_file_path(task, lims_samples):
     except KeyError:
         task.fail("Primers file not known for prep '{}'.".format(sample_prep))
 
-def get_read_lengths(lims_demux_process, lims_lane):
-    if task.instrument == "novaseq":
-        pp = lims_lane.parent_process
-        return "-".join(str(x) for x in [
-            pp.udf.get('Read 1 Cycles'),
-            pp.udf.get('Index Read 1'),
-            pp.udf.get('Index Read 2'),
-            pp.udf.get('Read 2 Cycles'),
-        ])
-    else:
-        sp = utilities.get_sequencing_process(lims_demux_process)
-        return "-".join(str(x) for x in [
-            sp.udf.get('Read 1 Cycles'),
-            sp.udf.get('Index 1 Read Cycles'),
-            sp.udf.get('Index 2 Read Cycles'),
-            sp.udf.get('Read 2 Cycles'),
-        ])
 
 def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_samples, reference_genome, viralrecon_version,
                 output_sample_list_path, output_ext_sample_list_path):
@@ -419,30 +402,13 @@ def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_
     lims_sample_map = dict((s.name, s) for s in lims_samples)
         
     # Primary details contains tuples of (name,r1path,r2path,well)
-    primary_details_rows = []
-
-    # Supplementary information is stored in one list of tuples per row, each row just like
-    # common_details below
-    supplementary_details_rows = []
+    sample_details_rows = []
 
     # Project/Run/etc details
     common_details = [
         ('ProjectName',  project.name),
-        ('ProjectSubmitDate', lims_project.open_date),
         ('SeqRunId',     task.run_id),
         ('SequencerType', task.instrument),
-        ('ReadLength', get_read_lengths(lims_process, lims_demux_io[0][0])),
-        ('DataAnalysisDate', datetime.date.today()),
-        ('UtilVersion', subprocess.check_output(
-                        ['git', 'describe', '--tags', '--dirty'],
-                        cwd="/data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/util"
-                        ).strip()),
-        ('ReferenceGenome', reference_genome),
-        ('viralreconVersion', viralrecon_version),
-        ('PostConsensusWorkflowVersion', subprocess.check_output(
-                        ['git', 'describe', '--tags', '--dirty'],
-                        cwd="/data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/pangolin"
-                        ).strip())
     ]
     for sample in project.samples:
         # Multiple runs is not supported here
@@ -459,36 +425,27 @@ def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_
                 )
         lims_lane, lims_demuxfile = lims_demux_pairs[0]
 
-        # Define sample-level details (shared between all lanes)
-        sample_details = [
-            ('Well',            lims_sample.artifact.location[1].replace(":", "")),
-            ('Protocol',        lims_sample.udf.get('Sample prep NSC', 'UNKNOWN')),
-            ('OrigCtValue',     lims_sample.udf.get('Org. Ct value', 'NA')),
-            ('NumReadsSample',      lims_demuxfile.udf.get('# Reads PF', '')),
-            ('Q30PercentSample',      lims_demuxfile.udf.get('% Bases >=Q30', '')),
-            ('ClustersPFPercentRun', lims_lane.udf.get("%PF R1") or lims_lane.location[0].udf.get("%PF R1", '')),
-            ('ClustersRawRun',     lims_lane.udf.get("Clusters Raw R1") or lims_lane.location[0].udf.get("Clusters Raw R1", '')),
-            ('PhiXSpikedInLane',    lims_lane.udf.get("PhiX %", '')),
-        ]
         r1path = r1files[0].path
         r2path = re.sub(r"_R1_001.fastq.gz$", "_R2_001.fastq.gz", r1path)
-        primary_details_rows.append((sample.name, r1path, r2path))
-        supplementary_details_rows.append(sample_details)
 
-    headers = [header for header, value in (common_details + supplementary_details_rows[0])]
+        # Define sample-level details (shared between all lanes)
+        sample_details = [
+            ('sample',          sample.name),
+            ('Well',            lims_sample.artifact.location[1].replace(":", "")),
+            ('OrigCtValue',     lims_sample.udf.get('Org. Ct value', 'NA')),
+            ('fastq_1',         r1path),
+            ('fastq_2',         r2path),
+        ]
+        sample_details_rows.append(sample_details)
+
+    headers = [header for header, value in (sample_details_rows[0] + common_details)]
     string_data_rows_cells = [
-                    list(pri) + 
-                    [str(value) for header, value in common_details] + 
-                    [str(value) for header, value in sup]
-                    for pri, sup in zip(primary_details_rows, supplementary_details_rows)
+                    [str(value) for header, value in sam] +
+                    [str(value) for header, value in common_details]
+                    for sam in sample_details_rows
     ]
     with open(output_sample_list_path, "w") as of:
-        of.write("sample,fastq_1,fastq_2\n")
-        for pv in primary_details_rows:
-            of.write(",".join(pv) + "\n")
-    
-    with open(output_ext_sample_list_path, "w") as of:
-        of.write("sample,fastq_1,fastq_2," + ",".join(headers) + "\n")
+        of.write(",".join(headers) + "\n")
         for row_cells in string_data_rows_cells:
             of.write(",".join(row_cells) + "\n")
 
