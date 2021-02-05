@@ -404,12 +404,6 @@ def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_
     # Primary details contains tuples of (name,r1path,r2path,well)
     sample_details_rows = []
 
-    # Project/Run/etc details
-    common_details = [
-        ('ProjectName',  project.name),
-        ('SeqRunId',     task.run_id),
-        ('SequencerType', task.instrument),
-    ]
     for sample in project.samples:
         # Multiple runs is not supported here
         r1files = [file for file in sample.files if file.i_read == 1]
@@ -433,15 +427,17 @@ def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_
             ('sample',          sample.name),
             ('Well',            lims_sample.artifact.location[1].replace(":", "")),
             ('OrigCtValue',     lims_sample.udf.get('Org. Ct value', 'NA')),
+            ('ProjectName',  project.name),
+            ('SeqRunId',     task.run_id),
+            ('SequencerType', task.instrument),
             ('fastq_1',         r1path),
             ('fastq_2',         r2path),
         ]
         sample_details_rows.append(sample_details)
 
-    headers = [header for header, value in (sample_details_rows[0] + common_details)]
+    headers = [header for header, value in sample_details_rows[0]]
     string_data_rows_cells = [
-                    [str(value) for header, value in sam] +
-                    [str(value) for header, value in common_details]
+                    [str(value) for header, value in sam]
                     for sam in sample_details_rows
     ]
     with open(output_sample_list_path, "w") as of:
