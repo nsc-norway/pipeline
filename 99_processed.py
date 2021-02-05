@@ -31,7 +31,8 @@ def main(task):
         inputs = task.process.all_inputs(unique=True, resolve=True)
         lims_samples = task.lims.get_batch(set(sample for i in inputs for sample in i.samples))
         for lims_project in set(sample.project for sample in lims_samples):
-            if lims_project.udf.get('Project type') in ['FHI-Covid19', 'MIK-Covid19']:
+            # Have to check for existence; controls don't have project
+            if lims_project and lims_project.udf.get('Project type') in ['FHI-Covid19', 'MIK-Covid19']:
                 lims_project.closedate = datetime.now()
                 lims_project.put()
     task.success_finish()
