@@ -327,42 +327,19 @@ def fhi_mik_seq_delivery(task, project, lims_project, lims_process, lims_samples
 
     #### RUN viralrecon ####
     subprocess.check_call(["/bin/cp", "-rl", project_path, output_path])
-    script1 = """/data/common/tools/nscbin/nextflow run /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/viralrecon/main.nf \\
-                    -with-singularity /data/runScratch.boston/analysis/pipelines/2021_covid19/container-images/nfcore_viralrecon_{}.sif \\
-                    -profile singularity \\
-                    --input sampleList.csv \\
-                    --protocol amplicon \\
-                    --amplicon_bed "{}" \\
-                    --fasta "/data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/util/{}" \\
-                    --skip_kraken2 \\
-                    --skip_assembly \\
-                    --custom_config_base /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/util \\
-                    --max_memory '256.GB' \\
-                    --max_cpus 110 \\
-                    -resume
-""".format(viralrecon_version, primers_file, reference_genome)
-    
-    script2 = """/data/common/tools/nscbin/nextflow run /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/pangolin/main.nf \\
-                    -with-singularity /data/runScratch.boston/analysis/pipelines/2021_covid19/container-images/pangolin.sif \\
-                    --viralrecon_folder "{}" \\
-                    --samplelist extendedSampleList.csv \\
-                    -resume
-    """.format(output_path)
-
-    script3 = """/data/common/tools/nscbin/nextflow run /data/runScratch.boston/analysis/pipelines/2021_covid19/nsc_pipeline/ivar-nextclade/main.nf \\
-                    --fasta "{}" \\
-                    --viralrecon_folder "{}" \\
-                    --samplelist extendedSampleList.csv \\
-                    -resume
-    """.format(reference_genome, output_path)
-    
-    # Correct the permissions on this file, it's too restrictive
-    script4 = """chmod 664 results/pipeline_info/pipeline_dag.dot
-    """
+    script1 = """
+/data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v2/main.nf \\
+    --outpath "{}" \\
+    --samplelist sampleList.csv \\
+    -resume
+python /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v2/bin/Report_generator.py \\
+    "{}" \\
+    sampleList.csv
+    """.format(output_path, output_path)
 
     script_file = os.path.join(output_path, "script.sh")
     log_file = os.path.join(output_path, "log.txt")
-    open(script_file, "w").write(script1 + script2 + script3 + script4)
+    open(script_file, "w").write(script1)
     task.info("Starting analysis for {}...".format(project.name))
     subprocess.check_call(
             ["sbatch",
