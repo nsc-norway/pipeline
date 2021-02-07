@@ -325,20 +325,27 @@ def fhi_mik_seq_delivery(task, project, lims_project, lims_process, lims_samples
                          os.path.join(output_path, "sampleList.csv"),
                          os.path.join(output_path, "extendedSampleList.csv"))
 
+    ### DEFINE PRIMER TOOL ARG FOR NEXTLOW PIPELINE ###
+    trim_tool = "primerclip"
+
     #### RUN viralrecon ####
     subprocess.check_call(["/bin/cp", "-rl", project_path, output_path])
     script1 = """
 /data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v2/main.nf \\
-    --outpath "{}" \\
+    --outpath "$PWD" \\
     --samplelist sampleList.csv \\
-    -resume
+    --trim_tool "{}" \\
+    -resume > log.txt
+
+grep expected log.txt | cut -f3 -d'(' | cut -f1 -d')' | sort | uniq > failed_samples.txt
+
 python /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v2/bin/Report_generator.py \\
-    "{}" \\
+    "$PWD" \\
     sampleList.csv
-    """.format(output_path, output_path)
+    """.format(trim_tool)
 
     script_file = os.path.join(output_path, "script.sh")
-    log_file = os.path.join(output_path, "log.txt")
+    log_file = os.path.join(output_path, "control-job-log.txt")
     open(script_file, "w").write(script1)
     task.info("Starting analysis for {}...".format(project.name))
     subprocess.check_call(
