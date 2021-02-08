@@ -3,7 +3,7 @@
 
 import sys
 import os
-from datetime import datetime
+import datetime
 from genologics.lims import *
 from common import nsc, taskmgr
 
@@ -33,7 +33,7 @@ def main(task):
         for lims_project in set(sample.project for sample in lims_samples):
             # Have to check for existence; controls don't have project
             if lims_project and lims_project.udf.get('Project type') in ['FHI-Covid19', 'MIK-Covid19']:
-                lims_project.closedate = datetime.now()
+                lims_project.close_date = datetime.date.today()
                 lims_project.put()
     task.success_finish()
 
