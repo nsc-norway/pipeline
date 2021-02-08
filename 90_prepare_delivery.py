@@ -384,7 +384,19 @@ def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_
                     if o['output-type'] == "ResultFile" and o['output-generation-type'] == "PerReagentLabel"]
 
     lims_sample_map = dict((s.name, s) for s in lims_samples)
-        
+    
+    # Figure out "additional fields" in LIMS to add as headers
+    additional_columns_strings = [
+        s.udf["Additional columns (MIK)"]
+        for s in lims_sample_map.values()
+        if 'Additional columns (MIK)' in s.udf
+    ]
+    additional_columns = sorted(list(set(
+        key_val.split("=")[0]
+        for s in additional_columns_strings
+        for key_val in s.split(";")
+    )))
+
     # Primary details contains tuples of (name,r1path,r2path,well)
     sample_details_rows = []
 
@@ -417,6 +429,14 @@ def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_
             ('fastq_1',         r1path),
             ('fastq_2',         r2path),
         ]
+        additional_column_map = dict(
+            key_val.split("=", 1)
+            for key_val in
+                lims_sample.udf.get('Additional columns (MIK)', '').split(";")
+            if '=' in key_val
+        )
+        for colname in additional_columns:
+            sample_details.append((colname, additional_column_map.get(colname, '')))
         sample_details_rows.append(sample_details)
 
     headers = [header for header, value in sample_details_rows[0]]
