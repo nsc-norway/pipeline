@@ -420,10 +420,13 @@ def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_
         sample_details_rows.append(sample_details)
 
     headers = [header for header, value in sample_details_rows[0]]
-    string_data_rows_cells = [
+    well_col = headers.index("Well")
+    def well_col_order(row):
+        return (int(row[well_col][1:]), row[well_col][0])
+    string_data_rows_cells = sorted([
                     [str(value) for header, value in sam]
                     for sam in sample_details_rows
-    ]
+    ], key=well_col_order)
     with open(output_sample_list_path, "w") as of:
         of.write(",".join(headers) + "\n")
         for row_cells in string_data_rows_cells:
