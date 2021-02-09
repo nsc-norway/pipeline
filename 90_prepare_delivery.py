@@ -331,15 +331,16 @@ def fhi_mik_seq_delivery(task, project, lims_project, lims_process, lims_samples
     #### RUN viralrecon ####
     subprocess.check_call(["/bin/cp", "-rl", project_path, output_path])
     script1 = """
-/data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v3/main.nf \\
+/data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v3.1/main.nf \\
     --outpath "$PWD" \\
     --samplelist sampleList.csv \\
     --trim_tool "{}" \\
+    --align_tool "bowtie2" \\
     -resume > log.txt
 
 grep expected log.txt | cut -f3 -d'(' | cut -f1 -d')' | sort | uniq > failed_samples.txt
 
-python /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v3/bin/Report_generator_v3.py \\
+python /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v3.1/bin/Report_generator_v3.1.py \\
     "$PWD" \\
     sampleList.csv
     """.format(trim_tool)
