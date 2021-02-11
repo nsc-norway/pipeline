@@ -336,17 +336,13 @@ def fhi_mik_seq_delivery(task, project, lims_project, lims_process, lims_samples
     --samplelist sampleList.csv \\
     --trim_tool "{}" \\
     --align_tool "bowtie2" \\
-    -resume > log.txt
+    -resume > pipeline_log.txt
 
-grep expected log.txt | cut -f3 -d'(' | cut -f1 -d')' | sort | uniq > failed_samples.txt
-
-python /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v3.1/bin/Report_generator_v3.1.py \\
-    "$PWD" \\
-    sampleList.csv
+python /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v3.1/bin/Report_generator_v3.1.2.py > reportgen_log.txt
     """.format(trim_tool)
 
     script_file = os.path.join(output_path, "script.sh")
-    log_file = os.path.join(output_path, "control-job-log.txt")
+    log_file = os.path.join(output_path, "control_job_log.txt")
     open(script_file, "w").write(script1)
     task.info("Starting analysis for {}...".format(project.name))
     subprocess.check_call(
@@ -385,18 +381,6 @@ def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_
                     if o['output-type'] == "ResultFile" and o['output-generation-type'] == "PerReagentLabel"]
 
     lims_sample_map = dict((s.name, s) for s in lims_samples)
-    
-    # Figure out "additional fields" in LIMS to add as headers
-    additional_columns_strings = [
-        s.udf["Additional columns (MIK)"]
-        for s in lims_sample_map.values()
-        if 'Additional columns (MIK)' in s.udf
-    ]
-    additional_columns = sorted(list(set(
-        key_val.split("=")[0]
-        for s in additional_columns_strings
-        for key_val in s.split(";")
-    )))
 
     # Primary details contains tuples of (name,r1path,r2path,well)
     sample_details_rows = []
@@ -429,15 +413,8 @@ def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_
             ('SequencerType', task.instrument),
             ('fastq_1',         r1path),
             ('fastq_2',         r2path),
+            ('MIKInputCols',    lims_sample.udf.get('Additional columns (MIK)', '')),
         ]
-        additional_column_map = dict(
-            key_val.split("=", 1)
-            for key_val in
-                lims_sample.udf.get('Additional columns (MIK)', '').split(";")
-            if '=' in key_val
-        )
-        for colname in additional_columns:
-            sample_details.append((colname, additional_column_map.get(colname, '')))
         sample_details_rows.append(sample_details)
 
     headers = [header for header, value in sample_details_rows[0]]
