@@ -331,14 +331,14 @@ def fhi_mik_seq_delivery(task, project, lims_project, lims_process, lims_samples
     #### RUN viralrecon ####
     subprocess.check_call(["/bin/cp", "-rl", project_path, output_path])
     script1 = """
-/data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v3.1/main.nf \\
+/data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v4/main.nf \\
     --outpath "$PWD" \\
     --samplelist sampleList.csv \\
     --trim_tool "{}" \\
     --align_tool "bowtie2" \\
     -resume > pipeline_log.txt
 
-python /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v3.1/bin/Report_generator_v3.1.2.py > reportgen_log.txt
+/data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/report_generator_v4/main.nf
     """.format(trim_tool)
 
     script_file = os.path.join(output_path, "script.sh")
