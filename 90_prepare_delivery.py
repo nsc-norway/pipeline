@@ -329,16 +329,16 @@ def fhi_mik_seq_delivery(task, project, lims_project, lims_process, lims_samples
     trim_tool = "primerclip"
 
     #### RUN viralrecon ####
-    subprocess.check_call(["/bin/cp", "-rl", project_path, output_path])
+    subprocess.check_call(["/bin/cp", "-rl", project_path, delivery_base_dir])
     script1 = """
-/data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v4/main.nf \\
+/data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v5/main.nf \\
     --outpath "$PWD" \\
     --samplelist sampleList.csv \\
     --trim_tool "{}" \\
     --align_tool "bowtie2" \\
     -resume > pipeline_log.txt
 
-/data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/report_generator_v4/main.nf
+/data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/report_generator_v5/main.nf
     """.format(trim_tool)
 
     script_file = os.path.join(output_path, "script.sh")
@@ -400,7 +400,7 @@ def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_
                 )
         lims_lane, lims_demuxfile = lims_demux_pairs[0]
 
-        r1path = r1files[0].path
+        r1path = "../" + r1files[0].path
         r2path = re.sub(r"_R1_001.fastq.gz$", "_R2_001.fastq.gz", r1path)
 
         # Define sample-level details (shared between all lanes)
