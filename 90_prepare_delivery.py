@@ -311,17 +311,13 @@ def fhi_mik_seq_delivery(task, project, lims_project, lims_process, lims_samples
     task.info("Preparing data and scripts for {}...".format(project.name))
     
     #### PROJECT-RELATED PARAMETERS #####
-    primers_file = get_primers_file_path(task, lims_samples)
     proj_dir_name = os.path.basename(project_path)
     output_path = os.path.join(delivery_base_dir, project.name)
 
     os.mkdir(output_path)
 
-    reference_genome = "NC_045512.2.fasta"
-    viralrecon_version = "1.1.0"
-
     #### SAMPLE LIST ####
-    covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_samples, reference_genome, viralrecon_version,
+    covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_samples,
                          os.path.join(output_path, "sampleList.csv"),
                          os.path.join(output_path, "extendedSampleList.csv"))
 
@@ -351,25 +347,7 @@ def fhi_mik_seq_delivery(task, project, lims_project, lims_process, lims_samples
             cwd=output_path)
 
 
-def get_primers_file_path(task, lims_samples):
-    """Ensure all samples have the same prep type, and return primers file"""
-
-    prep_protocols = set(s.udf.get('Sample prep NSC') for s in lims_samples)
-    if len(prep_protocols) != 1 or not next(iter(prep_protocols)):
-        task.fail("Require exactly one Sample prep, found: ()".format(list(prep_protocols)))
-    
-    primer_files = {
-        'Swift SNAP':   '/boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline/util/swift_primers.bed',
-        'NimaGen':      '/boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline/util/nimagen_primers_v2.bed'
-    }
-    sample_prep = next(iter(prep_protocols))
-    try:
-        return primer_files[sample_prep]
-    except KeyError:
-        task.fail("Primers file not known for prep '{}'.".format(sample_prep))
-
-
-def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_samples, reference_genome, viralrecon_version,
+def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_samples,
                 output_sample_list_path, output_ext_sample_list_path):
     """Create sample table, used to drive the nextflow-based analysis pipelines."""
 
