@@ -309,7 +309,10 @@ def delivery_norstore(process, project_name, source_path, task):
 
 def fhi_mik_seq_delivery(task, project, lims_project, lims_process, lims_samples, project_path, delivery_base_dir):
     task.info("Preparing data and scripts for {}...".format(project.name))
-    
+
+    if not re.match(r"[A-Za-z_0-9-]+$", project.name):
+        task.fail("fhi_mik_seq_delivery: Unacceptable project name {}.".format(project.name))
+
     #### PROJECT-RELATED PARAMETERS #####
     proj_dir_name = os.path.basename(project_path)
     output_path = os.path.join(delivery_base_dir, project.name)
@@ -323,7 +326,9 @@ def fhi_mik_seq_delivery(task, project, lims_project, lims_process, lims_samples
 
     #### RUN viralrecon ####
     subprocess.check_call(["/bin/cp", "-rl", project_path, delivery_base_dir])
-    script1 = """
+    script1 = """#!/bin/bash
+set -e
+
 /data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v7/main.nf \\
     --outpath "$PWD" \\
     --samplelist sampleList.csv \\
@@ -331,7 +336,15 @@ def fhi_mik_seq_delivery(task, project, lims_project, lims_process, lims_samples
     -resume > pipeline_log.txt
 
 /data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/report_generator_v7/main.nf
-    """
+
+rm -r work .nextflow*
+(cd ../ ;
+    tar cf {analysis_dir}.tar {analysis_dir}
+    md5sum {analysis_dir}.tar > {analysis_dir}.tar.md5
+    tar cf {fastq_dir}.tar {fastq_dir}
+    md5sum {fastq_dir}.tar > {fastq_dir}.tar.md5
+    )
+    """.format(analysis_dir=project.name, fastq_dir=proj_dir_name)
 
     script_file = os.path.join(output_path, "script.sh")
     log_file = os.path.join(output_path, "control_job_log.txt")
