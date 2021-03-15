@@ -307,7 +307,7 @@ def delivery_norstore(process, project_name, source_path, task):
         task.warn("Password generation failed: " + str(e))
 
 
-def fhi_mik_seq_delivery(task, project, lims_project, lims_process, lims_samples, project_path, delivery_base_dir):
+def fhi_mik_seq_delivery(task, project_type, project, lims_project, lims_process, lims_samples, project_path, delivery_base_dir):
     task.info("Preparing data and scripts for {}...".format(project.name))
 
     if not re.match(r"[A-Za-z_0-9-]+$", project.name):
@@ -336,19 +336,41 @@ set -e
     -resume > pipeline_log.txt
 
 /data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/report_generator_v7/main.nf
-
 rm -r work .nextflow*
+"""
+    if project_type == "FHI-Covid19":
+        script2 = """
 (cd ../ ;
-    tar cf {analysis_dir}.tar {analysis_dir}
-    md5sum {analysis_dir}.tar > {analysis_dir}.tar.md5
-    tar cf {fastq_dir}.tar {fastq_dir}
+    tar cf for_FHI_TSD_1/{analysis_dir}_variants.tar {analysis_dir}/results/*.tsv {analysis_dir}/pipeline_report_log.txt {analysis_dir}/results/4_consensus/ivar/ {analysis_dir}/results/3_variants/ivar/
+    tar cf for_FHI_TSD_2/{analysis_dir}.tar {analysis_dir}
+    tar cf for_FHI_TSD_2/{fastq_dir}.tar {fastq_dir}
+    cd for_FHI_TSD_1/
+    md5sum {analysis_dir}_variants.tar > {analysis_dir}_variants.tar.md5
+    cd ../for_FHI_TSD_2/
     md5sum {fastq_dir}.tar > {fastq_dir}.tar.md5
+    md5sum {analysis_dir}.tar > {analysis_dir}.tar.md5
     )
-    """.format(analysis_dir=project.name, fastq_dir=proj_dir_name)
+""".format(analysis_dir=project.name, fastq_dir=proj_dir_name)
+
+    elif project_type == "MIK-Covid19":
+        script2 = """
+(cd ../ ;
+    ln -s ../{analysis_dir} for_MIK_IronKey_1
+    ln -s ../{fastq_dir} for_MIK_IronKey_2
+    tar cf for_FHI_TSD_1/{analysis_dir}_variants.tar {analysis_dir}/results/*.tsv {analysis_dir}/pipeline_report_log.txt {analysis_dir}/results/4_consensus/ivar/ {analysis_dir}/results/3_variants/ivar/
+    tar cf for_FHI_TSD_2/{analysis_dir}.tar {analysis_dir}
+    tar cf for_FHI_TSD_2/{fastq_dir}.tar {fastq_dir}
+    cd for_FHI_TSD_1/
+    md5sum {analysis_dir}_variants.tar > {analysis_dir}_variants.tar.md5
+    cd ../for_FHI_TSD_2/
+    md5sum {fastq_dir}.tar > {fastq_dir}.tar.md5
+    md5sum {analysis_dir}.tar > {analysis_dir}.tar.md5
+    )
+""".format(analysis_dir=project.name, fastq_dir=proj_dir_name)
 
     script_file = os.path.join(output_path, "script.sh")
     log_file = os.path.join(output_path, "control_job_log.txt")
-    open(script_file, "w").write(script1)
+    open(script_file, "w").write(script1 + script2)
     task.info("Starting analysis for {}...".format(project.name))
     subprocess.check_call(
             ["sbatch",
@@ -472,10 +494,10 @@ def main(task):
             delivery_external_user(task, lims_project, project_path, "/data/runScratch.boston/mik_data")
         elif project_type == "FHI-Covid19": # Implicitly requires LIMS mode (or we wouldn't have project_type)
             lims_samples = [s for s in l_samples if s.project == lims_project]
-            fhi_mik_seq_delivery(task, project, lims_project, task.process, lims_samples, project_path, "/data/runScratch.boston/analysis/covid")
+            fhi_mik_seq_delivery(task, project_type, project, lims_project, task.process, lims_samples, project_path, "/data/runScratch.boston/analysis/covid")
         elif project_type == "MIK-Covid19":
             lims_samples = [s for s in l_samples if s.project == lims_project]
-            fhi_mik_seq_delivery(task, project, lims_project, task.process, lims_samples, project_path, "/data/runScratch.boston/analysis/covid")
+            fhi_mik_seq_delivery(task, project_type, project, lims_project, task.process, lims_samples, project_path, "/data/runScratch.boston/analysis/covid")
         elif delivery_type in ["User HDD", "New HDD", "TSD project"]:
             task.info("Hard-linking " + project.name + " to delivery area...")
             delivery_harddrive(project.name, project_path)
