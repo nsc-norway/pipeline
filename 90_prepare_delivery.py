@@ -341,7 +341,7 @@ rm -r work .nextflow*
     if project_type == "FHI-Covid19":
         script2 = """
 (cd ../ ;
-    tar cf for_FHI_TSD_1/{analysis_dir}_variants.tar {analysis_dir}/results/*.tsv {analysis_dir}/pipeline_report_log.txt {analysis_dir}/results/4_consensus/ivar/ {analysis_dir}/results/3_variants/ivar/
+    tar cf for_FHI_TSD_1/{analysis_dir}_variants.tar {analysis_dir}/results/*.tsv {analysis_dir}/pipeline_report_log.txt {analysis_dir}/results/4_consensus/ivar/ {analysis_dir}/results/3_variants/ivar/ {analysis_dir}/results/9_QC/
     tar cf for_FHI_TSD_2/{analysis_dir}.tar {analysis_dir}
     tar cf for_FHI_TSD_2/{fastq_dir}.tar {fastq_dir}
     cd for_FHI_TSD_1/
@@ -355,9 +355,9 @@ rm -r work .nextflow*
     elif project_type == "MIK-Covid19":
         script2 = """
 (cd ../ ;
-    ln -s ../{analysis_dir} for_MIK_IronKey_1
-    ln -s ../{fastq_dir} for_MIK_IronKey_2
-    tar cf for_FHI_TSD_1/{analysis_dir}_variants.tar {analysis_dir}/results/*.tsv {analysis_dir}/pipeline_report_log.txt {analysis_dir}/results/4_consensus/ivar/ {analysis_dir}/results/3_variants/ivar/
+    cp -rl ../{analysis_dir} for_MIK_IronKey_1
+    cp -rl ../{fastq_dir} for_MIK_IronKey_2
+    tar cf for_FHI_TSD_1/{analysis_dir}_variants.tar {analysis_dir}/results/*.tsv {analysis_dir}/pipeline_report_log.txt {analysis_dir}/results/4_consensus/ivar/ {analysis_dir}/results/3_variants/ivar/ {analysis_dir}/results/9_QC/
     tar cf for_FHI_TSD_2/{analysis_dir}.tar {analysis_dir}
     tar cf for_FHI_TSD_2/{fastq_dir}.tar {fastq_dir}
     cd for_FHI_TSD_1/
