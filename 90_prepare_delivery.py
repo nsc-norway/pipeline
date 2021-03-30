@@ -329,48 +329,50 @@ def fhi_mik_seq_delivery(task, project_type, project, lims_project, lims_process
     script1 = """#!/bin/bash
 set -e
 
-/data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v7/main.nf \\
+# Make tar file with fastqs in parallel with everything else
+( cd .. && tar cf for_FHI_TSD_2/{fastq_dir}.tar {fastq_dir} && cd for_FHI_TSD_2/ && md5sum {fastq_dir}.tar > {fastq_dir}.tar.md5 ) &
+
+"""
+    if project_type == "MIK-Covid19":
+        script1 += """
+(cd .. && cp -rl {fastq_dir} for_MIK_IronKey_2) &
+"""
+    script1 += """
+
+# Run workflow
+/data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v8/main.nf \\
     --outpath "$PWD" \\
     --samplelist sampleList.csv \\
     --align_tool "bowtie2" \\
     -resume > pipeline_log.txt
 
-/data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/report_generator_v7/main.nf
-rm -r work .nextflow*
-"""
-    if project_type == "FHI-Covid19":
-        script2 = """
-(cd ../ ;
-    tar cf for_FHI_TSD_1/{analysis_dir}_variants.tar {analysis_dir}/results/*.tsv {analysis_dir}/pipeline_report_log.txt {analysis_dir}/results/4_consensus/ivar/ {analysis_dir}/results/3_variants/ivar/ {analysis_dir}/results/9_QC/
-    tar cf for_FHI_TSD_2/{analysis_dir}.tar {analysis_dir}
-    tar cf for_FHI_TSD_2/{fastq_dir}.tar {fastq_dir}
-    cd for_FHI_TSD_1/
-    md5sum {analysis_dir}_variants.tar > {analysis_dir}_variants.tar.md5
-    cd ../for_FHI_TSD_2/
-    md5sum {fastq_dir}.tar > {fastq_dir}.tar.md5
-    md5sum {analysis_dir}.tar > {analysis_dir}.tar.md5
-    )
-""".format(analysis_dir=project.name, fastq_dir=proj_dir_name)
 
-    elif project_type == "MIK-Covid19":
-        script2 = """
-(cd ../ ;
-    cp -rl {analysis_dir} for_MIK_IronKey_1
-    cp -rl {fastq_dir} for_MIK_IronKey_2
-    tar cf for_FHI_TSD_1/{analysis_dir}_variants.tar {analysis_dir}/results/*.tsv {analysis_dir}/pipeline_report_log.txt {analysis_dir}/results/4_consensus/ivar/ {analysis_dir}/results/3_variants/ivar/ {analysis_dir}/results/9_QC/
-    tar cf for_FHI_TSD_2/{analysis_dir}.tar {analysis_dir}
-    tar cf for_FHI_TSD_2/{fastq_dir}.tar {fastq_dir}
-    cd for_FHI_TSD_1/
-    md5sum {analysis_dir}_variants.tar > {analysis_dir}_variants.tar.md5
-    cd ../for_FHI_TSD_2/
-    md5sum {fastq_dir}.tar > {fastq_dir}.tar.md5
-    md5sum {analysis_dir}.tar > {analysis_dir}.tar.md5
-    )
-""".format(analysis_dir=project.name, fastq_dir=proj_dir_name)
+# Prepare delivery files
+cd ..
+
+# Variants
+tar cf for_FHI_TSD_1/{analysis_dir}_variants.tar {analysis_dir}/results/*.tsv {analysis_dir}/pipeline_report_log.txt {analysis_dir}/results/4_consensus/ivar/ {analysis_dir}/results/3_variants/ivar/ {analysis_dir}/results/9_QC/
+( cd for_FHI_TSD_1/ && md5sum {analysis_dir}_variants.tar > {analysis_dir}_variants.tar.md5 )
+
+# Need to clean up before making analysis tar file / copy
+rm -r {analysis_dir}/work {analysis_dir}/.nextflow*
+
+"""
+    if project_type == "MIK-Covid19":
+        script1 += """
+cp -rl {analysis_dir} for_MIK_IronKey_1
+"""
+    script1 += """
+tar cf for_FHI_TSD_2/{analysis_dir}.tar {analysis_dir}
+( cd for_FHI_TSD_2/ && md5sum {analysis_dir}.tar > {analysis_dir}.tar.md5 )
+
+wait
+"""
+    script = script1.format(analysis_dir=project.name, fastq_dir=proj_dir_name)
 
     script_file = os.path.join(output_path, "script.sh")
     log_file = os.path.join(output_path, "control_job_log.txt")
-    open(script_file, "w").write(script1 + script2)
+    open(script_file, "w").write(script)
     task.info("Starting analysis for {}...".format(project.name))
     subprocess.check_call(
             ["sbatch",
