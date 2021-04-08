@@ -77,7 +77,7 @@ else:
             "hiseq": 64,
             "hiseqx": 64,
             "hiseq4k": 64,
-            "novaseq": 110,
+            "novaseq": 96,
             "miseq": 16,
             "nextseq": 64
             }
