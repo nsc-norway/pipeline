@@ -329,15 +329,15 @@ def fhi_mik_seq_delivery(task, project_type, project, lims_project, lims_process
     script1 = """#!/bin/bash
 set -e
 
-# Make tar file with fastqs in parallel with everything else
-( cd .. && tar cf for_FHI_TSD_2/{fastq_dir}.tar {fastq_dir} && cd for_FHI_TSD_2/ && md5sum {fastq_dir}.tar > {fastq_dir}.tar.md5 ) &
-
 """
     if project_type == "MIK-Covid19":
         script1 += """
-(cd .. && cp -rl {fastq_dir} for_MIK_IronKey_2) &
+(cd .. && cp -rl {fastq_dir} for_MIK_IronKey_2)
 """
     script1 += """
+
+# Make tar file with fastqs in parallel with everything else
+( cd .. && tar cf for_FHI_TSD_2/{fastq_dir}.tar {fastq_dir} && cd for_FHI_TSD_2/ && md5sum {fastq_dir}.tar > {fastq_dir}.tar.md5 ) &
 
 # Run workflow
 /data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v8/main.nf \\
