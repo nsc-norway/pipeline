@@ -74,7 +74,9 @@ The tests can be executed using the following command:
     python test_module.py
 
 Python 2.7 is required to run the tests, and some of the Python package 
-dependencies of the pipeline may also be required.
+dependencies of the pipeline may also be required: jinja2, requests,
+interop. genologics library checked out in same directory as pipeline
+(this repo).
 
 The tests will only run on Unix-like platforms, with slash as path 
 separator.
