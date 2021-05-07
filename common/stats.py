@@ -43,7 +43,7 @@ def get_stats(
                     'YieldQ30': 0, 'QualityScoreSum': 0,
                     'Mismatch0': 0, 'Mismatch1': 0
                 })
-                if read_number == 1:
+                if read_metrics['ReadNumber'] == 1:
                     data['NumberClusters'] += demux_result['NumberReads']
                 data['NumberReads'] += demux_result['NumberReads']
                 data['Yield'] += read_metrics['Yield']
@@ -62,13 +62,11 @@ def get_stats(
             '% PF': 100.0,
             '% of Raw Clusters Per Lane': csums['NumberClusters'] * 100.0 / lane_stats[coordinates[0]]['TotalClustersRaw'],
             '% of PF Clusters Per Lane': csums['NumberClusters'] * 100.0 / lane_stats[coordinates[0]]['TotalClustersPF'],
+            '% Perfect Index Read': csums['Mismatch0'] * 100.0 / csums['NumberReads'],
+            '% One Mismatch Reads (Index)': csums['Mismatch1'] * 100.0 / csums['NumberReads'],
             '% Bases >=Q30': csums['YieldQ30'] * 100.0 / csums['Yield'],
             'Ave Q Score': csums['QualityScoreSum'] * 1.0 / csums['Yield']
         }
-        if 'Mismatch0' in csums:
-            results[coordinates]['% Perfect Index Read'] = csums['Mismatch0'] * 100.0 / csums['NumberReads'],
-            results[coordinates]['% One Mismatch Reads (Index)'] = csums['Mismatch1'] * 100.0 / csums['NumberReads'],
-
 
     return results
 
