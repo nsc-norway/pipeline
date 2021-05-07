@@ -2,6 +2,7 @@
 
 import re
 import os
+import json
 import itertools
 import utilities
 import samples
@@ -214,6 +215,66 @@ def parse_demultiplexing_stats(conversion_stats_path, aggregate_lanes):
     return samples
 
 
+def get_stats(
+        _,  # Instrument
+        run_dir,
+        aggregate_lanes=True,
+        aggregate_reads=False,
+        suffix=""
+        ):
+    stats_file_path = os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats" + suffix, "Stats.json")
+    with open(stats_file_path) as  statsfile:
+        stats = json.load(statsfile)
+
+    result = {}
+    for conversion_result in stats['ConversionResults']:
+        for demux_result in conversion_result['DemuxResults']:
+            for read_metrics in demux_result['ReadMetrics']:
+                lane_number = conversion_result['LaneNumber']
+                sample_id = demux_result['SampleId']
+                read_number = read_metrics['ReadNumber']
+                if aggregate_lanes: lane_number = "X"
+                if aggregate_reads: read_number = 1
+                
+
+    for coordinates in conversion_stats.keys():
+        lane, project, sample, read = coordinates
+        de_s = demultiplexing_stats[(lane, project, sample)]
+        con_s_raw, con_s_pf = conversion_stats[coordinates]
+
+        stats = {}
+        stats['# Reads'] = con_s_raw['ClusterCount']
+        stats['# Reads PF'] = con_s_pf['ClusterCount']
+        stats['Yield PF (Gb)'] = con_s_pf['Yield'] / 1e9
+        if con_s_raw['ClusterCount'] > 0:
+            stats['%PF'] = con_s_pf['ClusterCount'] * 100.0 / con_s_raw['ClusterCount']
+        else:
+            stats['%PF'] = 0.0
+        if all_raw_reads[lane] != 0.0:
+            stats['% of Raw Clusters Per Lane'] = con_s_raw['ClusterCount'] * 100.0 / all_raw_reads[lane]
+        else:
+            stats['% of Raw Clusters Per Lane'] = 0.0
+        if all_pf_reads[lane] != 0.0:
+            stats['% of PF Clusters Per Lane'] = con_s_pf['ClusterCount'] * 100.0 / all_pf_reads[lane]
+        else:
+            stats['% of PF Clusters Per Lane'] = 0.0
+        if de_s['BarcodeCount'] != 0.0:
+            stats['% Perfect Index Read'] = de_s['PerfectBarcodeCount'] * 100.0 / de_s['BarcodeCount']
+            stats['% One Mismatch Reads (Index)'] = de_s['OneMismatchBarcodeCount'] * 100.0 / de_s['BarcodeCount']
+        else:
+            stats['% Perfect Index Read'] = 0
+            stats['% One Mismatch Reads (Index)'] = 0
+        if con_s_pf['Yield'] > 0:
+            stats['% Bases >=Q30'] = con_s_pf['YieldQ30'] * 100.0 / con_s_pf['Yield']
+            stats['Ave Q Score'] = con_s_pf['QualityScoreSum'] * 1.0 / con_s_pf['Yield']
+        else:
+            stats['% Bases >=Q30'] = 0.0
+            stats['Ave Q Score'] = 0.0
+        result[coordinates] = stats
+
+    return result
+
+
 def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_reads=False):
     """Function for the NextSeq, to compute the usual demultiplexing stats.
 
@@ -303,24 +364,6 @@ def get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes=True, aggregate_rea
         result[coordinates] = stats
 
     return result
-
-
-###################### WRAPPER FNC #######################
-def get_stats(
-        instrument, 
-        run_dir,
-        aggregate_lanes=True,
-        aggregate_reads=False,
-        suffix=""
-        ):
-    """Instrument-independent interface to the stats module.
-
-    We used to handle MiSeq on-instrument demultiplexing, but that 
-    support is now dropped, since we use bcl2fastq2.
-    """
-
-    stats_xml_file_path = os.path.join(run_dir, "Data", "Intensities", "BaseCalls", "Stats" + suffix)
-    return get_bcl2fastq_stats(stats_xml_file_path, aggregate_lanes, aggregate_reads)
 
 
 ###################### Other metrics #######################
