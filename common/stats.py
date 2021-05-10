@@ -31,9 +31,17 @@ def get_stats(
         lane_metrics['TotalClustersPF'] += conversion_result['TotalClustersPF']
         lane_stats[lane_number] = lane_metrics
 
-        for demux_result in conversion_result['DemuxResults'] + [conversion_result['Undetermined']]:
+        demux_result_list = [(False, dr) for dr in conversion_result['DemuxResults']]
+        if 'Undetermined' in conversion_result:
+            demux_result_list.append((True, conversion_result['Undetermined']))
+
+        for is_undetermined, demux_result in demux_result_list:
+            if is_undetermined:
+                sample_id = None
+            else:
+                sample_id = demux_result['SampleId']
+
             for read_metrics in demux_result['ReadMetrics']:
-                sample_id = demux_result.get('SampleId', None)
                 read_number = read_metrics['ReadNumber']
                 if aggregate_reads: read_number = 1
                 coordinates = (lane_number, sample_id, read_number)
@@ -41,16 +49,20 @@ def get_stats(
                 data = sums.get(coordinates, {
                     'NumberClusters': 0, 'NumberReads': 0, 'Yield': 0,
                     'YieldQ30': 0, 'QualityScoreSum': 0,
-                    'Mismatch0': 0, 'Mismatch1': 0
+                    'Mismatch0': None, 'Mismatch1': 0
                 })
-                if read_metrics['ReadNumber'] == 1:
+                if read_metrics['ReadNumber'] == 1 or (not aggregate_reads):
                     data['NumberClusters'] += demux_result['NumberReads']
                 data['NumberReads'] += demux_result['NumberReads']
                 data['Yield'] += read_metrics['Yield']
                 data['YieldQ30'] += read_metrics['YieldQ30']
                 data['QualityScoreSum'] += read_metrics['QualityScoreSum']
                 if 'IndexMetrics' in demux_result:
-                    data['Mismatch0'] += sum(im['MismatchCounts']['0'] for im in demux_result['IndexMetrics'])
+                    mm0 = sum(im['MismatchCounts']['0'] for im in demux_result['IndexMetrics'])
+                    if data['Mismatch0'] is not None:
+                        data['Mismatch0'] += mm0
+                    else:
+                        data['Mismatch0'] = mm0
                     data['Mismatch1'] += sum(im['MismatchCounts']['1'] for im in demux_result['IndexMetrics'])
                 sums[coordinates] = data
 
@@ -62,11 +74,14 @@ def get_stats(
             '% PF': 100.0,
             '% of Raw Clusters Per Lane': csums['NumberClusters'] * 100.0 / lane_stats[coordinates[0]]['TotalClustersRaw'],
             '% of PF Clusters Per Lane': csums['NumberClusters'] * 100.0 / lane_stats[coordinates[0]]['TotalClustersPF'],
-            '% Perfect Index Read': csums['Mismatch0'] * 100.0 / csums['NumberReads'],
             '% One Mismatch Reads (Index)': csums['Mismatch1'] * 100.0 / csums['NumberReads'],
             '% Bases >=Q30': csums['YieldQ30'] * 100.0 / csums['Yield'],
             'Ave Q Score': csums['QualityScoreSum'] * 1.0 / csums['Yield']
         }
+        if csums['Mismatch0'] is None: # Reproduce previous behaviour -- 100% if there are no IndexMetrics
+            results[coordinates]['% Perfect Index Read'] = 100
+        else:
+            results[coordinates]['% Perfect Index Read'] = csums['Mismatch0'] * 100.0 / csums['NumberReads']
 
     return results
 
