@@ -801,9 +801,15 @@ class Test90PrepareDelivery(TaskTestCase):
         with self.qc_dir(run_id) as tempdir, patch.object(sys, 'argv', ["script", "."]):
             deliv_test_dir = os.path.join(self.tempparent, "delivery")
             os.mkdir(deliv_test_dir)
+            original_sub_check_call = subprocess.check_call
+            def mock_sub_check_call(*x, **kw):
+                if x[0][0] != 'chgrp':
+                    return original_sub_check_call(*x, **kw)
             with patch.object(nsc, 'DELIVERY_DIR', deliv_test_dir, create=True),\
                     patch.object(nsc, 'DIAGNOSTICS_DELIVERY', deliv_test_dir, create=True),\
-                    patch.object(nsc, 'DEFAULT_DELIVERY_MODE', 'Transfer to diagnostics', create=True):
+                    patch.object(nsc, 'DEFAULT_DELIVERY_MODE', 'Transfer to diagnostics', create=True),\
+                    patch('subprocess.check_call') as sub_check_call:
+                sub_check_call.side_effect = mock_sub_check_call
                 with chdir(tempdir):
                     self.module.main(self.task)
                 self.task.success_finish.assert_called_once()
