@@ -637,9 +637,12 @@ class Test70MultiQC(TaskTestCase):
                 calls = []
                 for project in projects:
                     if not project['is_undetermined']:
+                        target_dir = os.path.join(self.qualitycontrol, project['name'])
                         calls.append(
-                            call(nsc.MULTIQC + ['-q', '-f', '.'], cwd=os.path.join(self.qualitycontrol, project['name']))
+                            call(nsc.MULTIQC + ['-q', '-f', '-o', target_dir, target_dir],
+                                cwd=ANY, stderr=ANY, stdout=ANY)
                             )
+                print "HEI", sub_call.mock_calls
                 sub_call.assert_has_calls(calls, any_order=True)
                 self.task.success_finish.assert_called_once()
 
