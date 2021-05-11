@@ -32,6 +32,9 @@ def main(task):
     mqc.cpus_per_task = 1
     mqc.comment = task.run_id
     remote.ArrayJob.start_jobs([mqc], max_local_threads=task.threads)
+    remote.ArrayJob.update_status([mqc])
+    task.array_job_status([mqc])
+
     while not mqc.is_finished:
         time.sleep(10)
         remote.ArrayJob.update_status([mqc])
