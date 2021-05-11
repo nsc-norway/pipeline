@@ -1,0 +1,139 @@
+Dear ,
+
+Samples/Libraries submitted under Project1 to NSC, Ullevål has been sequenced and are now ready for pick-up. You will therefore be billed for this service.
+
+
+------ Data collection ------
+You can pick up the data in a portable hard drive (please notice the size of the data  is approximately 2 GB).
+
+NOTE: UNKNOWN DELIVERY METHOD
+
+
+------ Data output ------
+Here is an overview of your data files and the number of fragments that were sequenced:
+
+UF5ZD7K1RAC-06I6G-Z6X-T7UDDR_S1_R1_001.fastq.gz	   3,072,786 fragments
+UF5ZD7K1RAC-06I6G-Z6X-T7UDDR_S1_R2_001.fastq.gz	   3,072,786 fragments
+07OJ0SB7JKL-U5U8Z-MBK-VV2UM0_S2_R1_001.fastq.gz	   2,947,767 fragments
+07OJ0SB7JKL-U5U8Z-MBK-VV2UM0_S2_R2_001.fastq.gz	   2,947,767 fragments
+HI6XBZ5CU5Y-8S5M1-PV6-PGJIHJ_S3_R1_001.fastq.gz	   3,679,841 fragments
+HI6XBZ5CU5Y-8S5M1-PV6-PGJIHJ_S3_R2_001.fastq.gz	   3,679,841 fragments
+JFPB00924AG-O2UAL-18G-J2R8AP_S4_R1_001.fastq.gz	   3,113,100 fragments
+JFPB00924AG-O2UAL-18G-J2R8AP_S4_R2_001.fastq.gz	   3,113,100 fragments
+POUDRIX7N0Y-H94ZM-CET-5NZWUI_S5_R1_001.fastq.gz	   2,752,694 fragments
+POUDRIX7N0Y-H94ZM-CET-5NZWUI_S5_R2_001.fastq.gz	   2,752,694 fragments
+3XVDKVK6TLC-PGSKZ-W6Y-NNFFYV_S6_R1_001.fastq.gz	   3,523,229 fragments
+3XVDKVK6TLC-PGSKZ-W6Y-NNFFYV_S6_R2_001.fastq.gz	   3,523,229 fragments
+TWIZCA1KAB6-ME1DFB0K-ROZ-DWFTA3_S7_R1_001.fastq.gz	   3,200,662 fragments
+TWIZCA1KAB6-ME1DFB0K-ROZ-DWFTA3_S7_R2_001.fastq.gz	   3,200,662 fragments
+9VLPXDG6UWK-SIT4T-A5X-KEOPOC_S8_R1_001.fastq.gz	   3,300,669 fragments
+9VLPXDG6UWK-SIT4T-A5X-KEOPOC_S8_R2_001.fastq.gz	   3,300,669 fragments
+5FUIO806G82-7Q1W2-0PR-5PAOJU_S9_R1_001.fastq.gz	   1,999,086 fragments
+5FUIO806G82-7Q1W2-0PR-5PAOJU_S9_R2_001.fastq.gz	   1,999,086 fragments
+SRB5OYYZNWL-QNH6F-ZX9-SONH2M_S10_R1_001.fastq.gz	   1,460,353 fragments
+SRB5OYYZNWL-QNH6F-ZX9-SONH2M_S10_R2_001.fastq.gz	   1,460,353 fragments
+EJCODLZRF7L-96Q2Z-Z23-IOHSI9_S11_R1_001.fastq.gz	   1,702,361 fragments
+EJCODLZRF7L-96Q2Z-Z23-IOHSI9_S11_R2_001.fastq.gz	   1,702,361 fragments
+NYMB0BEDM2G-5CV7R-MK7-00RH7Y_S12_R1_001.fastq.gz	   2,465,632 fragments
+NYMB0BEDM2G-5CV7R-MK7-00RH7Y_S12_R2_001.fastq.gz	   2,465,632 fragments
+DAMCH03BZ36-1SGAU-3WR-F5IYI5_S13_R1_001.fastq.gz	   2,382,231 fragments
+DAMCH03BZ36-1SGAU-3WR-F5IYI5_S13_R2_001.fastq.gz	   2,382,231 fragments
+EJ4YMK5HFJ1-Q4WVF-OSK-QJVJNJ_S14_R1_001.fastq.gz	   3,225,332 fragments
+EJ4YMK5HFJ1-Q4WVF-OSK-QJVJNJ_S14_R2_001.fastq.gz	   3,225,332 fragments
+JRIJB66Y9L0-VTIBB-K5U-F0KD97_S15_R1_001.fastq.gz	   4,575,044 fragments
+JRIJB66Y9L0-VTIBB-K5U-F0KD97_S15_R2_001.fastq.gz	   4,575,044 fragments
+L3S67XMG37B-6R2NH-NJF-VM8F74_S16_R1_001.fastq.gz	   3,792,088 fragments
+L3S67XMG37B-6R2NH-NJF-VM8F74_S16_R2_001.fastq.gz	   3,792,088 fragments
+GOAQQQ2I62E-LPERV-1V1-GIXX1Q_S17_R1_001.fastq.gz	   3,494,508 fragments
+GOAQQQ2I62E-LPERV-1V1-GIXX1Q_S17_R2_001.fastq.gz	   3,494,508 fragments
+WU5FG9AXL1H-F6O57-XDA-VJITVB_S18_R1_001.fastq.gz	   2,344,727 fragments
+WU5FG9AXL1H-F6O57-XDA-VJITVB_S18_R2_001.fastq.gz	   2,344,727 fragments
+W82DLYDAAF5-TBV0M3-CB8-PWOB2C_S19_R1_001.fastq.gz	   3,968,753 fragments
+W82DLYDAAF5-TBV0M3-CB8-PWOB2C_S19_R2_001.fastq.gz	   3,968,753 fragments
+SCSOYK263NB-HSPXAQ-ZUX-EFBP38_S20_R1_001.fastq.gz	   2,737,630 fragments
+SCSOYK263NB-HSPXAQ-ZUX-EFBP38_S20_R2_001.fastq.gz	   2,737,630 fragments
+LCS51XB4A1J-72OA2K-LK7-J648Y8_S21_R1_001.fastq.gz	   1,346,563 fragments
+LCS51XB4A1J-72OA2K-LK7-J648Y8_S21_R2_001.fastq.gz	   1,346,563 fragments
+VMUIU3GILRN-H6MHY3-LDW-5HX82H_S22_R1_001.fastq.gz	   2,885,844 fragments
+VMUIU3GILRN-H6MHY3-LDW-5HX82H_S22_R2_001.fastq.gz	   2,885,844 fragments
+62N52LEL1EX-8W7B2J-MMA-II2PM4_S23_R1_001.fastq.gz	   2,936,273 fragments
+62N52LEL1EX-8W7B2J-MMA-II2PM4_S23_R2_001.fastq.gz	   2,936,273 fragments
+ZUYCFYXB920-GWPLAF-ISR-EUQOGD_S24_R1_001.fastq.gz	   3,565,469 fragments
+ZUYCFYXB920-GWPLAF-ISR-EUQOGD_S24_R2_001.fastq.gz	   3,565,469 fragments
+F2VKT9D0YI3-SBMN44-DXS-KBHJIK_S25_R1_001.fastq.gz	   7,106,790 fragments
+F2VKT9D0YI3-SBMN44-DXS-KBHJIK_S25_R2_001.fastq.gz	   7,106,790 fragments
+F94N5KY46FP-LU8G138S-VK3-I5B2PJ_S26_R1_001.fastq.gz	   4,483,848 fragments
+F94N5KY46FP-LU8G138S-VK3-I5B2PJ_S26_R2_001.fastq.gz	   4,483,848 fragments
+VT02HL1FXZ3-T2DNXH-9LI-WUVY48_S27_R1_001.fastq.gz	   4,614,761 fragments
+VT02HL1FXZ3-T2DNXH-9LI-WUVY48_S27_R2_001.fastq.gz	   4,614,761 fragments
+S7QBTL4XTN6-ZZUM2E-8JV-T05K83_S28_R1_001.fastq.gz	   3,503,598 fragments
+S7QBTL4XTN6-ZZUM2E-8JV-T05K83_S28_R2_001.fastq.gz	   3,503,598 fragments
+MQT880UHUEL-U1GFO2JC-CPA-5BQOZE_S29_R1_001.fastq.gz	   2,806,216 fragments
+MQT880UHUEL-U1GFO2JC-CPA-5BQOZE_S29_R2_001.fastq.gz	   2,806,216 fragments
+7RVKAH8TTGM-LSSSOV-K0H-TMG5IL_S30_R1_001.fastq.gz	   6,491,816 fragments
+7RVKAH8TTGM-LSSSOV-K0H-TMG5IL_S30_R2_001.fastq.gz	   6,491,816 fragments
+ML2K452ZBAJ-RL18EQ-OUI-AM3B31_S31_R1_001.fastq.gz	   6,327,059 fragments
+ML2K452ZBAJ-RL18EQ-OUI-AM3B31_S31_R2_001.fastq.gz	   6,327,059 fragments
+RWAK6NQBSZV-4FT8KN-HFM-1VN1CN_S32_R1_001.fastq.gz	   5,600,821 fragments
+RWAK6NQBSZV-4FT8KN-HFM-1VN1CN_S32_R2_001.fastq.gz	   5,600,821 fragments
+64KSYU0CRWR-ZOOSN4-50G-TL6SS8_S33_R1_001.fastq.gz	      24,635 fragments
+64KSYU0CRWR-ZOOSN4-50G-TL6SS8_S33_R2_001.fastq.gz	      24,635 fragments
+SX3IZY6YHZD-FT59VE-02I-12XTBY_S34_R1_001.fastq.gz	       8,746 fragments
+SX3IZY6YHZD-FT59VE-02I-12XTBY_S34_R2_001.fastq.gz	       8,746 fragments
+1EAVJXA4YPV-ZSE4CJ-OE3-KBKT1K_S35_R1_001.fastq.gz	      89,678 fragments
+1EAVJXA4YPV-ZSE4CJ-OE3-KBKT1K_S35_R2_001.fastq.gz	      89,678 fragments
+0UDW36KMTE3-D6ZC9B-OUV-JO5HY2_S36_R1_001.fastq.gz	       2,302 fragments
+0UDW36KMTE3-D6ZC9B-OUV-JO5HY2_S36_R2_001.fastq.gz	       2,302 fragments
+0LVXRW0HP8H-ZMQUU8-0C5-6PC06W_S37_R1_001.fastq.gz	      61,035 fragments
+0LVXRW0HP8H-ZMQUU8-0C5-6PC06W_S37_R2_001.fastq.gz	      61,035 fragments
+XFYB3CP9C06-A1VIFF-UHZ-RNW1DX_S38_R1_001.fastq.gz	          27 fragments
+XFYB3CP9C06-A1VIFF-UHZ-RNW1DX_S38_R2_001.fastq.gz	          27 fragments
+QHZC0RSXFR7-40BORO-E7C-SGSEZQ_S39_R1_001.fastq.gz	     231,477 fragments
+QHZC0RSXFR7-40BORO-E7C-SGSEZQ_S39_R2_001.fastq.gz	     231,477 fragments
+HWD7Z2HLGQ5-92HPIM-9V6-K5TW22_S40_R1_001.fastq.gz	     720,571 fragments
+HWD7Z2HLGQ5-92HPIM-9V6-K5TW22_S40_R2_001.fastq.gz	     720,571 fragments
+ZLGLKYPE7S9-FZP8TW-J21-FWG6QJ_S41_R1_001.fastq.gz	   2,740,794 fragments
+ZLGLKYPE7S9-FZP8TW-J21-FWG6QJ_S41_R2_001.fastq.gz	   2,740,794 fragments
+B5VJRTIXY1P-I480G9-ZH7-GDH1CW_S42_R1_001.fastq.gz	   2,652,372 fragments
+B5VJRTIXY1P-I480G9-ZH7-GDH1CW_S42_R2_001.fastq.gz	   2,652,372 fragments
+KP5HMT8B4GT-0IG7GJ-D8I-ZYTL2N_S43_R1_001.fastq.gz	   2,461,198 fragments
+KP5HMT8B4GT-0IG7GJ-D8I-ZYTL2N_S43_R2_001.fastq.gz	   2,461,198 fragments
+BD7Z6UO0V6T-9Y6C5S-H16-WTPV5X_S44_R1_001.fastq.gz	   2,516,351 fragments
+BD7Z6UO0V6T-9Y6C5S-H16-WTPV5X_S44_R2_001.fastq.gz	   2,516,351 fragments
+T2EQJJI36OI-USO3ET-5BJ-6F7EUF_S45_R1_001.fastq.gz	   2,078,098 fragments
+T2EQJJI36OI-USO3ET-5BJ-6F7EUF_S45_R2_001.fastq.gz	   2,078,098 fragments
+6JUDY15RLAE-JMDYII-0I5-HVBPCV_S46_R1_001.fastq.gz	   3,068,569 fragments
+6JUDY15RLAE-JMDYII-0I5-HVBPCV_S46_R2_001.fastq.gz	   3,068,569 fragments
+X5UZK99QRT-QDOL3-JRJ-HS7JZJ_S47_R1_001.fastq.gz	          38 fragments
+X5UZK99QRT-QDOL3-JRJ-HS7JZJ_S47_R2_001.fastq.gz	          38 fragments
+FOR52O-XFWZ3-XRO-HZ4VUR_S48_R1_001.fastq.gz	   4,158,743 fragments
+FOR52O-XFWZ3-XRO-HZ4VUR_S48_R2_001.fastq.gz	   4,158,743 fragments
+
+
+----- Bioinformatic analyses ----
+Data alignment/analysis can be ordered as a service. For further details: http://www.sequencing.uio.no/services/bioinformatics/
+
+
+If you have any questions, don't hesitate to get in touch. 
+
+
+Regards
+Arvind Sundaram / Marius Bjørnstad
+
+Bioinformatician(s)
+Norwegian Sequencing Centre (https://www.sequencing.uio.no) / Part of NorSeq (https://www.norseq.org/)
+Oslo University Hospital, Ullevål, Oslo, Norway
+
+
+*********************************************************************************************************************
+Understanding the data: http://www.sequencing.uio.no/services/data-delivery/
+
+------- Acknowledgement -------
+The Norwegian Sequencing Centre (NSC) operates as a core facility and you will therefore not be billed for the labour costs incurred. However, you are requested to acknowledge the support you have received from the bodies funding the NSC. Please use the following text in articles or reports relating to this sequence data:
+"The sequencing service was provided by the Norwegian Sequencing Centre (www.sequencing.uio.no), a national technology platform hosted by the University of Oslo and supported by the "Functional Genomics" and "Infrastructure" programs of the Research Council of Norway and the Southeastern Regional Health Authorities".
+
+-----Terms, conditions and usage-----
+Data storage policy: https://www.sequencing.uio.no/services/data-delivery/#toc4
+Data security:  https://www.sequencing.uio.no/services/data-delivery/#toc3
+*********************************************************************************************************************
+
