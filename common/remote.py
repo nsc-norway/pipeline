@@ -109,6 +109,9 @@ class JobMonitoringException(Exception):
 # update_status(). Thus, instances of different implementations cannt be used 
 # together (use the ArrayJob alias, not SlurmArrayJob, LocalArrayJob).
 
+# Do use the static methods start_jobs() and update_status(), and not _start and
+# _check_status. The latter methods are not implemented for LocalArrayJob.
+
 class SlurmArrayJob(object):
     def __init__(self, arg_lists, jobname, time, stdout_pattern):
         
@@ -126,7 +129,7 @@ class SlurmArrayJob(object):
         self.states = {}
         self.summary = {}
 
-    def start(self):
+    def _start(self):
         handle, path = tempfile.mkstemp()
         os.write(handle, "#!/bin/bash\n\n")
         os.write(handle, "#SBATCH --job-name=\"{0}\"\n".format(self.jobname))
@@ -154,7 +157,7 @@ class SlurmArrayJob(object):
         self.summary = {'PENDING': len(self.arg_lists)}
         os.remove(path)
 
-    def check_status(self):
+    def _check_status(self):
         """Refresh status of jobs. Should be called periodically (every minute)."""
         try:
             squeue_out = utilities.check_output(nsc.SQUEUE + ['-j', self.job_id, '-O', 'ArrayTaskID,State', '-h', '-t', 'all', '-r'])
@@ -180,12 +183,12 @@ class SlurmArrayJob(object):
     @staticmethod
     def start_jobs(jobs, max_local_threads):
         for job in jobs:
-            job.start()
+            job._start()
 
     @staticmethod
     def update_status(jobs):
         for job in jobs:
-            job.check_status()
+            job._check_status()
 
 
 def local_execute(arg_list, logfile, cwd):

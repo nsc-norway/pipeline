@@ -50,6 +50,6 @@ nsc-python27 $DIR/50_qc_analysis.py $THREADS $LANES "$DEST"
 nsc-python27 $DIR/60_emails.py $LANES "$DEST"
 nsc-python27 $DIR/60_reports.py $LANES "$DEST"
 nsc-python27 $DIR/80_md5sum.py $THREADS $LANES "$DEST"
-nsc-python27 $DIR/70_multiqc.py $LANES "$DEST"
+nsc-python27 $DIR/70_multiqc.py $THREADS $LANES "$DEST"
 nsc-python27 $DIR/90_prepare_delivery.py $LANES "$DEST"
 
