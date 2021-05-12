@@ -168,8 +168,10 @@ def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned, oc
         if patterned:
             dupsum = sum(f.stats.get('fastdup reads with duplicate', 0)
                     for f in all_nonempty_files if f.i_read == 1)
+            dupanalysissum = sum(f.stats.get('fastdup reads analysed', 0)
+                    for f in all_nonempty_files if f.i_read == 1)
             try:
-                duppct = dupsum * 100.0 / cluster_no
+                duppct = dupsum * 100.0 / dupanalysissum
                 row.append(("%4.2f %%" % duppct, "number"))
             except ZeroDivisionError:
                 row.append(("-", "center"))
