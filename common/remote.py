@@ -71,7 +71,6 @@ def local_command(args, logfile, cwd=None, stdout=None):
         stdoutfile = open(stdout, "w")
     else:
         stdoutfile = stderrfile
-
     return subprocess.call(args, stdout=stdoutfile, stderr=stderrfile, cwd=cwd)
 
 
@@ -194,7 +193,7 @@ class SlurmArrayJob(object):
 def local_execute(arg_list, logfile, cwd):
     res = local_command(arg_list, logfile, cwd)
     if res != 0:
-        raise subprocess.CalledProcessError("Non-zero exit code")
+        raise subprocess.CalledProcessError(res, str(arg_list))
 
 
 class LocalArrayJob(object):
@@ -256,6 +255,42 @@ class LocalArrayJob(object):
                     if v > 0
                     ])
             job.is_finished = running == 0 and pending == 0
+
+
+class SerialArrayJob(object):
+    """Run each job one by one. Used for testing."""
+    def __init__(self, arg_lists, jobname, time, stdout_pattern):
+        global local_job_id
+        self.job_id = local_job_id
+        local_job_id += 1
+        self.arg_lists = arg_lists
+        self.stdout_pattern = stdout_pattern
+        self.summary = {"PENDING": len(arg_lists)}
+        self.cwd = None
+        self.results = []
+        self.is_finished = False
+        self.mem_per_task = 1024
+        self.cpus_per_task = 1
+        self.jobname = jobname
+        self.comment = None
+
+    @staticmethod
+    def start_jobs(jobs, max_local_threads=None):
+        for job in jobs:
+            job.results = []
+            for i, arg_list in enumerate(job.arg_lists):
+                logfile = job.stdout_pattern.replace("%a", str(i))
+                job.summary = {}
+                try:
+                    local_execute(arg_list, logfile, job.cwd)
+                    job.summary['COMPLETED'] = job.summary.get('COMPLETED', 0) + len(arg_list)
+                except subprocess.CalledProcessError:
+                    job.summary['FAILED'] = job.summary.get('FAILED', 0) + len(arg_list)
+            job.is_finished = True
+
+    @staticmethod
+    def update_status(jobs):
+        pass
 
 
 if nsc.REMOTE_MODE == "srun":
