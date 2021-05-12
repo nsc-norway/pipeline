@@ -48,13 +48,6 @@ class TaskTestCase(unittest.TestCase):
         success_patcher = patch.object(self.task, 'success_finish')
         success_patcher.start()
         self.addCleanup(success_patcher.stop)
-        # Disable multiprocessing using Pool everywhere
-        object_mock = Mock()
-        object_mock.map = map
-        fake_pool = Mock(return_value=object_mock)
-        pool_map_patcher = patch('multiprocessing.Pool', fake_pool)
-        pool_map_patcher.start()
-        self.addCleanup(pool_map_patcher.stop)
         self.task.__enter__()
         self.tempparent = None
         
@@ -589,13 +582,19 @@ class Test60Reports(TaskTestCase):
 
     @patch('os.rename')
     def reports_general_tester(self, projects, run_id, pdfpaths, os_rename):
-        with self.qc_dir(run_id) as tempdir:
+        # Replace multiprocessing.Pool.map with plain map
+        object_mock = Mock()
+        object_mock.map = map
+        fake_pool = Mock(return_value=object_mock)
+
+        with self.qc_dir(run_id):
             testargs = ["script", self.tempdir]
             with patch.object(sys, 'argv', testargs),\
-                    patch('subprocess.check_call') as sub_call:
+                    patch('subprocess.check_call') as sub_call,\
+                    patch('multiprocessing.Pool', fake_pool):
                 self.module.main(self.task)
                 calls = []
-                for fp in (str(f['path']) for p in projects for s in p['samples'] for f in s['files']):
+                for fp in (str(f['path']) for p in projects for s in p['samples'] for f in s['files'] if not p['is_undetermined']):
                     tex_name = re.sub(r"\.fastq\.gz$", ".qc.tex", os.path.basename(fp))
                     calls.append(call(['/usr/bin/pdflatex', '-shell-escape', tex_name],
                         cwd=os.path.join(self.qualitycontrol, 'pdf'), stdin=ANY, stdout=ANY))
@@ -632,7 +631,10 @@ class Test70MultiQC(TaskTestCase):
             projects = json.load(jsonfile)
         with self.qc_dir(run_id) as tempdir:
             testargs = ["script", self.tempdir]
-            with patch.object(sys, 'argv', testargs), patch('subprocess.call') as sub_call:
+            from common import remote
+            with patch.object(sys, 'argv', testargs), \
+                    patch('subprocess.call', return_value=0) as sub_call, \
+                    patch.object(remote, 'ArrayJob', remote.SerialArrayJob):
                 self.module.main(self.task)
                 calls = []
                 for project in projects:
@@ -642,7 +644,6 @@ class Test70MultiQC(TaskTestCase):
                             call(nsc.MULTIQC + ['-q', '-f', '-o', target_dir, target_dir],
                                 cwd=ANY, stderr=ANY, stdout=ANY)
                             )
-                print "HEI", sub_call.mock_calls
                 sub_call.assert_has_calls(calls, any_order=True)
                 self.task.success_finish.assert_called_once()
 
@@ -802,7 +803,7 @@ class Test90PrepareDelivery(TaskTestCase):
             deliv_test_dir = os.path.join(self.tempparent, "delivery")
             os.mkdir(deliv_test_dir)
             original_sub_check_call = subprocess.check_call
-            def mock_sub_check_call(*x, **kw):
+            def mock_sub_check_call(*x, **kw): # Skip command(s): chgrp.
                 if x[0][0] != 'chgrp':
                     return original_sub_check_call(*x, **kw)
             with patch.object(nsc, 'DELIVERY_DIR', deliv_test_dir, create=True),\
