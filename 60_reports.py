@@ -79,7 +79,7 @@ def make_reports(work_dir, suffix, run_id, projects, bcl2fastq_version):
 
     shutil.rmtree(pdf_dir)
 
-    generate_internal_html_report(quality_control_dir, projects)
+    generate_internal_html_report(quality_control_dir, [p for p in projects if not p.is_undetermined])
 
 
 
