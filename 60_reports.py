@@ -73,7 +73,7 @@ def make_reports(work_dir, suffix, run_id, projects, bcl2fastq_version):
             generate_report_for_customer,
             [tuple(arg_pack + [p,s,f]) 
                 for p in projects for s in p.samples for f in s.files
-                if not f.empty
+                if not p.is_undetermined and not f.empty
                 ]
             )
 
