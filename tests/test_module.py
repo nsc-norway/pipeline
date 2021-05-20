@@ -639,7 +639,7 @@ class Test70MultiQC(TaskTestCase):
                 calls = []
                 for project in projects:
                     if not project['is_undetermined']:
-                        target_dir = os.path.join(self.qualitycontrol, project['name'])
+                        target_dir = project['name']
                         calls.append(
                             call(nsc.MULTIQC + ['-q', '-f', '-o', target_dir, target_dir],
                                 cwd=ANY, stderr=ANY, stdout=ANY)
