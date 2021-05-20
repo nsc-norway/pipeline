@@ -75,29 +75,16 @@ def post_stats(lims, process, projects, demultiplex_stats, lane_metrics, lane_st
     for coordinates, stats in demultiplex_stats.items():
         # Note: while it may seem that this works for both aggregate_reads and
         # separate reads, it does not, the code must be changed for separate reads
-        lane, project, sample_name = coordinates[0:3]
+        lane, sample_id = coordinates[0:2]
         
-        if sample_name: # Not undetermined
+        if sample_id: # Not undetermined
             limsid = None
             for tproject in projects:
-                if tproject.name == project:
-                    for sample in tproject.samples:
-                        if sample.name == sample_name:
-                            if any(f.lane == lane for f in sample.files):
-                                limsid = sample.limsid
-                                sample_index = sample.sample_index
-            # When there are multiple samples with the same namem, possibly in different projects,
-            # the sample gets a name with a suffix "_S<ID>" in the stats file. The following branch
-            # should only run in the subordinate case when there is no exact match (to avoid improper
-            # matches of samples with _S in the name).
-            if not limsid and '_S' in sample_name:
-                for tproject in projects:
-                    if tproject.name == project:
-                        for sample in tproject.samples:
-                            if "{}_S{}".format(sample.name, sample.sample_index) == sample_name:
-                                if any(f.lane == lane for f in sample.files):
-                                    limsid = sample.limsid
-                                    sample_index = sample.sample_index
+                for sample in tproject.samples:
+                    if sample.sample_id == sample_id:
+                        if any(f.lane == lane for f in sample.files):
+                            limsid = sample.limsid
+                            sample_index = sample.sample_index
             
             if limsid is None:
                 continue # Skip unknown samples / project
