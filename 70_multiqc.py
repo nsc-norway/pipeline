@@ -24,10 +24,11 @@ def main(task):
     commands = []
     for project in projects:
         if not project.is_undetermined:
-            project_qc_dir = os.path.join(output_dir, project.name)
+            project_qc_dir = project.name
             commands.append(nsc.MULTIQC + ["-q", "-f", "-o", project_qc_dir, project_qc_dir])
 
     mqc = remote.ArrayJob(commands, "multiqc", "01:00:00", task.logfile("multiqc.%a"))
+    mqc.cwd = output_dir
     mqc.mem_per_task = 8000
     mqc.cpus_per_task = 1
     mqc.comment = task.run_id
