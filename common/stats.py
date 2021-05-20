@@ -71,7 +71,7 @@ def get_stats(
         results[coordinates] = {
             '# Reads PF': csums['NumberReads'],
             'Yield PF (Gb)': csums['Yield'] / 1e9,
-            '% PF': 100.0,
+            '%PF': 100.0,
             '% of Raw Clusters Per Lane': csums['NumberClusters'] * 100.0 / lane_stats[coordinates[0]]['TotalClustersRaw'],
             '% of PF Clusters Per Lane': csums['NumberClusters'] * 100.0 / lane_stats[coordinates[0]]['TotalClustersPF'],
             '% One Mismatch Reads (Index)': csums['Mismatch1'] * 100.0 / csums['NumberReads'],
