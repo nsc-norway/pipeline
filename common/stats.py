@@ -74,14 +74,14 @@ def get_stats(
             '%PF': 100.0,
             '% of Raw Clusters Per Lane': csums['NumberClusters'] * 100.0 / lane_stats[coordinates[0]]['TotalClustersRaw'],
             '% of PF Clusters Per Lane': csums['NumberClusters'] * 100.0 / lane_stats[coordinates[0]]['TotalClustersPF'],
-            '% One Mismatch Reads (Index)': csums['Mismatch1'] * 100.0 / csums['NumberReads'],
-            '% Bases >=Q30': csums['YieldQ30'] * 100.0 / csums['Yield'],
-            'Ave Q Score': csums['QualityScoreSum'] * 1.0 / csums['Yield']
+            '% One Mismatch Reads (Index)': csums['Mismatch1'] * 100.0 / max(csums['NumberReads'], 1),
+            '% Bases >=Q30': csums['YieldQ30'] * 100.0 / max(csums['Yield'], 1),
+            'Ave Q Score': csums['QualityScoreSum'] * 1.0 / max(csums['Yield'], 1)
         }
         if csums['Mismatch0'] is None: # Reproduce previous behaviour -- 100% if there are no IndexMetrics
             results[coordinates]['% Perfect Index Read'] = 100
         else:
-            results[coordinates]['% Perfect Index Read'] = csums['Mismatch0'] * 100.0 / csums['NumberReads']
+            results[coordinates]['% Perfect Index Read'] = csums['Mismatch0'] * 100.0 / max(csums['NumberReads'], 1)
 
     return results
 
