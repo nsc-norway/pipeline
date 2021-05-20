@@ -147,7 +147,8 @@ class SlurmArrayJob(object):
             os.write(handle, "[ $SLURM_ARRAY_TASK_ID == {0} ] && {1} && exit 0\n".format(i, argv))
         os.write(handle, "exit 1\n")
         os.close(handle)
-        
+        if not self.arg_lists:
+            raise ValueError("Starting SLURM array job {}: The list of jobs is empty (check sample sheet).".format(self.jobname))
         array = '--array=0-'+str(len(self.arg_lists) - 1)
         if self.max_simultaneous is not None:
             array += "%%%d" % (self.max_simultaneous)

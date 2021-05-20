@@ -44,6 +44,7 @@ def main(task):
     file_sizes = []
     for project in projects:
         if not project.is_undetermined:
+            project_dir = os.path.join(output_dir, project.name)
             if not os.path.exists(project_dir):
                 os.mkdir(project_dir)
             for sample in project.samples:
