@@ -43,52 +43,45 @@ def main(task):
     fastqc_zipfiles = []
     file_sizes = []
     for project in projects:
-        if project.is_undetermined:
-            project_dir = os.path.join(output_dir, "Undetermined")
-        else:
-            project_dir = os.path.join(output_dir, project.name)
-        if not os.path.exists(project_dir):
-            os.mkdir(project_dir)
-        for sample in project.samples:
-            if project.is_undetermined:
-                sample_dir = os.path.join(project_dir, "Sample_Undetermined")
-            else:
+        if not project.is_undetermined:
+            if not os.path.exists(project_dir):
+                os.mkdir(project_dir)
+            for sample in project.samples:
                 sample_dir = os.path.join(project_dir, "Sample_" + sample.name)
-            if not os.path.exists(sample_dir):
-                os.mkdir(sample_dir)
-            for f in sample.files:
-                if not f.empty:
-                    file_fastqc_dir = samples.get_fastqc_dir(project, sample, f)
-                    fqc_basedir = os.path.join( output_dir, os.path.dirname(file_fastqc_dir))
-                    fq_path = os.path.join(bc_dir, f.path)
-                    fqc_commands.append([nsc.FASTQC, "--extract",
-                            "--outdir=" + fqc_basedir,
-                            fq_path
-                            ])
-                    file_sizes.append(os.path.getsize(fq_path))
-                    fastqc_zipfiles.append(os.path.join(output_dir, file_fastqc_dir + ".zip"))
-                    if f.i_read == 1:
-                        output_path = os.path.join(
-                                output_dir,
-                                samples.get_fastdup_path(project, sample, f),
-                                )
-                        if nsc.SUPRDUPR:
-                            dup_commands.append(
-                                    ["bash", "-c", " ".join(
-                                    nsc.SUPRDUPR + [
-                                        os.path.join(bc_dir, f.path),
-                                        ]) +
-				    " > " + output_path]
+                if not os.path.exists(sample_dir):
+                    os.mkdir(sample_dir)
+                for f in sample.files:
+                    if not f.empty:
+                        file_fastqc_dir = samples.get_fastqc_dir(project, sample, f)
+                        fqc_basedir = os.path.join( output_dir, os.path.dirname(file_fastqc_dir))
+                        fq_path = os.path.join(bc_dir, f.path)
+                        fqc_commands.append([nsc.FASTQC, "--extract",
+                                "--outdir=" + fqc_basedir,
+                                fq_path
+                                ])
+                        file_sizes.append(os.path.getsize(fq_path))
+                        fastqc_zipfiles.append(os.path.join(output_dir, file_fastqc_dir + ".zip"))
+                        if f.i_read == 1:
+                            output_path = os.path.join(
+                                    output_dir,
+                                    samples.get_fastdup_path(project, sample, f),
                                     )
-                        else:
-                            dup_commands.append(
-                                    nsc.FASTDUP_ARGLIST + [
-                                        os.path.join(bc_dir, f.path),
-                                        output_path
-                                        ]
-                                    )
+                            if nsc.SUPRDUPR:
+                                dup_commands.append(
+                                        ["bash", "-c", " ".join(
+                                        nsc.SUPRDUPR + [
+                                            os.path.join(bc_dir, f.path),
+                                            ]) +
+                        " > " + output_path]
+                                        )
+                            else:
+                                dup_commands.append(
+                                        nsc.FASTDUP_ARGLIST + [
+                                            os.path.join(bc_dir, f.path),
+                                            output_path
+                                            ]
+                                        )
     
-
     fqc = remote.ArrayJob(fqc_commands, "fastqc", "2-0",
             fqc_log_path.replace(".txt", ".%a.txt"))
     fqc.mem_per_task = 1900
