@@ -108,6 +108,8 @@ NBANHP9RLY7ABDLIS-22UA-SPB-2TEYPU_S95_R1_001.fastq.gz	   8,112,902 fragments
 NBANHP9RLY7ABDLIS-22UA-SPB-2TEYPU_S95_R2_001.fastq.gz	   8,112,902 fragments
 BCX7D46JEDN3HZXX3-SFXY-Y43-48JICX_S96_R1_001.fastq.gz	   8,445,426 fragments
 BCX7D46JEDN3HZXX3-SFXY-Y43-48JICX_S96_R2_001.fastq.gz	   8,445,426 fragments
+RandomIndexEmpty_S97_R1_001.fastq.gz	           0 fragments
+RandomIndexEmpty_S97_R2_001.fastq.gz	           0 fragments
 
 
 ----- Bioinformatic analyses ----

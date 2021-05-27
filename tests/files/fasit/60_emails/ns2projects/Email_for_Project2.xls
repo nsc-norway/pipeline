@@ -2,7 +2,7 @@
 Email for Project2
 --------------------------------		
 
-Sequence ready for download - sequencing run 210223_NS500336_0474_AHF3LWBGXG - Project_Project2 (48 samples)
+Sequence ready for download - sequencing run 210223_NS500336_0474_AHF3LWBGXG - Project_Project2 (49 samples)
 
 TTXKPEL03YL-JT044-A2I-CH9M67_S49_R1_001.fastq.gz	5,140,852	fragments
 TTXKPEL03YL-JT044-A2I-CH9M67_S49_R2_001.fastq.gz	5,140,852	fragments
@@ -100,3 +100,5 @@ NBANHP9RLY7ABDLIS-22UA-SPB-2TEYPU_S95_R1_001.fastq.gz	8,112,902	fragments
 NBANHP9RLY7ABDLIS-22UA-SPB-2TEYPU_S95_R2_001.fastq.gz	8,112,902	fragments
 BCX7D46JEDN3HZXX3-SFXY-Y43-48JICX_S96_R1_001.fastq.gz	8,445,426	fragments
 BCX7D46JEDN3HZXX3-SFXY-Y43-48JICX_S96_R2_001.fastq.gz	8,445,426	fragments
+RandomIndexEmpty_S97_R1_001.fastq.gz	0	fragments
+RandomIndexEmpty_S97_R2_001.fastq.gz	0	fragments
