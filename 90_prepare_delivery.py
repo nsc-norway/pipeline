@@ -14,6 +14,7 @@ import time
 import subprocess
 import datetime
 import glob
+import time
 import demultiplex_stats
 from genologics.lims import *
 from common import nsc
@@ -194,6 +195,37 @@ def delivery_diag_link(task, project, basecalls_dir, project_path):
 
     subprocess.check_call(["chmod", "-R", "ug+rwX,o-rwx", os.path.join(nsc.DIAGNOSTICS_DELIVERY, dest_dir)])
     subprocess.check_call(["chgrp", "-R", "ous-diag-delv", os.path.join(nsc.DIAGNOSTICS_DELIVERY, dest_dir)])
+
+    # Check undetermined percentage, then close the sequencing (Mi/NextSeq) or Data QC (NovaSeq) step.
+    # ---- Automation workflow for diagnostics projects ----
+    # 1. auto-next-script.sh cron job (lims repo) checks:
+    #    - sequencing step completed (NovaSeq) or Finish Date set (others)
+    # 2. Triggers the LIMS automations one by one (10. Copy Run, 20...., 90 This One)
+    # 3. This automation then goes and closes the QC (NovaSeq) / Sequencing (others) step (see code below)
+    # 4. The auto-next-script.sh cron job then sees that it is closed, and all jobs are completed, so
+    #    it finishes the demultiplexing step too.
+    if task.process: # Only in LIMS mode
+        qc_proc = utilities.get_sequencing_process(task.process, qc=True)
+        if qc_proc:
+            qc_step = Step(lims, qc_proc.id)
+            if qc_step.current_state.upper() != "COMPLETED":
+                # The step may have been completed already, if there's another project.
+                # This will only process if it's not completed.
+                if any(i.udf.get(nsc.LANE_UNDETERMINED_UDF, 100) < 50 for i in qc_proc.all_inputs()):
+                    task.fail("Undetermined indices < 50 %. To continue anyway, manually complete" +
+                        "the Sequencing and Demultiplexing steps.")
+                # NovaSeq -- QC flags are on outputs of the QC step
+                qcs = [o['uri'] for i, o in qc_proc.input_output_maps if 'output-generation-type' == 'PerInput']
+                if not qcs:
+                    # Others -- QC flags are on inputs
+                    qcs = qc_proc.all_inputs(unique=True)
+                for qc in qcs:
+                    qc.qc_flag = "PASSED"
+                lims.put_batch(qcs)
+                while qc_step.current_state.upper() != "COMPLETED":
+                    qc_step.advance()
+                    time.sleep(5)
+                    step.get(force=True)
 
 
 def copy_sav_files(task, dest_dir, srun_user_args=[]):
