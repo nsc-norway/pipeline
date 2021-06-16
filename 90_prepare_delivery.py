@@ -30,6 +30,9 @@ else:
     sys.stderr.write("Using dummy security module\n")
     from common import secure_dummy as secure
 
+# Wait time in seconds after triggering the processing of a project
+COVID_PROJECT_DELAY = 30
+
 
 def delivery_16s(task, project, lims_project, delivery_method, basecalls_dir, project_path):
     """Special delivery method for demultiplexing internal 16S barcodes."""
@@ -414,6 +417,8 @@ wait
                     "--cpus-per-task", "4",
                     "--wrap", "bash " + script_file],
             cwd=output_path)
+    task.info("Waiting {} seconds after starting {}...".format(COVID_PROJECT_DELAY, project.name))
+    time.sleep(COVID_PROJECT_DELAY)
 
 
 def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_samples,
