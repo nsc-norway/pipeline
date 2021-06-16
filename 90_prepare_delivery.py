@@ -210,25 +210,26 @@ def delivery_diag_link(task, project, basecalls_dir, project_path):
     if task.process: # Only in LIMS mode
         qc_proc = utilities.get_sequencing_process(task.process, qc=True)
         if qc_proc:
-            qc_step = Step(lims, qc_proc.id)
+            qc_step = Step(qc_proc.lims, id=qc_proc.id)
             if qc_step.current_state.upper() != "COMPLETED":
+                task.info("Completing the Sequencing QC step...")
                 # The step may have been completed already, if there's another project.
                 # This will only process if it's not completed.
-                if any(i.udf.get(nsc.LANE_UNDETERMINED_UDF, 100) < 50 for i in qc_proc.all_inputs()):
-                    task.fail("Undetermined indices < 50 %. To continue anyway, manually complete" +
+                if any(i.udf.get(nsc.LANE_UNDETERMINED_UDF, 0) > 50 for i in qc_proc.all_inputs()):
+                    task.fail("Undetermined indices > 50 %. To continue anyway, manually complete" +
                         "the Sequencing and Demultiplexing steps.")
                 # NovaSeq -- QC flags are on outputs of the QC step
-                qcs = [o['uri'] for i, o in qc_proc.input_output_maps if 'output-generation-type' == 'PerInput']
+                qcs = [o['uri'] for i, o in qc_proc.input_output_maps if o['output-generation-type'] == 'PerInput']
                 if not qcs:
                     # Others -- QC flags are on inputs
                     qcs = qc_proc.all_inputs(unique=True)
                 for qc in qcs:
                     qc.qc_flag = "PASSED"
-                lims.put_batch(qcs)
+                qc_proc.lims.put_batch(qcs)
                 while qc_step.current_state.upper() != "COMPLETED":
                     qc_step.advance()
                     time.sleep(5)
-                    step.get(force=True)
+                    qc_step.get(force=True)
 
 
 def copy_sav_files(task, dest_dir, srun_user_args=[]):

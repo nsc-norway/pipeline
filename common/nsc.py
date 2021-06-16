@@ -71,6 +71,16 @@ SEQ_PROCESSES=[
         ('miseq', 'MiSeq Run (MiSeq) NSC 5.1'),
         ]
 
+# Sequencing data QC processes (where we can choose pass/fail). Different from the
+# main seq process only for NovaSeq.
+QC_PROCESSES=[
+        ('hiseqx', 'Illumina Sequencing (HiSeq X) 1.0'),
+        ('hiseq4k', 'Illumina Sequencing (HiSeq 3000/4000) 1.0'),
+        ('novaseq', 'NovaSeq Data QC 1.0'),
+        ('nextseq', 'NextSeq 500/550 Run NSC 3.0'),
+        ('miseq', 'MiSeq Run (MiSeq) NSC 5.1'),
+        ]
+
 DEMULTIPLEXING_QC_PROCESS = "Demultiplexing and QC NSC 2.0"
 
 

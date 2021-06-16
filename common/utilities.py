@@ -21,11 +21,15 @@ from genologics.lims import *
 import nsc
 
 
-def get_sequencing_process(process):
+def get_sequencing_process(process, qc=False):
     """Gets the sequencing process from a process object corresponing to a process
     which is run after sequencing, such as demultiplexing. This function looks up
     the sequencing step by examining the sibling processes run on one of the
-    samples in the process's inputs."""
+    samples in the process's inputs.
+    
+    If qc is specified, it will return the sequencing data QC process instead of the
+    main sequencing process. There is a difference only for NovaSeq.
+    """
 
     # Each entry in input_output_maps is an input/output specification with a single
     # input and any number of outputs. This gets the first input.
@@ -33,7 +37,8 @@ def get_sequencing_process(process):
     first_in_artifact = first_io[0]['uri']
 
     processes = process.lims.get_processes(inputartifactlimsid=first_in_artifact.id)
-    seq_processes = [proc for proc in processes if proc.type_name in [p[1] for p in nsc.SEQ_PROCESSES]]
+    find_proc_names = [p[1] for p in (nsc.QC_PROCESSES if qc else nsc.SEQ_PROCESSES)]
+    seq_processes = [proc for proc in processes if proc.type_name in find_proc_names]
     try:
         # Use the last sequencing process. There may be more than one process if 
         # the sequencing step was repeated, but not the clustering step (this should
