@@ -31,7 +31,7 @@ else:
     from common import secure_dummy as secure
 
 # Wait time in seconds after triggering the processing of a project
-COVID_PROJECT_DELAY = 30
+COVID_PROJECT_DELAY = 10
 
 
 def delivery_16s(task, project, lims_project, delivery_method, basecalls_dir, project_path):
