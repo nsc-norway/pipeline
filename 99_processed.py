@@ -16,17 +16,6 @@ def main(task):
     task.running()
 
     inputs = task.process.all_inputs(unique=True)
-
-    if os.path.exists(
-            os.path.join(nsc.PRIMARY_STORAGE, "processed", task.run_id)
-            ):
-        task.info("Run " + task.run_id + " is already in processed directory")
-    else:
-        task.info("Will not move " + task.src_dir + " to processed directory, this has been disabled")
-        #os.rename(
-        #        task.src_dir,
-        #        os.path.join(nsc.PRIMARY_STORAGE, "processed", task.run_id)
-        #        )
     if task.process:
         inputs = task.process.all_inputs(unique=True, resolve=True)
         lims_samples = task.lims.get_batch(set(sample for i in inputs for sample in i.samples))
