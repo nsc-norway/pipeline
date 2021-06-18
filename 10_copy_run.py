@@ -82,6 +82,21 @@ def main(task):
                 """Remember to include the name of the destination directory in the 
 work_dir argument.""")
 
+    first_location_source = source
+    if not os.path.exists(source):
+        # Check if the run exists on the default source (runScratch) and if so, change
+        # the source, and move it once CopyComplete is done.
+        check_path = os.path.join(nsc.PRIMARY_STORAGES['default'], run_id)
+        if os.path.exists(check_path):
+            first_location_source = check_path
+
+    if instrument in ["nextseq", "novaseq"]:
+        while not os.path.exists(os.path.join(first_location_source, "CopyComplete.txt")):
+            task.info("Waiting for CopyComplete.txt...")
+            time.sleep(60)
+
+    if first_location_source != source:
+        os.rename(first_location_source, source)
 
     # Specify source with trailing slash to copy content
     source = source.rstrip('/') + "/"
@@ -102,11 +117,6 @@ work_dir argument.""")
             pass
         else:
             raise
-
-    if instrument in ["nextseq", "novaseq"]:
-        while not os.path.exists(os.path.join(source, "CopyComplete.txt")):
-            task.info("Waiting for CopyComplete.txt...")
-            time.sleep(60)
 
     logfile = task.logfile("rsync")
     rc = remote.run_command(

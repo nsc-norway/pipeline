@@ -297,6 +297,15 @@ class Task(object):
 
         return False
 
+    def get_run_base_dirs(self, process):
+        source, working = [storages['default'] for storages in [nsc.PRIMARY_STORAGES, nsc.SECONDARY_STORAGES]]
+        if process:
+            # Get any sample, project, and then its project type
+            first_project = next(iter(sample.project for sample in process.all_inputs()[0].samples if sample.project))
+            project_type = first_project.udf.get(nsc.PROJECT_TYPE_UDF)
+            source = nsc.PRIMARY_STORAGES.get(project_type, source)
+            working = nsc.SECONDARY_STORAGES.get(project_type, working)
+        return source, working
 
 
     # To be called to indicate the status
@@ -375,10 +384,12 @@ class Task(object):
                         pass
 
             if run_id:
-                src_dir = os.path.join(nsc.PRIMARY_STORAGE, run_id)
-                work_dir = os.path.join(nsc.SECONDARY_STORAGE, run_id)
+                source_base_dir, working_base_dir = self.get_run_base_dirs(self.process)
+                src_dir = os.path.join(source_base_dir, run_id)
+                work_dir = os.path.join(working_base_dir, run_id)
                 # These defaults are set to None in the ARG_OPTIONS initialization,
-                # no need to check if they are None
+                # no need to check if they are None. This sets the fallback values, but
+                # they will still be controlled by UDFs on the step, if available.
                 ARG_OPTIONS['run_id'][DEFAULT_VAL_INDEX] = run_id
                 ARG_OPTIONS['src_dir'][DEFAULT_VAL_INDEX] = src_dir
                 ARG_OPTIONS['work_dir'][DEFAULT_VAL_INDEX] = work_dir

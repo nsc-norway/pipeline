@@ -165,8 +165,8 @@ FASTDUP_ARGLIST=[FASTDUP, "-s", "10", "-e", "60"]
 # Paths
 if SITE and SITE.startswith("cees"):
     if TAG == "prod":
-        PRIMARY_STORAGE = "/storage/nscdata/runsIllumina"
-        SECONDARY_STORAGE="/storage/nscdata/runsIllumina"
+        PRIMARY_STORAGES = {"default": "/storage/nscdata/runsIllumina"}
+        SECONDARY_STORAGES = {"default": "/storage/nscdata/runsIllumina"}
         if SITE == "cees":
             DELIVERY_DIR="/storage/nscdata/runsIllumina/delivery" 
         elif SITE == "cees-sensitive":
@@ -175,29 +175,47 @@ if SITE and SITE.startswith("cees"):
         LIMS_SERVER="cees-lims"
 
     elif TAG == "dev":
-        PRIMARY_STORAGE = "/var/pipeline-test/runsIllumina"
-        SECONDARY_STORAGE="/var/pipeline-test/runsIllumina"
+        PRIMARY_STORAGES = {"default": "/var/pipeline-test/runsIllumina"}
+        SECONDARY_STORAGES = {"default": "/var/pipeline-test/runsIllumina"}
         #TRIGGER_DIR="/opt/nsc/trigger"
 
 elif SITE == "ous":
-    PRIMARY_STORAGE = "/data/runScratch.boston"     # source data
+    PRIMARY_STORAGES = { # Location of BCLs, by project type
+        "Diagnostics": "/boston/diag/runs",
+        "Sensitive": "/data/runScratch.boston",
+        "Non-Sensitive": "/data/runScratch.boston",
+        "FHI-Covid19": "/data/runScratch.boston",
+        "MIK-Covid19": "/data/runScratch.boston",
+        "Microbiology": "/data/runScratch.boston",
+        "Immunology": "/data/runScratch.boston",
+        "default": "/data/runScratch.boston"
+        }
     if TAG == "prod":
-        SECONDARY_STORAGE="/data/runScratch.boston/demultiplexed"         # location of demultiplexed files
+        SECONDARY_STORAGES = { # location of demultiplexed files, by project type
+            "Diagnostics": "/boston/diag/runs/demultiplexed",
+            "Sensitive": "/data/runScratch.boston/demultiplexed",
+            "Non-Sensitive": "/data/runScratch.boston/demultiplexed",
+            "FHI-Covid19": "/data/runScratch.boston/demultiplexed",
+            "MIK-Covid19": "/data/runScratch.boston/demultiplexed",
+            "Microbiology": "/data/runScratch.boston/demultiplexed",
+            "Immunology": "/data/runScratch.boston/demultiplexed",
+            "default": "/data/runScratch.boston/demultiplexed"
+        }
         DELIVERY_DIR="/data/runScratch.boston/demultiplexed/delivery"     # used by prepare-delivery after QC
         DIAGNOSTICS_DELIVERY = "/boston/diag/nscDelivery"
         TRIGGER_DIR="/data/runScratch.boston/scripts/trigger"
         LIMS_SERVER="ous-lims"
 
     elif TAG == "dev":
-        SECONDARY_STORAGE="/data/runScratch.boston/test"    # location of demultiplexed files
+        SECONDARY_STORAGES = {"default": "/data/runScratch.boston/test"}    # location of demultiplexed files
         DELIVERY_DIR="/data/runScratch.boston/test/delivery"# used by prepare-delivery after QC
         DIAGNOSTICS_DELIVERY = "/data/runScratch.boston/test/diag"
         TRIGGER_DIR="/data/runScratch.boston/scripts/dev/trigger"
         LIMS_SERVER="dev-lims"
         
 else:
-    PRIMARY_STORAGE = "/tmp"
-    SECONDARY_STORAGE = "/tmp"
+    PRIMARY_STORAGES = {"default": "/tmp"}
+    SECONDARY_STORAGE = {"default": "/tmp"}
 
 
 # Configure LIMS access:
