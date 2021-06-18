@@ -152,14 +152,9 @@ def main(process_id, sample_sheet_file):
 
         if run_id:
             process.udf[nsc.RUN_ID_UDF] = run_id
-
-            logging.debug('Found source and destination paths')
-            source_path = os.path.join(nsc.PRIMARY_STORAGE, run_id)
-            dest_path = os.path.join(nsc.SECONDARY_STORAGE, run_id)
-            process.udf[nsc.SOURCE_RUN_DIR_UDF] = source_path
-            process.udf[nsc.WORK_RUN_DIR_UDF] = dest_path
+            logging.debug('Found Run ID: {}.'.format(run_id))
         else:
-            logging.debug('Unable to determine source and destination paths')
+            logging.debug('Unable to determine Run ID.')
 
         instrument = utilities.get_instrument(seq_proc)
         for udf in CHECKED.get(instrument, []):
