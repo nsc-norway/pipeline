@@ -113,8 +113,10 @@ td.text {
 {% endfor %}
 
 <p>&nbsp;</p>
-<p>Regards</p>
+<p>Regards</p>{% if project_datas[0].diag_project %}
+<p>NSC/Diagnostics (Check who has sent the email &#128540;)</p>
+{% else %}
 <p>Arvind/Marius (Check who has sent the email &#128540;)</p>
-
+{% endif %}
 </body>
 </html>
