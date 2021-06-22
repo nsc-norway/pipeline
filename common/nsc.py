@@ -215,7 +215,7 @@ elif SITE == "ous":
         
 else:
     PRIMARY_STORAGES = {"default": "/tmp"}
-    SECONDARY_STORAGE = {"default": "/tmp"}
+    SECONDARY_STORAGES = {"default": "/tmp"}
 
 
 # Configure LIMS access:
