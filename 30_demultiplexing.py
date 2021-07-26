@@ -1,5 +1,6 @@
 import os
 import re
+import time
 from math import ceil
 
 from genologics.lims import *
@@ -120,12 +121,15 @@ def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
                 e = e_
         else:
             raise e
+        utilities.upload_file(task.process, nsc.BCL2FASTQ_LOG, log_path)
         log_iter = iter(log)
         for l,i in zip(log_iter,range(6)):
             if l.startswith("bcl2fastq v"):
                 task.process.udf[nsc.BCL2FASTQ_VERSION_UDF] = l.split(" ")[1].strip("\n")
                 # Will put() when calling success_finish() or fail()
-        utilities.upload_file(task.process, nsc.BCL2FASTQ_LOG, log_path)
+                break
+        else:
+            task.fail("Unable to read the bcl2fastq version from the bcl2fastq log file.")
 
     return rcode == 0
 
