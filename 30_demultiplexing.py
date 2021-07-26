@@ -110,16 +110,22 @@ def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
     # - Upload log
     # - Get the bcl2fastq version
     if task.process:
-        try:
-            utilities.upload_file(task.process, nsc.BCL2FASTQ_LOG, log_path)
-            log = open(log_path)
-            log_iter = iter(log)
-            for l,i in zip(log_iter,range(4)):
-                if l.startswith("bcl2fastq v"):
-                    task.process.udf[nsc.BCL2FASTQ_VERSION_UDF] = l.split(" ")[1].strip("\n")
-                    # Will put() when calling success_finish() or fail()
-        except IOError:
-            pass
+        e = None
+        for _ in range(3):
+            try:
+                log = open(log_path)
+                break
+            except IOError as e_:
+                time.sleep(30)
+                e = e_
+        else:
+            raise e
+        log_iter = iter(log)
+        for l,i in zip(log_iter,range(6)):
+            if l.startswith("bcl2fastq v"):
+                task.process.udf[nsc.BCL2FASTQ_VERSION_UDF] = l.split(" ")[1].strip("\n")
+                # Will put() when calling success_finish() or fail()
+        utilities.upload_file(task.process, nsc.BCL2FASTQ_LOG, log_path)
 
     return rcode == 0
 
