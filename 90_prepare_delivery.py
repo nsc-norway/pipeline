@@ -15,6 +15,7 @@ import subprocess
 import datetime
 import glob
 import time
+import requests
 import demultiplex_stats
 from genologics.lims import *
 from common import nsc
@@ -227,7 +228,15 @@ def delivery_diag_link(task, project, basecalls_dir, project_path):
                     qc.qc_flag = "PASSED"
                 qc_proc.lims.put_batch(qcs)
                 while qc_step.current_state.upper() != "COMPLETED":
-                    qc_step.advance()
+                    for _ in range(3):
+                        try:
+                            qc_step.advance()
+                            break
+                        except requests.exceptions.HTTPError:
+                            task.info("Completing sequencing / QC step - waiting for LIMS script...")
+                            time.sleep(30)
+                    else:
+                        raise RuntimeError("Failed to advance the Sequencing / Data QC step due to a HTTP error in the API.")
                     time.sleep(5)
                     qc_step.get(force=True)
 
