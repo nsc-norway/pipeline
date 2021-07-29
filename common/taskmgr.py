@@ -300,11 +300,15 @@ class Task(object):
     def get_run_base_dirs(self, process):
         source, working = [storages['default'] for storages in [nsc.PRIMARY_STORAGES, nsc.SECONDARY_STORAGES]]
         if process:
-            # Get any sample, project, and then its project type
-            first_project = next(iter(sample.project for sample in process.all_inputs()[0].samples if sample.project))
-            project_type = first_project.udf.get(nsc.PROJECT_TYPE_UDF)
-            source = nsc.PRIMARY_STORAGES.get(project_type, source)
-            working = nsc.SECONDARY_STORAGES.get(project_type, working)
+            # Get any sample, project, and then its project type. Assumes that there is a sample with a project
+            # (not just controls). But it skips the case when there are no inputs at all -- this is primarily for
+            # the tests.
+            inputs = process.all_inputs()
+            if len(inputs) > 0:
+                first_project = next(iter(sample.project for sample in inputs[0].samples if sample.project))
+                project_type = first_project.udf.get(nsc.PROJECT_TYPE_UDF)
+                source = nsc.PRIMARY_STORAGES.get(project_type, source)
+                working = nsc.SECONDARY_STORAGES.get(project_type, working)
         return source, working
 
 
