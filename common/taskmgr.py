@@ -144,7 +144,7 @@ class Task(object):
         """Get the path to a logfile in the standard log directory, for use with
         subprocesses, etc."""
 
-        logdir = os.path.join(self.work_dir, nsc.RUN_LOG_DIR)
+        logdir = os.path.join(os.path.abspath(self.work_dir), nsc.RUN_LOG_DIR)
 
         if not os.path.exists(logdir):
             os.mkdir(logdir)
