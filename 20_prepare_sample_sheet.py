@@ -119,10 +119,10 @@ def main(task):
                 sample_sheet = reverse_complement_index2(sample_sheet)
         else:
             task.info("Not in LIMS mode, don't know if we should reverse index2, leaving it as on Sample Sheet.")
-    # NovaSeq sample sheet generator will replace some invalid characters with _. Including -
+    # NovaSeq & MiSeq sample sheet generators will replace some invalid characters with _. Including -
     # which is copiously used in our conventions. We bluntly translate all _ back to -, without
     # knowing for sure if they started as - or not.
-    if instrument == "novaseq":
+    if instrument in ["miseq", "novaseq"]:
         sample_sheet = replace_underscores(sample_sheet)
 
     if task.lanes:
