@@ -124,7 +124,7 @@ def delivery_16s(task, project, lims_project, delivery_method, basecalls_dir, pr
     subprocess.call(["/data/runScratch.boston/scripts/run-16s-sbatch.sh", project_path])
 
 
-def delivery_diag_link(task, project, basecalls_dir, project_path):
+def delivery_diag_move(task, project, basecalls_dir, project_path):
     """Special delivery method for diagnostics at OUS"""
 
     dest_dir = os.path.join(
@@ -132,17 +132,17 @@ def delivery_diag_link(task, project, basecalls_dir, project_path):
             os.path.basename(project_path)
             )
 
-    cp_args = ['cp', '-rl']
+    # Move data into delivery area for NSC
+    transfer_cmd_args = ['mv']
 
     if os.path.exists(dest_dir):
         raise RuntimeError("Destination directory '" + dest_dir + "' already exists")
-    args = cp_args + [project_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
+    args = transfer_cmd_args + [project_path.rstrip("/"), nsc.DIAGNOSTICS_DELIVERY]
     subprocess.check_call(args)
 
-    # Now copy quality control data. Make real copy, not links for qc files, as we change
-    # the permissions of the transferred data independently of the source files in the NSC
-    # area.
-    cp_copy_args = ['cp', '-r']
+    # Now copy quality control data. The Stats and Reports belong to all projects, so
+    # we make hard links, not move them.
+    cp_copy_args = ['cp', '-rl']
     # Diagnostics wants the QC info in a particular format (file names, etc.). Do not
     # change without consultiing with them. 
     source_qc_dir = os.path.join(basecalls_dir, "QualityControl" + task.suffix)
@@ -174,7 +174,7 @@ def delivery_diag_link(task, project, basecalls_dir, project_path):
                 dest = os.path.join(sample_dir, fdp_name)
                 if os.path.exists(dest):
                     shutil.rmtree(dest)
-                subprocess.check_call(cp_args + [source, dest])
+                subprocess.check_call(transfer_cmd_args + [source, dest])
 
         for f in sample.files:
             source = os.path.join(source_qc_dir, samples.get_fastqc_dir(project, sample, f) + "/")
@@ -183,7 +183,7 @@ def delivery_diag_link(task, project, basecalls_dir, project_path):
                 dest = os.path.join(sample_dir, fqc_name)
                 if os.path.exists(dest):
                     shutil.rmtree(dest)
-                subprocess.check_call(cp_args + [source, dest])
+                subprocess.check_call(transfer_cmd_args + [source, dest])
 
     # Get the demultiplex stats for diag. We generate a HTML file in the same 
     # format as that used by the first version of bcl2fastq.
@@ -515,6 +515,7 @@ def main(task):
     samples.add_index_read_files(projects, task.work_dir)
 
     sensitive_fail = []
+    diag_delete_work_dir_after = False
     for project in projects:
         project_path = os.path.join(task.bc_dir, project.proj_dir)
 
@@ -538,8 +539,9 @@ def main(task):
             task.info("Running 16S delivery for " + project.name + "...")
             delivery_16s(task, project, lims_project, delivery_type, task.bc_dir, project_path)
         elif project_type == "Diagnostics" or delivery_type == "Transfer to diagnostics":
-            task.info("Linking " + project.name + " to diagnostics...")
-            delivery_diag_link(task, project, task.bc_dir, project_path)
+            task.info("Moving/linking " + project.name + " to diagnostics...")
+            delivery_diag_move(task, project, task.bc_dir, project_path)
+            diag_delete_work_dir_after = not not task.process
         elif project_type == "Immunology":
             delivery_external_user(task, lims_project, project_path, "/data/runScratch.boston/imm_data")
         elif project_type == "Microbiology":
@@ -567,6 +569,20 @@ def main(task):
             delivery_norstore(task.process, project.name, project_path, task)
         else:
             print "No delivery prep done for project", project.name
+        if diag_delete_work_dir_after:
+            task.info("Deleting demultiplexing dir...")
+            if glob.glob(os.path.join(
+                task.work_dir,
+                "Data",
+                "Intensities",
+                "BaseCalls",
+                "L001"
+                )):
+                task.fail("Won't delete the demultiplexed dir because it seems to contain BCL data.")
+            else:
+                shutil.rmtree(task.work_dir)
+
+
 
     if sensitive_fail:
         task.fail("Selected Internet-based delivery for sensitive data, nothing done for: " + ",".join(sensitive_fail))
