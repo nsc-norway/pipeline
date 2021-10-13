@@ -357,19 +357,20 @@ def write_html_and_email_files(jinja_env, process, run_dir, bc_dir, delivery_dir
         projects, print_lane_number, lane_stats, software_versions, patterned, occupancy):
     """Stats summary file for emails, etc."""
 
-    project_datas = []
+    lims_projects = {}
+    seq_process = None
     if process:
         seq_process = utilities.get_sequencing_process(process)
-        inputs = process.all_inputs(unique=True, resolve=True)
-        samples = process.lims.get_batch((sample for i in inputs for sample in i.samples))
-        lims_projects = dict(
-                (utilities.get_sample_sheet_proj_name(sample.project.name), sample.project)
-                for sample in samples
-                if sample.project
-                )
-    else:
-        lims_projects = {}
-        seq_process = None
+        if seq_process:
+            inputs = process.all_inputs(unique=True, resolve=True)
+            samples = process.lims.get_batch((sample for i in inputs for sample in i.samples))
+            lims_projects = dict(
+                    (utilities.get_sample_sheet_proj_name(sample.project.name), sample.project)
+                    for sample in samples
+                    if sample.project
+                    )
+                
+    project_datas = []    
     for project in projects:
         if not project.is_undetermined:
             lims_project = lims_projects.get(project.name)

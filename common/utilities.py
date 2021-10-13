@@ -112,12 +112,21 @@ def get_rta_version(run_dir):
     return rta_ver_element.text 
 
 
+def try_get_pattern(pattern, string):
+    match = re.match(pattern, string)
+    if match:
+        return match.group(1)
+    else:
+        return None
+
+
 def get_fcid_by_runid(run_id):
     runid = get_instrument_by_runid(run_id)
     if runid.startswith("hiseq") or runid == "nextseq":
-        return re.match(r"[\d]{6}_[\dA-Z]+_[\d]+_[AB]([A-Z\d-]+)$", run_id).group(1)
+        return try_get_pattern(r"[\d]{6}_[\dA-Z]+_[\d]+_[AB]([A-Z\d-]+)$", run_id)
     else:
-        return re.match(r"[\d]{6}_[\dA-Z]+_[\d]+_([A-Z\d-]+)$", run_id).group(1)
+        return try_get_pattern(r"[\d]{6}_[\dA-Z]+_[\d]+_([A-Z\d-]+)$", run_id)
+
 
 def merged_lanes(run_id):
     return get_instrument_by_runid(run_id) == "nextseq"
