@@ -103,6 +103,10 @@ def main(task):
     task.running()
 
     runid = task.run_id
+    if task.work_dir.startswith(nsc.SECONDARY_STORAGES['Diagnostics']):
+        # Skip this for diag projects
+        task.success_finish()
+        return
     projects = (project for project in task.projects if not project.is_undetermined)
 
     project_triggers = glob.glob(os.path.join(nsc.TRIGGER_DIR, "project.*.*"))
