@@ -227,19 +227,18 @@ def delivery_diag_move(task, project, basecalls_dir, project_path):
                 for qc in qcs:
                     qc.qc_flag = "PASSED"
                 qc_proc.lims.put_batch(qcs)
+                attempts = 0
+                error_object = None
                 while qc_step.current_state.upper() != "COMPLETED":
-                    error_object = None
-                    for _ in range(6):
-                        try:
-                            qc_step.advance()
-                            break
-                        except requests.exceptions.HTTPError as e:
-                            task.info("Completing sequencing / QC step - waiting for LIMS script...")
-                            error_object = e
-                            time.sleep(60)
-                    else:
-                        task.fail("Failed to advance the Sequencing / Data QC step due to an HTTP error in the API "
-                                  "(after multiple retries).", repr(error_object))
+                    attempts += 1
+                    if attempt > 10:
+                        task.fail("Failed to advance the Sequencing / Data QC step.", repr(error_object))
+                    try:
+                        qc_step.advance()
+                    except requests.exceptions.HTTPError as e:
+                        task.info("Completing sequencing / QC step - waiting for LIMS script...")
+                        error_object = e
+                        time.sleep(55)
                     time.sleep(5)
                     qc_step.get(force=True)
 
