@@ -227,10 +227,10 @@ def delivery_diag_move(task, project, basecalls_dir, project_path):
                 for qc in qcs:
                     qc.qc_flag = "PASSED"
                 qc_proc.lims.put_batch(qcs)
-                attempts = 0
+                attempt = 0
                 error_object = None
                 while qc_step.current_state.upper() != "COMPLETED":
-                    attempts += 1
+                    attempt += 1
                     if attempt > 10:
                         task.fail("Failed to advance the Sequencing / Data QC step.", repr(error_object))
                     try:
