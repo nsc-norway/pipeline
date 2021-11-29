@@ -92,7 +92,7 @@ def get_sample_sheet_data(cluster_proc, fcid):
         o = io[1]
         if o['output-type'] == 'ResultFile' and o['output-generation-type'] == 'PerAllInputs':
             name = o['uri'].name
-            if name == 'SampleSheet csv' or name == "bcl2fastq Sample Sheet" or name == "HiSeq 3000-4000 Sample Sheet" or name == "Sample Sheet" or name == "bcl2fastq SampleSheet":
+            if name == 'SampleSheet csv' or name == "bcl2fastq Sample Sheet" or name == "MiSeq SampleSheet" or name == "Sample Sheet" or name == "bcl2fastq SampleSheet":
                 files = []
                 if len(o['uri'].files) == 1:
                     f = o['uri'].files[0]
