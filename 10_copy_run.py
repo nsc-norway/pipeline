@@ -90,10 +90,9 @@ work_dir argument.""")
         if os.path.exists(check_path):
             first_location_source = check_path
 
-    if instrument in ["nextseq", "novaseq"]:
-        while not os.path.exists(os.path.join(first_location_source, "CopyComplete.txt")):
-            task.info("Waiting for CopyComplete.txt...")
-            time.sleep(60)
+    while not os.path.exists(os.path.join(first_location_source, "CopyComplete.txt")):
+        task.info("Waiting for CopyComplete.txt...")
+        time.sleep(60)
 
     if first_location_source != source:
         os.rename(first_location_source, source)
