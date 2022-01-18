@@ -103,7 +103,7 @@ def main(task):
     task.running()
 
     runid = task.run_id
-    if task.work_dir.startswith(nsc.SECONDARY_STORAGES['Diagnostics']):
+    if task.work_dir.startswith(nsc.SECONDARY_STORAGES.get('Diagnostics', 'Diagnostics')):
         # Skip this for diag projects
         task.success_finish()
         return
