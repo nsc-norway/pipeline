@@ -387,7 +387,7 @@ set -e
 ( cd .. && tar cf for_FHI_TSD_2/{fastq_dir}.tar {fastq_dir} && cd for_FHI_TSD_2/ && md5sum {fastq_dir}.tar > {fastq_dir}.tar.md5 ) &
 
 # Run workflow
-/data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v10/main.nf \\
+/data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v11/main.nf \\
     --outpath "$PWD" \\
     --samplelist sampleList.csv \\
     --align_tool "bowtie2" \\
