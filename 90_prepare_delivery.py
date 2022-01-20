@@ -427,6 +427,7 @@ wait
                     "-o", log_file,
                     "--mem", "16G",
                     "--cpus-per-task", "4",
+                    "--qos=high",
                     "--wrap", "bash " + script_file],
             cwd=output_path)
     task.info("Waiting {} seconds after starting {}...".format(COVID_PROJECT_DELAY, project.name))
