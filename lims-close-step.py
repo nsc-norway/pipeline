@@ -4,6 +4,7 @@
 import sys
 from genologics.lims import *
 from common import nsc
+import datetime
 
 def main(process_id):
     if ':' in process_id:
