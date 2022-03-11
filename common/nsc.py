@@ -138,7 +138,7 @@ elif SITE == "ous":
     FASTQC="/data/common/tools/fastQC/FastQC_v0.11.8/fastqc"
     FASTDUP=False
     SUPRDUPR=["/data/common/tools/suprDUPr/v1.3/suprDUPr", "-1", "-s", "10", "-e", "60"]
-    MULTIQC = ["singularity", "run", "-B", "/boston", "/data/common/tools/multiqc/multiqc_1.11--pyhdfd78af_0.sif", "multiqc"]
+    MULTIQC = ["singularity", "run", "-B", "/boston", "/data/common/tools/multiqc/multiqc-1.12--pyhdfd78af_0", "multiqc"]
     MD5=["/usr/bin/md5deep", "-rl", "-j5"]
     BASEURI="https://ous-lims.sequencing.uio.no"
 
