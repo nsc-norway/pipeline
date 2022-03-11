@@ -113,7 +113,8 @@ def main(process_id, sample_sheet_file):
 
     fcids = set()
     wells = set()
-    for i in process.all_inputs():
+    inputs = process.all_inputs(resolve=True) # Resolve, to cache and use later
+    for i in inputs:
         fcids.add(i.location[0].name)
         wells.add(i.location[1])
 
@@ -166,13 +167,28 @@ def main(process_id, sample_sheet_file):
             if next(iter(process.all_inputs())).location[0].type.name == "Library Tube":
                 # NovaSeq Standard workflow: Don't split the lanes
                 process.udf['No lane splitting'] = True
-        logging.debug('Saved settings in the process')
-
     else:
         logging.warning("Couldn't find the sequencing process")
+
+    all_samples = process.lims.get_batch(set(s for i in inputs for s in i.samples))
+    projects = set(sam.project for sam in all_samples if sam.project)
+    project_demux_options = set(project.udf.get('Demultiplexing options') for project in projects)
+    if len(project_demux_options) > 1:
+        logging.error("""Projects have different values for 'Demultiplexing options': {}. Fix by changing options,
+                    or splitting in multiple steps.""".format(
+            ", ".join(repr(var) for var in project_demux_options)
+            ))
+        return 1 ### ABORT - This will leave the step open with an error message
+
+    for option in project_demux_options: # There is just zero or one options
+        if option:
+            process.udf['Other options for bcl2fastq'] = option
+
     process.put()
+    logging.debug('Saved settings in the process')
 
     logging.info("Program completed")
+    return 0
 
 
 
