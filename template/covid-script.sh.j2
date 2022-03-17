@@ -1,0 +1,35 @@
+#!/bin/bash
+set -e
+
+{% if project_type == "MIK-Covid19" %}
+(cd .. && cp -rl {{fastq_dir}} for_MIK_IronKey_2)
+{% endif %}
+
+# Make tar file with fastqs in parallel with everything else
+( cd .. && tar cf for_FHI_TSD_2/{{fastq_dir}}.tar {{fastq_dir}} && cd for_FHI_TSD_2/ && md5sum {{fastq_dir}}.tar > {{fastq_dir}}.tar.md5 ) &
+
+# Run workflow
+/data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v11/main.nf \
+    --outpath "$PWD" \
+    --samplelist sampleList.csv \
+    --align_tool "bowtie2" \
+    -resume > pipeline_log.txt
+
+# Prepare delivery files
+cd ..
+
+# Variants
+tar cf for_FHI_TSD_1/{{analysis_dir}}_variants.tar {{analysis_dir}}/results/*.tsv {{analysis_dir}}/pipeline_report_log.txt {{analysis_dir}}/results/4_consensus/ivar/ {{analysis_dir}}/results/3_variants/ivar/ {{analysis_dir}}/results/9_QC/
+( cd for_FHI_TSD_1/ && md5sum {{analysis_dir}}_variants.tar > {{analysis_dir}}_variants.tar.md5 )
+
+# Need to clean up before making analysis tar file / copy
+rm -r {{analysis_dir}}/work {{analysis_dir}}/.nextflow*
+
+{% if project_type == "MIK-Covid19" %}
+cp -rl {{analysis_dir}} for_MIK_IronKey_1
+{% endif %}
+
+tar cf for_FHI_TSD_2/{{analysis_dir}}.tar {{analysis_dir}}
+( cd for_FHI_TSD_2/ && md5sum {{analysis_dir}}.tar > {{analysis_dir}}.tar.md5 )
+
+wait

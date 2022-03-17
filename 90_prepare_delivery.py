@@ -16,6 +16,7 @@ import datetime
 import glob
 import time
 import requests
+from jinja2 import Environment, FileSystemLoader
 import demultiplex_stats
 from genologics.lims import *
 from common import nsc
@@ -30,9 +31,6 @@ if nsc.TAG == "prod":
 else:
     sys.stderr.write("Using dummy security module\n")
     from common import secure_dummy as secure
-
-# Wait time in seconds after triggering the processing of a project
-COVID_PROJECT_DELAY = 10
 
 
 def delivery_16s(task, project, lims_project, delivery_method, basecalls_dir, project_path):
@@ -371,52 +369,16 @@ def fhi_mik_seq_delivery(task, project_type, project, lims_project, lims_process
                          os.path.join(output_path, "sampleList.csv"),
                          os.path.join(output_path, "extendedSampleList.csv"))
 
-    #### RUN viralrecon ####
+    #### RUN covid analysis pipeline ####
     subprocess.check_call(["/bin/cp", "-rl", project_path, delivery_base_dir])
-    script1 = """#!/bin/bash
-set -e
-
-"""
-    if project_type == "MIK-Covid19":
-        script1 += """
-(cd .. && cp -rl {fastq_dir} for_MIK_IronKey_2)
-"""
-    script1 += """
-
-# Make tar file with fastqs in parallel with everything else
-( cd .. && tar cf for_FHI_TSD_2/{fastq_dir}.tar {fastq_dir} && cd for_FHI_TSD_2/ && md5sum {fastq_dir}.tar > {fastq_dir}.tar.md5 ) &
-
-# Run workflow
-/data/common/tools/nscbin/nextflow run /boston/runScratch/analysis/pipelines/2021_covid19/nsc_pipeline_v11/main.nf \\
-    --outpath "$PWD" \\
-    --samplelist sampleList.csv \\
-    --align_tool "bowtie2" \\
-    -resume > pipeline_log.txt
-
-
-# Prepare delivery files
-cd ..
-
-# Variants
-tar cf for_FHI_TSD_1/{analysis_dir}_variants.tar {analysis_dir}/results/*.tsv {analysis_dir}/pipeline_report_log.txt {analysis_dir}/results/4_consensus/ivar/ {analysis_dir}/results/3_variants/ivar/ {analysis_dir}/results/9_QC/
-( cd for_FHI_TSD_1/ && md5sum {analysis_dir}_variants.tar > {analysis_dir}_variants.tar.md5 )
-
-# Need to clean up before making analysis tar file / copy
-rm -r {analysis_dir}/work {analysis_dir}/.nextflow*
-
-"""
-    if project_type == "MIK-Covid19":
-        script1 += """
-cp -rl {analysis_dir} for_MIK_IronKey_1
-"""
-    script1 += """
-tar cf for_FHI_TSD_2/{analysis_dir}.tar {analysis_dir}
-( cd for_FHI_TSD_2/ && md5sum {analysis_dir}.tar > {analysis_dir}.tar.md5 )
-
-wait
-"""
-    script = script1.format(analysis_dir=project.name, fastq_dir=proj_dir_name)
-
+    # Prepare script
+    template_dir = os.path.join(os.path.dirname(__file__), "template")
+    jinja_env = Environment(loader=FileSystemLoader(template_dir))
+    script = jinja_env.get_template('covid-script.sh.j2').render(
+                analysis_dir=project.name,
+                fastq_dir=proj_dir_name,
+                project_type=project_type
+            )
     script_file = os.path.join(output_path, "script.sh")
     log_file = os.path.join(output_path, "control_job_log.txt")
     open(script_file, "w").write(script)
@@ -430,9 +392,6 @@ wait
                     "--qos=high",
                     "--wrap", "bash " + script_file],
             cwd=output_path)
-    task.info("Waiting {} seconds after starting {}...".format(COVID_PROJECT_DELAY, project.name))
-    time.sleep(COVID_PROJECT_DELAY)
-
 
 def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_samples,
                 output_sample_list_path, output_ext_sample_list_path):
