@@ -74,11 +74,8 @@ else:
                 ],
             }
     THREADS_OVERRIDE = {
-            "hiseq": 64,
-            "hiseqx": 64,
-            "hiseq4k": 64,
-            "novaseq": 96,
-            "miseq": 16,
+            "novaseq": 128,
+            "miseq": 32,
             "nextseq": 64
             }
 
