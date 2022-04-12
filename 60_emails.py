@@ -425,7 +425,7 @@ def write_html_and_email_files(jinja_env, process, run_dir, bc_dir, delivery_dir
     for project_data in project_datas:
         link_placement = delivery_dir + "/email_content/{}_multiqc.html".format(project_data.dir)
         try:
-            shutil.copy("../../{}/multiqc_report.html".format(project_data.name), link_placement)
+            os.symlink("../../{}/multiqc_report.html".format(project_data.name), link_placement)
         except OSError as e:
             if e.errno == 17: pass # File exists
             else: raise
