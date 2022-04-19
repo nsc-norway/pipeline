@@ -20,7 +20,7 @@ def main(task):
     projects = task.projects
 
     # Per-project fastqc multiqc reports
-    output_dir = os.path.join(bc_dir, "QualityControl" + task.suffix)
+    qc_dir = os.path.join(bc_dir, "QualityControl" + task.suffix)
     commands = []
     for project in projects:
         if not project.is_undetermined:
@@ -28,7 +28,7 @@ def main(task):
             commands.append(nsc.MULTIQC + ["-q", "-f", "-o", project_qc_dir, project_qc_dir])
 
     mqc = remote.ArrayJob(commands, "multiqc", "01:00:00", task.logfile("multiqc.%a"))
-    mqc.cwd = output_dir
+    mqc.cwd = qc_dir
     mqc.mem_per_task = 8000
     mqc.cpus_per_task = 1
     mqc.comment = task.run_id
@@ -43,6 +43,15 @@ def main(task):
 
     if mqc.summary.keys() != ["COMPLETED"]:
         task.fail("MultiQC failed (check logs)")
+
+    # Make links to multiqc reports in the delivery dir
+    for project in qc_dir:
+        link_placement =  "{}/Delivery/email_content/{}_multiqc.html".format(qc_dir, project.proj_dir)
+        try:
+            os.link("{}/{}/multiqc_report.html".format(qc_dir, project.name), link_placement)
+        except OSError as e:
+            if e.errno == 17: pass # File exists
+            else: raise
 
     task.success_finish()
 
