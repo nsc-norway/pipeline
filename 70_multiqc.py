@@ -46,12 +46,16 @@ def main(task):
 
     # Make links to multiqc reports in the delivery dir
     for project in projects:
+        if project.is_undetermined: continue
+
         link_placement =  "{}/Delivery/email_content/{}_multiqc.html".format(qc_dir, project.proj_dir)
-        try:
-            os.link("{}/{}/multiqc_report.html".format(qc_dir, project.name), link_placement)
-        except OSError as e:
-            if e.errno == 17: pass # File exists
-            else: raise
+        source = "{}/{}/multiqc_report.html".format(qc_dir, project.name)
+        if os.path.isfile(source):
+            try:
+                os.link(source, link_placement)
+            except OSError as e:
+                if e.errno == 17: pass # File exists
+                else: raise
 
     task.success_finish()
 
