@@ -45,7 +45,7 @@ def main(task):
         task.fail("MultiQC failed (check logs)")
 
     # Make links to multiqc reports in the delivery dir
-    for project in qc_dir:
+    for project in projects:
         link_placement =  "{}/Delivery/email_content/{}_multiqc.html".format(qc_dir, project.proj_dir)
         try:
             os.link("{}/{}/multiqc_report.html".format(qc_dir, project.name), link_placement)
