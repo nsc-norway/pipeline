@@ -27,7 +27,7 @@ def main(task):
             project_qc_dir = project.name
             commands.append(nsc.MULTIQC + ["-q", "-f", "-o", project_qc_dir, project_qc_dir])
 
-    mqc = remote.ArrayJob(commands, "multiqc", "01:00:00", task.logfile("multiqc.%a"))
+    mqc = remote.ArrayJob(commands, "multiqc", "02:00:00", task.logfile("multiqc.%a"))
     mqc.cwd = qc_dir
     mqc.mem_per_task = 8000
     mqc.cpus_per_task = 1
