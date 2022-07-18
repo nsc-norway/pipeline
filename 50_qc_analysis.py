@@ -98,6 +98,9 @@ def main(task):
         median_size = list(sorted(file_sizes))[len(file_sizes)/2]
         if median_size < 50 * 1024**2:
             fqc.max_simultaneous = 10
+        else:
+            # Limit parallelism to reduce load on storage cluster
+            fqc.max_simultaneous = 100
     except IndexError:
         pass
 
@@ -114,6 +117,8 @@ def main(task):
                 dup_log_path.replace(".txt", ".%a.txt"))
         dup.mem_per_task = 500
         dup.cpus_per_task = 1
+        # Limit parallelism to reduce load on storage cluster
+        dup.max_simultaneous = 50
         dup.comment = run_id
         jobs = [fqc, dup]
     else:
