@@ -528,18 +528,18 @@ def main(task):
             delivery_norstore(task.process, project.name, project_path, task)
         else:
             print "No delivery prep done for project", project.name
-        if diag_delete_work_dir_after:
-            task.info("Deleting demultiplexing dir...")
-            if glob.glob(os.path.join(
-                task.work_dir,
-                "Data",
-                "Intensities",
-                "BaseCalls",
-                "L001"
-                )):
-                task.fail("Won't delete the demultiplexed dir because it seems to contain BCL data.")
-            else:
-                shutil.rmtree(task.work_dir)
+    if diag_delete_work_dir_after:
+        task.info("Deleting demultiplexing dir...")
+        if glob.glob(os.path.join(
+            task.work_dir,
+            "Data",
+            "Intensities",
+            "BaseCalls",
+            "L001"
+            )):
+            task.fail("Won't delete the demultiplexed dir because it seems to contain BCL data.")
+        else:
+            shutil.rmtree(task.work_dir)
 
 
 
