@@ -25,7 +25,7 @@ def main(task):
     for project in projects:
         if not project.is_undetermined:
             project_qc_dir = project.name
-            commands.append(nsc.MULTIQC + ["-q", "-f", "-o", project_qc_dir, project_qc_dir])
+            commands.append(nsc.MULTIQC + ["-m", "fastqc", "-q", "-f", "-o", project_qc_dir, project_qc_dir])
 
     mqc = remote.ArrayJob(commands, "multiqc", "02:00:00", task.logfile("multiqc.%a"))
     mqc.cwd = qc_dir
