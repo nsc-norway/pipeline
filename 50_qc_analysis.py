@@ -100,7 +100,7 @@ def main(task):
             fqc.max_simultaneous = 10
         else:
             # Limit parallelism to reduce load on storage cluster
-            fqc.max_simultaneous = 52
+            fqc.max_simultaneous = 52 # reduce this to 10 if LIMS crash
     except IndexError:
         pass
 
@@ -118,7 +118,7 @@ def main(task):
         dup.mem_per_task = 500
         dup.cpus_per_task = 1
         # Limit parallelism to reduce load on storage cluster
-        dup.max_simultaneous = 26
+        dup.max_simultaneous = 26 # reduce to 5 if LIMS crash
         dup.comment = run_id
         jobs = [fqc, dup]
     else:
