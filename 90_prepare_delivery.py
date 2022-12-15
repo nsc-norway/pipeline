@@ -241,7 +241,15 @@ def delivery_diag_move(task, project, basecalls_dir, project_path):
                     qc_step.get(force=True)
 
 
-def copy_sav_files(task, dest_dir, srun_user_args=[]):
+def copy_qc_files(task, project_name, dest_dir, srun_user_args=[]):
+    qc_dest_path = os.path.join(dest_dir, "QualityControl")
+    try:
+        os.mkdir(qc_dest_path)
+    except OSError as e:
+        if e.errno != 17: # Ignore "File exists" errors
+            raise
+    qc_dir = os.path.join(task.bc_dir, "QualityControl" + task.suffix)
+
     # Copy "SAV" files for advanced users
     if task.instrument == "nextseq":
         sav_include_paths = [
@@ -260,20 +268,34 @@ def copy_sav_files(task, dest_dir, srun_user_args=[]):
         sav_include_paths.append(os.path.relpath(sorted(demultiplexing_sample_sheets)[-1], task.work_dir))
     rsync_cmd = [nsc.RSYNC, '-r']
     rsync_cmd += sav_include_paths
-    rsync_cmd += [os.path.join(dest_dir, task.run_id) + "/"]
+    rsync_cmd += [os.path.join(qc_dest_path, task.run_id) + "/"]
     rcode = remote.run_command(rsync_cmd, task, "rsync_sav_files", time="1:00:00",
             srun_user_args=srun_user_args, cwd=task.work_dir, comment=task.run_id)
     # Rsync error code is ignored, failure here is not fatal.
+    
+    # Copy bcl2fastq html reports
+    # MultiQC
+    # Delivery HTML
+    # Use a quick cheeky local process - it's too small for a SLURM job
+    subprocess.call([nsc.RSYNC, '-r',
+                        os.path.join(task.bc_dir, "Reports"),
+                        os.path.join(qc_dir, project_name, "multiqc_report.html"),
+                        #Emails_for_221209_M07166_0208_000000000-KNBCY.html
+                        os.path.join(qc_dir, "Delivery", "Emails_for_" + task.run_id + ".html"),
+                        qc_dest_path + "/"
+                    ])
 
 
-def delivery_external_user(task, lims_project, project_path, delivery_path):
+
+def delivery_external_user(task, lims_project, project_path, project_name, delivery_path):
     """Link the fastq files, close LIMS project, and copy SAV data if specified"""
 
-    dest_dir = os.path.join(delivery_path, os.path.basename(project_path))
+    project_dir_name = os.path.basename(project_path)
+    dest_dir = os.path.join(delivery_path, project_dir_name)
     subprocess.check_call(["/bin/cp", "-rl", project_path, dest_dir])
     lims_project.close_date = datetime.date.today()
     lims_project.put()
-    copy_sav_files(task, dest_dir)
+    copy_qc_files(task, project_name, dest_dir)
 
 
 def delivery_harddrive(project_name, source_path):
@@ -502,9 +524,9 @@ def main(task):
             delivery_diag_move(task, project, task.bc_dir, project_path)
             diag_delete_work_dir_after = not not task.process
         elif project_type == "Immunology":
-            delivery_external_user(task, lims_project, project_path, "/data/runScratch.boston/imm_data")
+            delivery_external_user(task, lims_project, project_path, project.name, "/data/runScratch.boston/imm_data")
         elif project_type == "Microbiology":
-            delivery_external_user(task, lims_project, project_path, "/data/runScratch.boston/mik_data")
+            delivery_external_user(task, lims_project, project_path, project.name, "/data/runScratch.boston/mik_data")
         elif project_type == "FHI-Covid19": # Implicitly requires LIMS mode (or we wouldn't have project_type)
             lims_samples = [s for s in l_samples if s.project == lims_project]
             fhi_mik_seq_delivery(task, project_type, project, lims_project, task.process, lims_samples, project_path, "/data/runScratch.boston/analysis/covid")
