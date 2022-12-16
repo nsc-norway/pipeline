@@ -290,11 +290,15 @@ def copy_qc_files(task, project_name, dest_dir, srun_user_args=[]):
 def delivery_external_user(task, lims_project, project_path, project_name, delivery_path):
     """Link the fastq files, close LIMS project, and copy SAV data if specified"""
 
+    # Copy FASTQ Files
     project_dir_name = os.path.basename(project_path)
     dest_dir = os.path.join(delivery_path, project_dir_name)
-    subprocess.check_call(["/bin/cp", "-rl", project_path, dest_dir])
+    rsync_cmd = [nsc.RSYNC, '-r', project_path + "/", dest_dir + "/"]
+    remote.run_command(rsync_cmd, task, "copy_run_fastqs", time="12:00:00", comment=task.run_id)
+    # Close the project automatically in LIMS (just for these "external" IMM/MIK projects)
     lims_project.close_date = datetime.date.today()
     lims_project.put()
+    # Copy QC
     copy_qc_files(task, project_name, dest_dir)
 
 
