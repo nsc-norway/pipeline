@@ -460,6 +460,7 @@ def covid_seq_write_sample_list(task, project, lims_project, lims_process, lims_
             ('fastq_1',         r1path),
             ('fastq_2',         r2path),
             ('MIKInputCols',    lims_sample.udf.get('Additional columns (MIK)', '')),
+            ('ControlName',    lims_sample.udf.get('Control Name', '')),
         ]
         sample_details_rows.append(sample_details)
 
