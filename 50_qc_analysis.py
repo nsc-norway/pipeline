@@ -112,6 +112,12 @@ def main(task):
     for read in reads:
         if read.attrib['Number'] == "1":
             r1_cycles = int(read.attrib['NumCycles'])
+    # Check for overriding read 1 length
+    if task.process and 'Other options for bcl2fastq' in task.process.udf:
+        ubm = task.process.udf.get('Other options for bcl2fastq', '')
+        umatch = re.match(r'--use-bases-mask[= ]+y(\d+)', ubm)
+        if umatch:
+            r1_cycles = int(umatch.group(1))
     if task.instrument in ["hiseqx", "hiseq4k", "novaseq"] and nsc.FASTDUP != None and r1_cycles > 60:
         dup = remote.ArrayJob(dup_commands, "suprDUPr", "1-0", 
                 dup_log_path.replace(".txt", ".%a.txt"))
