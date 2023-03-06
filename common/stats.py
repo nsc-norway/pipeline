@@ -101,7 +101,7 @@ def add_duplication_results(qc_dir, projects):
                             assert lines[0][0:2] == ["NUM_READS", "READS_WITH_DUP"]
                             num_reads, reads_with_dup = [int(v) for v in lines[1][0:2]]
                             stats = f.stats or dict()
-                            stats['% Sequencing Duplicates'] = reads_with_dup * 100.0 / max(num_reads, 1)
+                            stats['% Sequencing Duplicates'] = reads_with_dup * 100.0 / num_reads
                             stats['fastdup reads with duplicate'] = reads_with_dup
                             stats['fastdup reads analysed'] = num_reads
                             f.stats = stats
