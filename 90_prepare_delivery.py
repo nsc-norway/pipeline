@@ -354,7 +354,7 @@ def delivery_norstore(process, project_name, source_path, task):
     tarname = project_dir + ".tar"
     args = ["/bin/tar", "cf", save_path + "/" + tarname , project_dir]
     rcode = remote.run_command(
-            args, task, "tar", "04:00:00",
+            args, task, "tar", "10:00:00",
             cwd=os.path.dirname(source_path),
             comment=task.run_id
             ) # dirname = parent dir
@@ -365,7 +365,7 @@ def delivery_norstore(process, project_name, source_path, task):
     # would use normal md5sum, but we have md5deep as a dependency already
     rcode = remote.run_command(
             nsc.MD5 + [tarname], task,
-            "md5deep_tar", "08:00:00", cwd=save_path, stdout=md5_path,
+            "md5deep_tar", "16:00:00", cwd=save_path, stdout=md5_path,
             comment=task.run_id
             )
     if rcode != 0:
