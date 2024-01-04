@@ -20,7 +20,11 @@ This section attempts to describe the setup in general.
 
 ### Dependencies (libraries)
 
-Required yum packages:
+Alternative: There's a Dockerfile that defines the relevant python and all dependencies.
+You need to integrate this into the environment yourself, e.g. by making a wrapper script
+for nsc-pyhton27.
+
+Required yum packages (obsolete; see docker file):
 
 - `python2-mock` (depends on `python2`, `python2-pip`, which are also needed)
 - `python2-requests`
