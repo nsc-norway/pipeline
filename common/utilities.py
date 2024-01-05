@@ -18,7 +18,7 @@ from collections import defaultdict
 from xml.etree import ElementTree
 
 from genologics.lims import *
-import nsc
+from . import nsc
 
 
 def get_sequencing_process(process, qc=False):
@@ -91,7 +91,7 @@ def get_bcl2fastq2_version(process, work_dir):
     if log_paths:
         log_path = log_paths[-1]
         log = open(log_path)
-        for i in xrange(3):
+        for i in range(3):
             l = next(log)
             if l.startswith("bcl2fastq v"):
                 return l.split(" ")[1].strip("\n")
@@ -218,7 +218,7 @@ class LimsInfo(object):
             if lane.samples[0].project == lims_project:
                 state_count[state]+=1
         self.status_map = state_count
-        self.sequencing_status = ", ".join(str(k) + ": " + str(v) for k, v in state_count.items())
+        self.sequencing_status = ", ".join(str(k) + ": " + str(v) for k, v in list(state_count.items()))
 
 
 def get_udf(process, udf, default):

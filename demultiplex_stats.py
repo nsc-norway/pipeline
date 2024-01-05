@@ -189,8 +189,8 @@ def interactive(task):
             for project in projects if project.is_undetermined
             )
 
-    print demultiplex_stats(project, undetermined_project, task.work_dir, task.bc_dir, instrument, 
-            task.no_lane_splitting, fcid, bcl2fastq_version, task.suffix)
+    print(demultiplex_stats(project, undetermined_project, task.work_dir, task.bc_dir, instrument, 
+            task.no_lane_splitting, fcid, bcl2fastq_version, task.suffix))
     task.success_finish()
 
 

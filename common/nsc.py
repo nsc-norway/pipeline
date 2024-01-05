@@ -1,5 +1,5 @@
 # NSC-specific configuration
-from __future__ import print_function
+
 from genologics.lims import *
 import getpass
 import os

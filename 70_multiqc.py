@@ -41,7 +41,7 @@ def main(task):
         remote.ArrayJob.update_status([mqc])
         task.array_job_status([mqc])
 
-    if mqc.summary.keys() != ["COMPLETED"]:
+    if list(mqc.summary.keys()) != ["COMPLETED"]:
         task.fail("MultiQC failed (check logs)")
 
     # Make links to multiqc reports in the delivery dir

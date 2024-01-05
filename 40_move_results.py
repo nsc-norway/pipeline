@@ -53,7 +53,7 @@ def move_files(bc_dir, projects):
                     try:
                         os.rename(orig_path, new_path)
                     except OSError:
-                        print "Failed to move file", orig_path, "to", new_path
+                        print("Failed to move file", orig_path, "to", new_path)
                         # We don't know which files are empty at this point. Just ignoring errors.
                         #if not f.empty:
                         #    raise
@@ -79,7 +79,7 @@ def move_files(bc_dir, projects):
                                     )
                         os.rmdir(path)
                     except OSError:
-                        print "Failed to remove directory ", path
+                        print("Failed to remove directory ", path)
 
             # Remove project dir
             try:
@@ -88,7 +88,7 @@ def move_files(bc_dir, projects):
                     project=project.name
                     ))
             except OSError:
-                print "Failed to remove directory", project.name
+                print("Failed to remove directory", project.name)
 
 
 def main(task):

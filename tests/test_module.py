@@ -26,7 +26,7 @@ from genologics.lims import *
 
 class DummyTestCase(unittest.TestCase):
     def test_dummy(self):
-        self.assertEquals("moo", "moo")
+        self.assertEqual("moo", "moo")
 
 
 ### Support code
@@ -84,8 +84,8 @@ class TaskTestCase(unittest.TestCase):
             if do_cleanup:
                 shutil.rmtree(self.tempparent)
             else:
-                print self.__class__.__name__, ">>>", self.tempparent,\
-                        "<<< Test dir preserved due to failure or debug mode"
+                print(self.__class__.__name__, ">>>", self.tempparent,\
+                        "<<< Test dir preserved due to failure or debug mode")
 
     def check_files_with_reference(self, test_dir, ref_dir):
         self.assertTrue(os.path.isdir(test_dir), "Expected {0} to be a directory, but it isn't.".format(
@@ -101,7 +101,7 @@ class TaskTestCase(unittest.TestCase):
                     with open(ref_path) as ref_file,\
                             open(test_path) as test_file:
                         test_data = test_file.read()
-                        self.assertEquals(ref_file.read(), test_data, "File {0} differs from the "
+                        self.assertEqual(ref_file.read(), test_data, "File {0} differs from the "
                                 "reference {1}.".format(test_path, ref_path))
 
     def tearDown(self):
@@ -123,11 +123,11 @@ def chdir(path):
 
 def convert_strings_to_unicode(dic):
     res = {}
-    for k, v in dic.items():
+    for k, v in list(dic.items()):
         if isinstance(v, str):
-            res[unicode(k)] = unicode(v)
+            res[str(k)] = str(v)
         else:
-            res[unicode(k)] = v
+            res[str(k)] = v
     return res
 
 
@@ -169,9 +169,9 @@ class TestTaskFramework(unittest.TestCase):
         with patch.object(sys, 'argv', testargs):
             task.__enter__()
             task.running()
-            self.assertEquals(task.run_id, TEST_RUN)
-            self.assertEquals(task.lanes, [1])
-            self.assertEquals(task.process, None)
+            self.assertEqual(task.run_id, TEST_RUN)
+            self.assertEqual(task.lanes, [1])
+            self.assertEqual(task.process, None)
 
 
     def test_args_lims_mode(self):
@@ -195,7 +195,7 @@ class TestTaskFramework(unittest.TestCase):
         with patch.object(sys, 'argv', testargs):
             task.__enter__()
             task.running()
-            self.assertEquals(projects_to_dicts(task.projects), correct_projects)
+            self.assertEqual(projects_to_dicts(task.projects), correct_projects)
 
 
     def test_sample_sheet_parsing_with_index_merged_lanes(self):
@@ -207,7 +207,7 @@ class TestTaskFramework(unittest.TestCase):
         with patch.object(sys, 'argv', testargs):
             task.__enter__()
             task.running()
-            self.assertEquals(projects_to_dicts(task.projects), correct_projects)
+            self.assertEqual(projects_to_dicts(task.projects), correct_projects)
 
 
     def test_sample_sheet_parsing_with_extra_comma(self):
@@ -219,7 +219,7 @@ class TestTaskFramework(unittest.TestCase):
         with patch.object(sys, 'argv', testargs):
             task.__enter__()
             task.running()
-            self.assertEquals(projects_to_dicts(task.projects), correct_projects)
+            self.assertEqual(projects_to_dicts(task.projects), correct_projects)
 
     def test_sample_sheet_parsing_hi4000(self):
         with open("files/samples/hi4000.json") as jsonfile:
@@ -231,7 +231,7 @@ class TestTaskFramework(unittest.TestCase):
         with patch.object(sys, 'argv', testargs):
             task.__enter__()
             task.running()
-            self.assertEquals(projects_to_dicts(task.projects), correct_projects)
+            self.assertEqual(projects_to_dicts(task.projects), correct_projects)
 
     def test_sample_sheet_parsing_novs2std_nonmerged(self):
         with open("files/samples/novs2standard.json") as jsonfile:
@@ -243,7 +243,7 @@ class TestTaskFramework(unittest.TestCase):
         with patch.object(sys, 'argv', testargs):
             task.__enter__()
             task.running()
-            self.assertEquals(projects_to_dicts(task.projects), correct_projects)
+            self.assertEqual(projects_to_dicts(task.projects), correct_projects)
 
     def test_sample_sheet_parsing_novs2std_merged(self):
         with open("files/samples/novs2standard-merged.json") as jsonfile:
@@ -255,7 +255,7 @@ class TestTaskFramework(unittest.TestCase):
         with patch.object(sys, 'argv', testargs):
             task.__enter__()
             task.running()
-            self.assertEquals(projects_to_dicts(task.projects), correct_projects)
+            self.assertEqual(projects_to_dicts(task.projects), correct_projects)
 
     def test_sample_sheet_parsing_novs2xp(self):
         with open("files/samples/novs2xp.json") as jsonfile:
@@ -267,7 +267,7 @@ class TestTaskFramework(unittest.TestCase):
         with patch.object(sys, 'argv', testargs):
             task.__enter__()
             task.running()
-            self.assertEquals(projects_to_dicts(task.projects), correct_projects)
+            self.assertEqual(projects_to_dicts(task.projects), correct_projects)
 
 # 2. Test of the individual "Task" scipts
 
@@ -313,7 +313,7 @@ class Test20PrepareSampleSheet(TaskTestCase):
             self.task.success_finish.assert_called_once()
         old_samplesheet = open(INPUT_SAMPLE_SHEET).read()
         new_samplesheet = open(os.path.join(self.tempdir, "DemultiplexingSampleSheet.csv")).read()
-        self.assertEquals(old_samplesheet, new_samplesheet)
+        self.assertEqual(old_samplesheet, new_samplesheet)
 
     def test_novaseq_samplesheet_edited(self):
         """Testing that the script replaced underscores with dashes."""
@@ -328,7 +328,7 @@ class Test20PrepareSampleSheet(TaskTestCase):
             self.task.success_finish.assert_called_once()
         correct_samplesheet = open("files/fasit/20_prepare_sample_sheet/novaseq-standard-fixed.csv").read()
         new_samplesheet = open(os.path.join(self.tempdir, "DemultiplexingSampleSheet.csv")).read()
-        self.assertEquals(correct_samplesheet, new_samplesheet)
+        self.assertEqual(correct_samplesheet, new_samplesheet)
 
 
 class Test30Demultiplexing(TaskTestCase):

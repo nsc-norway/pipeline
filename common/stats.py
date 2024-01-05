@@ -3,8 +3,8 @@
 import re
 import os
 import json
-import utilities
-import samples
+from . import utilities
+from . import samples
 
 def get_stats(
         _,  # Instrument
@@ -67,7 +67,7 @@ def get_stats(
                 sums[coordinates] = data
 
     results = {}
-    for coordinates, csums in sums.items():
+    for coordinates, csums in list(sums.items()):
         results[coordinates] = {
             '# Reads PF': csums['NumberReads'],
             'Yield PF (Gb)': csums['Yield'] / 1e9,
@@ -112,10 +112,10 @@ def add_duplication_results(qc_dir, projects):
 if __name__ == "__main__":
     import sys
     if len(sys.argv) != 2:
-            print "Use: dump_stats.py RUN_DIR"
+            print("Use: dump_stats.py RUN_DIR")
             sys.exit(1)
 
     run_folder = sys.argv[1]
     run_id = os.path.basename(run_folder)
     instrument = utilities.get_instrument_by_runid(run_id)
-    print get_stats(instrument, run_folder)
+    print(get_stats(instrument, run_folder))

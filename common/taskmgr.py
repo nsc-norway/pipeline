@@ -1,5 +1,5 @@
 
-from __future__ import print_function
+
 
 import os
 import sys
@@ -9,9 +9,9 @@ import datetime
 import time
 
 # local
-import utilities
-import samples
-import nsc
+from . import utilities
+from . import samples
+from . import nsc
 
 from genologics.lims import *
 
@@ -184,7 +184,7 @@ class Task(object):
         """Get the list of project objects, defined in the samples module. """
 
         num_reads, index_reads = utilities.get_num_reads(self.work_dir)
-        sample_sheet = samples.parse_sample_sheet(self.sample_sheet_content)
+        sample_sheet = samples.parse_sample_sheet(self.sample_sheet_content.decode('utf-8'))
         sample_sheet_data = sample_sheet['data']
 
         # Supply a list of lanes if lane number isn't given in the sample sheet
@@ -201,7 +201,7 @@ class Task(object):
                 expand_lanes = None
 
         experiment_name = None
-        if sample_sheet.has_key('header'):
+        if 'header' in sample_sheet:
             experiment_name = sample_sheet['header'].get("Experiment Name")
 
         return samples.get_projects(
@@ -424,7 +424,7 @@ class Task(object):
                     for code in known_codes
                     if array_job.summary.get(code)
                     ]
-            other_states = sum(v for code, v in array_job.summary.items() if code not in known_codes) 
+            other_states = sum(v for code, v in list(array_job.summary.items()) if code not in known_codes) 
             if other_states:
                 states.append("?:{0}".format(other_states))
 

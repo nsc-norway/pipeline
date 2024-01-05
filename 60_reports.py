@@ -93,7 +93,7 @@ def replace_multiple(replacedict, text):
     # but the use of dollar signs in template placeholders interferes 
     # with latex syntax, though only when editing the template itself)
 
-    pattern = re.compile('|'.join(replacedict.keys()))
+    pattern = re.compile('|'.join(list(replacedict.keys())))
     return pattern.sub(lambda m: replacedict[m.group(0)], text)
 
 
@@ -188,7 +188,7 @@ def generate_internal_html_report(quality_control_dir, projects):
         i = 0
         samples_files = sorted(
                 ((p, s, fi) for p in projects for s in p.samples for fi in s.files),
-                key=lambda (p, s,f): (f.lane, s.name == None, s.name, f.i_read)
+                key=lambda p_s_f: (p_s_f[2].lane, p_s_f[1].name == None, p_s_f[1].name, p_s_f[2].i_read)
                 )
         for p, s, fq in samples_files:
             fq_name = os.path.basename(fq.path)

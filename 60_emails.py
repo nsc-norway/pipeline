@@ -108,7 +108,7 @@ def get_lane_summary_data(projects, print_lane_number, lane_stats, patterned, oc
 
     # PhiX column for each of read 1, read 2:
     phix_n_cols = max( 
-                [len(lane.phix) for lane in lane_stats.values() if lane]
+                [len(lane.phix) for lane in list(lane_stats.values()) if lane]
                 or [1]
                 )
     phix_cols = ["AlignPhixR{}".format(read) for read in range(1, phix_n_cols+1)]
@@ -254,7 +254,7 @@ class ProjectData(object):
         )
         files = sorted(
                 ((s,fi) for s in project.samples for fi in s.files),
-                key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
+                key=lambda s_f2: (s_f2[1].lane, s_f2[0].sample_index, s_f2[1].i_read)
                 )
 
         mean_frags = {}
@@ -491,7 +491,7 @@ def write_sample_info_table(output_path, runid, project):
         if project.name.startswith("Diag-"):
             files = sorted(
                     ((s,fi) for s in project.samples for fi in s.files if fi.i_read == 1),
-                    key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
+                    key=lambda s_f: (s_f[1].lane, s_f[0].sample_index, s_f[1].i_read)
                     )
             for i, (s,f) in enumerate(files, 1):
                 out.write("Sample\t" + str(i) + "\t")
@@ -503,7 +503,7 @@ def write_sample_info_table(output_path, runid, project):
         else:
             files = sorted(
                     ((s,fi) for s in project.samples for fi in s.files),
-                    key=lambda (s,f): (f.lane, s.sample_index, f.i_read)
+                    key=lambda s_f1: (s_f1[1].lane, s_f1[0].sample_index, s_f1[1].i_read)
                     )
             for s,f in files:
                 out.write(os.path.basename(f.path) + "\t")

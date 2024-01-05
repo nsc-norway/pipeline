@@ -143,10 +143,10 @@ def main(task):
     
     fail = ""
     detail = ""
-    if fqc.summary.keys() != ["COMPLETED"]:
+    if list(fqc.summary.keys()) != ["COMPLETED"]:
         fail += "fastqc failure "
         detail = str(fqc.summary)
-    if dup and dup.summary.keys() != ["COMPLETED"]:
+    if dup and list(dup.summary.keys()) != ["COMPLETED"]:
         fail += "fastdup failure "
         detail = str(dup.summary)
     if fail:

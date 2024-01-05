@@ -7,8 +7,8 @@ from collections import Counter
 from genologics.lims import *
 
 # Local imports
-import nsc
-import utilities
+from . import nsc
+from . import utilities
 
 
 # Sample object model
@@ -171,7 +171,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
             if sample.sample_dir:
                 path += sample.sample_dir + "/"
 
-            for i_read in xrange(1, num_reads+1):
+            for i_read in range(1, num_reads+1):
 
                 fastq_name = get_fastq_name(
                         instrument,
@@ -213,7 +213,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
     for lane in lanes:
         if lane in not_multiplexed_lanes:
             continue
-        for i_read in xrange(1, num_reads+1):
+        for i_read in range(1, num_reads+1):
             if merged_lanes:
                 path = "Undetermined_S0_R{0}_001.fastq.gz".format(i_read)
             else:
@@ -222,7 +222,7 @@ def get_projects(run_id, sample_sheet_data, num_reads, merged_lanes, expand_lane
                         )
             undetermined_sample.files.append(FastqFile(lane, i_read, path, path, None, None))
 
-    return [undetermined_project] + projects.values()
+    return [undetermined_project] + list(projects.values())
 
 
 def check_files_merged_lanes(run_dir):

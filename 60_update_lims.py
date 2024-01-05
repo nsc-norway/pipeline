@@ -72,7 +72,7 @@ def post_stats(lims, process, projects, demultiplex_stats, lane_metrics, lane_st
     #print "Done loading"
 
     update_artifacts = set()
-    for coordinates, stats in demultiplex_stats.items():
+    for coordinates, stats in list(demultiplex_stats.items()):
         # Note: while it may seem that this works for both aggregate_reads and
         # separate reads, it does not, the code must be changed for separate reads
         lane, sample_id = coordinates[0:2]
@@ -105,7 +105,7 @@ def post_stats(lims, process, projects, demultiplex_stats, lane_metrics, lane_st
                 lane_analyte.udf[nsc.LANE_UNDETERMINED_UDF] = stats['% of PF Clusters Per Lane']
                 update_artifacts.add(lane_analyte)
 
-    for lane, metric in lane_metrics.items():
+    for lane, metric in list(lane_metrics.items()):
         lane_analyte = get_lane(process, lane)
         if lane_analyte:
             duplicates = metric.get('% Sequencing Duplicates', None)
@@ -126,11 +126,11 @@ def get_lane_metrics(projects):
     for project in projects:
         for sample in project.samples:
             for f in sample.files:
-                if f.i_read == 1 and f.stats and f.stats.has_key('fastdup reads with duplicate'):
+                if f.i_read == 1 and f.stats and 'fastdup reads with duplicate' in f.stats:
                     lane_n_with_dup[f.lane] += f.stats['fastdup reads with duplicate']
                     lane_count[f.lane] += f.stats['fastdup reads analysed']
     metrics = {}
-    for lane in lane_n_with_dup.keys():
+    for lane in list(lane_n_with_dup.keys()):
         metrics[lane] = {'% Sequencing Duplicates': lane_n_with_dup[lane] * 100.0 / lane_count[lane]}
     return metrics
 

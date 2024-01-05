@@ -16,5 +16,5 @@ with open(sys.argv[1]) as f:
                 if len(data) > 1: # Identify sample names as entries containing hyphen
                     fiels[1+lane_offset] = "-".join("".join(random.choice(alpha) for a in d) for d in data)
                 id_name[fiels[lane_offset]] = fiels[1+lane_offset]
-        print ",".join(fiels),
+        print(",".join(fiels), end=' ')
 

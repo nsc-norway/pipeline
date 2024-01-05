@@ -4,13 +4,13 @@ import os
 import subprocess
 import getpass
 import tempfile
-import StringIO
+import io
 import itertools
 import multiprocessing
 import time
 
-import nsc
-import utilities
+from . import nsc
+from . import utilities
 
 local_job_id = 1
 
@@ -166,9 +166,9 @@ class SlurmArrayJob(object):
         new_states = dict(line.split() for line in squeue_out.splitlines() if line)
     
         # If this job cancelled, make sure others are marked as the same state too.
-        if new_states and all(state in set(('COMPLETED', 'FAILED', 'CANCELLED')) for state in new_states.values()):
-            for jix in self.states.keys():
-                if not jix in new_states.keys() and self.states[jix] == "PENDING":
+        if new_states and all(state in set(('COMPLETED', 'FAILED', 'CANCELLED')) for state in list(new_states.values())):
+            for jix in list(self.states.keys()):
+                if not jix in list(new_states.keys()) and self.states[jix] == "PENDING":
                     self.states[jix] = 'CANCELLED'
 
         self.states.update(new_states)
@@ -178,7 +178,7 @@ class SlurmArrayJob(object):
 
     @property
     def is_finished(self):
-        return all(state in set(('COMPLETED', 'FAILED', 'CANCELLED')) for state in self.states.values())
+        return all(state in set(('COMPLETED', 'FAILED', 'CANCELLED')) for state in list(self.states.values()))
 
     @staticmethod
     def start_jobs(jobs, max_local_threads):

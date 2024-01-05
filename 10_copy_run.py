@@ -75,7 +75,7 @@ def main(task):
     source = task.src_dir
     destination = task.work_dir    
     # Check destination
-    print run_id
+    print(run_id)
     instrument = utilities.get_instrument_by_runid(run_id)
     if not instrument:
         task.fail("Destination does not look like an Illumina run folder", 
@@ -111,7 +111,7 @@ work_dir argument.""")
 
     try:
         os.mkdir(destination)
-    except OSError, e:
+    except OSError as e:
         if e.errno == 17: # Already exists
             pass
         else:

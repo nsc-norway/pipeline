@@ -554,7 +554,7 @@ def main(task):
             task.info("Tar'ing and copying " + project.name + " to delivery area, for Norstore...")
             delivery_norstore(task.process, project.name, project_path, task)
         else:
-            print "No delivery prep done for project", project.name
+            print("No delivery prep done for project", project.name)
     if diag_delete_work_dir_after:
         task.info("Deleting demultiplexing dir...")
         if glob.glob(os.path.join(

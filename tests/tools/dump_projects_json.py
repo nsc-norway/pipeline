@@ -47,10 +47,10 @@ reads = int(os.environ.get('READS', 2)) # Number of data reads; 1=single read, 2
 
 with open(sys.argv[1]) as sample_sheet_file:
     sample_sheet_content = sample_sheet_file.read()
-sample_sheet = samples.parse_sample_sheet(sample_sheet_content)
+sample_sheet = samples.parse_sample_sheet(sample_sheet_content.decode('utf-8'))
 sample_sheet_data = sample_sheet['data']
 projects = samples.get_projects(sys.argv[2], sample_sheet_data, reads, collapse_lanes, expand_lanes)
 if os.environ.get('ADD_INDEX_FILES'):
     samples.add_index_read_files(projects, "/dev/null", True)
-print(json.dumps(projects_to_dicts(projects)))
+print((json.dumps(projects_to_dicts(projects))))
 

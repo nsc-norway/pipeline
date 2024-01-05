@@ -23,11 +23,11 @@ def main(task):
     run_id = task.run_id
 
     if task.process:
-        print "Demultiplexing process for LIMS process", task.process.id, ", run", run_id
+        print("Demultiplexing process for LIMS process", task.process.id, ", run", run_id)
 
     source_run_dir = task.src_dir
     dest_run_dir = task.work_dir
-    print "Reading from", source_run_dir, "writing to", dest_run_dir
+    print("Reading from", source_run_dir, "writing to", dest_run_dir)
 
     threads = task.threads
 
@@ -101,7 +101,7 @@ def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
 
     log_path = task.logfile("bcl2fastq2")
 
-    print "Calling bcl2fastq with:", " ".join(args)
+    print("Calling bcl2fastq with:", " ".join(args))
     rcode = remote.run_command(
             args, task, "bcl2fastq2", time="1-0", logfile=log_path,
             cpus=n_threads, mem="15G", comment=comment
@@ -123,7 +123,7 @@ def run_dmx(task, n_threads, run_dir, output_dir, sample_sheet_path,
             raise e
         utilities.upload_file(task.process, nsc.BCL2FASTQ_LOG, log_path)
         log_iter = iter(log)
-        for l,i in zip(log_iter,range(6)):
+        for l,i in zip(log_iter,list(range(6))):
             if l.startswith("bcl2fastq v"):
                 task.process.udf[nsc.BCL2FASTQ_VERSION_UDF] = l.split(" ")[1].strip("\n")
                 # Will put() when calling success_finish() or fail()
