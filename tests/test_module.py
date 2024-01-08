@@ -421,7 +421,13 @@ class Test50QcAnalysis(TaskTestCase):
 
         with self.qc_dir(self.H4RUN) as tempdir:
             testargs = ["script", tempdir]
-            with patch.object(sys, 'argv', testargs), patch('subprocess.call') as call:
+            # Replace multiprocessing.Pool.map with plain map
+            object_mock = Mock()
+            object_mock.map = lambda f, *args: list(map(f, *args))  # Force immediate execution
+            fake_pool = Mock(return_value=object_mock)
+            with patch.object(sys, 'argv', testargs), \
+                    patch('subprocess.call') as call, \
+                    patch('multiprocessing.Pool', fake_pool):
                 call.return_value = 0
                 self.module.main(self.task)
                 # This test is quite incomplete: because the local array job
