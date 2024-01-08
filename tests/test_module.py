@@ -645,7 +645,7 @@ class Test70MultiQC(TaskTestCase):
                     if not project['is_undetermined']:
                         target_dir = project['name']
                         calls.append(
-                            call(nsc.MULTIQC + ['-q', '-f', '-o', target_dir, target_dir],
+                            call(nsc.MULTIQC + ['-m', 'fastqc', '-q', '-f', '-o', target_dir, target_dir],
                                 cwd=ANY, stderr=ANY, stdout=ANY)
                             )
                 sub_call.assert_has_calls(calls, any_order=True)
