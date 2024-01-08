@@ -593,7 +593,7 @@ class Test60Reports(TaskTestCase):
     def reports_general_tester(self, projects, run_id, pdfpaths, os_rename):
         # Replace multiprocessing.Pool.map with plain map
         object_mock = Mock()
-        object_mock.map = map
+        object_mock.map = lambda f, *args: list(map(f, *args))  # Force immediate execution
         fake_pool = Mock(return_value=object_mock)
 
         with self.qc_dir(run_id):
