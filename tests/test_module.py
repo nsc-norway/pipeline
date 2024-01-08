@@ -164,6 +164,11 @@ def projects_to_dicts(projects):
 
 class TestTaskFramework(unittest.TestCase):
 
+    def setUp(self):
+        # Disable irrelevant warnings about unclosed files
+        warnings.simplefilter("ignore", ResourceWarning)
+
+
     def test_args_workdir_lanes_no_lims(self):
         """Test some argument parsing functionality."""
 
