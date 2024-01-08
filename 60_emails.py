@@ -433,7 +433,7 @@ def write_html_and_email_files(jinja_env, process, run_dir, bc_dir, delivery_dir
             
 
 def get_email_recipient_info(run_id, project_datas):
-    summary_recipients = set(('nsc-ous-data-delivery@sequencing.uio.no',))
+    summary_recipients = ['nsc-ous-data-delivery@sequencing.uio.no']
     emails = []
     for project_data in project_datas:
         if project_data.lims:
@@ -442,16 +442,16 @@ def get_email_recipient_info(run_id, project_datas):
             email_to = ""
         if project_data.diag_project:
             email_to = "diag-lab@medisin.uio.no,diag-bioinf@medisin.uio.no"
-            summary_recipients.add('diag-lab@medisin.uio.no')
-            summary_recipients.add('diag-bioinf@medisin.uio.no')
+            summary_recipients.append('diag-lab@medisin.uio.no')
+            summary_recipients.append('diag-bioinf@medisin.uio.no')
             if project_data.name.startswith("Diag-EKG"):
-                summary_recipients.add('EKG@ous-hf.no')
+                summary_recipients.append('EKG@ous-hf.no')
                 email_to += ',EKG@ous-hf.no'
             elif project_data.name.startswith("Diag-EHG"):
-                summary_recipients.add('EHG-HTS@medisin.uio.no')
+                summary_recipients.append('EHG-HTS@medisin.uio.no')
                 email_to += ',EHG-HTS@medisin.uio.no'
         elif project_data.name.startswith("TI-") or project_data.name.startswith("MIK-"):
-            summary_recipients.add(email_to)
+            summary_recipients += email_to
         email_cc = ""
         email_bcc = "nsc-ous-data-delivery@sequencing.uio.no"
         email_subject = "Sequence ready for download - sequencing run {run_id} - {name} ({nsamples} samples)".format(

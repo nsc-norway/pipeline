@@ -1,2 +1,2 @@
 text|diag-lab@medisin.uio.no,diag-bioinf@medisin.uio.no||nsc-ous-data-delivery@sequencing.uio.no|Sequence ready for download - sequencing run 191119_A00943_0005_AMERGDLANS - Diag-TestNovaSeq-2019-18-11 (78 samples)|email_content/191119_A00943.A.Project_Diag-TestNovaSeq-2019-18-11.txt|
-html|nsc-ous-data-delivery@sequencing.uio.no,diag-bioinf@medisin.uio.no,diag-lab@medisin.uio.no|||Summary for run 191119_A00943_0005_AMERGDLANS|email_content/Summary_for_191119_A00943_0005_AMERGDLANS.html|
+html|nsc-ous-data-delivery@sequencing.uio.no,diag-lab@medisin.uio.no,diag-bioinf@medisin.uio.no|||Summary for run 191119_A00943_0005_AMERGDLANS|email_content/Summary_for_191119_A00943_0005_AMERGDLANS.html|
