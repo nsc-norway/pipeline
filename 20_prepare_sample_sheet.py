@@ -103,7 +103,7 @@ def main(task):
                 )
 
     # Always replace special characters with ? and fix line breaks
-    sample_sheet = replace_special_chars(sample_sheet)
+    sample_sheet = replace_special_chars(sample_sheet.decode('utf-8'))
 
     # Doctor the sample sheet, only if using HiSeq and it doesn't have [Data] header
     instrument = utilities.get_instrument_by_runid(task.run_id)
@@ -134,7 +134,7 @@ def main(task):
                 task.process,
                 name = nsc.SAMPLE_SHEET,
                 path = "DemultiplexingSampleSheet.csv",
-                data = sample_sheet
+                data = sample_sheet.encode('utf-8')
                 )
     else:
         if task.args.output_sample_sheet:
@@ -142,7 +142,7 @@ def main(task):
         else:
             path = os.path.join(task.work_dir, "DemultiplexingSampleSheet.csv")
 
-        open(path, 'wb').write(sample_sheet)
+        open(path, 'w').write(sample_sheet)
     
     task.success_finish()
 

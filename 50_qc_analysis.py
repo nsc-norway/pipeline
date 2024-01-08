@@ -95,7 +95,7 @@ def main(task):
     # simultaneous jobs to be safe. Use median size 50MB as cut-off; parameters may need
     # tuning.
     try:
-        median_size = list(sorted(file_sizes))[len(file_sizes)/2]
+        median_size = list(sorted(file_sizes))[len(file_sizes)//2]
         if median_size < 50 * 1024**2:
             fqc.max_simultaneous = 10
         else:

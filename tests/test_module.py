@@ -1,4 +1,5 @@
 import unittest
+import warnings
 from mock import patch, Mock, call, ANY
 import sys
 import json
@@ -50,6 +51,9 @@ class TaskTestCase(unittest.TestCase):
         self.addCleanup(success_patcher.stop)
         self.task.__enter__()
         self.tempparent = None
+        # Disable irrelevant warnings about unclosed files
+        warnings.simplefilter("ignore", ResourceWarning)
+
         
     def make_tempdir(self, run_id):
         self.tempparent = tempfile.mkdtemp()
@@ -74,7 +78,7 @@ class TaskTestCase(unittest.TestCase):
         compressed_file  = conversion_stats_file + ".gz"
         if os.path.exists(compressed_file):
             with gzip.open(compressed_file) as inf:
-                with open(conversion_stats_file, "w") as outf:
+                with open(conversion_stats_file, "wb") as outf:
                     outf.write(inf.read())
         do_cleanup = False
         try:
@@ -98,8 +102,8 @@ class TaskTestCase(unittest.TestCase):
                     self.check_files_with_reference(test_path, ref_path)
                 elif os.path.isfile(ref_path):
                     self.assertTrue(os.path.isfile(test_path), "{0} is not a file".format(test_path))
-                    with open(ref_path) as ref_file,\
-                            open(test_path) as test_file:
+                    with open(ref_path, 'rb') as ref_file,\
+                            open(test_path, 'rb') as test_file:
                         test_data = test_file.read()
                         self.assertEqual(ref_file.read(), test_data, "File {0} differs from the "
                                 "reference {1}.".format(test_path, ref_path))

@@ -279,7 +279,7 @@ class ProjectData(object):
             else:
                 sample = os.path.basename(f.path)
             if f.empty:
-                self.file_fragments_table.append((sample, 0, -1.0 if mean_frags > 0 else 0.0))
+                self.file_fragments_table.append((sample, 0, -1.0 if mean_frags[f.lane] > 0 else 0.0))
             else:
                 self.file_fragments_table.append(
                         (sample, f.stats['# Reads PF'],
@@ -385,8 +385,7 @@ def write_html_and_email_files(jinja_env, process, run_dir, bc_dir, delivery_dir
                                 run_parameters=run_parameters, software_versions=software_versions,
                                 project_datas=project_datas
                                 )
-        doc_bytes = doc_content.encode('utf-8') 
-        out.write(doc_bytes)
+        out.write(doc_content)
 
 
     # Summary file for email content
@@ -397,8 +396,7 @@ def write_html_and_email_files(jinja_env, process, run_dir, bc_dir, delivery_dir
                                 run_parameters=run_parameters, software_versions=software_versions,
                                 project_datas=project_datas
                                 )
-        doc_bytes = doc_content.encode('utf-8') 
-        out.write(doc_bytes)
+        out.write(doc_content)
 
     # Per-project file for email content
     for project_data in project_datas:
@@ -418,14 +416,13 @@ def write_html_and_email_files(jinja_env, process, run_dir, bc_dir, delivery_dir
                     password = "invalid"
             doc_content = jinja_env.get_template('project_email.txt').render(project_data=project_data,
                     username=username, password=password, size=size)
-            doc_bytes = doc_content.encode('utf-8') 
-            out.write(doc_bytes)
+            out.write(doc_content)
 
     # List of emails to send
     with open(delivery_dir + "/automatic_email_list.txt", 'w') as out:
         for e in get_email_recipient_info(run_id, project_datas):
             if not any(x is None for x in e):
-                out.write(("|".join(e) + "\n").encode('utf-8'))
+                out.write(("|".join(e) + "\n"))
 
     script_file = os.path.join(delivery_dir, "Open_emails.command")
     if not os.path.exists(script_file):

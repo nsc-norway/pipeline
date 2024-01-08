@@ -32,6 +32,10 @@ else:
     sys.stderr.write("Using dummy security module\n")
     from common import secure_dummy as secure
 
+hardlink = "l"
+# Disable hard linking if running on MacOS
+if sys.platform == "darwin":
+    hardlink = ""
 
 def delivery_16s(task, project, lims_project, delivery_method, basecalls_dir, project_path):
     """Special delivery method for demultiplexing internal 16S barcodes."""
@@ -140,7 +144,7 @@ def delivery_diag_move(task, project, basecalls_dir, project_path):
 
     # Now copy quality control data. The Stats and Reports belong to all projects, so
     # we make hard links, not move them.
-    cp_copy_args = ['cp', '-rl']
+    cp_copy_args = ['cp', f'-r{hardlink}']
     # Diagnostics wants the QC info in a particular format (file names, etc.). Do not
     # change without consultiing with them. 
     source_qc_dir = os.path.join(basecalls_dir, "QualityControl" + task.suffix)
@@ -304,7 +308,7 @@ def delivery_external_user(task, lims_project, project_path, project_name, deliv
 
 def delivery_harddrive(project_name, source_path):
     # Copy to delivery area
-    subprocess.check_call(["/bin/cp", "-rl", source_path, nsc.DELIVERY_DIR])
+    subprocess.check_call(["/bin/cp", f"-r{hardlink}", source_path, nsc.DELIVERY_DIR])
     #log_path = task.logfile("rsync-" + project_name)
     #args = [nsc.RSYNC, '-rlt', '--chmod=ug+rwX,o-rwx'] # chmod 660
     #args += [source_path.rstrip("/"), nsc.DELIVERY_DIR]
@@ -396,7 +400,7 @@ def fhi_mik_seq_delivery(task, project_type, project, lims_project, lims_process
                          os.path.join(output_path, "extendedSampleList.csv"))
 
     #### RUN covid analysis pipeline ####
-    subprocess.check_call(["/bin/cp", "-rl", project_path, delivery_base_dir])
+    subprocess.check_call(["/bin/cp", f"-r{hardlink}", project_path, delivery_base_dir])
     # Prepare script
     template_dir = os.path.join(os.path.dirname(__file__), "template")
     jinja_env = Environment(loader=FileSystemLoader(template_dir))
