@@ -24,10 +24,12 @@ Downloading:
 
 To download for the RHEL9 platform used on the prod servers:
 
-	docker run -ti --rm ubi9/ubi -v $PWD/downloadpip:/downloadpip bash -c "\
-		yum install -y python3-pip && \
-		cd /downloadpip && \
-		pip download -r requirements.txt
+	docker run -ti --rm -v $PWD/downloadpip:/downloadpip \
+		registry.access.redhat.com/ubi9/ubi \
+		bash -c "\
+			yum install -y python3-pip && \
+			cd /downloadpip && \
+			pip download -r requirements.txt
 		"
 
 Creating environment: This must be done with the correct absolute path to use on the system
