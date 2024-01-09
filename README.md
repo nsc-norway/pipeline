@@ -11,6 +11,9 @@ See the [Wiki](https://github.com/nsc-norway/pipeline/wiki) for more information
 
 See SETUP.md for setup instructions. (currently out of date)
 
+Testing: See the `tests` subdirectory.
+
+
 ## Content
 
 ### Main scripts: the primary data processing / analysis tasks.
