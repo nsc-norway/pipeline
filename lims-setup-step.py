@@ -138,7 +138,7 @@ def main(process_id, sample_sheet_file):
         parent_proc = parent_processes[0]
         sample_sheet_data = get_sample_sheet_data(parent_proc, fcid)
         if sample_sheet_data:
-            open(sample_sheet_file, "w").write(sample_sheet_data)
+            open(sample_sheet_file, "wb").write(sample_sheet_data)
     else:
         logging.info("Cannot auto-detect sample sheet when there are more than one clustering processes")
 
