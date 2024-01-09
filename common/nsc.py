@@ -205,7 +205,8 @@ elif SITE == "ous":
         LIMS_SERVER="ous-lims"
 
     elif TAG == "dev":
-        SECONDARY_STORAGES = {"default": "/data/runScratch.boston/test"}    # location of demultiplexed files
+        PRIMARY_STORAGES = {"default": "/data/runScratch.boston/test"}
+        SECONDARY_STORAGES = {"default": "/data/runScratch.boston/test/demultiplexed"}    # location of demultiplexed files
         DELIVERY_DIR="/data/runScratch.boston/test/delivery"# used by prepare-delivery after QC
         DIAGNOSTICS_DELIVERY = "/data/runScratch.boston/test/diag"
         TRIGGER_DIR="/data/runScratch.boston/scripts/dev/trigger"

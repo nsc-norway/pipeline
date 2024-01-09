@@ -1,5 +1,17 @@
 # High-level tests for the pipeline #
 
+
+## Full pipeline tests and datasets ##
+
+NSC-OUS test run location:
+
+/data/runScratch.boston/test
+
+See: README_test.txt
+
+
+## Automatic tests ##
+
 The script test_module.py contains functional tests for each of the 
 data processing / analysis scripts. The tests are implemented in 
 Python's built-in `unittest` framework.
