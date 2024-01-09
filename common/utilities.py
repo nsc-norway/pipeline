@@ -13,7 +13,6 @@ import traceback
 import re
 import requests
 import glob
-import locale # Not needed in 2.7, see display_int
 from collections import defaultdict
 from xml.etree import ElementTree
 
@@ -238,21 +237,14 @@ def strip_chars(string):
 
 # *** Compatibility support functions ***
 
-# Locale setting is used for the function below
-try:
-    locale.setlocale(locale.LC_ALL, 'en_US')
-except locale.Error:
-    pass # Can't be sure we use correct thousands separator
-
 def display_int(val):
-    """Adds thousands separators. To be replaced with "{:,}".format(val) when 
-    upgrading to Python 2.7"""
+    """Adds thousands separators and dash for missing values.
+    
+    (This used to have a special case for Python < 2.7)"""
     if val is None:
         return "-"
-    elif sys.version_info >= (2,7):
-        return "{:,.0f}".format(val)
     else:
-        return locale.format("%d", round(val), grouping=True)
+        return "{:,.0f}".format(val)
 
 
 # The check_output function is only available in Python >=2.7, but we also support 2.6,
