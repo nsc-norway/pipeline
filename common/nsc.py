@@ -81,8 +81,6 @@ QC_PROCESSES=[
         ('miseq', 'MiSeq Run NSC 3.0'),
         ]
 
-DEMULTIPLEXING_QC_PROCESS = "Demultiplexing and QC NSC 2.0"
-
 
 #### Misc config ####
 
