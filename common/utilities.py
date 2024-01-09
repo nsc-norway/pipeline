@@ -257,7 +257,10 @@ def display_int(val):
 
 # The check_output function is only available in Python >=2.7, but we also support 2.6,
 # as on RHEL6.
-if sys.version_info >= (2, 7):
+if sys.version_info >= (3, 0):
+    def check_output(*args, **kwargs):
+        return subprocess.check_output(*args, **kwargs).decode('utf-8')
+elif sys.version_info >= (2, 7):
     check_output = subprocess.check_output
 else:
     def check_output(args, **kwargs):

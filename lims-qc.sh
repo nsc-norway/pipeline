@@ -12,6 +12,6 @@ fi
 
 for script in $SCRIPTS
 do
-	nsc-python27 $(dirname $0)/$script --pid=$1
+	nsc-python3 $(dirname $0)/$script --pid=$1
 done
 

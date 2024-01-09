@@ -12,6 +12,6 @@ fi
 
 for script in $SCRIPTS
 do
-	python $(dirname $0)/$script "$@"
+	nsc-python3 $(dirname $0)/$script "$@"
 done
 
