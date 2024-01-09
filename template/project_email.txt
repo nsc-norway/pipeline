@@ -11,7 +11,7 @@ You can download the data and all quality control reports using the following in
 https://hts-nonsecure.web.sigma2.no/{{ project_data.dir }}/
 
 username: {{ username }}
-password: {{ password }}
+password: {{ password }}
 {% elif project_data.lims.delivery_method == "User HDD" %}
 You can pick up the data in a portable hard drive (please notice the size of the data  is approximately {{ "%.0f" % size if size else "XXXX" }} GB).
 {% elif project_data.lims.delivery_method == "New HDD" %}

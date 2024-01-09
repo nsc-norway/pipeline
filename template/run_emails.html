@@ -2,7 +2,7 @@
 
 <html>
 <head>
-<title>Run {{ run_id }} summary</title>
+<title>Run {{ run_id }} summary</title>
 <meta charset="UTF-8">
 </head>
 
@@ -47,7 +47,7 @@ td.text {
 {% for row in lane_data %}
 <tr>
 {% for cell in row %}
-    <td class="{{ cell[1] }}">{{ cell[0] }}</td>
+    <td class="{{ cell[1] }}">{{ cell[0] }}</td>
 {% endfor %}
 </tr>
 {% endfor %}
@@ -70,14 +70,14 @@ td.text {
     {% endif %}
     <tr>
         <td>Cycles</td>
-        <td>{{ run_parameters.cycles[0][0] }}</td>
-        <td>{{ run_parameters.cycles[0][1] }}</td>
+        <td>{{ run_parameters.cycles[0][0] }}</td>
+        <td>{{ run_parameters.cycles[0][1] }}</td>
     </tr>
     {% for cycles in run_parameters.cycles[1:] %}
     <tr>
         <td></td>
-        <td>{{ cycles[0] }}</td>
-        <td>{{ cycles[1] }}</td>
+        <td>{{ cycles[0] }}</td>
+        <td>{{ cycles[1] }}</td>
     </tr>
     {% endfor %}
 </table>
