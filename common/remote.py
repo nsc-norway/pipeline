@@ -129,33 +129,34 @@ class SlurmArrayJob(object):
         self.summary = {}
 
     def _start(self):
-        handle, path = tempfile.mkstemp()
-        os.write(handle, "#!/bin/bash\n\n")
-        os.write(handle, "#SBATCH --job-name=\"{0}\"\n".format(self.jobname))
-        os.write(handle, "#SBATCH --time={0}\n".format(self.time))
-        os.write(handle, "#SBATCH --output=\"{0}\"\n".format(self.stdout_pattern))
-        if self.cpus_per_task:
-            os.write(handle, "#SBATCH --cpus-per-task={0}\n".format(self.cpus_per_task))
-        if self.mem_per_task:
-            os.write(handle, "#SBATCH --mem={0}\n".format(self.mem_per_task))
-        if self.comment:
-            os.write(handle, "#SBATCH --comment=\"{0}\"\n".format(self.comment))
+        handle, path = tempfile.mkstemp(text=True)
+        with tempfile.NamedTemporaryFile(mode='w') as outputfile:
+            outputfile.write("#!/bin/bash\n\n")
+            outputfile.write("#SBATCH --job-name=\"{0}\"\n".format(self.jobname))
+            outputfile.write("#SBATCH --time={0}\n".format(self.time))
+            outputfile.write("#SBATCH --output=\"{0}\"\n".format(self.stdout_pattern))
+            if self.cpus_per_task:
+                outputfile.write("#SBATCH --cpus-per-task={0}\n".format(self.cpus_per_task))
+            if self.mem_per_task:
+                outputfile.write("#SBATCH --mem={0}\n".format(self.mem_per_task))
+            if self.comment:
+                outputfile.write("#SBATCH --comment=\"{0}\"\n".format(self.comment))
 
 
-        for i, arg_list in enumerate(self.arg_lists):
-            argv = " ".join("'" + s.replace("'", "'\\''") + "'" for s in arg_list)
-            os.write(handle, "[ $SLURM_ARRAY_TASK_ID == {0} ] && {1} && exit 0\n".format(i, argv))
-        os.write(handle, "exit 1\n")
-        os.close(handle)
-        if not self.arg_lists:
-            raise ValueError("Starting SLURM array job {}: The list of jobs is empty (check sample sheet).".format(self.jobname))
-        array = '--array=0-'+str(len(self.arg_lists) - 1)
-        if self.max_simultaneous is not None:
-            array += "%%%d" % (self.max_simultaneous)
-        self.job_id = utilities.check_output(nsc.SBATCH_ARGLIST + ['--parsable', array, path], cwd=self.cwd).strip()
-        self.states = dict((str(j), 'PENDING') for j in range(len(self.arg_lists)))
-        self.summary = {'PENDING': len(self.arg_lists)}
-        os.remove(path)
+            for i, arg_list in enumerate(self.arg_lists):
+                argv = " ".join("'" + s.replace("'", "'\\''") + "'" for s in arg_list)
+                outputfile.write("[ $SLURM_ARRAY_TASK_ID == {0} ] && {1} && exit 0\n".format(i, argv))
+            outputfile.write("exit 1\n")
+            outputfile.flush()
+
+            if not self.arg_lists:
+                raise ValueError("Starting SLURM array job {}: The list of jobs is empty (check sample sheet).".format(self.jobname))
+            array = '--array=0-'+str(len(self.arg_lists) - 1)
+            if self.max_simultaneous is not None:
+                array += "%%%d" % (self.max_simultaneous)
+            self.job_id = utilities.check_output(nsc.SBATCH_ARGLIST + ['--parsable', array, outputfile.name], cwd=self.cwd).strip()
+            self.states = dict((str(j), 'PENDING') for j in range(len(self.arg_lists)))
+            self.summary = {'PENDING': len(self.arg_lists)}
 
     def _check_status(self):
         """Refresh status of jobs. Should be called periodically (every minute)."""
