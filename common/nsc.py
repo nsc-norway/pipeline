@@ -205,8 +205,16 @@ elif SITE == "ous":
         LIMS_SERVER="ous-lims"
 
     elif TAG == "dev":
-        PRIMARY_STORAGES = {"default": "/data/runScratch.boston/test"}
-        SECONDARY_STORAGES = {"default": "/data/runScratch.boston/test/demultiplexed"}    # location of demultiplexed files
+        PRIMARY_STORAGES = {
+            "Diagnostics": "/data/runScratch.boston/test/diag/runs",
+            "default": "/data/runScratch.boston/test"
+        }
+        # Location of demultiplexed files. Note a dedicated Diagnostics key is REQUIRED for identifying
+        # diag runs in 90_triggers.py.
+        SECONDARY_STORAGES = {
+            "Diagnostics": "/data/runScratch.boston/test/diag/demultiplexed",
+            "default": "/data/runScratch.boston/test/demultiplexed"
+        }
         DELIVERY_DIR="/data/runScratch.boston/test/delivery"# used by prepare-delivery after QC
         DIAGNOSTICS_DELIVERY = "/data/runScratch.boston/test/diag"
         TRIGGER_DIR="/data/runScratch.boston/scripts/dev/trigger"
