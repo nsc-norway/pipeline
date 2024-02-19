@@ -173,7 +173,7 @@ def get_resultfile(lims, process, lane, input_limsid, read):
             if o['output-type'] == "ResultFile" and o['output-generation-type'] == "PerReagentLabel":
                 output = o['uri']
                 # Match the output based on LIMS-ID.
-                if output.samples[0].id == input_sample.id:
+                if output.samples and output.samples[0].id == input_sample.id:
                     return output
                     
 
