@@ -52,15 +52,15 @@ Oslo University Hospital, Ullevål, Oslo, Norway
 
 
 *********************************************************************************************************************
-Understanding the data: http://www.sequencing.uio.no/services/data-delivery/
+Understanding the data: https://www.sequencing.uio.no/illumina-services/10.%20Bioinformatic%20services/#toc9
 
 ------- Acknowledgement -------
 The Norwegian Sequencing Centre (NSC) operates as a core facility and you will therefore not be billed for the labour costs incurred. However, you are requested to acknowledge the support you have received from the bodies funding the NSC. Please use the following text in articles or reports relating to this sequence data:
 "The sequencing service was provided by the Norwegian Sequencing Centre (www.sequencing.uio.no), a national technology platform hosted by the University of Oslo and supported by the "Functional Genomics" and "Infrastructure" programs of the Research Council of Norway and the Southeastern Regional Health Authorities".
 
 -----Terms, conditions and usage-----
-Data storage policy: https://www.sequencing.uio.no/services/data-delivery/#toc4
-Data security:  https://www.sequencing.uio.no/services/data-delivery/#toc3
+Data storage policy: https://www.sequencing.uio.no/illumina-services/10.%20Bioinformatic%20services/#toc12
+Data security:  https://www.sequencing.uio.no/illumina-services/10.%20Bioinformatic%20services/#toc11
 *********************************************************************************************************************
 
 
