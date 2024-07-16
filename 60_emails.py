@@ -433,7 +433,7 @@ def write_html_and_email_files(jinja_env, process, run_dir, bc_dir, delivery_dir
             
 
 def get_email_recipient_info(run_id, project_datas):
-    summary_recipients = ['nsc-ous-data-delivery@sequencing.uio.no']
+    summary_recipients = ['"nsc-ous-data-delivery@sequencing.uio.no" <nsc-ous-data-delivery@sequencing.uio.no>']
     emails = []
     for project_data in project_datas:
         if project_data.lims:
@@ -453,7 +453,7 @@ def get_email_recipient_info(run_id, project_datas):
         elif project_data.name.startswith("TI-") or project_data.name.startswith("MIK-"):
             summary_recipients.append(email_to)
         email_cc = ""
-        email_bcc = "nsc-ous-data-delivery@sequencing.uio.no"
+        email_bcc = '"nsc-ous-data-delivery@sequencing.uio.no" <nsc-ous-data-delivery@sequencing.uio.no>'
         email_subject = "Sequence ready for download - sequencing run {run_id} - {name} ({nsamples} samples)".format(
                 run_id = run_id,
                 name = project_data.name,
