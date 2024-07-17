@@ -18,14 +18,18 @@ def main():
         if not automation_log_path.is_file():
             # Run automation for this path
             
+            # Open the LIMS file
+            with open(lims_file_path) as f:
+                lims_info = yaml.safe_load(f)
+
+            if lims_info.get('status') != 'ImportCompleted':
+                continue
+
             # Misc. setup
             logfile = open(automation_log_path, 'w')
             print("Started automation at", str(datetime.datetime.now()), file=logfile)
             
             demultiplexed_run_dir = demultiplexed_runs_path / run_id # Created by file mover if nsc projects
-            with open(lims_file_path) as f:
-                lims_info = yaml.safe_load(f)
-
             # Suffix for some directories created by the file mover script
             if analysis_path.name == "1":
                 suffix = ""
