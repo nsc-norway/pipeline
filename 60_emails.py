@@ -434,6 +434,7 @@ def write_html_and_email_files(jinja_env, process, run_dir, bc_dir, delivery_dir
 
 def get_email_recipient_info(run_id, project_datas):
     summary_recipients = ['"nsc-ous-data-delivery@sequencing.uio.no" <nsc-ous-data-delivery@sequencing.uio.no>']
+    summary_cc = ""
     emails = []
     for project_data in project_datas:
         if project_data.lims:
@@ -451,7 +452,8 @@ def get_email_recipient_info(run_id, project_datas):
                 summary_recipients.append('EHG-HTS@medisin.uio.no')
                 email_to += ',EHG-HTS@medisin.uio.no'
         elif project_data.name.startswith("TI-") or project_data.name.startswith("MIK-"):
-            summary_recipients.append(email_to)
+            #summary_recipients.append(email_to)
+            summary_cc = email_to
         email_cc = ""
         email_bcc = '"nsc-ous-data-delivery@sequencing.uio.no" <nsc-ous-data-delivery@sequencing.uio.no>'
         email_subject = "Sequence ready for download - sequencing run {run_id} - {name} ({nsamples} samples)".format(
@@ -467,12 +469,11 @@ def get_email_recipient_info(run_id, project_datas):
         emails.append(("text", email_to, email_cc, email_bcc, email_subject, email_content_file, email_attachment))
     
     email_to = ",".join(summary_recipients)
-    email_cc = ""
     email_bcc = ""
     email_subject = "Summary for run {run_id}".format(run_id=run_id)
     email_content_file = "email_content/Summary_for_{run_id}.html".format(run_id=run_id)
     email_attachment = ""
-    emails.append(("html", email_to, email_cc, email_bcc, email_subject, email_content_file, email_attachment))
+    emails.append(("html", email_to, summary_cc, email_bcc, email_subject, email_content_file, email_attachment))
     return emails
 
 
