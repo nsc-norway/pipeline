@@ -131,9 +131,14 @@ def process_dragen_run(analysis_path):
         # Create project-specifc SampleRenamingList files for NSC projects
         project_samples = [sample for sample in samples if sample['project_name'] == project_name]
         if any(is_nsc(sample) for sample in project_samples):
-            with open(nsc_run_base / f"QualityControl{analysis_suffix}" / f"SampleRenamingList-{project_name}{analysis_suffix}.csv", 'w') as srl:
+            with open(nsc_run_base / f"QualityControl{analysis_suffix}" / f"SampleRenamingList-{project_name}.csv", 'w') as srl:
                 srl.write(get_sample_renaming_list(project_samples, run_id))
  
+        # Create project-specifc SampleRenamingList files for NSC projects
+        nsc_samples = [sample for sample in samples if is_nsc(sample)]
+        with open(nsc_run_base / f"QualityControl{analysis_suffix}" / f"SampleRenamingList-run.csv", 'w') as srl:
+            srl.write(get_sample_renaming_list(project_samples, run_id))
+
 
     # BCL TODO
 

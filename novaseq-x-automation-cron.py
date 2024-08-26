@@ -69,7 +69,8 @@ def main():
 /boston/common/tools/nextflow/nextflow-23.10.1-all run /data/runScratch.boston/analysis/pipelines/novaseqx_nextflow/main_run.nf \\
     --runid "{run_id}" \\
     --qcid "QualityControl{suffix}" \\
-    --analysisfolder "Analysis{suffix}"
+    --analysisid "Analysis{suffix}" \\
+    --samplerenaminglist "SampleRenamingList-run.csv" 
 """
                 dependency_list = "afterok:" + ":".join(nsc_project_slurm_jobs)
                 pipeline_dir = demultiplexed_run_dir / "pipeline" / "run"
@@ -106,7 +107,7 @@ def start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiple
     --runid "{run_id}" \\
     --qcid "QualityControl{suffix}" \\
     --analysisid "Analysis{suffix}" \\
-    --samplerenaminglist "SampleRenamingList-{project_name}{suffix}.csv" \\
+    --samplerenaminglist "SampleRenamingList-{project_name}.csv" \\
     --deliverymethod "{delivery_method}"
 """
     pipeline_dir = demultiplexed_run_dir / "pipeline" / ("prj-" + project_name)
