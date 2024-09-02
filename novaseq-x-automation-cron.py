@@ -72,7 +72,7 @@ def main():
     --analysisid "Analysis{suffix}" \\
     --samplerenaminglist "SampleRenamingList-run.csv" 
 """
-                dependency_list = "afterok:" + ":".join(nsc_project_slurm_jobs)
+                dependency_list = "afterany:" + ":".join(nsc_project_slurm_jobs)
                 pipeline_dir = demultiplexed_run_dir / "pipeline" / "run"
                 pipeline_dir.mkdir(parents=True, exist_ok=True)
                 slurm_script_path = pipeline_dir / "script.sh"
