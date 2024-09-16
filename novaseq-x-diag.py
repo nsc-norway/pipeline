@@ -1,11 +1,15 @@
 import os
 import yaml
 import sys
+import re
 import asyncio
 from collections import defaultdict
 from pathlib import Path
 from genologics.lims import *
 from genologics import config
+
+DIAG_DESTINATION_PATH = Path("/boston/diag/nscDelivery")
+lims = Lims(config.BASEURI, config.USERNAME, config.PASSWORD)
 
 async def process_all_diag_projects(lims_file_path):
     """
@@ -14,13 +18,12 @@ async def process_all_diag_projects(lims_file_path):
     NOTE: The lims file has to exist in its original location. The path will be used to determine
     the Run ID.
     """
-    input_run_dir = analysis_path.resolve().parents[2]
-    run_id = input_run_dir.name
 
-    # Load LIMS-based information
-    lims_file_path = analysis_dir / "ClarityLIMSImport_NSC.yaml"
+
     with open(lims_file_path) as f:
         lims_info = yaml.safe_load(f)
+
+    run_id = lims_file_path.resolve().parents[2].name
 
     samples = lims_info['samples']
 
@@ -37,10 +40,10 @@ async def process_all_diag_projects(lims_file_path):
             for fastq_name in get_fastq_names(sample):
                 project_md5sum_results_async[project].append(run_md5sum(fastq_dir, fastq_name))
 
-    for project, fastq_dir in project_fastq_dir.items():
-        md5sum_results = await asyncio.gather(*project_md5sum_results_async)
+    for project, fastq_dir in project_fastq_dirs.items():
+        md5sum_results = await asyncio.gather(*project_md5sum_results_async[project])
         assert all(exit_code == 0 for exit_code, stdout in md5sum_results), "all processes should have zero exit code"
-        with open(fastq_dir / "md5sum.txt", "w") as md5sum_file:
+        with open(fastq_dir / "md5sum.txt", "wb") as md5sum_file:
             for _, stdout in md5sum_results:
                 md5sum_file.write(stdout)
 
@@ -55,18 +58,18 @@ async def process_all_diag_projects(lims_file_path):
             match_workflows.append((int(m.group(1)), int(m.group(2)), w))
     major, minor, workflow = sorted(match_workflows)[-1]
     # 2. find root artifacts of the samples in this analysis
-    artifacts = [Sample(lims, sample['sample_id']).artifact for sample in samples if sample['project_type'] == "Diagnostics"]
+    artifacts = [Sample(lims, id=sample['sample_id']).artifact for sample in samples if sample['project_type'] == "Diagnostics"]
     # 3. queue artifacts
-    lims.route_analytes(artifact, workflow)
+    lims.route_analytes(artifacts, workflow)
 
 
 async def run_md5sum(fastq_dir, filename):
     proc = await asyncio.create_subprocess_exec(
-            ["srun", "md5sum", filename],
+            "srun", "md5sum", filename,
             cwd=fastq_dir,
             stdout=asyncio.subprocess.PIPE
             )
-    stdout = await proc.communicate()
+    stdout, stderr = await proc.communicate()
     return proc.returncode, stdout
 
 
@@ -88,6 +91,8 @@ def get_fastq_names(sample):
 def get_project_fastq_dir_path(run_id, sample):
     """Return a Path pointing to the directory for FASTQ files for this sample."""
 
+    #fastq_dir = "ora_fastq" if sample.get('ora_compression') else "fastq"
+    # The fastq location is always "fastq" even if ora is used.
     return DIAG_DESTINATION_PATH / get_project_dir_name(run_id, sample) / "fastq"
 
 
@@ -110,10 +115,9 @@ if __name__ == "__main__":
         sys.exit(1)
 
     lims_file = Path(sys.argv[1])
-    if not analysis_dir.is_file():
+    if not lims_file.is_file():
         print("error: LIMS file", lims_file, "does not exist.")
         sys.exit(1)
 
-    asyncio.run(process_all_diag_projects(analysis_dir))
-
+    asyncio.run(process_all_diag_projects(lims_file))
 

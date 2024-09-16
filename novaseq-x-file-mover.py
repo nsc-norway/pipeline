@@ -9,11 +9,22 @@ from pathlib import Path
 DIAG_DESTINATION_PATH = Path("/boston/diag/nscDelivery")
 NSC_DESTINATION_PATH = Path("/data/runScratch.boston/demultiplexed")
 
+# Disable moving files. Will still copy / link files and create directory structure, but will not
+# remove anything from the source folder. This can be used for testing or recovery.
 TEST_DISABLE_MOVING = False
-# The following two options disable the checks, but will stil cause an error if the move commands fail.
-# Consider using TEST_DISABLE_MOVING together with the following options to complete partial / failed
-# move jobs.
+
+
+## READNE TROUBLESHOOTING MODE ##
+
+# To fix issues, enable the following two "IGNORE_*" options. Remove QualityControl from all project folders in
+# /boston/diag/nscDelivery and the run folder in /boston/runScratch/demultiplexed first. Fix the root cause.
+# Rerun the file mover or trigger the automation again by removing the automation log.
+
+# The following two options disable the checks and disable errors if the moving commands fail.
+# This option skips over files when the source does not exist. This can be used to recover failed
+# novaseq-x-file-mover runs.
 IGNORE_MISSING = False
+# Disable checking for existing destination files only.
 IGNORE_EXISTING = False
 
 def process_dragen_run(analysis_path):
@@ -114,11 +125,6 @@ def process_dragen_run(analysis_path):
         project_info['project_fastq_path'].mkdir(exist_ok=True)
         move_files(project_info['samples_fastqs_moving'])
 
-        # Run md5 check if required
-        if project_info['create_fastq_checksum']:
-            checksum_file = project_info['project_fastq_path'] / "md5sum.txt"
-            create_checksums(checksum_file, [dest_path for src_path, dest_path in project_info['samples_fastqs_moving']])
-
         # Create analysis output (we do an existence check, to allow for various
         # folder structures)
         if not project_info['project_analysis_path'].is_dir():
@@ -181,6 +187,11 @@ def move_files(move_file_list):
     for src, dest in move_file_list:
         if TEST_DISABLE_MOVING:
             print("mv", src, dest)
+        elif IGNORE_MISSING:
+            try:
+                src.rename(dest)
+            except IOError:
+                print("Unable to move file", src, "to", dest, ", skipping.")
         else:
             src.rename(dest)
 
@@ -251,14 +262,21 @@ def move_analysis_dirs_and_files(project_analysis_target_path, sample_analysis_m
     for src_path, (src_name, dest_name) in sample_analysis_moving_list:
         # First move the directory itself
         sample_dir = project_analysis_target_path / dest_name
+        failed_moving = False
         if TEST_DISABLE_MOVING:
             print("mv", src_path, sample_dir)
+        elif IGNORE_MISSING:
+            try:
+                src_path.rename(sample_dir)
+            except IOError:
+                print("Failed to move", src_path, "to", sample_dir, ", ignoreed.")
+                failed_moving = True
         else:
             src_path.rename(sample_dir)
 
         # If the sample name should be renamed, we need to find all the files with this prefix
         # and rename them
-        if src_name != dest_name:
+        if src_name != dest_name and not failed_moving:
             renamable_files = list(sample_dir.glob(f"*/{src_name}.*"))
             for old_path in renamable_files:
                 old_suffix = old_path.name[len(src_name):]
@@ -291,7 +309,6 @@ def get_projects_file_moving_lists(run_id, run_folder, samples, analysis_suffix,
             'project_base_path': Path,
             'project_fastq_path': Path,
             'samples_fastqs_moving': [(src_path, dest_path), (src_path, dest_path), ...],
-            'create_fastq_checksum': Boolean,
             'project_analysis_path': Path,
             'analysis_dirs_moving': [
                 (src_path, (src_sample_id, dest_sample_id)),
@@ -339,7 +356,6 @@ def get_projects_file_moving_lists(run_id, run_folder, samples, analysis_suffix,
                 'project_base_path': get_dest_project_base_path(run_id, sample),
                 'project_fastq_path': fastq_destination_path,
                 'samples_fastqs_moving': fastq_move_paths,
-                'create_fastq_checksum': is_diag(sample),
                 'project_analysis_path': analysis_destination_path,
                 'analysis_dirs_moving': set([analysis_move]), # Use a set - need to de-duplicate if samples are run
                                                               # on multiple lanes
@@ -542,21 +558,6 @@ def get_sample_renaming_list(samples, run_id):
                     fastq_name
                 ]))
     return "\n".join([header] + data) + "\n"
-
-
-def create_checksums(output_checksum_file, fastq_paths):
-    """Create an md5sum file.
-
-    The file will contain the names of the fastq files (base name, no path) and the
-    md5sum checksums.
-    """
-    checksums = []
-    with open(output_checksum_file, 'w') as ofile:
-        for path in fastq_paths:
-            print("Creating checksum for ", path)
-            fastq_dir = path.parent
-            subprocess.run(["md5sum", path.name], stdout=ofile, cwd=fastq_dir)
-        
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
