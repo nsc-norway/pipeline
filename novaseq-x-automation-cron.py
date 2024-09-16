@@ -3,9 +3,10 @@ import datetime
 import sys
 from pathlib import Path
 import subprocess
-
+import os
 
 def main():
+    os.umask(0o007)
     input_run_path = Path("/data/runScratch.boston/NovaSeqX")
     demultiplexed_runs_path = Path("/data/runScratch.boston/demultiplexed")
     script_dir_path = Path(__file__).resolve().parent
