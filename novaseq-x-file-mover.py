@@ -91,6 +91,7 @@ def process_dragen_run(analysis_path):
 
     # Copy metrics and reports for the whole run, and specific files for some project types
     for my_samples, output_run_base in global_run_info_list:
+        output_run_base.mkdir(exist_ok=True)
         my_apps = set(sample['onboard_workflow'] for sample in my_samples)
         link_global_files(lims_file_path, analysis_suffix, input_run_dir, analysis_dir, my_apps, output_run_base, my_samples[0].get('ora_compression'))
 
