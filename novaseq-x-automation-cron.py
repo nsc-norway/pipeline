@@ -12,6 +12,15 @@ SCRIPT_DIR_PATH = Path(__file__).resolve().parent
 INPUT_RUN_PATH = Path("/data/runScratch.boston/NovaSeqX")
 
 
+def run_subprocess_with_logging(error_logger, args, **kwargs):
+    try:
+        subprocess.run(args, check=True, stderr=subprocess.PIPE, stdout=subprocess.DEVNULL, text=True, **kwargs)
+    except subprocess.CalledProcessError as e:
+        error_logger.error(f"Command '{' '.join(args)}' failed with exit code {e.returncode}.")
+        if e.stderr:
+            error_logger.error(e.stderr)
+
+
 def setup_logging(analysis_path):
     # Set up separate loggers for progress and errors
     logfile_path = analysis_path / "automation_log_nsc.txt"
@@ -73,9 +82,9 @@ def main():
                     suffix = f"_{analysis_path.name}"
 
                 # Run the file mover
-                subprocess.run(
+                run_subprocess_with_logging(
+                    error_logger,
                     ["nsc-python3", str(SCRIPT_DIR_PATH / "novaseq-x-file-mover.py"), str(analysis_path)],
-                    check=True
                 )
 
                 # Project-specific processing
@@ -114,17 +123,16 @@ def main():
                     slurm_script_path = pipeline_dir / "script.sh"
                     with open(slurm_script_path, 'w') as slurm_script_file:
                         slurm_script_file.write(run_slurm_script)
-                    subprocess.run(
+                    run_subprocess_with_logging(
+                        error_logger,
                         ["sbatch", "--dependency=" + dependency_list, str(slurm_script_path)],
                         cwd=pipeline_dir,
-                        check=True,
-                        stdout=subprocess.DEVNULL
                     )
 
                 if any_diag_project:
-                    subprocess.run(
+                    run_subprocess_with_logging(
+                        error_logger,
                         ["nsc-python3", str(SCRIPT_DIR_PATH / "novaseq-x-diag.py"), str(lims_file_path)],
-                        check=True
                     )
 
                 progress_logger.info(f"Completed automation at {datetime.datetime.now()}")
