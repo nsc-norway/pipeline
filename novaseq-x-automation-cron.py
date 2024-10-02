@@ -13,14 +13,15 @@ INPUT_RUN_PATH = Path("/data/runScratch.boston/NovaSeqX")
 
 
 def run_subprocess_with_logging(error_logger, args, **kwargs):
-    try:
-        subprocess.run(args, check=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE, text=True, **kwargs)
-    except subprocess.CalledProcessError as e:
-        error_logger.error(f"Command '{' '.join(args)}' failed with exit code {e.returncode}.")
-        if e.stderr:
-            error_logger.error("STDERR: " + e.stderr)
-        if e.stdout:
-            error_logger.error("STDOUT: " + e.stderr)
+    result = subprocess.run(args, stderr=subprocess.PIPE, stdout=subprocess.PIPE, text=True, **kwargs)
+    if result.returncode != 0:
+        error_logger.error(f"Command '{' '.join(args)}' failed with exit code {result.returncode}.")
+        if result.stderr:
+            error_logger.error("BEGIN STDERR:\n" + result.stderr)
+            error_logger.error("END STDERR")
+        if result.stdout:
+            error_logger.error("BEGIN STDOUT:\n" + result.stdout)
+            error_logger.error("END STDOUT")
 
 
 def setup_logging(analysis_path):
