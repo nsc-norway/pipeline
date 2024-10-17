@@ -499,7 +499,7 @@ def get_new_sample_id(sample):
 def get_sample_renaming_list(samples, run_id):
     data = []
     num_fastq_files = None
-    header = "OldSampleID,NewSampleID,ProjectName,NSC_ProjectName,Fastq"
+    header = "Lane,OldSampleID,NewSampleID,ProjectName,NSC_ProjectName,Fastq"
     for sample in samples:
         # we have to repeat a bit of the work that's done in the moving function - to generate the
         # full fastq paths
@@ -510,6 +510,7 @@ def get_sample_renaming_list(samples, run_id):
         for fastq_name in destination_fastq_names:
             data.append(
                 ",".join([
+                    str(sample['lane']),
                     sample['samplesheet_sample_id'],
                     get_new_sample_id(sample),
                     sample['project_name'],
