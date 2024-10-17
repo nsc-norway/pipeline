@@ -164,6 +164,7 @@ def main():
     
     # Save the demultiplexing results and QC to LIMS, and put the artifact IDs in the sample info list.
     exchange_output_artifact_info(lims, bcl_convert_process, demultiplexed_lane_sample_info)
+    add_undetermined_percent_to_lims(lims, samplesheet_process.all_inputs(), demultiplexed_lane_sample_info)
 
     # Create yaml file for downstream automation
     no_qc_no_unde_dlsi = [
@@ -308,7 +309,7 @@ def parse_demultiplexing_stats(output_folder):
             '# Reads': read_count * num_data_read_passes,
             '# Reads PF': read_count * num_data_read_passes,
             'Yield PF (Gb)': sample_yield / 1e9,
-            '% of PF Clusters Per Lane': read_count * 100 / max(1, lane_total_read_count[demultiplex_stats_row['Lane']]),
+            '% of PF Clusters Per Lane': 100 * float(demultiplex_stats_row['% Reads']),
             '% Perfect Index Read': float(demultiplex_stats_row['% Perfect Index Reads']),
             '% One Mismatch Reads (Index)': float(demultiplex_stats_row['% One Mismatch Index Reads']),
             '% Bases >=Q30': sum(float(row['YieldQ30']) for row in quality_metrics_rows) * 100 / max(1, sample_yield),
@@ -416,8 +417,21 @@ def exchange_output_artifact_info(lims, bcl_convert_process, demultiplexed_lane_
                 row['artifact_name'] = o.name
                 row['lane_artifact'] = i.id
                 row['sample_id'] = o.samples[0].id
-
     lims.put_batch(list(update_artifacts))
+
+
+def add_undetermined_percent_to_lims(lims, input_artifacts, demultiplexed_lane_sample_info):
+    for lane_artifact in input_artifacts:
+        lane_number = int(lane_artifact.location[1].split(":")[0])
+        undetermined_rows = [row for row in demultiplexed_lane_sample_info
+                             if row['lane'] == lane_number and row['samplesheet_sample_id'] == "Undetermined"]
+        if len(undetermined_rows) > 1:
+            raise RuntimeError(f"There is more than one undetermined row in lane {lane_number}!")
+        elif len(undetermined_rows) == 1:
+            lane_artifact.udf['NSC % Undetermined Indices (PF)'] = undetermined_rows[0]['qc']['% of PF Clusters Per Lane']
+        # If there is no undetermined, we don't do anything
+    lims.put_batch(input_artifacts)
+
 
 if __name__ == "__main__":
     main()
