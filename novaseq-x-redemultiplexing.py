@@ -62,24 +62,25 @@ def main():
               f"BCL Convert step {bcl_convert_process_id}.")
         sys.exit(1)
 
+    # Actualize and check all the parameters on the BCL Convert step
     compute_type = samplesheet_process.udf.get("BCL Convert Instrument")
     if not compute_type in ['External DRAGEN', 'CPU']:
         print(f"Unsupported compute type '{compute_type}' for off-board redemultiplexing")
         sys.exit(1)
     bcl_convert_process.udf["Compute platform"] = compute_type
     bcl_convert_process.udf["Run ID"] = run_id
-    data_compression_type = samplesheet_process.udf['FASTQ Compression Format']
-    if data_compression_type == "dragen" and compute_type != "External DRAGEN":
-        print("ERROR: Invalid configuration: 'dragen' compression is only available for External DRAGEN.")
-        sys.exit(1)
-
     run_folder_udf = bcl_convert_process.udf.get('Sequencing Output Folder')
     if run_folder_udf:
         run_folder_path = Path(run_folder_udf)
     else:
         run_folder_path = Path(RUN_FOLDER_LOCATION) / run_id
+        bcl_convert_process.udf['Sequencing Output Folder'] = str(run_folder_path)
     if not run_folder_path.exists():
         print(f"Run folder {run_folder_path} does not exist. You can override the Sequencing Output Folder on the BCL Convert step ({bcl_convert_process_id}).")
+        sys.exit(1)
+    data_compression_type = samplesheet_process.udf['FASTQ Compression Format']
+    if data_compression_type == "dragen" and compute_type != "External DRAGEN":
+        print("ERROR: Invalid configuration: 'dragen' compression is only available for External DRAGEN.")
         sys.exit(1)
     assert (run_folder_path / "Analysis").is_dir(), f"Analysis folder should exist at {run_folder_path / 'Analysis'}"
 
