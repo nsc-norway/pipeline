@@ -349,7 +349,7 @@ def get_projects_file_moving_lists(run_id, run_folder, samples, analysis_suffix,
         fastq_move_paths = [(fop, dfp) for fop, dfp in zip(fastq_original_paths, destination_fastq_paths)]
 
         # Analysis / QC dir for each sample.
-        if 'onboard_analysis' in sample: # Only applicable for onboard DRAGEN
+        if 'onboard_workflow' in sample: # Only applicable for onboard DRAGEN
             sample_analysis_path = analysis_dir / "Data" / sample_app_dir / sample['samplesheet_sample_id']
             analysis_sample_rename_tuple = (sample['samplesheet_sample_id'], get_new_sample_id(sample))
             analysis_move = set([(sample_analysis_path, analysis_sample_rename_tuple)])
