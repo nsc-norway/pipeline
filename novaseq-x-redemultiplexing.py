@@ -172,7 +172,7 @@ def main():
         for row in demultiplexed_lane_sample_info
         if row['samplesheet_sample_id'] != "Undetermined"
     ]
-    with open(analysis_path / "ClarityLIMSImport_NSC_TEST.yaml", "w") as yamlout:
+    with open(analysis_path / "ClarityLIMSImport_NSC.yaml", "w") as yamlout:
         yaml.dump({
             'status': 'ImportCompleted',
             'bcl_convert_version': bcl_convert_version,
@@ -319,6 +319,7 @@ def parse_demultiplexing_stats(output_folder):
         demultiplexed_lane_sample_info.append({
             'lane': int(demultiplex_stats_row['Lane']),
             'samplesheet_sample_id': demultiplex_stats_row['SampleID'],
+            'samplesheet_sample_project': demultiplex_stats_row['Sample_Project'],
             'num_data_read_passes': num_data_read_passes,
             'samplesheet_position': sample_id_position,
             'project_name': demultiplex_stats_row['Sample_Project'],
