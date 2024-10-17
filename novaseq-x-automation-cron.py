@@ -72,6 +72,8 @@ def main():
             if lims_info.get('status') != 'ImportCompleted':
                 continue # If the LIMS import is not completed, we skip this path.
 
+            bcl_convert_version = lims_info.get("bcl_convert_version", "UNKNOWN")
+
             # Setup the loggers, also creating the log file, which is used as a flag to not rerun the automation.
             progress_logger, error_logger = setup_logging(analysis_path)
             try:
@@ -102,7 +104,8 @@ def main():
                     if project_type == "Diagnostics":
                         any_diag_project = True
                     else:
-                        job_id = start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiplexed_run_dir)
+                        run_fastqc = "false" if lims_info.get("compute_platform") == "Onboard DRAGEN" else "true"
+                        job_id = start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiplexed_run_dir, run_fastqc, bcl_convert_version)
                         nsc_project_slurm_jobs.append(job_id)
 
                 # Queue run-based processing
@@ -118,7 +121,8 @@ def main():
     --runid "{run_id}" \\
     --qcid "QualityControl{suffix}" \\
     --analysisid "Analysis{suffix}" \\
-    --samplerenaminglist "SampleRenamingList-run.csv" 
+    --samplerenaminglist "SampleRenamingList-run.csv" \\
+    --bcl_convert_version "{bcl_convert_version}"
 """
                     dependency_list = "afterany:" + ":".join(nsc_project_slurm_jobs)
                     pipeline_dir = demultiplexed_run_dir / "pipeline" / "run"
@@ -145,7 +149,7 @@ def main():
                 raise  # Re-raise the exception to trigger any necessary stderr email output
 
 
-def start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiplexed_run_dir):
+def start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiplexed_run_dir, run_fastqc, bcl_convert_version):
     slurm_script = f"""#!/bin/bash
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=8G
@@ -158,7 +162,9 @@ def start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiple
     --qcid "QualityControl{suffix}" \\
     --analysisid "Analysis{suffix}" \\
     --samplerenaminglist "SampleRenamingList-{project_name}.csv" \\
-    --deliverymethod "{delivery_method}"
+    --deliverymethod "{delivery_method}" \\
+    --run_fastqc {enable_fastqc} \\
+    --bcl_convert_version "{bcl_convert_version}"
 """
     pipeline_dir = demultiplexed_run_dir / "pipeline" / ("prj-" + project_name)
     pipeline_dir.mkdir(parents=True, exist_ok=True)
