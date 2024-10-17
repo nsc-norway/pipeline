@@ -130,15 +130,17 @@ def main():
     with open(samplesheet_path, "wb") as f:
         f.write(sample_sheet)
 
+    extra_options = samplesheet_process.udf.get("BCL Convert / DRAGEN command line options", "")
+
     # Create demultiplexing script file and run demultiplexing
     job_name = f"{analysis_id}.{run_id}"
     bcl_convert_process.udf['Status'] = "RUNNING"
     bcl_convert_process.put()
     print("RUNNING", job_name)
     if compute_type == "External DRAGEN":
-        returncode = run_demultiplexing_dragen(job_name, run_folder_path, samplesheet_path, output_folder_parent, output_folder)
+        returncode = run_demultiplexing_dragen(job_name, run_folder_path, samplesheet_path, output_folder_parent, output_folder, extra_options)
     else:
-        returncode = run_demultiplexing_cpu(job_name, run_folder_path, samplesheet_path, output_folder_parent, output_folder)
+        returncode = run_demultiplexing_cpu(job_name, run_folder_path, samplesheet_path, output_folder_parent, output_folder, extra_options)
 
     if returncode != 0:
         print("ERROR: BCL Conversion returned non-zero exit code", returncode, ".")
@@ -220,7 +222,7 @@ def get_analysis_id_and_path(bcl_convert_process, run_folder_path, compute_type)
     return analysis_id, analysis_path
 
 
-def run_demultiplexing_dragen(job_name, run_folder_path, samplesheet_path, output_folder_parent, output_folder):
+def run_demultiplexing_dragen(job_name, run_folder_path, samplesheet_path, output_folder_parent, output_folder, extra_options):
     script_content = f"""#!/bin/bash
 #SBATCH --job-name={job_name}
 #SBATCH --partition=dragen
@@ -232,7 +234,7 @@ def run_demultiplexing_dragen(job_name, run_folder_path, samplesheet_path, outpu
         --ora-reference /staging/projects/p22/reference/hg19/oradata_homo_sapiens \\
         --output-directory {output_folder} \\
         --bcl-sampleproject-subdirectories true \\
-        --sample-sheet {samplesheet_path}
+        --sample-sheet {samplesheet_path} {extra_options}
 """
     script_path = output_folder_parent / "script.sh"
     with open(script_path, "w") as script_file:
@@ -244,7 +246,7 @@ def run_demultiplexing_dragen(job_name, run_folder_path, samplesheet_path, outpu
     return result.returncode
 
 
-def run_demultiplexing_cpu(job_name, run_folder_path, samplesheet_path, output_folder_parent, output_folder):
+def run_demultiplexing_cpu(job_name, run_folder_path, samplesheet_path, output_folder_parent, output_folder, extra_options):
 
     log_folder = output_folder_parent / "logs"
     log_folder.mkdir(exist_ok=True)
@@ -263,7 +265,7 @@ apptainer exec \\
         --bcl-input-directory {run_folder_path} \\
         --output-directory {output_folder} \\
         --bcl-sampleproject-subdirectories true \\
-        --sample-sheet {samplesheet_path}
+        --sample-sheet {samplesheet_path} {extra_options}
 """
     script_path = output_folder_parent / "script.sh"
     with open(script_path, "w") as script_file:
