@@ -163,7 +163,7 @@ def start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiple
     --analysisid "Analysis{suffix}" \\
     --samplerenaminglist "SampleRenamingList-{project_name}.csv" \\
     --deliverymethod "{delivery_method}" \\
-    --run_fastqc {enable_fastqc} \\
+    --run_fastqc {run_fastqc} \\
     --bcl_convert_version "{bcl_convert_version}"
 """
     pipeline_dir = demultiplexed_run_dir / "pipeline" / ("prj-" + project_name)
