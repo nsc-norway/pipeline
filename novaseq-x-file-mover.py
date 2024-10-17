@@ -220,6 +220,10 @@ def link_global_files(lims_file_path, analysis_suffix, input_run_dir, analysis_d
     # Hard-link Demux (only available for onboard analysis)
     if is_onboard_analysis:
         shutil.copytree(analysis_dir / "Data" / "Demux", qc_dir / "Demux", copy_function=os.link)
+    else:
+        (qc_dir / "Demux").mkdir()
+        (qc_dir / "Demux" / "Demultiplex_Stats.csv").symlink_to("../BCLConvert/fastq/Reports/Demultiplex_Stats.csv")
+        (qc_dir / "Demux" / "Top_Unknown_Barcodes.csv").symlink_to("../BCLConvert/fastq/Reports/Top_Unknown_Barcodes.csv")
     
     fastq_dir = "ora_fastq" if ora else "fastq"
     # Process app-level aggregated stats files
