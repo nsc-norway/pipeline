@@ -104,15 +104,8 @@ def process_dragen_run(analysis_path):
     for my_samples, output_run_base in global_run_info_list:
         output_run_base.mkdir(exist_ok=True)
         my_apps = set(sample['onboard_workflow'] for sample in my_samples)
-        link_global_files(lims_file_path, analysis_suffix, input_run_dir, analysis_dir, my_apps, output_run_base, my_samples[0].get('ora_compression'))
-
-        # Transform sample sheet so it can be reused for BCL Convert
-        # It will only include the samples in the subset of samples given here
-        with open(input_run_dir / "SampleSheet.csv") as sample_sheet:
-            transformed_sample_sheet = transform_sample_sheet(run_id, my_samples, sample_sheet)
-            with open(output_run_base / f"SampleSheet_transformed{analysis_suffix}.csv", "w") as output_sample_sheet:
-                output_sample_sheet.write(transformed_sample_sheet)
-        
+        is_onboard_analysis = lims_info.get('compute_platform') == "Onboard DRAGEN"
+        link_global_files(lims_file_path, analysis_suffix, input_run_dir, analysis_dir, my_apps, output_run_base, my_samples[0].get('ora_compression'), is_onboard_analysis)
 
     for project_name, project_info in projects_info_map.items():
         # Create the base project directory. We have already checked that the required destinations
@@ -126,14 +119,15 @@ def process_dragen_run(analysis_path):
         move_files(project_info['samples_fastqs_moving'])
 
         # Create analysis output (we do an existence check, to allow for various
-        # folder structures)
-        if not project_info['project_analysis_path'].is_dir():
-            project_info['project_analysis_path'].mkdir()
- 
-        move_analysis_dirs_and_files(
-            project_info['project_analysis_path'],
-            project_info['analysis_dirs_moving']
-        )
+        # folder structures). Analysis is only applicable to Onboard DRAGEN.
+        if lims_info.get('compute_platform') == "Onboard DRAGEN":
+            if not project_info['project_analysis_path'].is_dir():
+                project_info['project_analysis_path'].mkdir()
+     
+            move_analysis_dirs_and_files(
+                project_info['project_analysis_path'],
+                project_info['analysis_dirs_moving']
+            )
 
         # Create project-specifc SampleRenamingList files for NSC projects
         project_samples = [sample for sample in samples if sample['project_name'] == project_name]
@@ -196,7 +190,7 @@ def move_files(move_file_list):
             src.rename(dest)
 
 
-def link_global_files(lims_file_path, analysis_suffix, input_run_dir, analysis_dir, my_apps, output_run_base, ora):
+def link_global_files(lims_file_path, analysis_suffix, input_run_dir, analysis_dir, my_apps, output_run_base, ora, is_onboard_analysis):
     """Hard-link/Copy QC files.
         * Run level (SAV files)
         * DRAGEN analysis level (e.g. Analysis/1, as called argument of this script)
@@ -223,19 +217,21 @@ def link_global_files(lims_file_path, analysis_suffix, input_run_dir, analysis_d
     # Copy LIMS information file to output directories
     shutil.copy(lims_file_path, qc_dir)
 
-    # Hard-link Demux
-    shutil.copytree(analysis_dir / "Data" / "Demux", qc_dir / "Demux", copy_function=os.link)
+    # Hard-link Demux (only available for onboard analysis)
+    if is_onboard_analysis:
+        shutil.copytree(analysis_dir / "Data" / "Demux", qc_dir / "Demux", copy_function=os.link)
     
     fastq_dir = "ora_fastq" if ora else "fastq"
     # Process app-level aggregated stats files
     for app in my_apps:
         app_dir = get_app_dir(app)
         (qc_dir / app_dir).mkdir()
-        shutil.copytree(
-            analysis_dir / "Data" / app_dir / "AggregateReports",
-            qc_dir / app_dir / "AggregateReports",
-            copy_function=os.link
-        )
+        if is_onboard_analysis:
+            shutil.copytree(
+                analysis_dir / "Data" / app_dir / "AggregateReports",
+                qc_dir / app_dir / "AggregateReports",
+                copy_function=os.link
+            )
         (qc_dir / app_dir / fastq_dir).mkdir()
         shutil.copytree(
             analysis_dir / "Data" / app_dir / fastq_dir / "Reports",
@@ -244,16 +240,23 @@ def link_global_files(lims_file_path, analysis_suffix, input_run_dir, analysis_d
         )
         # Make a copy of the used SampleSheet (real copy, not a link, just in case people get an idea
         # to edit it with vim)
-        shutil.copy(
-            analysis_dir / "Data" / app_dir / "SampleSheet.csv",
-            qc_dir / ("SampleSheet_" + app_dir + ".csv")
-        )
-        # Copy the full analysis summary to all destinations
-        shutil.copytree(
-            analysis_dir / "Data" / "summary",
-            qc_dir / "summary",
-            copy_function=os.link
-        )
+        if is_onboard_analysis:
+            shutil.copy(
+                analysis_dir / "Data" / app_dir / "SampleSheet.csv",
+                qc_dir / ("SampleSheet_" + app_dir + ".csv")
+            )
+            # Copy the full analysis summary to all destinations
+            shutil.copytree(
+                analysis_dir / "Data" / "summary",
+                qc_dir / "summary",
+                copy_function=os.link
+            )
+        else:
+            # Alternative location for SampleSheet for redemultiplexing
+            shutil.copy(
+                analysis_dir / "SampleSheet.csv",
+                qc_dir / ("SampleSheet_" + app_dir + ".csv")
+            )
 
 
 def move_analysis_dirs_and_files(project_analysis_target_path, sample_analysis_moving_list):
@@ -325,8 +328,8 @@ def get_projects_file_moving_lists(run_id, run_folder, samples, analysis_suffix,
             sample['num_data_read_passes'] = 2
             print("Warning: fallback num_data_read_passes")
         if 'onboard_workflow' not in sample:
-            sample['onboard_workflow'] = "germline"
-            print("Warning: fallback onboard_workflow")
+            # For off-board (re)demultiplexing this is not set, and only BCL convert is available
+            sample['onboard_workflow'] = "bcl_convert"
         # end fallback
 
         # Determine source file set to move
@@ -342,9 +345,12 @@ def get_projects_file_moving_lists(run_id, run_folder, samples, analysis_suffix,
         fastq_move_paths = [(fop, dfp) for fop, dfp in zip(fastq_original_paths, destination_fastq_paths)]
 
         # Analysis / QC dir for each sample.
-        sample_analysis_path = analysis_dir / "Data" / sample_app_dir / sample['samplesheet_sample_id']
-        analysis_sample_rename_tuple = (sample['samplesheet_sample_id'], get_new_sample_id(sample))
-        analysis_move = (sample_analysis_path, analysis_sample_rename_tuple)
+        if 'onboard_analysis' in sample: # Only applicable for onboard DRAGEN
+            sample_analysis_path = analysis_dir / "Data" / sample_app_dir / sample['samplesheet_sample_id']
+            analysis_sample_rename_tuple = (sample['samplesheet_sample_id'], get_new_sample_id(sample))
+            analysis_move = set([(sample_analysis_path, analysis_sample_rename_tuple)])
+        else:
+            analysis_move = set()
         # Get the analysis/QC destination path for this project (not sample specific)
         analysis_destination_path = get_dest_project_analysis_dir_path(run_id, analysis_suffix, sample)
 
@@ -357,13 +363,13 @@ def get_projects_file_moving_lists(run_id, run_folder, samples, analysis_suffix,
                 'project_fastq_path': fastq_destination_path,
                 'samples_fastqs_moving': fastq_move_paths,
                 'project_analysis_path': analysis_destination_path,
-                'analysis_dirs_moving': set([analysis_move]), # Use a set - need to de-duplicate if samples are run
-                                                              # on multiple lanes
+                'analysis_dirs_moving': analysis_move, # use a set - need to de-duplicate if samples are run
+                                                      # on multiple lanes
             }
             projects[project_name] = project_data
         else:
             projects[project_name]['samples_fastqs_moving'] += fastq_move_paths
-            projects[project_name]['analysis_dirs_moving'].add(analysis_move)
+            projects[project_name]['analysis_dirs_moving'].update(analysis_move) # Adds zero or one analysis item
 
     return projects
 
@@ -400,8 +406,11 @@ def get_original_fastq_paths(analysis_dir, sample_app_dir, sample):
                     for read_nr in range(1, (sample['num_data_read_passes'] + 1))
     ]
     fastq_dir = "ora_fastq" if sample.get('ora_compression') else "fastq"
+    fastq_path = analysis_dir / "Data" / sample_app_dir / fastq_dir
+    if 'samplesheet_sample_project' in sample:
+        fastq_path = fastq_path / sample['samplesheet_sample_project']
     return [
-        analysis_dir / "Data" / sample_app_dir / fastq_dir / fastq_name
+        fastq_path / fastq_name
         for fastq_name in fastq_original_names
     ]
 
@@ -481,60 +490,6 @@ def get_new_sample_id(sample):
         return sample['sample_name']
     else:
         raise ValueError("Unsupported project type")
-
-
-def transform_sample_sheet(run_id, samples, sample_sheet_file):
-    """Creates a new sample sheet with the modified sample IDs and including the
-    Sample_Project column."""
-
-    is_in_bclconvert_data = False
-    next_is_header = False
-    sample_id_index = None
-    sample_project_index = None
-    sample_id_to_project = {
-        sample['samplesheet_sample_id']: sample['project_name']
-        for sample in samples
-    }
-    sample_id_to_new_id = {
-        sample['samplesheet_sample_id']: get_new_sample_id(sample)
-        for sample in samples
-    }
-    new_file_lines = []
-    for linefull in sample_sheet_file:
-        l = linefull.rstrip("\n")
-        if next_is_header:
-            parts_lower = [p.lower() for p in l.split(",")]
-            try:
-                sample_id_index = parts_lower.index("sample_id")
-            except ValueError:
-                print("ERROR cannot find sample_id. Found columns: " + " ".join(parts_lower))
-                raise
-            sample_project_index = len(parts_lower)
-            l += ",Sample_Project"
-            is_in_bclconvert_data = True
-            next_is_header = False
-        elif is_in_bclconvert_data:
-            if l.strip().startswith("["): # Indicates the beginning of a different block. We are done.
-                break
-            else: # Sample data line
-                parts = l.split(",")
-                # Check that it's a proper sample entry, otherwise it's just echoed out as is.
-                # The Project_name column is added last, but is not in the original sample sheet,
-                # so the last index will be one less than sample_project_index, and the length will
-                # be equal to sample_project_index.
-                if len(parts) == sample_project_index:
-                    old_sample_id = parts[sample_id_index]
-                    if old_sample_id not in sample_id_to_new_id:
-                        # Skip sample IDs that are not in the specified sample list
-                        continue
-                    parts[sample_id_index] = sample_id_to_new_id[old_sample_id]
-                    parts.append(sample_id_to_project[old_sample_id])
-                    l = ",".join(parts)
-        else: # Not in BCLConvert_Data block
-            if l.strip().lower().startswith("[bclconvert_data]"):
-                next_is_header = True
-        new_file_lines.append(l)
-    return "\n".join(new_file_lines) + "\n"
 
 
 def get_sample_renaming_list(samples, run_id):
