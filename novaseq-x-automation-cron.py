@@ -96,6 +96,7 @@ def main():
                 projects = set(sample['project_name'] for sample in lims_info['samples'])
                 nsc_project_slurm_jobs = []
                 any_diag_project = False
+                any_nondiag_project = False
                 for project_name in projects:
                     progress_logger.info(f"Processing project {project_name}")
                     project_samples = [sample for sample in lims_info['samples'] if sample['project_name'] == project_name]
@@ -104,6 +105,7 @@ def main():
                     if project_type == "Diagnostics":
                         any_diag_project = True
                     else:
+                        any_nondiag_project = True
                         run_fastqc = "false" if lims_info.get("compute_platform") == "Onboard DRAGEN" else "true"
                         job_id = start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiplexed_run_dir, run_fastqc, bcl_convert_version)
                         nsc_project_slurm_jobs.append(job_id)
@@ -141,6 +143,9 @@ def main():
                         error_logger,
                         ["nsc-python3", str(SCRIPT_DIR_PATH / "novaseq-x-diag.py"), str(lims_file_path)],
                     )
+                if not any_nondiag_project:
+                    # TODO - close the sequencing step for diag-only runs
+                    pass
 
                 progress_logger.info(f"Completed automation at {datetime.datetime.now()}")
     
