@@ -53,6 +53,7 @@ def process_dragen_run(analysis_path):
         lims_info = yaml.safe_load(f)
 
     samples = lims_info['samples']
+    is_onboard_analysis = lims_info.get('compute_platform') == "Onboard DRAGEN"
 
     # Check sample info
     for sample in samples:
@@ -64,7 +65,7 @@ def process_dragen_run(analysis_path):
                             "to use for a file name. Please correct the yaml file.")
 
     # Retrieve paths and moving instruction for all fastqs and analysis files (dict indexed by project name)
-    projects_info_map = get_projects_file_moving_lists(run_id, input_run_dir, samples, analysis_suffix, analysis_path)
+    projects_info_map = get_projects_file_moving_lists(run_id, input_run_dir, samples, analysis_suffix, analysis_path, is_onboard_analysis)
     # Verify existence of source fastq and analysis files
     if not IGNORE_MISSING:
         check_missing(projects_info_map)
@@ -104,7 +105,6 @@ def process_dragen_run(analysis_path):
     for my_samples, output_run_base in global_run_info_list:
         output_run_base.mkdir(exist_ok=True)
         my_apps = set(sample['onboard_workflow'] for sample in my_samples)
-        is_onboard_analysis = lims_info.get('compute_platform') == "Onboard DRAGEN"
         link_global_files(lims_file_path, analysis_suffix, input_run_dir, analysis_dir, my_apps, output_run_base, my_samples[0].get('ora_compression'), is_onboard_analysis)
 
     for project_name, project_info in projects_info_map.items():
@@ -298,7 +298,7 @@ def move_bcl_dirs(x):
     pass # TODO?
 
 
-def get_projects_file_moving_lists(run_id, run_folder, samples, analysis_suffix, analysis_dir):
+def get_projects_file_moving_lists(run_id, run_folder, samples, analysis_suffix, analysis_dir, is_onboard_analysis):
     """This function determines the original fastq names and the target names of where
     to move the fastq files. It also gets the corresponding info for the analysis
     directories, but the analysis also needs renaming of the contents, based on
@@ -349,7 +349,7 @@ def get_projects_file_moving_lists(run_id, run_folder, samples, analysis_suffix,
         fastq_move_paths = [(fop, dfp) for fop, dfp in zip(fastq_original_paths, destination_fastq_paths)]
 
         # Analysis / QC dir for each sample.
-        if 'onboard_workflow' in sample: # Only applicable for onboard DRAGEN
+        if is_onboard_analysis: # Only applicable for onboard DRAGEN
             sample_analysis_path = analysis_dir / "Data" / sample_app_dir / sample['samplesheet_sample_id']
             analysis_sample_rename_tuple = (sample['samplesheet_sample_id'], get_new_sample_id(sample))
             analysis_move = set([(sample_analysis_path, analysis_sample_rename_tuple)])
