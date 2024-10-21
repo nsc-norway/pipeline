@@ -9,6 +9,7 @@ from genologics.lims import *
 from genologics import config
 
 DIAG_DESTINATION_PATH = Path("/boston/diag/nscDelivery")
+DIAG_RUN_FOLDER_MOVE_PATH = Path("/boston/diag/runs")
 lims = Lims(config.BASEURI, config.USERNAME, config.PASSWORD)
 
 async def process_all_diag_projects(lims_file_path):
@@ -23,13 +24,15 @@ async def process_all_diag_projects(lims_file_path):
     with open(lims_file_path) as f:
         lims_info = yaml.safe_load(f)
 
-    run_id = lims_file_path.resolve().parents[2].name
+    run_folder = lims_file_path.resolve().parents[2]
+    run_id = run_folder.name
 
     samples = lims_info['samples']
 
     # Check sample info
     project_md5sum_results_async = {}
     project_fastq_dirs = {}
+    have_any_nsc_samples = False
     for sample in samples:
         if sample['project_type'] == "Diagnostics":
             project = sample['project_name']
@@ -39,6 +42,8 @@ async def process_all_diag_projects(lims_file_path):
             fastq_dir = project_fastq_dirs[project]
             for fastq_name in get_fastq_names(sample):
                 project_md5sum_results_async[project].append(run_md5sum(fastq_dir, fastq_name))
+        elif sample['project_type'] in ["Sensitive", "Non-sensitive"]:
+            have_any_nsc_samples = True
 
     for project, fastq_dir in project_fastq_dirs.items():
         md5sum_results = await asyncio.gather(*project_md5sum_results_async[project])
@@ -61,6 +66,44 @@ async def process_all_diag_projects(lims_file_path):
     artifacts = [Sample(lims, id=sample['sample_id']).artifact for sample in samples if sample['project_type'] == "Diagnostics"]
     # 3. queue artifacts
     lims.route_analytes(artifacts, workflow)
+
+    if not have_any_nsc_samples:
+        # Complete the sequencing QC step
+        lane_artifact_ids = list(set(sample['lane_artifact'] for sample in samples))
+        qc_pass_and_complete_seq_step(lane_artifact_ids)
+
+        # Move the run folder only if this is analysis ID 1 - first time demultiplexing
+        if analysis_id == "1":
+            dest_path = DIAG_RUN_FOLDER_MOVE_PATH / run_folder.name
+            if not dest_path.exists():
+                run_folder.rename(DIAG_RUN_FOLDER_MOVE_PATH / run_folder.name)
+
+
+def qc_pass_and_complete_seq_step(lane_artifact_ids):
+    """Pass and close the QC step."""
+
+    processes = lims.get_processes(inputartifactlimsid=lane_artifact_ids)
+    # Find process that is not completed and has "per input" output generation
+    # This will be the QC process
+    is_per_input = False
+    for p in processes:
+        if not p.date_run and 'NovaSeq X Run QC' in p.type_name:
+            for i, o in p.input_output_maps:
+                if o['output-generation-type'] == "PerInput":
+                    is_per_input = True
+                    break
+    if is_per_input:
+        for i, o in p.input_output_maps:
+            if o['output-generation-type'] == "PerInput":
+                o['uri'].qcflag = "PASSED"
+                o['uri'].put()
+        step = Step(lims, id=p.id)
+        for na in step.actions.next_actions:
+            na['action'] = 'complete'
+        step.actions.put()
+        while not fail and step.current_state.upper() != "COMPLETED":
+            step.advance()
+            step.get(force=True)
 
 
 async def run_md5sum(fastq_dir, filename):
