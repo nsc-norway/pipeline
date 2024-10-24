@@ -127,7 +127,7 @@ def main():
                     dependency_list = "afterany:" + ":".join(nsc_project_slurm_jobs)
                     pipeline_dir = demultiplexed_run_dir / "pipeline" / "run"
                     pipeline_dir.mkdir(parents=True, exist_ok=True)
-                    slurm_script_path = pipeline_dir / "script.sh"
+                    slurm_script_path = pipeline_dir / f"script{suffix}.sh"
                     with open(slurm_script_path, 'w') as slurm_script_file:
                         slurm_script_file.write(run_slurm_script)
                     run_subprocess_with_logging(
@@ -168,7 +168,7 @@ def start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiple
 """
     pipeline_dir = demultiplexed_run_dir / "pipeline" / ("prj-" + project_name)
     pipeline_dir.mkdir(parents=True, exist_ok=True)
-    slurm_script_path = pipeline_dir / "script.sh"
+    slurm_script_path = pipeline_dir / f"script{suffix}.sh"
     with open(slurm_script_path, 'w') as slurm_script_file:
         slurm_script_file.write(slurm_script)
 
