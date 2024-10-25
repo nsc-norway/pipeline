@@ -26,6 +26,7 @@ async def process_all_diag_projects(lims_file_path):
 
     run_folder = lims_file_path.resolve().parents[2]
     run_id = run_folder.name
+    analysis_id = lims_file_path.resolve().parents[1]
 
     samples = lims_info['samples']
 
