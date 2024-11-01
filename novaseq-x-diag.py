@@ -96,7 +96,8 @@ def qc_pass_and_complete_seq_step(lane_artifact_ids):
     if is_per_input:
         for i, o in p.input_output_maps:
             if o['output-generation-type'] == "PerInput":
-                o['uri'].qcflag = "PASSED"
+                o['uri'].get()
+                o['uri'].qc_flag = "PASSED"
                 o['uri'].put()
         step = Step(lims, id=p.id)
         for na in step.actions.next_actions:
