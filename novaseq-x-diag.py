@@ -3,6 +3,7 @@ import yaml
 import sys
 import re
 import asyncio
+import time
 from collections import defaultdict
 from pathlib import Path
 from genologics.lims import *
@@ -103,9 +104,12 @@ def qc_pass_and_complete_seq_step(lane_artifact_ids):
         for na in step.actions.next_actions:
             na['action'] = 'complete'
         step.actions.put()
-        while not fail and step.current_state.upper() != "COMPLETED":
+        attempt = 0
+        while attempt < 10 and step.current_state.upper() != "COMPLETED":
             step.advance()
+            time.sleep(10)
             step.get(force=True)
+            attempt += 1
 
 
 async def run_md5sum(fastq_dir, filename):
