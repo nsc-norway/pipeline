@@ -124,7 +124,7 @@ def main():
     --samplerenaminglist "SampleRenamingList-run.csv" \\
     --bcl_convert_version "{bcl_convert_version}"
 """
-                    dependency_list = "afterany:" + ":".join(nsc_project_slurm_jobs)
+                    dependency_list = "afterok:" + ":".join(nsc_project_slurm_jobs)
                     pipeline_dir = demultiplexed_run_dir / "pipeline" / "run"
                     pipeline_dir.mkdir(parents=True, exist_ok=True)
                     slurm_script_path = pipeline_dir / f"script{suffix}.sh"
