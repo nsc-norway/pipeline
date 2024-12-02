@@ -199,9 +199,6 @@ def delivery_diag_move(task, project, basecalls_dir, project_path):
     with open(os.path.join(dest_dir, "Demultiplex_Stats.htm"), 'w') as f:
         f.write(demultiplex_stats_content)
 
-    subprocess.check_call(["chmod", "-R", "ug+rwX,o-rwx", os.path.join(nsc.DIAGNOSTICS_DELIVERY, dest_dir)])
-    subprocess.check_call(["chgrp", "-R", "ous-diag-delv", os.path.join(nsc.DIAGNOSTICS_DELIVERY, dest_dir)])
-
     # Check undetermined percentage, then close the sequencing (Mi/NextSeq) or Data QC (NovaSeq) step.
     # ---- Automation workflow for diagnostics projects ----
     # 1. auto-next-script.sh cron job (lims repo) checks:
