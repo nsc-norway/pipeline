@@ -275,7 +275,7 @@ apptainer exec \\
             cwd=output_folder_parent
     )
     return result.returncode
-    
+
 
 def parse_demultiplexing_stats(output_folder):
     with open(output_folder / "Reports" / "Demultiplex_Stats.csv", newline='') as f:
@@ -290,21 +290,36 @@ def parse_demultiplexing_stats(output_folder):
     for demultiplex_stats_row in demultiplex_stats:
         lane_total_read_count[demultiplex_stats_row['Lane']] += float(demultiplex_stats_row['# Reads'])
 
-    for demultiplex_stats_row in demultiplex_stats:
-        quality_metrics_rows = [row for row in quality_metrics if 
-                                    row['Lane'] == demultiplex_stats_row['Lane'] and
-                                    row['SampleID'] == demultiplex_stats_row['SampleID'] and
-                                    row['Sample_Project'] == demultiplex_stats_row['Sample_Project']
-                                    ]
+    # Determine a list of unique lane, sample_id, sample_project. They are not unique in case
+    # a sample has multiple different indexes, like some 10x libraries using a mix of 4 indexes.
+    # The data are always merged by BCL Convert, so the following list corresponds to the list of
+    # output files. (This is an unusual edge case messing up our simple code)
+    dedup_lane_sample_project = list(dict.fromkeys(
+        (row['Lane'], row['SampleID'], row['Sample_Project'])
+        for row in demultiplex_stats
+    ))
+
+    for lane, sampleid, project in dedup_lane_sample_project:
+        demultiplex_stats_rows = [row for row in demultiplex_stats
+                if row['Lane'] == lane and
+                row['SampleID'] == sampleid and
+                row['Sample_Project'] == project
+        ]
+        quality_metrics_rows = [row for row in quality_metrics
+                if row['Lane'] == lane and
+                row['SampleID'] == sampleid and
+                row['Sample_Project'] == project
+        ]
 
         # Sample S-number depends only on the unique sample ID. It is reused for samples from
         # different projects with the same name.
-        sample_id_position = sample_id_positions.get(demultiplex_stats_row['SampleID'])
+        sample_id_position = sample_id_positions.get(sampleid)
         if not sample_id_position:
             sample_id_position = len(sample_id_positions)
-            sample_id_positions[demultiplex_stats_row['SampleID']] = sample_id_position
-        num_data_read_passes = len(quality_metrics_rows)
-        read_count = int(demultiplex_stats_row['# Reads'])
+            sample_id_positions[sampleid] = sample_id_position
+
+        num_data_read_passes = max(int(row['ReadNumber']) for row in quality_metrics_rows)
+        read_count = sum(int(row['# Reads']) for row in demultiplex_stats_rows)
         sample_yield = sum(float(row['Yield']) for row in quality_metrics_rows)
         # QC for LIMS
         qc = { # Note: If the metrics are changed, they should also be updated in exchange_output_artifact_info
@@ -312,25 +327,54 @@ def parse_demultiplexing_stats(output_folder):
             '# Reads': read_count * num_data_read_passes,
             '# Reads PF': read_count * num_data_read_passes,
             'Yield PF (Gb)': sample_yield / 1e9,
-            '% of PF Clusters Per Lane': 100 * float(demultiplex_stats_row['% Reads']),
-            '% Perfect Index Read': float(demultiplex_stats_row['% Perfect Index Reads']),
-            '% One Mismatch Reads (Index)': float(demultiplex_stats_row['% One Mismatch Index Reads']),
+            '% of PF Clusters Per Lane': 100 * sum(float(row['% Reads']) for row in demultiplex_stats_rows),
+            # Compute a weighted average (by # Reads)
+            '% Perfect Index Read': 100 * sum(
+                float(row['% Perfect Index Reads'])*float(row['# Reads'])
+                for row in demultiplex_stats_rows) / max(1, read_count),
+            '% One Mismatch Reads (Index)':  100 * sum(
+                float(row['% One Mismatch Index Reads'])*float(row['# Reads'])
+                for row in demultiplex_stats_rows) / max(1, read_count),
             '% Bases >=Q30': sum(float(row['YieldQ30']) for row in quality_metrics_rows) * 100 / max(1, sample_yield),
-            'Ave Q Score': sum(float(row['Mean Quality Score (PF)']) for row in quality_metrics_rows) / num_data_read_passes,
+            'Ave Q Score': sum(float(row['Mean Quality Score (PF)'])*float(row['Yield']) for row in quality_metrics_rows) / sample_yield,
         }
         # Details for yaml file
         demultiplexed_lane_sample_info.append({
-            'lane': int(demultiplex_stats_row['Lane']),
-            'samplesheet_sample_id': demultiplex_stats_row['SampleID'],
-            'samplesheet_sample_project': demultiplex_stats_row['Sample_Project'],
+            'lane': int(lane),
+            'samplesheet_sample_id': sampleid,
+            'samplesheet_sample_project': project,
             'num_data_read_passes': num_data_read_passes,
             'samplesheet_position': sample_id_position,
-            'project_name': demultiplex_stats_row['Sample_Project'],
-            'sample_name': demultiplex_stats_row['SampleID'],
+            'project_name': project,
+            'sample_name': sampleid,
             # For internal use by this script
             'qc': qc
         })
+
     return demultiplexed_lane_sample_info
+
+
+def dedup_and_aggregate_samples(sample_list):
+    """Collapse and aggregate samples with multiple indexes.
+    
+    In the sample sheet and demultiplex stats, these are represented by multiple rows. However,
+    they only produce a single pair (set) of fastq files if the """
+
+    dedup_sample_list = []
+    sample_keys = [(entry['lane'], entry['sample_id'], entry['project_name']) for sample in sample_list]
+    known_lane_sample_project = set()
+    for i in range(len(sample_list)):
+        entry = sample_list[i]
+        key = sample_keys[i]
+        if key not in known_lane_sample_project:
+            known_lane_sample_project.add(key)
+            other_samples = [
+                other
+                for other_key, other in zip(sampe_keys[i+1:], sample_list[i+1:])
+                if other_key == key
+            ]
+            # ...
+            dedup_sample_list.append(aggregate_entry)
 
 
 def add_project_info_from_lims(lims, demultiplexed_lane_sample_info):
@@ -390,7 +434,7 @@ def exchange_output_artifact_info(lims, bcl_convert_process, demultiplexed_lane_
                 matching_records = [ # Restrict records to the correct project
                     row
                     for row in matching_records
-                    if row['Sample_Project'] == project_name
+                    if 'Sample_Project' in row and row['Sample_Project'] == project_name
                 ]
                 if len(matching_records) > 1: # It's unexpected that there are multiple rows with the same project.
                     raise RuntimeError(f"Unable to find unique demultiplexed record for {o.id}.")

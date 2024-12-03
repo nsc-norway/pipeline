@@ -14,6 +14,14 @@ See SETUP.md for setup instructions. (currently out of date)
 Testing: See the `tests` subdirectory.
 
 
+## NovaSeq X scripts
+
+These are not related to the other scripts. There are four scripts to control data handling and
+re-demultiplexing using Onboard analysis or BCL Convert.
+
+**NovaSeq X scripts require Python > 3.7**
+
+
 ## Content
 
 ### Main scripts: the primary data processing / analysis tasks.
