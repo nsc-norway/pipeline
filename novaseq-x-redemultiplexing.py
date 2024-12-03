@@ -284,7 +284,7 @@ def parse_demultiplexing_stats(output_folder):
         quality_metrics = list(csv.DictReader(f))
     
     demultiplexed_lane_sample_info = []
-    sample_id_positions = {}
+    sample_id_positions = {"Undetermined": 0}
     # Compute lane-level aggregates
     lane_total_read_count = defaultdict(int)
     for demultiplex_stats_row in demultiplex_stats:
@@ -301,7 +301,7 @@ def parse_demultiplexing_stats(output_folder):
         # different projects with the same name.
         sample_id_position = sample_id_positions.get(demultiplex_stats_row['SampleID'])
         if not sample_id_position:
-            sample_id_position = len(sample_id_positions) + 1
+            sample_id_position = len(sample_id_positions)
             sample_id_positions[demultiplex_stats_row['SampleID']] = sample_id_position
         num_data_read_passes = len(quality_metrics_rows)
         read_count = int(demultiplex_stats_row['# Reads'])
