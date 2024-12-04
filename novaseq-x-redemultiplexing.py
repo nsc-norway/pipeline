@@ -318,14 +318,16 @@ def parse_demultiplexing_stats(output_folder):
             sample_id_position = len(sample_id_positions)
             sample_id_positions[sampleid] = sample_id_position
 
-        num_data_read_passes = max(int(row['ReadNumber']) for row in quality_metrics_rows)
+        # Number of data reads excluding index reads
+        num_data_read_passes = len(set(row['ReadNumber'] for row in quality_metrics_rows if "I" not in row['ReadNumber']))
+        num_index_reads_written_as_fastq = len(set(row['ReadNumber'] for row in quality_metrics_rows if "I" in row['ReadNumber']))
         read_count = sum(int(row['# Reads']) for row in demultiplex_stats_rows)
         sample_yield = sum(float(row['Yield']) for row in quality_metrics_rows)
         # QC for LIMS
         qc = { # Note: If the metrics are changed, they should also be updated in exchange_output_artifact_info
                # to populate artifacts with no demultiplexing stats
-            '# Reads': read_count * num_data_read_passes,
-            '# Reads PF': read_count * num_data_read_passes,
+            '# Reads': read_count * (num_data_read_passes + num_index_reads_written_as_fastq),
+            '# Reads PF': read_count * (num_data_read_passes + num_index_reads_written_as_fastq),
             'Yield PF (Gb)': sample_yield / 1e9,
             '% of PF Clusters Per Lane': 100 * sum(float(row['% Reads']) for row in demultiplex_stats_rows),
             # Compute a weighted average (by # Reads)
@@ -344,6 +346,7 @@ def parse_demultiplexing_stats(output_folder):
             'samplesheet_sample_id': sampleid,
             'samplesheet_sample_project': project,
             'num_data_read_passes': num_data_read_passes,
+            'num_index_reads_written_as_fastq': num_index_reads_written_as_fastq,
             'samplesheet_position': sample_id_position,
             'project_name': project,
             'sample_name': sampleid,

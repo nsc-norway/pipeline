@@ -409,6 +409,16 @@ def get_original_fastq_paths(analysis_dir, sample_app_dir, sample):
                     ])
                     for read_nr in range(1, (sample['num_data_read_passes'] + 1))
     ]
+    if 'num_index_reads_written_as_fastq' in sample:
+        fastq_original_names += ["_".join([
+                            sample['samplesheet_sample_id'],
+                            f"S{sample['samplesheet_position']}",
+                            "L" + str(sample['lane']).zfill(3),
+                            "I" + str(read_nr),
+                            f"001.fastq.{compression_type}"
+                        ])
+                        for read_nr in range(1, (sample['num_index_reads_written_as_fastq'] + 1))
+        ]
     fastq_dir = "ora_fastq" if sample.get('ora_compression') else "fastq"
     fastq_path = analysis_dir / "Data" / sample_app_dir / fastq_dir
     if 'samplesheet_sample_project' in sample:
@@ -439,7 +449,7 @@ def get_destination_fastq_names(sample, fastq_original_paths):
     else:
         # Change name to sample_name. Do we need to keep the S-number and 001?
         compression_type = "ora" if sample.get('ora_compression') else "gz"
-        return [
+        output_names = [
             "_".join([
                 sample['sample_name'],
                 f"S{sample['samplesheet_position']}",
@@ -448,6 +458,17 @@ def get_destination_fastq_names(sample, fastq_original_paths):
                 ]) + f"_001.fastq.{compression_type}"
             for read in range(1, sample['num_data_read_passes'] + 1)
         ]
+        if 'num_index_reads_written_as_fastq' in sample:
+                output_names += ["_".join([
+                            sample['samplesheet_sample_id'],
+                            f"S{sample['samplesheet_position']}",
+                            "L" + str(sample['lane']).zfill(3),
+                            "I" + str(read_nr),
+                            f"001.fastq.{compression_type}"
+                        ])
+                        for read_nr in range(1, (sample['num_index_reads_written_as_fastq'] + 1))
+            ]
+        return output_names
 
 
 def get_dest_project_fastq_dir_path(run_id, sample):
