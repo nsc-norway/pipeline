@@ -338,7 +338,7 @@ def parse_demultiplexing_stats(output_folder):
                 float(row['% One Mismatch Index Reads'])*float(row['# Reads'])
                 for row in demultiplex_stats_rows) / max(1, read_count),
             '% Bases >=Q30': sum(float(row['YieldQ30']) for row in quality_metrics_rows) * 100 / max(1, sample_yield),
-            'Ave Q Score': sum(float(row['Mean Quality Score (PF)'])*float(row['Yield']) for row in quality_metrics_rows) / sample_yield,
+            'Ave Q Score': sum(float(row['Mean Quality Score (PF)'])*float(row['Yield']) for row in quality_metrics_rows) / max(1, sample_yield),
         }
         # Details for yaml file
         demultiplexed_lane_sample_info.append({
