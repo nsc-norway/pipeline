@@ -252,18 +252,11 @@ def copy_qc_files(task, project_name, dest_dir, srun_user_args=[]):
     qc_dir = os.path.join(task.bc_dir, "QualityControl" + task.suffix)
 
     # Copy "SAV" files for advanced users
-    if task.instrument == "nextseq":
-        sav_include_paths = [
-            "RunInfo.xml",
-            "RunParameters.xml",
-            "InterOp",
-            ]
-    else:
-        sav_include_paths = [
-            "RunInfo.xml",
-            "runParameters.xml",
-            "InterOp",
-            ]
+    sav_include_paths = [
+        "RunInfo.xml",
+        "RunParameters.xml",
+        "InterOp",
+        ]
     demultiplexing_sample_sheets = glob.glob(os.path.join(task.work_dir, "DemultiplexingSampleSheet*.csv"))
     if demultiplexing_sample_sheets:
         sav_include_paths.append(os.path.relpath(sorted(demultiplexing_sample_sheets)[-1], task.work_dir))
