@@ -114,7 +114,7 @@ def qc_pass_and_complete_seq_step(lane_artifact_ids):
 
 async def run_md5sum(fastq_dir, filename):
     proc = await asyncio.create_subprocess_exec(
-            "srun", "md5sum", filename,
+            "srun", "--qos=high", "md5sum", filename,
             cwd=fastq_dir,
             stdout=asyncio.subprocess.PIPE
             )
