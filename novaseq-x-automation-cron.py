@@ -22,6 +22,7 @@ def run_subprocess_with_logging(error_logger, args, **kwargs):
         if result.stdout:
             error_logger.error("BEGIN STDOUT:\n" + result.stdout)
             error_logger.error("END STDOUT")
+        raise RuntimeError("Called process error")
 
 
 def setup_logging(analysis_path):
