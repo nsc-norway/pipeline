@@ -250,11 +250,13 @@ def link_global_files(lims_file_path, analysis_suffix, input_run_dir, analysis_d
                 qc_dir / ("SampleSheet_" + app_dir + ".csv")
             )
             # Copy the full analysis summary to all destinations
-            shutil.copytree(
-                analysis_dir / "Data" / "summary",
-                qc_dir / "summary",
-                copy_function=os.link
-            )
+            dest_dir = qc_dir / "summary"
+            if not dest_dir.exists(): # Skip if already transferred when processing a different app
+                shutil.copytree(
+                    analysis_dir / "Data" / "summary",
+                    qc_dir / "summary",
+                    copy_function=os.link
+                )
         else:
             # Alternative location for SampleSheet for redemultiplexing
             shutil.copy(
