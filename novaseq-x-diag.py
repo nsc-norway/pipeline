@@ -72,10 +72,10 @@ async def process_all_diag_projects(lims_file_path):
     if not have_any_nsc_samples:
         # Complete the sequencing QC step
         lane_artifact_ids = list(set(sample['lane_artifact'] for sample in samples))
-        qc_pass_and_complete_seq_step(lane_artifact_ids)
+        have_closed_step = qc_pass_and_complete_seq_step(lane_artifact_ids)
 
         # Move the run folder only if this is analysis ID 1 - first time demultiplexing
-        if analysis_id == "1":
+        if have_closed_step and analysis_id == "1":
             dest_path = DIAG_RUN_FOLDER_MOVE_PATH / run_folder.name
             if not dest_path.exists():
                 run_folder.rename(DIAG_RUN_FOLDER_MOVE_PATH / run_folder.name)
@@ -110,6 +110,8 @@ def qc_pass_and_complete_seq_step(lane_artifact_ids):
             time.sleep(10)
             step.get(force=True)
             attempt += 1
+        return True
+    return False
 
 
 async def run_md5sum(fastq_dir, filename):
