@@ -11,6 +11,7 @@ import csv
 import yaml
 import subprocess
 import datetime
+import logging
 from pathlib import Path
 from collections import defaultdict
 
@@ -21,20 +22,7 @@ from genologics import config
 RUN_FOLDER_LOCATION = "/data/runScratch.boston/NovaSeqX"
 CPU_BCL_CONVERT_CONTAINER_IMAGE = "/data/common/tools/bclconvert/bclconvert-4.3.6.sif"
 
-def main():
-
-    dev_env = len(sys.argv) > 2 and sys.argv[2] == "dev"
-    if dev_env:
-        config.BASEURI = "https://dev-lims.sequencing.uio.no"
-        config.PASSWORD = open("/data/runScratch.boston/scripts/etc/seq-user/dev-apiuser-password.txt").read().strip()
-
-    # Identification of demultiplexing parameters. Errors in this section are fatal and will
-    # cause an immediate error message in LIMS.
-    try:
-        process_id = sys.argv[1]
-    except IndexError:
-        print("Usage: %s <process id>" % sys.argv[0])
-        sys.exit(1)
+def main(process_id):
     
     lims = Lims(config.BASEURI, config.USERNAME, config.PASSWORD)
     samplesheet_process = Process(lims, id=process_id)
@@ -164,6 +152,10 @@ def main():
     # Add common info
     for lane_sample_info in demultiplexed_lane_sample_info:
         lane_sample_info['ora_compression'] = (data_compression_type == "dragen")
+
+    # Determine file names / S number
+    for lane_sample_info in demultiplexed_lane_sample_info:
+        lane_sample_info['samplesheet_position'] = lookup_sample_s_number(output_folder, lane_sample_info)
     
     # Save the demultiplexing results and QC to LIMS, and put the artifact IDs in the sample info list.
     exchange_output_artifact_info(lims, bcl_convert_process, demultiplexed_lane_sample_info)
@@ -277,6 +269,28 @@ apptainer exec \\
     return result.returncode
 
 
+def lookup_sample_s_number(output_folder, lane_sample_info):
+    # Edvardsen-gDNA12-2024-11-19/1-RBE-1_S104_L003_R1_001.fastq.gz
+    if lane_sample_info['samplesheet_sample_id'] == "Undetermined":
+        # BCL Convert doesn't allow any normal sample to be called "Undetermined"
+        # and the lookup below doesn't work for undetermined. S0 is always correct.
+        return 0
+    fastq_pattern = \
+                lane_sample_info['samplesheet_sample_id'] +\
+                f"_S*_L{lane_sample_info['lane']:03}_R1_001.fastq." +\
+                ("ora" if lane_sample_info['ora_compression'] else "gz")
+    search_path = (output_folder / lane_sample_info['project_name'])
+    fastq_glob = list(search_path.glob(fastq_pattern))
+    if len(fastq_glob) == 1:
+        m = re.search(r"_S(\d+)_L\d+_R1_001.fastq.(ora|gz)$", fastq_glob[0].name)
+        if m:
+            return int(m.group(1))
+        else:
+            raise RuntimeError(f"Found a fastq path {fastq_glob[0]} but can't extract S-number.")
+    else:
+        raise RuntimeError(f"Found {len(fastq_glob)} matches for {fastq_pattern} inside {search_path}, expected one match")
+
+
 def parse_demultiplexing_stats(output_folder):
     with open(output_folder / "Reports" / "Demultiplex_Stats.csv", newline='') as f:
         demultiplex_stats = list(csv.DictReader(f))
@@ -347,7 +361,6 @@ def parse_demultiplexing_stats(output_folder):
             'samplesheet_sample_project': project,
             'num_data_read_passes': num_data_read_passes,
             'num_index_reads_written_as_fastq': num_index_reads_written_as_fastq,
-            'samplesheet_position': sample_id_position,
             'project_name': project,
             'sample_name': sampleid,
             # For internal use by this script
@@ -485,5 +498,26 @@ def add_undetermined_percent_to_lims(lims, input_artifacts, demultiplexed_lane_s
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        dev_env = len(sys.argv) > 3 and sys.argv[3] == "dev"
+        if dev_env:
+            config.BASEURI = "https://dev-lims.sequencing.uio.no"
+            config.PASSWORD = open("/data/runScratch.boston/scripts/etc/seq-user/dev-apiuser-password.txt").read().strip()
+
+        # Identification of demultiplexing parameters. Errors in this section are fatal and will
+        # cause an immediate error message in LIMS.
+        try:
+            process_id = sys.argv[1]
+            logfile_name = sys.argv[2]
+        except IndexError:
+            print("Usage: %s <process_id> <logfile_name>" % sys.argv[0])
+            print(" -- or --")
+            print("Usage: %s <process_id> <logfile_name> dev" % sys.argv[0])
+            sys.exit(1)
+
+        logging.basicConfig(filename=logfile_name, filemode="w")
+        main(process_id)
+    except Exception as e:
+        logging.exception(e)
+        raise
 
