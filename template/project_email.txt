@@ -28,6 +28,9 @@ You can pick up the data in a portable hard drive (please notice the size of the
 NOTE: UNKNOWN DELIVERY METHOD
 {% endif %}
 
+We will keep a copy of the data for THREE MONTHS after the run date, and will then DELETE ALL OUR COPIES without further notice.
+{% if project_data.lims.delivery_method == "Norstore" %}The download link will stop working when we delete the data.{% endif %}
+
 ------ Data output ------
 Here is an overview of your data files and the number of fragments that were sequenced:
 {% for (file, frags, rel_frags) in project_data.file_fragments_table %}
