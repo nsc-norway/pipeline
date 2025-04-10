@@ -23,7 +23,7 @@ TEST_DISABLE_MOVING = False
 # The following two options disable the checks and disable errors if the moving commands fail.
 # This option skips over files when the source does not exist. This can be used to recover failed
 # novaseq-x-file-mover runs.
-IGNORE_MISSING = False
+IGNORE_MISSING = True
 # Disable checking for existing destination files only.
 IGNORE_EXISTING = False
 
@@ -140,9 +140,6 @@ def process_dragen_run(analysis_path):
         if nsc_samples:
             with open(nsc_run_base / f"QualityControl{analysis_suffix}" / f"SampleRenamingList-run.csv", 'w') as srl:
                 srl.write(get_sample_renaming_list(nsc_samples, run_id))
-
-
-    # BCL TODO
 
 
 def check_missing(projects_info):
