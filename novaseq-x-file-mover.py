@@ -194,7 +194,7 @@ def link_global_files(lims_file_path, analysis_suffix, input_run_dir, analysis_d
         * App level aggregate reports and logs
     """
     # Copying in run-level files
-    for run_file in ["RunParameters.xml", "RunInfo.xml", "RTA.cfg"]:
+    for run_file in ["RunParameters.xml", "RunInfo.xml"]:
         if not (output_run_base / run_file).is_file():
             os.link(input_run_dir / run_file, output_run_base / run_file)
     # Link only bin files in InterOp, without recursion into C1.1, ... dirs
