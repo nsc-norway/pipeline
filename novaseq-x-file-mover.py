@@ -8,6 +8,7 @@ from pathlib import Path
 
 DIAG_DESTINATION_PATH = Path("/boston/diag/nscDelivery")
 NSC_DESTINATION_PATH = Path("/data/runScratch.boston/demultiplexed")
+MIK_DESTINATION_PATH = Path("/data/runScratch.boston/mik_data")
 
 # Disable moving files. Will still copy / link files and create directory structure, but will not
 # remove anything from the source folder. This can be used for testing or recovery.
@@ -57,7 +58,7 @@ def process_dragen_run(analysis_path):
 
     # Check sample info
     for sample in samples:
-        if not (is_nsc(sample) or is_diag(sample)):
+        if not (is_nsc(sample) or is_diag(sample) or is_mik(sample)):
             raise ValueError(f"Project {sample['project_name']} has unknown project type {sample['project_type']} "
                                 f"(sample {sample['sample_name']}).")
         if not all(c.isalnum() or c in '-_' for c in sample['project_name']):
@@ -135,7 +136,7 @@ def process_dragen_run(analysis_path):
             with open(nsc_run_base / f"QualityControl{analysis_suffix}" / f"SampleRenamingList-{project_name}.csv", 'w') as srl:
                 srl.write(get_sample_renaming_list(project_samples, run_id))
  
-        # Create project-specifc SampleRenamingList files for NSC projects
+        # Create SampleRenamingList files for all NSC projects
         nsc_samples = [sample for sample in samples if is_nsc(sample)]
         if nsc_samples:
             with open(nsc_run_base / f"QualityControl{analysis_suffix}" / f"SampleRenamingList-run.csv", 'w') as srl:
@@ -390,10 +391,11 @@ def get_app_dir(onboard_workflow):
 def is_nsc(sample):
     return sample['project_type'] in ["Sensitive", "Non-Sensitive"]
 
-
 def is_diag(sample):
     return sample['project_type']  == "Diagnostics"
 
+def is_mik(sample):
+    return sample['project_type']  == "Microbiology"
 
 def get_original_fastq_paths(analysis_dir, sample_app_dir, sample):
     """Determines the paths of the files to move."""
@@ -435,6 +437,8 @@ def get_dest_project_base_path(run_id, sample):
         return DIAG_DESTINATION_PATH / get_project_dir_name(run_id, sample)
     elif is_nsc(sample): # Create intermediate directory with Run ID
         return NSC_DESTINATION_PATH / run_id / get_project_dir_name(run_id, sample)
+    elif is_mik(sample):
+        return MIK_DESTINATION_PATH / get_project_dir_name(run_id, sample)
 
 
 def get_destination_fastq_names(sample, fastq_original_paths):
@@ -475,8 +479,12 @@ def get_dest_project_fastq_dir_path(run_id, sample):
 
     if is_diag(sample):
         return DIAG_DESTINATION_PATH / get_project_dir_name(run_id, sample) / "fastq"
-    else: # Create intermediate directory with Run ID
+    elif is_mik(sample):
+        return MIK_DESTINATION_PATH / get_project_dir_name(run_id, sample) / "fastq"
+    elif is_nsc(sample): # Create intermediate directory with Run ID
         return NSC_DESTINATION_PATH / run_id / get_project_dir_name(run_id, sample)
+    else:
+        raise ValueError("Unknown sample type")
 
 
 def get_project_dir_name(run_id, sample):
@@ -500,6 +508,8 @@ def get_dest_project_analysis_dir_path(run_id, analysis_suffix, sample):
         return DIAG_DESTINATION_PATH / get_project_dir_name(run_id, sample) / "analysis"
     elif is_nsc(sample):
         return NSC_DESTINATION_PATH / run_id / f"Analysis{analysis_suffix}" / get_project_dir_name(run_id, sample)
+    elif is_mik(sample):
+        return MIK_DESTINATION_PATH / get_project_dir_name(run_id, sample) / "analysis"
     else:
         raise ValueError("Unsupported project type")
 
@@ -510,13 +520,17 @@ def get_new_sample_id(sample):
 
     if is_diag(sample):
         return sample['samplesheet_sample_id']
-    elif is_nsc(sample):
+    elif is_nsc(sample) or is_mik(sample):
         return sample['sample_name']
     else:
         raise ValueError("Unsupported project type")
 
 
 def get_sample_renaming_list(samples, run_id):
+    """File to convert the samplesheet sample names to the moved file names created by
+    this script.
+    """
+
     data = []
     num_fastq_files = None
     header = "Lane,OldSampleID,NewSampleID,ProjectName,NSC_ProjectName,Fastq"
