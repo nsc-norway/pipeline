@@ -104,10 +104,14 @@ def main():
                     delivery_method = project_samples[0]['delivery_method'].replace(" ", "_")
                     if project_type == "Diagnostics":
                         any_diag_project = True
-                    else:
+                    elif project_type == "Microbiology":
+                        pass
+                    elif project_type in ["Sensitive", "Non-Sensitive"]:
                         run_fastqc = "false" if lims_info.get("compute_platform") == "Onboard DRAGEN" else "true"
                         job_id = start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiplexed_run_dir, run_fastqc, bcl_convert_version)
                         nsc_project_slurm_jobs.append(job_id)
+                    else:
+                        progress_logger.error(f"Project {project_name} has unknown project type: {project_type}. No project-specific processing done.")
 
                 # Queue run-based processing
                 if nsc_project_slurm_jobs:

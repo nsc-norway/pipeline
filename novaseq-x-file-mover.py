@@ -1,570 +1,407 @@
-import os
-import yaml
 import sys
+import os
+import logging
 import shutil
-import subprocess
+import yaml
 from pathlib import Path
+from dataclasses import dataclass, field
+from typing import List, Dict
+
+# Constants: destination base paths
+DEST_PATHS = {
+    'Diagnostics': Path('/boston/diag/nscDelivery'),
+    'Sensitive': Path('/data/runScratch.boston/demultiplexed'),
+    'Non-Sensitive': Path('/data/runScratch.boston/demultiplexed'),
+    'Microbiology': Path('/data/runScratch.boston/mik_data'),
+}
+
+# Control flags (for testing / recovery)
+TEST_MODE = False      # If True, do not actually rename/move files
+IGNORE_MISSING = False # If True, skip missing sources without error
+IGNORE_EXISTING = False# If True, skip destination-exists checks
+
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
 
 
-DIAG_DESTINATION_PATH = Path("/boston/diag/nscDelivery")
-NSC_DESTINATION_PATH = Path("/data/runScratch.boston/demultiplexed")
-MIK_DESTINATION_PATH = Path("/data/runScratch.boston/mik_data")
+@dataclass
+class Project:
+    name: str
+    samplesheet_sample_project: str = None
+    type: str
+    ora_compression: bool = None # Track compression type at project level
+    fastq_path: Path = None
+    analysis_path: Path = None
+    qc_path: Path = None
+    run_qc_path: Path = None
 
-# Disable moving files. Will still copy / link files and create directory structure, but will not
-# remove anything from the source folder. This can be used for testing or recovery.
-TEST_DISABLE_MOVING = False
+    def setup_paths(self, dest_paths: Dict[str, Path], run_id):
+        try:
+            projecttype_root = dest_paths[self.type]
+        except KeyError:
+            raise ValueError(f"Invalid project type {self.type} for project {self.name}")
+        
+        if self.is_nsc():
+            run_dir = projecttype_root / run_id
+            # NSC: group under run, fastq and analysis separate
+            sfx = '_ora' if self.ora_compression else ''
+            self.fastq_path =  run_dir / (self._dir_name() + sfx)
+            self.analysis_path = run_dir / f'Analysis{self.analysis_suffix}' / self._dir_name()
+            self.qc_path = run_dir / f'QualityControl{self.analysis_suffix}' / self._dir_name()
+            self.run_qc_path = run_dir
+        else:
+            # Diag/Mik: project root, with subdirs
+            project_root_path =  projecttype_root / self._dir_name()
+            self.fastq_path = project_root_path / 'fastq'
+            self.analysis_path = project_root_path / 'analysis'
+            self.qc_path = project_root_path / 'QualityControl'
+            self.run_qc_path = project_root_path
+
+    def _dir_name(self, run_id) -> str:
+        runid_parts = run_id.split('_')
+        date6 = runid_parts[0][2:]
+        serial = runid_parts[1]
+        side = runid_parts[-1][0]
+        return f"{date6}_{serial}.{side}.Project_{self.name}"
+
+    def is_nsc(self) -> bool:
+        return self.type in ['Sensitive', 'Non-Sensitive']
+
+    def is_diag(self) -> bool:
+        return self.type == 'Diagnostics'
+
+    def is_mik(self) -> bool:
+        return self.type == 'Microbiology'
 
 
-## READNE TROUBLESHOOTING MODE ##
-
-# To fix issues, enable the following two "IGNORE_*" options. Remove QualityControl from all project folders in
-# /boston/diag/nscDelivery and the run folder in /boston/runScratch/demultiplexed first. Fix the root cause.
-# Rerun the file mover or trigger the automation again by removing the automation log.
-
-# The following two options disable the checks and disable errors if the moving commands fail.
-# This option skips over files when the source does not exist. This can be used to recover failed
-# novaseq-x-file-mover runs.
-IGNORE_MISSING = True
-# Disable checking for existing destination files only.
-IGNORE_EXISTING = False
-
-def process_dragen_run(analysis_path):
-    """Main function to process the output of an on-board DRAGEN analysis run.
+@dataclass
+class Sample:
+    """Sample x lane information object
     
-    analysis_path: a pathlib.Path object pointing to the root of the analysis folder.
+    Corresponds to an entry in the LIMS file, which is also equivalent to an output fastq file set
+    (R1, optionally R2, I1, I2). If a sample is run on multiple lanes, there will be one entry per lane.
+    If the same sample ID is used for multiple indexes in the same lane, there will just be one entry
+    for all of them (BCL Convert merges them to one fastq set).
     """
+
+    project: Project
+    sample_name: str
+    samplesheet_sample_id: str
+    samplesheet_position: int
+    lane: int
+    num_data_reads: int
+    num_index_reads_written_as_fastq: int = 0
+    ora_compression: bool = False
+    filemover_workflow: str = 'bcl_convert'
+
+    def new_sample_id(self) -> str:
+        return self.sample_name if (self.is_nsc() or self.is_mik()) else self.samplesheet_sample_id
+
+    def app_dir(self) -> str:
+        if self.filemover_workflow == 'bcl_convert':
+            return 'BCLConvert'
+        suffix = self.filemover_workflow.capitalize()
+        return f"Dragen{suffix}"
+
+
+class FileMover:
+    """Main class that does the work of this script
     
-    # Get run information
-    # parents[0] "Analysis"
-    # parents[1] Run folder
-    input_run_dir = analysis_path.resolve().parents[1]
-    run_id = input_run_dir.name
-    # Analysis ID is 1, 2, ...
-    analysis_id = analysis_path.name
+    Contains the processing state and analysis level (global) details."""
 
-    # Use a suffix if re-analysing the run
-    if analysis_id == "1":
-        analysis_suffix = ""
-    else:
-        analysis_suffix = f"_{analysis_id}"
+    def __init__(
+        self,
+        analysis_dir: Path,
+        dest_paths: Dict[str, Path],
+        test_mode: bool = False,
+        ignore_missing: bool = False,
+        ignore_existing: bool = False
+    ):
+        """
+        analysis_dir: root of the DRAGEN analysis folder (e.g. RUN_ID/Analysis/1)
+        nsc_root, diag_root, mik_root: base destination directories for each project type
+        test_mode: if True, just print moves without performing them
+        ignore_missing: skip missing source errors
+        ignore_existing: skip existing destination errors
+        """
+        self.analysis_dir = analysis_dir.resolve()
+        self.dest_paths = dest_paths
+        self.nsc_base_path = dest_paths['Sensitive']
+        self.test_mode = test_mode
+        self.ignore_missing = ignore_missing
+        self.ignore_existing = ignore_existing
+        
+        # derive run_id and analysis suffix
+        self.run_dir = self.analysis_dir.parents[1]
+        self.run_id = self.run_dir.name
+        analysis_id = self.analysis_dir.name
+        self.analysis_suffix = '' if analysis_id == '1' else f"_{analysis_id}"
 
-    # Load LIMS-based information
-    lims_file_path = analysis_dir / "ClarityLIMSImport_NSC.yaml"
-    with open(lims_file_path) as f:
-        lims_info = yaml.safe_load(f)
+        # load LIMS file
+        self.lims_path  = self.analysis_dir / 'ClarityLIMSImport_NSC.yaml'
 
-    samples = lims_info['samples']
-    is_onboard_analysis = lims_info.get('compute_platform') == "Onboard DRAGEN"
+        # Set class members to be updated by load_lims()
+        self.samples: List[Sample] = []
+        self.projects: Dict[str, Project] = {}
+        self.is_onboard = False
+        self.compute_platform = None
+        # Group projects
 
-    # Check sample info
-    for sample in samples:
-        if not (is_nsc(sample) or is_diag(sample) or is_mik(sample)):
-            raise ValueError(f"Project {sample['project_name']} has unknown project type {sample['project_type']} "
-                                f"(sample {sample['sample_name']}).")
-        if not all(c.isalnum() or c in '-_' for c in sample['project_name']):
-            raise ValueError(f"Project name '{repr(sample['project_name'])}' has unexpected characters and may be unsafe "
-                            "to use for a file name. Please correct the yaml file.")
 
-    # Retrieve paths and moving instruction for all fastqs and analysis files (dict indexed by project name)
-    projects_info_map = get_projects_file_moving_lists(run_id, input_run_dir, samples, analysis_suffix, analysis_path, is_onboard_analysis)
-    # Verify existence of source fastq and analysis files
-    if not IGNORE_MISSING:
-        check_missing(projects_info_map)
-    # Check that project and analysis directories don't exist
-    if not IGNORE_EXISTING:
-        check_destinations_not_exist(projects_info_map)
+    def load_lims_file(self):
+        logger.info(f"Loading LIMS info from {self.lims_path}")
+        with open(self.lims_path) as f:
+            data = yaml.safe_load(f)
+        self.compute_platform = data.get('compute_platform', '')
+        self.is_onboard = self.compute_platform == 'Onboard DRAGEN'
+        for entry in data['samples']:
+            project_name = entry['project_name']
+            if project_name not in self.projects:
+                self.projects[project_name] = self._create_project(entry)
+            
+            project = self.projects[entry['project_name']]
+            assert project.type == entry['project_type'], "Project type should be the same for all samples in the project"
+            assert project.ora_compression == entry['ora_compression'], "Compression type should be the same for all samples in the project"
 
-    # Create run-level output folder for NSC
-    if any(is_nsc(sample) for sample in samples):
-        nsc_run_base = NSC_DESTINATION_PATH / run_id
-        if not nsc_run_base.is_dir():
-            nsc_run_base.mkdir()
-        # Create analysis dir (shared for all projects)
-        output_analysis_dir_path = nsc_run_base / f"Analysis{analysis_suffix}"
-        if not output_analysis_dir_path.is_dir():
-            output_analysis_dir_path.mkdir()
-    else:
-        nsc_run_base = None
-    
-    # Add destination paths for global QC info
-    # Each item is a tuple of ([sample, sample...], output_run_base)
-    # Where output_run_base is a destination directory for these files
-    global_run_info_list = []
-    if nsc_run_base: # Has any NSC samples -> QC info goes in NSC run base dir
-        global_run_info_list.append(
-            ([sample for sample in samples if is_nsc(sample)], nsc_run_base)
-        )
-    diag_projects = set(sample['project_name'] for sample in samples if is_diag(sample))
-    for project in diag_projects:
-        project_samples = [sample for sample in samples if sample['project_name'] == project]
-        global_run_info_list.append((
-            project_samples,
-            get_dest_project_base_path(run_id, project_samples[0])
-        ))
-
-    # Copy metrics and reports for the whole run, and specific files for some project types
-    for my_samples, output_run_base in global_run_info_list:
-        output_run_base.mkdir(exist_ok=True)
-        my_apps = set(sample['onboard_workflow'] for sample in my_samples)
-        link_global_files(lims_file_path, analysis_suffix, input_run_dir, analysis_dir, my_apps, output_run_base, my_samples[0].get('ora_compression'), is_onboard_analysis)
-
-    for project_name, project_info in projects_info_map.items():
-        # Create the base project directory. We have already checked that the required destinations
-        # don't exist, it's okay if this one exists now.
-        project_info['project_base_path'].mkdir(exist_ok=True)
-
-        # Create destination fastq folder and move files into it.
-        # For diag runs, the fastq file directory is a subdirectory of the main project directory.
-        # For nsc this is the same as the base path, so we allow it to exist.
-        project_info['project_fastq_path'].mkdir(exist_ok=True)
-        move_files(project_info['samples_fastqs_moving'])
-
-        # Create analysis output (we do an existence check, to allow for various
-        # folder structures). Analysis is only applicable to Onboard DRAGEN.
-        if lims_info.get('compute_platform') == "Onboard DRAGEN":
-            if not project_info['project_analysis_path'].is_dir():
-                project_info['project_analysis_path'].mkdir()
-     
-            move_analysis_dirs_and_files(
-                project_info['project_analysis_path'],
-                project_info['analysis_dirs_moving']
+            s = Sample(
+                project=project,
+                sample_name=entry['sample_name'],
+                samplesheet_sample_id=entry['samplesheet_sample_id'],
+                samplesheet_position=int(entry['samplesheet_position']),
+                lane=int(entry['lane']),
+                num_data_reads=int(entry['num_data_read_passes']),
+                num_index_reads_written_as_fastq=int(entry.get('num_index_reads_written_as_fastq', 0)),
+                ora_compression=bool(entry.get('ora_compression', False)),
+                filemover_workflow=entry.get('onboard_workflow') if self.is_onboard else 'bcl_convert'
             )
+            self.samples.append(s)
 
-        # Create project-specifc SampleRenamingList files for NSC projects
-        project_samples = [sample for sample in samples if sample['project_name'] == project_name]
-        if any(is_nsc(sample) for sample in project_samples):
-            with open(nsc_run_base / f"QualityControl{analysis_suffix}" / f"SampleRenamingList-{project_name}.csv", 'w') as srl:
-                srl.write(get_sample_renaming_list(project_samples, run_id))
- 
-        # Create SampleRenamingList files for all NSC projects
-        nsc_samples = [sample for sample in samples if is_nsc(sample)]
-        if nsc_samples:
-            with open(nsc_run_base / f"QualityControl{analysis_suffix}" / f"SampleRenamingList-run.csv", 'w') as srl:
-                srl.write(get_sample_renaming_list(nsc_samples, run_id))
+        logger.info(f"Loaded {len(self.samples)} samples in {len(self.projects)} projects from LIMS file")
 
 
-def check_missing(projects_info):
-    missing_fq = [
-        src_file
-        for project_info in projects_info.values()
-        for src_file, dest_file in project_info['samples_fastqs_moving']
-        if not src_file.is_file()
-    ]
-    if missing_fq:
-        print("ERROR: Missing expected fastq file(s): " + "\n".join(str(p) for p in missing_fq))
-        sys.exit(1)
-    missing_analysis = [
-        file_info_tuple[1][0]
-        for project_info in projects_info.values()
-        for file_info_tuple in project_info['analysis_dirs_moving']
-        if not file_info_tuple[0].is_dir()
-    ]
-    if missing_analysis:
-        print("ERROR: Missing expected analysis directory(s): " + "\n".join(str(p) for p in missing_analysis))
-        sys.exit(1)
+    def _create_project(self, entry):
+        if not all(c.isalnum() or c in '-_' for c in entry['project_name']):
+            raise ValueError(f"Project name should only contain alphanumerics, - and _. Error: '{entry['project_name']}'")
+        
+        project = Project(
+                            name=entry['project_name'],
+                            samplesheet_sample_project=entry.get('samplesheet_sample_project'),
+                            type=entry['project_type'],
+                            ora_compression=entry['ora_compression']
+                        )
+        project.setup_paths(self.dest_paths, self.run_id)
+        return project
 
 
-def check_destinations_not_exist(projects_info_map):
-    for project_info in projects_info_map.values():
-        if project_info['project_fastq_path'].exists():
-            print(f"ERROR: Destination FASTQ dir already exists: {project_info['project_fastq_path']}")
+    def check_sources_and_destinations(self):
+        """Verify that the source files exist and the destination directories don't"""
+
+        missing = []
+        conflicts = []
+        # check sources
+        for p in self.projects.values():
+            for s in p.samples:
+                # Check fastq paths
+                for src in self._original_fastq_paths(s):
+                    if not src.exists():
+                        missing.append(src)
+                # Check sample-level analysis folders
+
+                    src_dir = self.analysis_dir / 'Data' / (s.samplesheet_sample_id if s.is_diag() else s.project_name) / s.app_dir() / s.samplesheet_sample_id
+                    if not src_dir.exists():
+                        missing.append(src_dir)
+        # check destinations
+        for p in self.projects.values():
+            for s in p.samples:
+                for name in self._dest_fastq_names(s):
+                    dest = p.fastq_path / name
+                    if dest.exists():
+                        conflicts.append(dest)
+            if p.analysis_path.exists() and any(s.filemover_workflow!='bcl_convert' for s in p.samples):
+                conflicts.append(p.analysis_path)
+        if missing and not IGNORE_MISSING:
+            for m in missing: logger.error(f"Missing source: {m}")
             sys.exit(1)
-        if (project_info['project_fastq_path'] != project_info['project_analysis_path']) \
-                                        and project_info['project_analysis_path'].exists():
-            print(f"ERROR: Destination analysis dir already exists: {project_info['project_analysis_path']}")
+        if conflicts and not IGNORE_EXISTING:
+            for c in conflicts: logger.error(f"Conflict at destination: {c}")
             sys.exit(1)
+        logger.info("Source & destination checks passed")
 
 
-def move_files(move_file_list):
-    for src, dest in move_file_list:
-        if TEST_DISABLE_MOVING:
-            print("mv", src, dest)
-        elif IGNORE_MISSING:
-            try:
-                src.rename(dest)
-            except IOError:
-                print("Unable to move file", src, "to", dest, ", skipping.")
+    def prepare_directories(self):
+        """Create the destination directories"""
+
+        # project-level (implicitly creates NSC run dir if required)
+        for p in self.projects.values():
+            for path in (p.fastq_path, p.analysis_path, p.qc_path):
+                path.mkdir(parents=True, exist_ok=True)
+        logger.info("Directory structure created")
+
+
+    def move_sample_files(self):
+        """Move all fastq and analysis files related to all samples"""
+
+        for s in self.samples:
+            logger.info(f"Processing sample {s.sample_name}")
+            self._move_fastqs(s)
+            if self.is_onboard:
+                # Onboard DRAGEN: Creates an analysis folder for each sample, even if only BCL Convert, it creates FastQC
+                self._move_analysis(s)
+            
+
+    def _move_fastqs(self, s: Sample):
+        self._move(self._original_fastq_paths(s), s.project.fastq_dir / self._dest_fastq_names(s))
+
+
+    def _move_analysis(self, s: Sample):
+        src = self.analysis_dir / 'Data' / (s.samplesheet_sample_id if s.is_diag() else s.project_name) / s.app_dir() / s.samplesheet_sample_id
+        dest = p.analysis_path / s.new_sample_id()
+        self._move(src, dest)
+
+
+    def _original_fastq_names(self, s: Sample) -> List[str]:
+        comp = 'ora' if s.ora_compression else 'gz'
+        names = []
+        for r in range(1, s.num_data_reads+1):
+            names.append(f"{s.samplesheet_sample_id}_S{s.samplesheet_position}_L{str(s.lane).zfill(3)}_R{r}_001.fastq.{comp}")
+        for i in range(1, s.num_index_reads_written_as_fastq+1):
+            names.append(f"{s.samplesheet_sample_id}_S{s.samplesheet_position}_L{str(s.lane).zfill(3)}_I{i}_001.fastq.{comp}")
+        return names
+
+
+    def _original_fastq_paths(self, s: Sample) -> List[Path]:
+        sp = s.project.samplesheet_sample_project
+        if self.is_onboard and sp:
+            # Onboard DRAGEN: sample name is used for fastq file names
+            base = self.analysis_dir / 'Data' / sp / s.app_dir()  / ('ora_fastq' if s.ora_compression else 'fastq') / sp
         else:
-            src.rename(dest)
+            base = self.analysis_dir / 'Data' / s.app_dir() / ('ora_fastq' if s.ora_compression else 'fastq')
+        paths = []
+        for fastq_name in self._original_fastq_names(s):
+            paths.append(base / fastq_name)
+        return paths
 
 
-def link_global_files(lims_file_path, analysis_suffix, input_run_dir, analysis_dir, my_apps, output_run_base, ora, is_onboard_analysis):
-    """Hard-link/Copy QC files.
-        * Run level (SAV files)
-        * DRAGEN analysis level (e.g. Analysis/1, as called argument of this script)
-        * App level aggregate reports and logs
-    """
-    # Copying in run-level files
-    for run_file in ["RunParameters.xml", "RunInfo.xml"]:
-        if not (output_run_base / run_file).is_file():
-            os.link(input_run_dir / run_file, output_run_base / run_file)
-    # Link only bin files in InterOp, without recursion into C1.1, ... dirs
-    (output_run_base / "InterOp").mkdir(exist_ok=True)
-    for binn in (input_run_dir / "InterOp").glob("*.bin"):
-        target_path = output_run_base / "InterOp" / binn.name
-        if not target_path.is_file():
-            os.link(binn, target_path)
-
-    # Link the full Logs directory recursively
-    if not (output_run_base / "Logs").is_dir():
-        shutil.copytree(input_run_dir / "Logs", output_run_base / "Logs", copy_function=os.link)
-
-    # Create QualityControl
-    qc_dir = output_run_base / f"QualityControl{analysis_suffix}"
-    qc_dir.mkdir(exist_ok=True)
-    # Copy LIMS information file to output directories
-    shutil.copy(lims_file_path, qc_dir)
-
-    # Hard-link Demux (only available for onboard analysis)
-    if is_onboard_analysis:
-        shutil.copytree(analysis_dir / "Data" / "Demux", qc_dir / "Demux", copy_function=os.link)
-    else:
-        (qc_dir / "Demux").mkdir()
-        (qc_dir / "Demux" / "Demultiplex_Stats.csv").symlink_to("../BCLConvert/fastq/Reports/Demultiplex_Stats.csv")
-        (qc_dir / "Demux" / "Top_Unknown_Barcodes.csv").symlink_to("../BCLConvert/fastq/Reports/Top_Unknown_Barcodes.csv")
-    
-    fastq_dir = "ora_fastq" if ora else "fastq"
-    # Process app-level aggregated stats files
-    for app in my_apps:
-        app_dir = get_app_dir(app)
-        (qc_dir / app_dir).mkdir()
-        if is_onboard_analysis:
-            shutil.copytree(
-                analysis_dir / "Data" / app_dir / "AggregateReports",
-                qc_dir / app_dir / "AggregateReports",
-                copy_function=os.link
-            )
-        (qc_dir / app_dir / fastq_dir).mkdir()
-        shutil.copytree(
-            analysis_dir / "Data" / app_dir / fastq_dir / "Reports",
-            qc_dir / app_dir / fastq_dir / "Reports",
-            copy_function=os.link
-        )
-        # Make a copy of the used SampleSheet (real copy, not a link, just in case people get an idea
-        # to edit it with vim)
-        if is_onboard_analysis:
-            shutil.copy(
-                analysis_dir / "Data" / app_dir / "SampleSheet.csv",
-                qc_dir / ("SampleSheet_" + app_dir + ".csv")
-            )
-            # Copy the full analysis summary to all destinations
-            dest_dir = qc_dir / "summary"
-            if not dest_dir.exists(): # Skip if already transferred when processing a different app
-                shutil.copytree(
-                    analysis_dir / "Data" / "summary",
-                    qc_dir / "summary",
-                    copy_function=os.link
-                )
+    def _dest_fastq_names(self, s: Sample) -> List[str]:
+        if s.project.is_nsc() or s.project.is_mik():
+            # NSC and MIK renames to plain sample names instead of "samplesheet_sample_id". The project name was
+            # prepended to the ID in the samplesheet for uniqueness when demultiplexing onboard.
+            # (this logic ignores the on/offboard status, as the final name should be the same regardless)
+            names = []
+            comp = 'ora' if s.ora_compression else 'gz'
+            for r in range(1, s.num_data_reads+1):
+                names.append(f"{s.sample_name}_S{s.samplesheet_position}_L{str(s.lane).zfill(3)}_R{r}_001.fastq.{comp}")
+            for i in range(1, s.num_index_reads_written_as_fastq+1):
+                names.append(f"{s.sample_name}_S{s.samplesheet_position}_L{str(s.lane).zfill(3)}_I{i}_001.fastq.{comp}")
+            return names
         else:
-            # Alternative location for SampleSheet for redemultiplexing
-            shutil.copy(
-                analysis_dir / "SampleSheet.csv",
-                qc_dir / ("SampleSheet_" + app_dir + ".csv")
-            )
+            return self._original_fastq_names(s)
 
 
-def move_analysis_dirs_and_files(project_analysis_target_path, sample_analysis_moving_list):
-    """Moves the analysis folders of all samples in a project."""
-
-    for src_path, (src_name, dest_name) in sample_analysis_moving_list:
-        # First move the directory itself
-        sample_dir = project_analysis_target_path / dest_name
-        failed_moving = False
-        if TEST_DISABLE_MOVING:
-            print("mv", src_path, sample_dir)
-        elif IGNORE_MISSING:
-            try:
-                src_path.rename(sample_dir)
-            except IOError:
-                print("Failed to move", src_path, "to", sample_dir, ", ignoreed.")
-                failed_moving = True
+    def _original_analysis(self, s: Sample) -> Path:
+        assert self.is_onboard, "Analysis folder is only available with onboard DRAGEN"
+        sample_project = s.project.samplesheet_sample_project
+        if sample_project: # Sample_Project was not enabled, it is not fully tested
+            return self.analysis_dir / 'Data' / sample_project / s.samplesheet_sample_id / s.app_dir() / s.samplesheet_sample_id
         else:
-            src_path.rename(sample_dir)
-
-        # If the sample name should be renamed, we need to find all the files with this prefix
-        # and rename them
-        if src_name != dest_name and not failed_moving:
-            renamable_files = list(sample_dir.glob(f"*/{src_name}.*"))
-            for old_path in renamable_files:
-                old_suffix = old_path.name[len(src_name):]
-                new_path = old_path.parent / (dest_name + old_suffix)
-                if TEST_DISABLE_MOVING:
-                    print("mv", old_path, new_path)
-                else:
-                    old_path.rename(new_path)
+            return self.analysis_dir / 'Data' / s.samplesheet_sample_id / s.app_dir() / s.samplesheet_sample_id
 
 
-def move_bcl_dirs(x):
-    pass # TODO?
+    def link_sav_files(self):
+        """Link the SAV files into all required target locations"""
+
+        # Get set of unique destination locations for run QC
+        target_paths = set(project.run_qc_path for project in self.projects.values())
+
+        for target_path in target_paths:
+            logger.info(f"Linking run-level QC files to {target_path}")
+
+            # SAV files
+            for fname in ['RunParameters.xml','RunInfo.xml']:
+                src = self.run_dir / fname
+                dst = target_path / fname
+                if src.exists() and not dst.exists():
+                    os.link(src, dst)
+
+            i_src = self.run_dir / 'InterOp'
+            i_dst = target_path / 'InterOp'
+            i_dst.mkdir(exist_ok=True)
+            for binf in i_src.glob('*.bin'):
+                tgt = i_dst / binf.name
+                if not tgt.exists(): os.link(binf, tgt)
 
 
-def get_projects_file_moving_lists(run_id, run_folder, samples, analysis_suffix, analysis_dir, is_onboard_analysis):
-    """This function determines the original fastq names and the target names of where
-    to move the fastq files. It also gets the corresponding info for the analysis
-    directories, but the analysis also needs renaming of the contents, based on
-    a pattern (not a known list of file names).
-
-    The base path is an optional parent directory that can contain the fastq and
-    analysis files for a given project (the only action is to create this path,
-    for NSC it's disabled by setting it equal to fastq path).
-
-    Output structure:
-        {'PROJET_NAME': PROJECT_DATA, ...}
-
-    PROJECT_DATA:
-        {
-            'project_base_path': Path,
-            'project_fastq_path': Path,
-            'samples_fastqs_moving': [(src_path, dest_path), (src_path, dest_path), ...],
-            'project_analysis_path': Path,
-            'analysis_dirs_moving': [
-                (src_path, (src_sample_id, dest_sample_id)),
-                (src_path, (src_sample_id, dest_sample_id)),
-                ...
-            ],
-        }
-    """
-
-    projects = {}
-    for sample in samples:
-        # Fallback for old format file (remove this)
-        if not 'num_data_read_passes' in sample:
-            sample['num_data_read_passes'] = 2
-            print("Warning: fallback num_data_read_passes")
-        if 'onboard_workflow' not in sample:
-            # For off-board (re)demultiplexing this is not set, and only BCL convert is available
-            sample['onboard_workflow'] = "bcl_convert"
-        # end fallback
-
-        # Determine source file set to move
-        # Analysis type (onboard_workflow): This determines the directory in which the fastqs appear (DRAGEN App dir).
-        # There will also be a subdirectory for each sanmple, containing the analysis info. For BCL Convert,
-        # this contains the FastQC files.
-        sample_app_dir = get_app_dir(sample['onboard_workflow'])
-    
-        fastq_original_paths = get_original_fastq_paths(analysis_dir, sample_app_dir, sample)
-        fastq_destination_path = get_dest_project_fastq_dir_path(run_id, sample)
-        destination_fastq_names = get_destination_fastq_names(sample, fastq_original_paths)
-        destination_fastq_paths = [fastq_destination_path / dfn for dfn in destination_fastq_names]
-        fastq_move_paths = [(fop, dfp) for fop, dfp in zip(fastq_original_paths, destination_fastq_paths)]
-
-        # Analysis / QC dir for each sample.
-        if is_onboard_analysis: # Only applicable for onboard DRAGEN
-            sample_analysis_path = analysis_dir / "Data" / sample_app_dir / sample['samplesheet_sample_id']
-            analysis_sample_rename_tuple = (sample['samplesheet_sample_id'], get_new_sample_id(sample))
-            analysis_move = set([(sample_analysis_path, analysis_sample_rename_tuple)])
-        else:
-            analysis_move = set()
-        # Get the analysis/QC destination path for this project (not sample specific)
-        analysis_destination_path = get_dest_project_analysis_dir_path(run_id, analysis_suffix, sample)
-
-        # Save sample information for sample sheet
-        project_name = sample['project_name']
-        project_data = projects.get(project_name)
-        if project_data is None:
-            project_data = {
-                'project_base_path': get_dest_project_base_path(run_id, sample),
-                'project_fastq_path': fastq_destination_path,
-                'samples_fastqs_moving': fastq_move_paths,
-                'project_analysis_path': analysis_destination_path,
-                'analysis_dirs_moving': analysis_move, # use a set - need to de-duplicate if samples are run
-                                                      # on multiple lanes
-            }
-            projects[project_name] = project_data
-        else:
-            projects[project_name]['samples_fastqs_moving'] += fastq_move_paths
-            projects[project_name]['analysis_dirs_moving'].update(analysis_move) # Adds zero or one analysis item
-
-    return projects
+    def copy_all_project_qc(self):
+        for project in self.projects:
+            self.copy_demux_qc(project)
 
 
-def get_app_dir(onboard_workflow):
-    if onboard_workflow == "bcl_convert":
-        return "BCLConvert"
-    else:
-        # Simple pattern - maybe this will work:
-        # onboard_workflow = "germline" -> dir name DragenGermline etc
-        return "Dragen" + \
-                        onboard_workflow.upper()[0] + \
-                        onboard_workflow[1:]
-
-def is_nsc(sample):
-    return sample['project_type'] in ["Sensitive", "Non-Sensitive"]
-
-def is_diag(sample):
-    return sample['project_type']  == "Diagnostics"
-
-def is_mik(sample):
-    return sample['project_type']  == "Microbiology"
-
-def get_original_fastq_paths(analysis_dir, sample_app_dir, sample):
-    """Determines the paths of the files to move."""
-
-    compression_type = "ora" if sample.get('ora_compression') else "gz"
-    fastq_original_names = ["_".join([
-                        sample['samplesheet_sample_id'],
-                        f"S{sample['samplesheet_position']}",
-                        "L" + str(sample['lane']).zfill(3),
-                        "R" + str(read_nr),
-                        f"001.fastq.{compression_type}"
-                    ])
-                    for read_nr in range(1, (sample['num_data_read_passes'] + 1))
-    ]
-    if 'num_index_reads_written_as_fastq' in sample:
-        fastq_original_names += ["_".join([
-                            sample['samplesheet_sample_id'],
-                            f"S{sample['samplesheet_position']}",
-                            "L" + str(sample['lane']).zfill(3),
-                            "I" + str(read_nr),
-                            f"001.fastq.{compression_type}"
-                        ])
-                        for read_nr in range(1, (sample['num_index_reads_written_as_fastq'] + 1))
-        ]
-    fastq_dir = "ora_fastq" if sample.get('ora_compression') else "fastq"
-    fastq_path = analysis_dir / "Data" / sample_app_dir / fastq_dir
-    if 'samplesheet_sample_project' in sample:
-        fastq_path = fastq_path / sample['samplesheet_sample_project']
-    return [
-        fastq_path / fastq_name
-        for fastq_name in fastq_original_names
-    ]
+    def copy_demux_qc(self, p: Project):
+        # Project level demux location:
+        logger.info(f"Copying QC files for project {p.name}")
+        # copy LIMS yaml
+        shutil.copy(self.lims_path, p.qc_path)
+        # demux stats
+        # Note: This doesn't work with Sample_project column for onboard analysis. The work was never completed.
+        demux_src = self.analysis_dir / 'Data' / 'Demux' if self.is_onboard else self.analysis_dir / 'Data' / 'BCLConvert' / 'fastq' / 'Reports'
+        demux_dst = p.qc_path / 'Demux'
+        if demux_src.exists() and not demux_dst.exists():
+            shutil.copytree(demux_src, demux_dst, copy_function=os.link)
+        # summary
+        sum_src = self.analysis_dir / 'Data' / 'summary'
+        sum_dst = p.qc_path / 'summary'
+        if sum_src.exists() and not sum_dst.exists():
+            shutil.copytree(sum_src, sum_dst, copy_function=os.link)
+        # sample sheet
+        ss_src = self.analysis_dir / 'SampleSheet.csv'
+        ss_dst = p.qc_path / 'SampleSheet.csv'
+        if ss_src.exists():
+            shutil.copy(ss_src, ss_dst)
 
 
-def get_dest_project_base_path(run_id, sample):
-    """Return a Path pointing to the target project directory for this sample."""
-
-    if is_diag(sample):
-        return DIAG_DESTINATION_PATH / get_project_dir_name(run_id, sample)
-    elif is_nsc(sample): # Create intermediate directory with Run ID
-        return NSC_DESTINATION_PATH / run_id / get_project_dir_name(run_id, sample)
-    elif is_mik(sample):
-        return MIK_DESTINATION_PATH / get_project_dir_name(run_id, sample)
-
-
-def get_destination_fastq_names(sample, fastq_original_paths):
-    """Get the target names of the fastq files in the same order as the input names / fastq reads.
-    
-    We need the "original paths" to determine the S-numbers for the files."""
-
-    if is_diag(sample):
-        # Keep the original names
-        return [p.name for p in fastq_original_paths]
-    else:
-        # Change name to sample_name. Do we need to keep the S-number and 001?
-        compression_type = "ora" if sample.get('ora_compression') else "gz"
-        output_names = [
-            "_".join([
-                sample['sample_name'],
-                f"S{sample['samplesheet_position']}",
-                "L" + str(sample['lane']).zfill(3),
-                "R" + str(read)
-                ]) + f"_001.fastq.{compression_type}"
-            for read in range(1, sample['num_data_read_passes'] + 1)
-        ]
-        if 'num_index_reads_written_as_fastq' in sample:
-                output_names += ["_".join([
-                            sample['samplesheet_sample_id'],
-                            f"S{sample['samplesheet_position']}",
-                            "L" + str(sample['lane']).zfill(3),
-                            "I" + str(read_nr),
-                            f"001.fastq.{compression_type}"
-                        ])
-                        for read_nr in range(1, (sample['num_index_reads_written_as_fastq'] + 1))
-            ]
-        return output_names
+    def _move(self, src: Path, dest: Path):
+        if TEST_MODE:
+            logger.info(f"[TEST] mv {src} -> {dest}")
+            return
+        if not src.exists():
+            msg = f"Missing source: {src}"
+            if IGNORE_MISSING:
+                logger.warning(msg + " (skipped)")
+                return
+            logger.error(msg)
+            sys.exit(1)
+        if dest.exists():
+            msg = f"Destination exists: {dest}"
+            if IGNORE_EXISTING:
+                logger.warning(msg + " (skipped)")
+                return
+            logger.error(msg)
+            sys.exit(1)
+        src.rename(dest)
+        logger.info(f"Moved {src} -> {dest}")
 
 
-def get_dest_project_fastq_dir_path(run_id, sample):
-    """Return a Path pointing to the directory for FASTQ files for this sample."""
-
-    if is_diag(sample):
-        return DIAG_DESTINATION_PATH / get_project_dir_name(run_id, sample) / "fastq"
-    elif is_mik(sample):
-        return MIK_DESTINATION_PATH / get_project_dir_name(run_id, sample) / "fastq"
-    elif is_nsc(sample): # Create intermediate directory with Run ID
-        return NSC_DESTINATION_PATH / run_id / get_project_dir_name(run_id, sample)
-    else:
-        raise ValueError("Unknown sample type")
+    def run(self):
+        self.load_lims_file()
+        self.check_sources_and_destinations()
+        self.prepare_directories()
+        self.link_sav_files()
+        self.copy_demux_qc()
+        self.copy_all_project_qc()
+        self.move_sample_files()
 
 
-def get_project_dir_name(run_id, sample):
-    """Get project directory name (common NSC format).
-    
-    YYMMDD_LH00534.A.Project_Diag-wgs123-2029-01-01"""
-
-    runid_parts = run_id.split("_")
-    flowcell_side = runid_parts[-1][0] # A or B
-    # Trim off the first two year digits
-    date = runid_parts[0][2:]
-    serial_no = runid_parts[1]
-    return f"{date}_{serial_no}.{flowcell_side}.Project_{sample['project_name']}"
-
-
-def get_dest_project_analysis_dir_path(run_id, analysis_suffix, sample):
-    """Get the path to be created, for containing all the analysis folders for a specific project."""
-
-    if is_diag(sample):
-        # TBC placement of analysis / FastQC files?
-        return DIAG_DESTINATION_PATH / get_project_dir_name(run_id, sample) / "analysis"
-    elif is_nsc(sample):
-        return NSC_DESTINATION_PATH / run_id / f"Analysis{analysis_suffix}" / get_project_dir_name(run_id, sample)
-    elif is_mik(sample):
-        return MIK_DESTINATION_PATH / get_project_dir_name(run_id, sample) / "analysis"
-    else:
-        raise ValueError("Unsupported project type")
-
-
-def get_new_sample_id(sample):
-    """Get the new sample name to use for this sample. Can be equal to the old name
-    (samplesheet_sample_id)."""
-
-    if is_diag(sample):
-        return sample['samplesheet_sample_id']
-    elif is_nsc(sample) or is_mik(sample):
-        return sample['sample_name']
-    else:
-        raise ValueError("Unsupported project type")
-
-
-def get_sample_renaming_list(samples, run_id):
-    """File to convert the samplesheet sample names to the moved file names created by
-    this script.
-    """
-
-    data = []
-    num_fastq_files = None
-    header = "Lane,OldSampleID,NewSampleID,ProjectName,NSC_ProjectName,Fastq"
-    for sample in samples:
-        # we have to repeat a bit of the work that's done in the moving function - to generate the
-        # full fastq paths
-        sample_app_dir = get_app_dir(sample['onboard_workflow'])
-        fastq_original_paths = get_original_fastq_paths(analysis_dir, sample_app_dir, sample)
-        fastq_destination_path = get_dest_project_fastq_dir_path(run_id, sample)
-        destination_fastq_names = get_destination_fastq_names(sample, fastq_original_paths)
-        for fastq_name in destination_fastq_names:
-            data.append(
-                ",".join([
-                    str(sample['lane']),
-                    sample['samplesheet_sample_id'],
-                    get_new_sample_id(sample),
-                    sample['project_name'],
-                    get_project_dir_name(run_id, sample),
-                    fastq_name
-                ]))
-    return "\n".join([header] + data) + "\n"
-
-if __name__ == "__main__":
+def main():
     if len(sys.argv) != 2:
-        print("use: novaseq-x-file-mover.py ANALYSIS_PATH")
-        print()
-        print("e.g. python novaseq-x-file-mover.py /data/runScratch.boston/NovaSeqX/RUN_ID/Analysis/1")
-        print()
+        print(f"Usage: python {Path(sys.argv[0]).name} <ANALYSIS_DIR>")
         sys.exit(1)
-
     analysis_dir = Path(sys.argv[1])
-    if not analysis_dir.is_dir():
-        print("error: analysis dir", analysis_dir, "does not exist.")
-        sys.exit(1)
+    FileMover(analysis_dir).run()
 
-    process_dragen_run(analysis_dir)
-
+if __name__ == '__main__':
+    main()

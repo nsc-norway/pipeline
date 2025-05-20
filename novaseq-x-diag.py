@@ -45,7 +45,11 @@ async def process_all_diag_projects(lims_file_path):
             for fastq_name in get_fastq_names(sample):
                 project_md5sum_results_async[project].append(run_md5sum(fastq_dir, fastq_name))
         elif sample['project_type'] in ["Sensitive", "Non-sensitive"]:
-            have_any_nsc_samples = True
+            have_any_nsc_samples = True # Block moving of the bcl run folder
+        elif sample['project_type'] == "Microbiology":
+            pass # MIK samples don't block moving the BCL folder
+        else:
+            raise RuntimeError("Invalid project type: " + sample['project_type'])
 
     for project, fastq_dir in project_fastq_dirs.items():
         md5sum_results = await asyncio.gather(*project_md5sum_results_async[project])
