@@ -104,14 +104,18 @@ def main():
                     delivery_method = project_samples[0]['delivery_method'].replace(" ", "_")
                     if project_type == "Diagnostics":
                         any_diag_project = True
-                    elif project_type == "Microbiology":
-                        pass
                     elif project_type in ["Sensitive", "Non-Sensitive"]:
                         run_fastqc = "false" if lims_info.get("compute_platform") == "Onboard DRAGEN" else "true"
                         job_id = start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiplexed_run_dir, run_fastqc, bcl_convert_version)
                         nsc_project_slurm_jobs.append(job_id)
+                    elif project_type == "Microbiology":
+                        # Filter and copy QualityMetrics and Demultiplex_Stats files
+                        handle_mik_project(project_name, project_samples)
+                    elif project_type == "PGT":
+                        progress_logger.info(f"No additional actions required for PGT project {project_name}.")
                     else:
-                        progress_logger.error(f"Project {project_name} has unknown project type: {project_type}. No project-specific processing done.")
+                        progress_logger.info(f"Unknown project type {project_type} for project {project_name}. Skipping.")
+>>>>>>> 7cefdaab210a6e750fee446fbe0112ae0a7b24ec
 
                 # Queue run-based processing
                 if nsc_project_slurm_jobs:
@@ -184,6 +188,11 @@ def start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiple
         stdout=subprocess.PIPE).stdout.decode().strip()
     
     return job_id
+
+def handle_mik_project(project_name, project_samples):
+    # TODO: Implement the logic for handling MIK projects
+    pass
+
 
 if __name__ == "__main__":
     main()
