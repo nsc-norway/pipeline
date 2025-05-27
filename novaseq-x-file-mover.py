@@ -73,10 +73,9 @@ class Project:
     run_qc_path: Path = None
 
     def setup_paths(self, dest_paths: Dict[str, Path], run_id, analysis_suffix):
-        try:
-            projecttype_root = dest_paths[self.project_type]
-        except KeyError:
+        if self.project_type not in dest_paths:
             raise ValueError(f"Invalid project type {self.project_type} for project {self.name}")
+        projecttype_root = dest_paths[self.project_type]
         
         if self.is_nsc():
             run_dir = projecttype_root / run_id
@@ -86,8 +85,14 @@ class Project:
             self.analysis_path = run_dir / f'Analysis{analysis_suffix}' / self._dir_name(run_id)
             self.qc_path = run_dir / f'QualityControl{analysis_suffix}' / self._dir_name(run_id)
             self.run_qc_path = run_dir
-        else:
-            # Diag/Mik: project root, with subdirs
+        elif self.is_mik():
+            project_root_path =  projecttype_root / self._dir_name(run_id)
+            self.fastq_path = project_root_path
+            self.analysis_path = project_root_path # Analysis is not used for MIK
+            self.qc_path = project_root_path / 'QualityControl'
+            self.run_qc_path = project_root_path
+        elif self.is_diag():
+            # Diag: project root, with subdirs
             project_root_path =  projecttype_root / self._dir_name(run_id)
             self.fastq_path = project_root_path / 'fastq'
             self.analysis_path = project_root_path / 'analysis'
@@ -264,7 +269,7 @@ class FileMover:
 
 
     def prepare_directories(self):
-        """Create the destination directories"""
+        """Create the destination directories for project and / or run"""
 
         # project-level (implicitly creates NSC run dir if required)
         for p in self.projects.values():
@@ -281,7 +286,8 @@ class FileMover:
             self._move_fastqs(s)
             if self.is_onboard:
                 # Onboard DRAGEN: Creates an analysis folder for each sample, even if only BCL Convert, it creates FastQC
-                self._move_analysis(s)
+                if not s.project.is_mik(): # Analysis outputs not included for MIK, to simplify folder
+                    self._move_analysis(s)
             
 
     def _move_fastqs(self, s: Sample):
@@ -369,20 +375,32 @@ class FileMover:
 
     def copy_all_project_qc(self):
         for project in self.projects.values():
-            self.copy_demux_qc(project)
+            if project.is_mik():
+                self.copy_filtered_demux_qc(project)
+            else:
+                self.copy_demux_qc(project)
 
 
     def copy_demux_qc(self, p: Project):
-        # Project level demux location:
+        """Copy global demux QC files to this project's destination"""
+
         logger.info(f"Copying QC files for project {p.name}")
         # copy LIMS yaml
         shutil.copy(self.lims_path, p.qc_path)
-        # demux stats
-        # Note: This doesn't work with Sample_project column for onboard analysis. The work was never completed.
-        demux_src = self.analysis_dir / 'Data' / 'Demux' if self.is_onboard else self.analysis_dir / 'Data' / 'BCLConvert' / 'fastq' / 'Reports'
+
+        # Copy Demultiplex_Stats.csv and other global demux stats into "<qc>/Demux" - or
+        # in case of offboard, link the file.
         demux_dst = p.qc_path / 'Demux'
-        if demux_src.exists() and not demux_dst.exists():
-            shutil.copytree(demux_src, demux_dst, copy_function=os.link)
+        if self.is_onboard:
+            demux_src = self.analysis_dir / 'Data' / 'Demux'
+            if demux_src.exists() and not demux_dst.exists():
+                shutil.copytree(demux_src, demux_dst, copy_function=os.link)
+        else:
+            # BCL Convert doesn't create a Demux dir, so we soft-link the files from Reports
+            (p.qc_path / "Demux").mkdir()
+            (p.qc_path / "Demux" / "Demultiplex_Stats.csv").symlink_to("../BCLConvert/fastq/Reports/Demultiplex_Stats.csv")
+            (p.qc_path / "Demux" / "Top_Unknown_Barcodes.csv").symlink_to("../BCLConvert/fastq/Reports/Top_Unknown_Barcodes.csv")
+
         # summary
         sum_src = self.analysis_dir / 'Data' / 'summary'
         sum_dst = p.qc_path / 'summary'
@@ -393,6 +411,44 @@ class FileMover:
         ss_dst = p.qc_path / 'SampleSheet.csv'
         if ss_src.exists():
             shutil.copy(ss_src, ss_dst)
+        
+        # Always copy "App level" QC, which is BCL Convert Reports separated by Dragen app
+        # In case of onboard analysis, this doesn't include Demultiplex_Stats - handled below
+        # For plain BCL Convert it contains Demultiplex_Stats.csv as well.
+        fastq_dir = "fastq_ora" if p.ora_compression else "fastq" # path component
+
+        project_app_dirs = set([s.app_dir() for s in self.samples if s.project == p])
+
+        # Copy the Reports from BCL Convert. For onboard analysis this is split up in directories
+        # for each app.
+        for app_dir in project_app_dirs:
+            demux_qc_destination = p.qc_path / app_dir / fastq_dir
+            if not demux_qc_destination.exists(): # If exists, we assume it has the right info
+                demux_qc_destination.mkdir(exist_ok=True, parents=True)
+                shutil.copytree(
+                    self.analysis_dir / "Data" / app_dir / fastq_dir / "Reports",
+                    demux_qc_destination / "Reports",
+                    copy_function=os.link
+                )
+            if self.is_onboard:
+                shutil.copytree(
+                    self.analysis_dir / "Data" / app_dir / "AggregateReports",
+                    p.qc_path / app_dir / "AggregateReports",
+                    copy_function=os.link
+                )
+
+
+    def copy_filtered_demux_qc(self, p: Project):
+        """Copy specific demultiplexing stats files, but include only the specified project's rows"""
+
+        logger.info(f"Copying and filtering QC files for project {p.name}")
+        return "Not implemented"
+        # demux stats
+        demux_src = self.analysis_dir / 'Data' / 'Demux' if self.is_onboard else self.analysis_dir / 'Data' / 'BCLConvert' / 'fastq' / 'Reports'
+        demux_dst = p.qc_path / 'Demux'
+        if demux_src.exists() and not demux_dst.exists():
+            for demux_file in ['Demultiplex_Stats.csv', 'Quality_Metrics.csv']:
+                shutil.copytree(demux_src, demux_dst, copy_function=os.link)
 
 
     def _move(self, src: Path, dest: Path):
