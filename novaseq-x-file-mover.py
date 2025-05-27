@@ -7,19 +7,6 @@ from pathlib import Path
 from dataclasses import dataclass, field
 from typing import List, Dict
 
-# Constants: destination base paths
-DEST_PATHS = {
-    'Diagnostics': Path('/boston/diag/nscDelivery'),
-    'Sensitive': Path('/data/runScratch.boston/demultiplexed'),
-    'Non-Sensitive': Path('/data/runScratch.boston/demultiplexed'),
-    'Microbiology': Path('/data/runScratch.boston/mik_data'),
-}
-
-# Control flags (for testing / recovery)
-TEST_MODE = False      # If True, do not actually rename/move files
-IGNORE_MISSING = False # If True, skip missing sources without error
-IGNORE_EXISTING = False# If True, skip destination-exists checks
-
 # Setup logging
 logging.basicConfig(
     level=logging.INFO,
@@ -29,34 +16,79 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+# Test mode disables the calls to move files
+TEST_MODE = os.environ.get("TEST_MODE", "False").lower() in ("1", "true", "yes")
+
+if TEST_MODE:
+    # Test paths
+    DEST_PATHS = {
+        'Diagnostics': Path('test/diag'),
+        'Sensitive': Path('test/nsc'),
+        'Non-Sensitive': Path('test/nsc'),
+        'Microbiology': Path('test/mik'),
+        'PGT': Path('test/pgt')
+    }
+    logger.info("Using test paths")
+    # Ensure test paths exist   
+    for create_dest_path in DEST_PATHS.values():
+        create_dest_path.mkdir(exist_ok=True, parents=True)
+else:
+    # Production destination paths by project
+    DEST_PATHS = {
+        'Diagnostics': Path('/boston/diag/nscDelivery'),
+        'Sensitive': Path('/data/runScratch.boston/demultiplexed'),
+        'Non-Sensitive': Path('/data/runScratch.boston/demultiplexed'),
+        'Microbiology': Path('/data/runScratch.boston/mik_data'),
+        'PGT': Path('/data/runScratch.boston/PGT/PGT-SR')
+    }
+
+# Control flags (for testing / recovery)
+# Disable moving files. Will still copy / link files and create directory structure, but will not
+# remove anything from the source folder. This can be used for testing or recovery.
+TEST_DISABLE_MOVING = os.environ.get("TEST_DISABLE_MOVING", "False").lower() in ("1", "true", "yes")
+
+## READNE TROUBLESHOOTING MODE ##
+
+# To fix issues, enable the following two "IGNORE_*" options. Remove QualityControl from all project folders in
+# /boston/diag/nscDelivery and the run folder in /boston/runScratch/demultiplexed first. Fix the root cause.
+# Rerun the file mover or trigger the automation again by removing the automation log.
+
+# The following two options disable the checks and disable errors if the moving commands fail.
+# This option skips over files when the source does not exist. This can be used to recover failed
+# novaseq-x-file-mover runs.
+IGNORE_MISSING = os.environ.get("IGNORE_MISSING", "False").lower() in ("1", "true", "yes")
+# Continue even if the destination files exist.
+IGNORE_EXISTING = os.environ.get("IGNORE_EXISTING", "False").lower() in ("1", "true", "yes")
+
 @dataclass
 class Project:
     name: str
-    samplesheet_sample_project: str = None
-    type: str
-    ora_compression: bool = None # Track compression type at project level
+    samplesheet_sample_project: str
+    project_type: str
+    ora_compression: bool
+    # The following data members are set by the setup_paths function
     fastq_path: Path = None
     analysis_path: Path = None
     qc_path: Path = None
     run_qc_path: Path = None
 
-    def setup_paths(self, dest_paths: Dict[str, Path], run_id):
+    def setup_paths(self, dest_paths: Dict[str, Path], run_id, analysis_suffix):
         try:
-            projecttype_root = dest_paths[self.type]
+            projecttype_root = dest_paths[self.project_type]
         except KeyError:
-            raise ValueError(f"Invalid project type {self.type} for project {self.name}")
+            raise ValueError(f"Invalid project type {self.project_type} for project {self.name}")
         
         if self.is_nsc():
             run_dir = projecttype_root / run_id
             # NSC: group under run, fastq and analysis separate
             sfx = '_ora' if self.ora_compression else ''
-            self.fastq_path =  run_dir / (self._dir_name() + sfx)
-            self.analysis_path = run_dir / f'Analysis{self.analysis_suffix}' / self._dir_name()
-            self.qc_path = run_dir / f'QualityControl{self.analysis_suffix}' / self._dir_name()
+            self.fastq_path =  run_dir / (self._dir_name(run_id) + sfx)
+            self.analysis_path = run_dir / f'Analysis{analysis_suffix}' / self._dir_name(run_id)
+            self.qc_path = run_dir / f'QualityControl{analysis_suffix}' / self._dir_name(run_id)
             self.run_qc_path = run_dir
         else:
             # Diag/Mik: project root, with subdirs
-            project_root_path =  projecttype_root / self._dir_name()
+            project_root_path =  projecttype_root / self._dir_name(run_id)
             self.fastq_path = project_root_path / 'fastq'
             self.analysis_path = project_root_path / 'analysis'
             self.qc_path = project_root_path / 'QualityControl'
@@ -70,13 +102,13 @@ class Project:
         return f"{date6}_{serial}.{side}.Project_{self.name}"
 
     def is_nsc(self) -> bool:
-        return self.type in ['Sensitive', 'Non-Sensitive']
+        return self.project_type in ['Sensitive', 'Non-Sensitive']
 
     def is_diag(self) -> bool:
-        return self.type == 'Diagnostics'
+        return self.project_type == 'Diagnostics'
 
     def is_mik(self) -> bool:
-        return self.type == 'Microbiology'
+        return self.project_type == 'Microbiology'
 
 
 @dataclass
@@ -100,7 +132,7 @@ class Sample:
     filemover_workflow: str = 'bcl_convert'
 
     def new_sample_id(self) -> str:
-        return self.sample_name if (self.is_nsc() or self.is_mik()) else self.samplesheet_sample_id
+        return self.sample_name if (self.project.is_nsc() or self.project.is_mik()) else self.samplesheet_sample_id
 
     def app_dir(self) -> str:
         if self.filemover_workflow == 'bcl_convert':
@@ -165,7 +197,7 @@ class FileMover:
                 self.projects[project_name] = self._create_project(entry)
             
             project = self.projects[entry['project_name']]
-            assert project.type == entry['project_type'], "Project type should be the same for all samples in the project"
+            assert project.project_type == entry['project_type'], "Project type should be the same for all samples in the project"
             assert project.ora_compression == entry['ora_compression'], "Compression type should be the same for all samples in the project"
 
             s = Sample(
@@ -191,10 +223,10 @@ class FileMover:
         project = Project(
                             name=entry['project_name'],
                             samplesheet_sample_project=entry.get('samplesheet_sample_project'),
-                            type=entry['project_type'],
+                            project_type=entry['project_type'],
                             ora_compression=entry['ora_compression']
                         )
-        project.setup_paths(self.dest_paths, self.run_id)
+        project.setup_paths(self.dest_paths, self.run_id, self.analysis_suffix)
         return project
 
 
@@ -204,31 +236,29 @@ class FileMover:
         missing = []
         conflicts = []
         # check sources
-        for p in self.projects.values():
-            for s in p.samples:
-                # Check fastq paths
-                for src in self._original_fastq_paths(s):
-                    if not src.exists():
-                        missing.append(src)
-                # Check sample-level analysis folders
-
-                    src_dir = self.analysis_dir / 'Data' / (s.samplesheet_sample_id if s.is_diag() else s.project_name) / s.app_dir() / s.samplesheet_sample_id
-                    if not src_dir.exists():
-                        missing.append(src_dir)
+        for s in self.samples:
+            # Check fastq paths
+            for src in self._original_fastq_paths(s):
+                if not src.exists():
+                    missing.append(src)
+            # Check sample-level analysis folders
+            src_dir = self.analysis_dir / 'Data' / s.app_dir() / s.samplesheet_sample_id
+            if not src_dir.exists():
+                missing.append(src_dir)
         # check destinations
+        for s in self.samples:
+            for name in self._dest_fastq_names(s):
+                dest = s.project.fastq_path / name
+                if dest.exists():
+                    conflicts.append(dest)
         for p in self.projects.values():
-            for s in p.samples:
-                for name in self._dest_fastq_names(s):
-                    dest = p.fastq_path / name
-                    if dest.exists():
-                        conflicts.append(dest)
-            if p.analysis_path.exists() and any(s.filemover_workflow!='bcl_convert' for s in p.samples):
+            if p.analysis_path.exists():
                 conflicts.append(p.analysis_path)
         if missing and not IGNORE_MISSING:
             for m in missing: logger.error(f"Missing source: {m}")
             sys.exit(1)
         if conflicts and not IGNORE_EXISTING:
-            for c in conflicts: logger.error(f"Conflict at destination: {c}")
+            for c in conflicts: logger.error(f"Destination already exists: {c}")
             sys.exit(1)
         logger.info("Source & destination checks passed")
 
@@ -255,12 +285,13 @@ class FileMover:
             
 
     def _move_fastqs(self, s: Sample):
-        self._move(self._original_fastq_paths(s), s.project.fastq_dir / self._dest_fastq_names(s))
+        for from_path, to_name in zip(self._original_fastq_paths(s), self._dest_fastq_names(s)):
+            self._move(from_path, s.project.fastq_path / to_name)
 
 
     def _move_analysis(self, s: Sample):
-        src = self.analysis_dir / 'Data' / (s.samplesheet_sample_id if s.is_diag() else s.project_name) / s.app_dir() / s.samplesheet_sample_id
-        dest = p.analysis_path / s.new_sample_id()
+        src = self.analysis_dir / 'Data' / s.app_dir() / s.samplesheet_sample_id
+        dest = s.project.analysis_path / s.new_sample_id()
         self._move(src, dest)
 
 
@@ -337,7 +368,7 @@ class FileMover:
 
 
     def copy_all_project_qc(self):
-        for project in self.projects:
+        for project in self.projects.values():
             self.copy_demux_qc(project)
 
 
@@ -391,7 +422,6 @@ class FileMover:
         self.check_sources_and_destinations()
         self.prepare_directories()
         self.link_sav_files()
-        self.copy_demux_qc()
         self.copy_all_project_qc()
         self.move_sample_files()
 
@@ -401,7 +431,7 @@ def main():
         print(f"Usage: python {Path(sys.argv[0]).name} <ANALYSIS_DIR>")
         sys.exit(1)
     analysis_dir = Path(sys.argv[1])
-    FileMover(analysis_dir).run()
+    FileMover(analysis_dir, DEST_PATHS).run()
 
 if __name__ == '__main__':
     main()
