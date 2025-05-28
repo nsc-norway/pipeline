@@ -98,6 +98,9 @@ class Project:
             self.analysis_path = project_root_path / 'analysis'
             self.qc_path = project_root_path / 'QualityControl'
             self.run_qc_path = project_root_path
+        else:
+            raise RuntimeError(f"Unable to handle project type {self.project_type}")
+            
 
     def _dir_name(self, run_id) -> str:
         runid_parts = run_id.split('_')
