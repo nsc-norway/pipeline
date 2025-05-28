@@ -416,9 +416,7 @@ class FileMover:
         # In case of onboard analysis, this doesn't include Demultiplex_Stats - handled below
         # For plain BCL Convert it contains Demultiplex_Stats.csv as well.
         fastq_dir = "fastq_ora" if p.ora_compression else "fastq" # path component
-
         project_app_dirs = set([s.app_dir() for s in self.samples if s.project == p])
-
         # Copy the Reports from BCL Convert. For onboard analysis this is split up in directories
         # for each app.
         for app_dir in project_app_dirs:
@@ -438,17 +436,52 @@ class FileMover:
                 )
 
 
+    def _filter_file(self, source_path: Path, dest_path: Path, project: Project):
+        sample_ids = set(sample.samplesheet_sample_id for sample in self.samples if sample.project == project)
+        with open(source_path) as source:
+            with open(dest_path, 'w') as dest:
+                header = True
+                id_idx = -1
+                project_idx = -1
+                for line in source:
+                    parts = line.strip("\n").split(",")
+                    if header:
+                        id_idx = parts.index("SampleID")
+                        try:
+                            project_idx = parts.index("Sample_Project")
+                        except ValueError:
+                            pass # No project is okay
+                        header = False
+                        dest.write(line)
+                    else:
+                        if len(parts) > max(id_idx, project_idx):
+                            if project_idx == -1 or parts[project_idx] == project.name:
+                                if parts[id_idx] in sample_ids:
+                                    dest.write(line)
+
+
     def copy_filtered_demux_qc(self, p: Project):
-        """Copy specific demultiplexing stats files, but include only the specified project's rows"""
+        """Copy specific demultiplexing stats files, but include only the specified project's samples"""
 
         logger.info(f"Copying and filtering QC files for project {p.name}")
-        return "Not implemented"
-        # demux stats
-        demux_src = self.analysis_dir / 'Data' / 'Demux' if self.is_onboard else self.analysis_dir / 'Data' / 'BCLConvert' / 'fastq' / 'Reports'
-        demux_dst = p.qc_path / 'Demux'
-        if demux_src.exists() and not demux_dst.exists():
-            for demux_file in ['Demultiplex_Stats.csv', 'Quality_Metrics.csv']:
-                shutil.copytree(demux_src, demux_dst, copy_function=os.link)
+
+        # Path component details to determine the location of source demultiplex stats files
+        fastq_dir = "fastq_ora" if p.ora_compression else "fastq" # path component
+        project_app_dirs = set([s.app_dir() for s in self.samples if s.project == p])
+        if len(project_app_dirs) != 1:
+            raise RuntimeError("Project with filtered demux QC file can only have one app, found: " +
+                                ", ".join(str(q) for q in project_app_dirs))
+        project_app_dir = next(iter(project_app_dirs))
+        
+        if self.is_onboard:
+            demux_src = self.analysis_dir / 'Data' / 'Demux' / 'Demultiplex_Stats.csv'
+        else:
+            demux_src = self.analysis_dir / 'Data' / project_app_dir / fastq_dir / 'Reports' / 'Demultiplex_Stats.csv'
+        demux_dst = p.qc_path / 'Demultiplex_Stats.csv'
+        self._filter_file(demux_src, demux_dst, p)
+        qual_src = self.analysis_dir / 'Data' / project_app_dir / fastq_dir / 'Reports' / 'Quality_Metrics.csv'
+        qual_dst = p.qc_path / 'Quality_Metrics.csv'
+        self._filter_file(qual_src, qual_dst, p)
 
 
     def _move(self, src: Path, dest: Path):
