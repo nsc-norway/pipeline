@@ -75,7 +75,7 @@ class Project:
     def setup_paths(self, dest_paths: Dict[str, Path], run_id, analysis_suffix):
         if self.project_type not in dest_paths:
             raise ValueError(f"Invalid project type {self.project_type} for project {self.name}")
-        projecttype_root = dest_paths[self.project_type]
+        projecttype_root = dest_paths.get(self.project_type)
         
         if self.is_nsc():
             run_dir = projecttype_root / run_id
@@ -91,7 +91,14 @@ class Project:
             self.analysis_path = project_root_path # Analysis is not used for MIK
             self.qc_path = project_root_path / 'QualityControl'
             self.run_qc_path = project_root_path
-        elif self.is_diag():
+        elif self.project_type == 'Diagnostics':
+            # Diag: project root, with subdirs
+            project_root_path =  projecttype_root / self._dir_name(run_id)
+            self.fastq_path = project_root_path / 'fastq'
+            self.analysis_path = project_root_path / 'analysis'
+            self.qc_path = project_root_path / 'QualityControl'
+            self.run_qc_path = project_root_path
+        elif self.project_type == 'PGT':
             # Diag: project root, with subdirs
             project_root_path =  projecttype_root / self._dir_name(run_id)
             self.fastq_path = project_root_path / 'fastq'
@@ -100,7 +107,7 @@ class Project:
             self.run_qc_path = project_root_path
         else:
             raise RuntimeError(f"Unable to handle project type {self.project_type}")
-            
+
 
     def _dir_name(self, run_id) -> str:
         runid_parts = run_id.split('_')
@@ -112,12 +119,12 @@ class Project:
     def is_nsc(self) -> bool:
         return self.project_type in ['Sensitive', 'Non-Sensitive']
 
-    def is_diag(self) -> bool:
-        return self.project_type == 'Diagnostics'
-
     def is_mik(self) -> bool:
         return self.project_type == 'Microbiology'
-
+    
+    def enable_rename_to_sample_name(self) -> bool:
+        return self.is_nsc() or self.is_mik()
+    
 
 @dataclass
 class Sample:
@@ -140,7 +147,7 @@ class Sample:
     filemover_workflow: str = 'bcl_convert'
 
     def new_sample_id(self) -> str:
-        return self.sample_name if (self.project.is_nsc() or self.project.is_mik()) else self.samplesheet_sample_id
+        return self.sample_name if self.project.enable_rename_to_sample_name() else self.samplesheet_sample_id
 
     def app_dir(self) -> str:
         if self.filemover_workflow == 'bcl_convert':
@@ -317,7 +324,7 @@ class FileMover:
     def _original_fastq_paths(self, s: Sample) -> List[Path]:
         sp = s.project.samplesheet_sample_project
         if self.is_onboard and sp:
-            # Onboard DRAGEN: sample name is used for fastq file names
+            # Onboard DRAGEN: sample project directories
             base = self.analysis_dir / 'Data' / sp / s.app_dir()  / ('ora_fastq' if s.ora_compression else 'fastq') / sp
         else:
             base = self.analysis_dir / 'Data' / s.app_dir() / ('ora_fastq' if s.ora_compression else 'fastq')
@@ -328,16 +335,15 @@ class FileMover:
 
 
     def _dest_fastq_names(self, s: Sample) -> List[str]:
-        if s.project.is_nsc() or s.project.is_mik():
-            # NSC and MIK renames to plain sample names instead of "samplesheet_sample_id". The project name was
-            # prepended to the ID in the samplesheet for uniqueness when demultiplexing onboard.
+        if s.project.enable_rename_to_sample_name():
+            # NSC and MIK renames to plain sample names instead of "samplesheet_sample_id".
             # (this logic ignores the on/offboard status, as the final name should be the same regardless)
             names = []
             comp = 'ora' if s.ora_compression else 'gz'
             for r in range(1, s.num_data_reads+1):
-                names.append(f"{s.sample_name}_S{s.samplesheet_position}_L{str(s.lane).zfill(3)}_R{r}_001.fastq.{comp}")
+                names.append(f"{s.new_sample_id()}_S{s.samplesheet_position}_L{str(s.lane).zfill(3)}_R{r}_001.fastq.{comp}")
             for i in range(1, s.num_index_reads_written_as_fastq+1):
-                names.append(f"{s.sample_name}_S{s.samplesheet_position}_L{str(s.lane).zfill(3)}_I{i}_001.fastq.{comp}")
+                names.append(f"{s.new_sample_id()}_S{s.samplesheet_position}_L{str(s.lane).zfill(3)}_I{i}_001.fastq.{comp}")
             return names
         else:
             return self._original_fastq_names(s)
