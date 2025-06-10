@@ -7,9 +7,22 @@ import os
 import logging
 
 
-DEMULTIPLEXED_RUNS_PATH = Path("/data/runScratch.boston/demultiplexed")
+# Test mode disables the calls to move files
+TEST_MODE = os.environ.get("TEST_MODE", "False").lower() in ("1", "true", "yes")
+
+if TEST_MODE:
+    NSC_DEMULTIPLEXED_RUNS_PATH = Path("test/nsc")
+    NSC_DEMULTIPLEXED_RUNS_PATH.mkdir(exist_ok=True, parents=True)
+    MIK_PATH = Path("test/nsc")
+    MIK_PATH.mkdir(exist_ok=True, parents=True)
+    INPUT_RUN_PATH = Path(".")
+else:
+    NSC_DEMULTIPLEXED_RUNS_PATH = Path("/data/runScratch.boston/demultiplexed")
+    MIK_PATH = Path("/data/runScratch.boston/mik_data")
+    INPUT_RUN_PATH = Path("/data/runScratch.boston/NovaSeqX")
+
+
 SCRIPT_DIR_PATH = Path(__file__).resolve().parent
-INPUT_RUN_PATH = Path("/data/runScratch.boston/NovaSeqX")
 
 
 def run_subprocess_with_logging(error_logger, args, **kwargs):
@@ -29,25 +42,30 @@ def setup_logging(analysis_path):
     # Set up separate loggers for progress and errors
     logfile_path = analysis_path / "automation_log_nsc.txt"
     
-    # Progress logger (logs only to file)
-    progress_logger = logging.getLogger(f"progress_{analysis_path}")
-    progress_logger.setLevel(logging.INFO)
-    
+
+    # Setup logging handlers
+    # Console handler for stderr (for sending emails / console output)
+    console_handler = logging.StreamHandler(sys.stderr)
+    console_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    console_handler.setFormatter(console_formatter)
+
+    # File logging
     file_handler = logging.FileHandler(logfile_path)
     file_formatter = logging.Formatter('%(asctime)s - %(message)s')
     file_handler.setFormatter(file_formatter)
+
+    # Progress logger logs only to file unless TEST_MODE
+    progress_logger = logging.getLogger(f"progress_{analysis_path}")
+    progress_logger.setLevel(logging.INFO)
     
     # Only log progress information to the file
     progress_logger.addHandler(file_handler)
+    if TEST_MODE:
+        progress_logger.addHandler(console_handler)
     
     # Exception logger (logs to both file and stderr)
     error_logger = logging.getLogger(f"error_{analysis_path}")
     error_logger.setLevel(logging.ERROR)
-    
-    # Console handler for stderr (for sending emails)
-    console_handler = logging.StreamHandler(sys.stderr)
-    console_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    console_handler.setFormatter(console_formatter)
     
     # Reuse the file handler for error logger (log to both stderr and file)
     error_logger.addHandler(file_handler)
@@ -81,7 +99,6 @@ def main():
                 # Log progress
                 progress_logger.info(f"Started automation at {datetime.datetime.now()}")
 
-                demultiplexed_run_dir = DEMULTIPLEXED_RUNS_PATH / run_id
                 if analysis_path.name == "1":
                     suffix = ""
                 else:
@@ -98,24 +115,23 @@ def main():
                 nsc_project_slurm_jobs = []
                 any_diag_project = False
                 for project_name in projects:
-                    progress_logger.info(f"Processing project {project_name}")
                     project_samples = [sample for sample in lims_info['samples'] if sample['project_name'] == project_name]
                     project_type = project_samples[0]['project_type']
+                    progress_logger.info(f"Processing project {project_name} of type {project_type}.")
                     delivery_method = project_samples[0]['delivery_method'].replace(" ", "_")
                     if project_type == "Diagnostics":
                         any_diag_project = True
-                    elif project_type in ["Sensitive", "Non-Sensitive"]:
+                    elif project_type in ["Sensitive", "Non-Sensitive"]: # NSC
                         run_fastqc = "false" if lims_info.get("compute_platform") == "Onboard DRAGEN" else "true"
+                        demultiplexed_run_dir = NSC_DEMULTIPLEXED_RUNS_PATH / run_id
                         job_id = start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiplexed_run_dir, run_fastqc, bcl_convert_version)
                         nsc_project_slurm_jobs.append(job_id)
                     elif project_type == "Microbiology":
-                        # Filter and copy QualityMetrics and Demultiplex_Stats files
-                        handle_mik_project(project_name, project_samples)
+                        start_human_removal(run_id, project_dir_name, project_samples)
                     elif project_type == "PGT":
                         progress_logger.info(f"No additional actions required for PGT project {project_name}.")
                     else:
                         progress_logger.info(f"Unknown project type {project_type} for project {project_name}. Skipping.")
->>>>>>> 7cefdaab210a6e750fee446fbe0112ae0a7b24ec
 
                 # Queue run-based processing
                 if nsc_project_slurm_jobs:
@@ -189,10 +205,29 @@ def start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiple
     
     return job_id
 
-def handle_mik_project(project_name, project_samples):
-    # TODO: Implement the logic for handling MIK projects
-    pass
 
+def dir_name(project_name, run_id):
+    """Get standard project directory name"""
+
+    runid_parts = run_id.split('_')
+    date6 = runid_parts[0][2:]
+    serial = runid_parts[1]
+    side = runid_parts[-1][0]
+    return f"{date6}_{serial}.{side}.Project_{project_name}"
+
+
+def start_human_removal(run_id, project_name, project_samples):
+    project_dir = MIK_PATH / dir_name(project_name, run_id)
+    script_path = "/data/runScratch.boston/mik_data/human_removal/human_removal.sh"
+    for sample in project_samples:
+        # Start one human removal job per sample
+        subprocess.run(
+            ["sbatch", "--parsable", str(script_path), sample['sample_name'], str(project_dir)],
+            cwd=project_dir,
+            check=True
+        )
+        # The command will fail if job submission fails, but otherwise, the logging is done by the
+        # script.
 
 if __name__ == "__main__":
     main()
