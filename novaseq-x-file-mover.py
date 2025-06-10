@@ -361,8 +361,8 @@ class FileMover:
     def link_sav_files(self):
         """Link the SAV files into all required target locations"""
 
-        # Get set of unique destination locations for run QC
-        target_paths = set(project.run_qc_path for project in self.projects.values())
+        # Get set of unique destination locations for run QC. Don't copy SAV files to MIK projects,
+        target_paths = set(project.run_qc_path for project in self.projects.values() if not project.is_mik())
 
         for target_path in target_paths:
             logger.info(f"Linking run-level QC files to {target_path}")
