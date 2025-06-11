@@ -26,7 +26,7 @@ if TEST_MODE:
         'Sensitive': Path('test/nsc'),
         'Non-Sensitive': Path('test/nsc'),
         'Microbiology': Path('test/mik'),
-        'PGT': Path('test/pgt')
+        'PGT': Path('test/diag')
     }
     logger.info("Using test paths")
     # Ensure test paths exist   
@@ -39,7 +39,7 @@ else:
         'Sensitive': Path('/data/runScratch.boston/demultiplexed'),
         'Non-Sensitive': Path('/data/runScratch.boston/demultiplexed'),
         'Microbiology': Path('/data/runScratch.boston/mik_data'),
-        'PGT': Path('/data/runScratch.boston/PGT/PGT-SR')
+        'PGT': Path('/boston/diag/nscDelivery')
     }
 
 # Control flags (for testing / recovery)
