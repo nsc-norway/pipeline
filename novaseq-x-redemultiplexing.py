@@ -82,7 +82,7 @@ def main(process_id):
     # Check for existing files - need to be deleted manually if clicking the button again
     # (Samplesheet - to avoid confusion about editing locally and overwriting samplesheet)
     samplesheet_name = "SampleSheet.csv"
-    samplesheet_path = analysis_path / samplesheet_name
+    samplesheet_path = analysis_path / "Data" / samplesheet_name
     if samplesheet_path.exists():
         print(f"Sample sheet already exists at {samplesheet_path}. FASTQ folder and sample sheet must be deleted to continue.")
         sys.exit(1)

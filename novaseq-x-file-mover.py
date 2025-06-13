@@ -65,6 +65,7 @@ class Project:
     name: str
     samplesheet_sample_project: str
     project_type: str
+    # Contains a copy of the sample-level setting for compression
     ora_compression: bool
     # The following data members are set by the setup_paths function
     fastq_path: Path = None
@@ -416,7 +417,7 @@ class FileMover:
         if sum_src.exists() and not sum_dst.exists():
             shutil.copytree(sum_src, sum_dst, copy_function=os.link)
         # sample sheet
-        ss_src = self.analysis_dir / 'SampleSheet.csv'
+        ss_src = self.analysis_dir / 'Data' / 'SampleSheet.csv'
         ss_dst = p.qc_path / 'SampleSheet.csv'
         if ss_src.exists():
             shutil.copy(ss_src, ss_dst)

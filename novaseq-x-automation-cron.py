@@ -122,9 +122,11 @@ def main():
                     if project_type == "Diagnostics":
                         any_diag_project = True
                     elif project_type in ["Sensitive", "Non-Sensitive"]: # NSC
-                        run_fastqc = "false" if lims_info.get("compute_platform") == "Onboard DRAGEN" else "true"
+                        is_onboard = "false" if lims_info.get("compute_platform") == "Onboard DRAGEN" else "true"
+                        is_paired_end = project_samples[0]['num_data_read_passes'] == 2
+                        is_ora = project_samples[0]['ora_compression']
                         demultiplexed_run_dir = NSC_DEMULTIPLEXED_RUNS_PATH / run_id
-                        job_id = start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiplexed_run_dir, run_fastqc, bcl_convert_version)
+                        job_id = start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiplexed_run_dir, is_paired_end, is_onboard, is_ora, bcl_convert_version)
                         nsc_project_slurm_jobs.append(job_id)
                     elif project_type == "Microbiology":
                         start_human_removal(run_id, project_dir_name, project_samples)
@@ -135,6 +137,7 @@ def main():
 
                 # Queue run-based processing
                 if nsc_project_slurm_jobs:
+                    progress_logger.info(f"Submitting run-level NSC job.")
                     run_slurm_script = f"""#!/bin/bash
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=8G
@@ -144,10 +147,10 @@ def main():
 
 /boston/common/tools/nextflow/nextflow-23.10.1-all run /data/runScratch.boston/analysis/pipelines/novaseqx_nextflow/main_run.nf \\
     --runid "{run_id}" \\
+    --runFolder "{demultiplexed_run_dir}" \\
     --qcid "QualityControl{suffix}" \\
     --analysisid "Analysis{suffix}" \\
-    --samplerenaminglist "SampleRenamingList-run.csv" \\
-    --bcl_convert_version "{bcl_convert_version}"
+    --bclConvertVersion "{bcl_convert_version}"
 """
                     dependency_list = "afterany:" + ":".join(nsc_project_slurm_jobs)
                     pipeline_dir = demultiplexed_run_dir / "pipeline" / "run"
@@ -162,6 +165,7 @@ def main():
                     )
 
                 if any_diag_project:
+                    progress_logger.info(f"Calling diagnostics automation script.")
                     run_subprocess_with_logging(
                         error_logger,
                         ["nsc-python3", str(SCRIPT_DIR_PATH / "novaseq-x-diag.py"), str(lims_file_path)],
@@ -174,7 +178,9 @@ def main():
                 raise  # Re-raise the exception to trigger any necessary stderr email output
 
 
-def start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiplexed_run_dir, run_fastqc, bcl_convert_version):
+def start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiplexed_run_dir, is_onboard, bcl_convert_version):
+    """Start project level automation script"""
+
     slurm_script = f"""#!/bin/bash
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=8G
@@ -184,12 +190,13 @@ def start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiple
 
 /boston/common/tools/nextflow/nextflow-23.10.1-all run /data/runScratch.boston/analysis/pipelines/novaseqx_nextflow/main_project.nf \\
     --runid "{run_id}" \\
+    --runFolder "${demultiplexed_run_dir} \\
     --qcid "QualityControl{suffix}" \\
     --analysisid "Analysis{suffix}" \\
-    --samplerenaminglist "SampleRenamingList-{project_name}.csv" \\
-    --deliverymethod "{delivery_method}" \\
-    --run_fastqc {run_fastqc} \\
-    --bcl_convert_version "{bcl_convert_version}"
+    --project "{project_name}" \\
+    --enableFastQC {not is_onboard} \\
+    --deliveryMethod {delivery_method} \\
+    --bclConvertVersion "{bcl_convert_version}"
 """
     pipeline_dir = demultiplexed_run_dir / "pipeline" / ("prj-" + project_name)
     pipeline_dir.mkdir(parents=True, exist_ok=True)
@@ -218,16 +225,18 @@ def dir_name(project_name, run_id):
 
 def start_human_removal(run_id, project_name, project_samples):
     project_dir = MIK_PATH / dir_name(project_name, run_id)
-    script_path = "/data/runScratch.boston/mik_data/human_removal/human_removal.sh"
+    script_path = "/data/runScratch.boston/mik_data/human_cleanup_analysis/mik_cleanup_script.sh"
     for sample in project_samples:
         # Start one human removal job per sample
+        mik_sample_id = f"{sample['sample_name']}_S{sample['samplesheet_position']}_L{str(s.lane).zfill(3)}"
         subprocess.run(
-            ["sbatch", "--parsable", str(script_path), sample['sample_name'], str(project_dir)],
+            ["sbatch", str(script_path), mik_sample_id],
             cwd=project_dir,
             check=True
         )
-        # The command will fail if job submission fails, but otherwise, the logging is done by the
-        # script.
+        # The command will fail if job submission fails, but pipeline failures are not fatal here,
+        # will be logged in the script logs.
 
 if __name__ == "__main__":
     main()
+
