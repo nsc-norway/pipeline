@@ -129,7 +129,7 @@ def main():
                         job_id = start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiplexed_run_dir, is_paired_end, is_onboard, is_ora, bcl_convert_version)
                         nsc_project_slurm_jobs.append(job_id)
                     elif project_type == "Microbiology":
-                        start_human_removal(run_id, project_dir_name, project_samples)
+                        start_human_removal(run_id, project_name, project_samples)
                     elif project_type == "PGT":
                         progress_logger.info(f"No additional actions required for PGT project {project_name}.")
                     else:
@@ -228,7 +228,7 @@ def start_human_removal(run_id, project_name, project_samples):
     script_path = "/data/runScratch.boston/mik_data/human_cleanup_analysis/mik_cleanup_script.sh"
     for sample in project_samples:
         # Start one human removal job per sample
-        mik_sample_id = f"{sample['sample_name']}_S{sample['samplesheet_position']}_L{str(s.lane).zfill(3)}"
+        mik_sample_id = f"{sample['sample_name']}_S{sample['samplesheet_position']}_L{str(sample['lane']).zfill(3)}"
         subprocess.run(
             ["sbatch", str(script_path), mik_sample_id],
             cwd=project_dir,
