@@ -219,7 +219,7 @@ class FileMoverTest(unittest.TestCase):
             mover.run()
         for p in mover.projects.values():
             self.assertTrue(p.fastq_path.is_dir())
-            self.assertTrue(p.qc_path.is_dir())
+            self.assertTrue(p.demux_qc_path.is_dir())
 
     def test_run_creates_directories_extra_types(self):
         shutil.rmtree(self.run_dir)
@@ -232,7 +232,7 @@ class FileMoverTest(unittest.TestCase):
         self.assertIn("PGT", project_types)
         for p in mover.projects.values():
             self.assertTrue(p.fastq_path.is_dir())
-            self.assertTrue(p.qc_path.is_dir())
+            self.assertTrue(p.demux_qc_path.is_dir())
 
 class AutomationCronTest(unittest.TestCase):
     def setUp(self):

@@ -13,7 +13,7 @@ TEST_MODE = os.environ.get("TEST_MODE", "False").lower() in ("1", "true", "yes")
 if TEST_MODE:
     NSC_DEMULTIPLEXED_RUNS_PATH = Path("test/nsc")
     NSC_DEMULTIPLEXED_RUNS_PATH.mkdir(exist_ok=True, parents=True)
-    MIK_PATH = Path("test/nsc")
+    MIK_PATH = Path("test/mik")
     MIK_PATH.mkdir(exist_ok=True, parents=True)
     INPUT_RUN_PATH = Path(".")
 else:
@@ -126,7 +126,7 @@ def main():
                         is_paired_end = project_samples[0]['num_data_read_passes'] == 2
                         is_ora = project_samples[0]['ora_compression']
                         demultiplexed_run_dir = NSC_DEMULTIPLEXED_RUNS_PATH / run_id
-                        job_id = start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiplexed_run_dir, is_paired_end, is_onboard, is_ora, bcl_convert_version)
+                        job_id = start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiplexed_run_dir, is_onboard, bcl_convert_version)
                         nsc_project_slurm_jobs.append(job_id)
                     elif project_type == "Microbiology":
                         start_human_removal(run_id, project_name, project_samples)
@@ -147,7 +147,7 @@ def main():
 
 /boston/common/tools/nextflow/nextflow-23.10.1-all run /data/runScratch.boston/analysis/pipelines/novaseqx_nextflow/main_run.nf \\
     --runid "{run_id}" \\
-    --runFolder "{demultiplexed_run_dir}" \\
+    --runfolder {demultiplexed_run_dir.absolute()} \\
     --qcid "QualityControl{suffix}" \\
     --analysisid "Analysis{suffix}" \\
     --bclConvertVersion "{bcl_convert_version}"
@@ -155,12 +155,13 @@ def main():
                     dependency_list = "afterany:" + ":".join(nsc_project_slurm_jobs)
                     pipeline_dir = demultiplexed_run_dir / "pipeline" / "run"
                     pipeline_dir.mkdir(parents=True, exist_ok=True)
-                    slurm_script_path = pipeline_dir / f"script{suffix}.sh"
+                    slurm_script_name = f"script{suffix}.sh"
+                    slurm_script_path = pipeline_dir / slurm_script_name
                     with open(slurm_script_path, 'w') as slurm_script_file:
                         slurm_script_file.write(run_slurm_script)
                     run_subprocess_with_logging(
                         error_logger,
-                        ["sbatch", "--dependency=" + dependency_list, str(slurm_script_path)],
+                        ["sbatch", "--dependency=" + dependency_list, slurm_script_name],
                         cwd=pipeline_dir,
                     )
 
@@ -190,22 +191,23 @@ def start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiple
 
 /boston/common/tools/nextflow/nextflow-23.10.1-all run /data/runScratch.boston/analysis/pipelines/novaseqx_nextflow/main_project.nf \\
     --runid "{run_id}" \\
-    --runFolder "${demultiplexed_run_dir} \\
+    --runfolder {demultiplexed_run_dir.absolute()} \\
     --qcid "QualityControl{suffix}" \\
     --analysisid "Analysis{suffix}" \\
     --project "{project_name}" \\
     --enableFastQC {not is_onboard} \\
-    --deliveryMethod {delivery_method} \\
-    --bclConvertVersion "{bcl_convert_version}"
+    --deliverymethod {delivery_method} \\
+    --bcl_convert_version "{bcl_convert_version}"
 """
     pipeline_dir = demultiplexed_run_dir / "pipeline" / ("prj-" + project_name)
     pipeline_dir.mkdir(parents=True, exist_ok=True)
-    slurm_script_path = pipeline_dir / f"script{suffix}.sh"
+    slurm_script_name = f"script{suffix}.sh"
+    slurm_script_path = pipeline_dir / slurm_script_name
     with open(slurm_script_path, 'w') as slurm_script_file:
         slurm_script_file.write(slurm_script)
 
     job_id = subprocess.run(
-        ["sbatch", "--parsable", str(slurm_script_path)],
+        ["sbatch", "--parsable", slurm_script_name],
         cwd=pipeline_dir,
         check=True,
         stdout=subprocess.PIPE).stdout.decode().strip()

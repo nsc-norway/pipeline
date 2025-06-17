@@ -70,8 +70,9 @@ class Project:
     # The following data members are set by the setup_paths function
     fastq_path: Path = None
     analysis_path: Path = None
-    qc_path: Path = None
-    run_qc_path: Path = None
+    demux_qc_path: Path = None
+    demux_qc_path: Path = None
+    run_sav_path: Path = None
 
     def setup_paths(self, dest_paths: Dict[str, Path], run_id, analysis_suffix):
         if self.project_type not in dest_paths:
@@ -84,28 +85,28 @@ class Project:
             sfx = '_ora' if self.ora_compression else ''
             self.fastq_path =  run_dir / (self._dir_name(run_id) + sfx)
             self.analysis_path = run_dir / f'Analysis{analysis_suffix}' / self._dir_name(run_id)
-            self.qc_path = run_dir / f'QualityControl{analysis_suffix}' / self._dir_name(run_id)
-            self.run_qc_path = run_dir
+            self.demux_qc_path = run_dir / f'QualityControl{analysis_suffix}'
+            self.run_sav_path = run_dir
         elif self.is_mik():
             project_root_path =  projecttype_root / self._dir_name(run_id)
             self.fastq_path = project_root_path
             self.analysis_path = project_root_path # Analysis is not used for MIK
-            self.qc_path = project_root_path / 'QualityControl'
-            self.run_qc_path = project_root_path
+            self.demux_qc_path = project_root_path / 'QualityControl'
+            self.run_sav_path = project_root_path
         elif self.project_type == 'Diagnostics':
             # Diag: project root, with subdirs
             project_root_path =  projecttype_root / self._dir_name(run_id)
             self.fastq_path = project_root_path / 'fastq'
             self.analysis_path = project_root_path / 'analysis'
-            self.qc_path = project_root_path / 'QualityControl'
-            self.run_qc_path = project_root_path
+            self.demux_qc_path = project_root_path / 'QualityControl'
+            self.run_sav_path = project_root_path
         elif self.project_type == 'PGT':
             # Diag: project root, with subdirs
             project_root_path =  projecttype_root / self._dir_name(run_id)
             self.fastq_path = project_root_path / 'fastq'
             self.analysis_path = project_root_path / 'analysis'
-            self.qc_path = project_root_path / 'QualityControl'
-            self.run_qc_path = project_root_path
+            self.demux_qc_path = project_root_path / 'QualityControl'
+            self.run_sav_path = project_root_path
         else:
             raise RuntimeError(f"Unable to handle project type {self.project_type}")
 
@@ -284,7 +285,7 @@ class FileMover:
 
         # project-level (implicitly creates NSC run dir if required)
         for p in self.projects.values():
-            for path in (p.fastq_path, p.analysis_path, p.qc_path):
+            for path in (p.fastq_path, p.analysis_path, p.demux_qc_path):
                 path.mkdir(parents=True, exist_ok=True)
         logger.info("Directory structure created")
 
@@ -363,7 +364,7 @@ class FileMover:
         """Link the SAV files into all required target locations"""
 
         # Get set of unique destination locations for run QC. Don't copy SAV files to MIK projects,
-        target_paths = set(project.run_qc_path for project in self.projects.values() if not project.is_mik())
+        target_paths = set(project.run_sav_path for project in self.projects.values() if not project.is_mik())
 
         for target_path in target_paths:
             logger.info(f"Linking run-level QC files to {target_path}")
@@ -383,12 +384,15 @@ class FileMover:
                 if not tgt.exists(): os.link(binf, tgt)
 
 
-    def copy_all_project_qc(self):
+    def copy_all_demux_qc(self):
+        demux_qc_dest_projects = {} # De-duplicate the destination paths
         for project in self.projects.values():
             if project.is_mik():
                 self.copy_filtered_demux_qc(project)
             else:
-                self.copy_demux_qc(project)
+                demux_qc_dest_projects[project.demux_qc_path] = project
+        for project in demux_qc_dest_projects.values():
+            self.copy_demux_qc(project)
 
 
     def copy_demux_qc(self, p: Project):
@@ -396,41 +400,41 @@ class FileMover:
 
         logger.info(f"Copying QC files for project {p.name}")
         # copy LIMS yaml
-        shutil.copy(self.lims_path, p.qc_path)
+        shutil.copy(self.lims_path, p.demux_qc_path)
 
         # Copy Demultiplex_Stats.csv and other global demux stats into "<qc>/Demux" - or
         # in case of offboard, link the file.
-        demux_dst = p.qc_path / 'Demux'
+        demux_dst = p.demux_qc_path / 'Demux'
         if self.is_onboard:
             demux_src = self.analysis_dir / 'Data' / 'Demux'
             if demux_src.exists() and not demux_dst.exists():
                 shutil.copytree(demux_src, demux_dst, copy_function=os.link)
         else:
             # BCL Convert doesn't create a Demux dir, so we soft-link the files from Reports
-            (p.qc_path / "Demux").mkdir()
-            (p.qc_path / "Demux" / "Demultiplex_Stats.csv").symlink_to("../BCLConvert/fastq/Reports/Demultiplex_Stats.csv")
-            (p.qc_path / "Demux" / "Top_Unknown_Barcodes.csv").symlink_to("../BCLConvert/fastq/Reports/Top_Unknown_Barcodes.csv")
+            (p.demux_qc_path / "Demux").mkdir()
+            (p.demux_qc_path / "Demux" / "Demultiplex_Stats.csv").symlink_to("../BCLConvert/fastq/Reports/Demultiplex_Stats.csv")
+            (p.demux_qc_path / "Demux" / "Top_Unknown_Barcodes.csv").symlink_to("../BCLConvert/fastq/Reports/Top_Unknown_Barcodes.csv")
 
         # summary
         sum_src = self.analysis_dir / 'Data' / 'summary'
-        sum_dst = p.qc_path / 'summary'
+        sum_dst = p.demux_qc_path / 'summary'
         if sum_src.exists() and not sum_dst.exists():
             shutil.copytree(sum_src, sum_dst, copy_function=os.link)
         # sample sheet
         ss_src = self.analysis_dir / 'Data' / 'SampleSheet.csv'
-        ss_dst = p.qc_path / 'SampleSheet.csv'
+        ss_dst = p.demux_qc_path / 'SampleSheet.csv'
         if ss_src.exists():
             shutil.copy(ss_src, ss_dst)
         
         # Always copy "App level" QC, which is BCL Convert Reports separated by Dragen app
-        # In case of onboard analysis, this doesn't include Demultiplex_Stats - handled below
+        # In case of onboard analysis, this doesn't include Demultiplex_Stats - handled above
         # For plain BCL Convert it contains Demultiplex_Stats.csv as well.
         fastq_dir = "fastq_ora" if p.ora_compression else "fastq" # path component
         project_app_dirs = set([s.app_dir() for s in self.samples if s.project == p])
         # Copy the Reports from BCL Convert. For onboard analysis this is split up in directories
         # for each app.
         for app_dir in project_app_dirs:
-            demux_qc_destination = p.qc_path / app_dir / fastq_dir
+            demux_qc_destination = p.demux_qc_path / app_dir / fastq_dir
             if not demux_qc_destination.exists(): # If exists, we assume it has the right info
                 demux_qc_destination.mkdir(exist_ok=True, parents=True)
                 shutil.copytree(
@@ -441,7 +445,7 @@ class FileMover:
             if self.is_onboard:
                 shutil.copytree(
                     self.analysis_dir / "Data" / app_dir / "AggregateReports",
-                    p.qc_path / app_dir / "AggregateReports",
+                    p.demux_qc_path / app_dir / "AggregateReports",
                     copy_function=os.link
                 )
 
@@ -487,10 +491,10 @@ class FileMover:
             demux_src = self.analysis_dir / 'Data' / 'Demux' / 'Demultiplex_Stats.csv'
         else:
             demux_src = self.analysis_dir / 'Data' / project_app_dir / fastq_dir / 'Reports' / 'Demultiplex_Stats.csv'
-        demux_dst = p.qc_path / 'Demultiplex_Stats.csv'
+        demux_dst = p.demux_qc_path / 'Demultiplex_Stats.csv'
         self._filter_file(demux_src, demux_dst, p)
         qual_src = self.analysis_dir / 'Data' / project_app_dir / fastq_dir / 'Reports' / 'Quality_Metrics.csv'
-        qual_dst = p.qc_path / 'Quality_Metrics.csv'
+        qual_dst = p.demux_qc_path / 'Quality_Metrics.csv'
         self._filter_file(qual_src, qual_dst, p)
 
 
@@ -521,7 +525,7 @@ class FileMover:
         self.check_sources_and_destinations()
         self.prepare_directories()
         self.link_sav_files()
-        self.copy_all_project_qc()
+        self.copy_all_demux_qc()
         self.move_sample_files()
 
 
