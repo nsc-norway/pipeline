@@ -429,7 +429,7 @@ class FileMover:
         # Always copy "App level" QC, which is BCL Convert Reports separated by Dragen app
         # In case of onboard analysis, this doesn't include Demultiplex_Stats - handled above
         # For plain BCL Convert it contains Demultiplex_Stats.csv as well.
-        fastq_dir = "fastq_ora" if p.ora_compression else "fastq" # path component
+        fastq_dir = "ora_fastq" if p.ora_compression else "fastq" # path component
         project_app_dirs = set([s.app_dir() for s in self.samples if s.project == p])
         # Copy the Reports from BCL Convert. For onboard analysis this is split up in directories
         # for each app.
@@ -480,7 +480,7 @@ class FileMover:
         logger.info(f"Copying and filtering QC files for project {p.name}")
 
         # Path component details to determine the location of source demultiplex stats files
-        fastq_dir = "fastq_ora" if p.ora_compression else "fastq" # path component
+        fastq_dir = "ora_fastq" if p.ora_compression else "fastq" # path component
         project_app_dirs = set([s.app_dir() for s in self.samples if s.project == p])
         if len(project_app_dirs) != 1:
             raise RuntimeError("Project with filtered demux QC file can only have one app, found: " +
