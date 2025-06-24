@@ -259,9 +259,10 @@ class FileMover:
                 if not src.exists():
                     missing.append(src)
             # Check sample-level analysis folders
-            src_dir = self.analysis_dir / 'Data' / s.app_dir() / s.samplesheet_sample_id
-            if not src_dir.exists():
-                missing.append(src_dir)
+            if self.is_onboard:
+                src_dir = self.analysis_dir / 'Data' / s.app_dir() / s.samplesheet_sample_id
+                if not src_dir.exists():
+                    missing.append(src_dir)
         # check destinations
         for s in self.samples:
             for name in self._dest_fastq_names(s):
@@ -293,13 +294,17 @@ class FileMover:
     def move_sample_files(self):
         """Move all fastq and analysis files related to all samples"""
 
+        moved_analysis_sampleids = set()
+
         for s in self.samples:
             logger.info(f"Processing sample {s.sample_name}")
             self._move_fastqs(s)
             if self.is_onboard:
                 # Onboard DRAGEN: Creates an analysis folder for each sample, even if only BCL Convert, it creates FastQC
                 if not s.project.is_mik(): # Analysis outputs not included for MIK, to simplify folder
-                    self._move_analysis(s)
+                    if s.samplesheet_sample_id not in moved_analysis_sampleids:
+                        self._move_analysis(s)
+                        moved_analysis_sampleids.add(s.samplesheet_sample_id)
             
 
     def _move_fastqs(self, s: Sample):
@@ -325,11 +330,16 @@ class FileMover:
 
     def _original_fastq_paths(self, s: Sample) -> List[Path]:
         sp = s.project.samplesheet_sample_project
-        if self.is_onboard and sp:
-            # Onboard DRAGEN: sample project directories
-            base = self.analysis_dir / 'Data' / sp / s.app_dir()  / ('ora_fastq' if s.ora_compression else 'fastq') / sp
-        else:
+        if self.is_onboard:
+            # Onboard DRAGEN
+            # base = self.analysis_dir / 'Data' / sp / s.app_dir() / ('ora_fastq' if s.ora_compression else 'fastq') / sp
             base = self.analysis_dir / 'Data' / s.app_dir() / ('ora_fastq' if s.ora_compression else 'fastq')
+        elif sp:
+            # sample project directories
+            base = self.analysis_dir / 'Data' / s.app_dir() / ('ora_fastq' if s.ora_compression else 'fastq') / sp
+        else:
+            # base = self.analysis_dir / 'Data' / s.app_dir() / ('ora_fastq' if s.ora_compression else 'fastq')
+            raise RuntimeError("Unsuppported configuration")
         paths = []
         for fastq_name in self._original_fastq_names(s):
             paths.append(base / fastq_name)

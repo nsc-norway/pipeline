@@ -122,7 +122,7 @@ def main():
                     if project_type == "Diagnostics":
                         any_diag_project = True
                     elif project_type in ["Sensitive", "Non-Sensitive"]: # NSC
-                        is_onboard = "false" if lims_info.get("compute_platform") == "Onboard DRAGEN" else "true"
+                        is_onboard = lims_info.get("compute_platform") == "Onboard DRAGEN"
                         is_paired_end = project_samples[0]['num_data_read_passes'] == 2
                         is_ora = project_samples[0]['ora_compression']
                         demultiplexed_run_dir = NSC_DEMULTIPLEXED_RUNS_PATH / run_id
@@ -150,7 +150,7 @@ def main():
     --runfolder {demultiplexed_run_dir.absolute()} \\
     --qcid "QualityControl{suffix}" \\
     --analysisid "Analysis{suffix}" \\
-    --bclConvertVersion "{bcl_convert_version}"
+    --bcl_convert_version "{bcl_convert_version}"
 """
                     dependency_list = "afterany:" + ":".join(nsc_project_slurm_jobs)
                     pipeline_dir = demultiplexed_run_dir / "pipeline" / "run"
@@ -197,7 +197,8 @@ def start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiple
     --project "{project_name}" \\
     --enableFastQC {not is_onboard} \\
     --deliverymethod {delivery_method} \\
-    --bcl_convert_version "{bcl_convert_version}"
+    --bcl_convert_version "{bcl_convert_version}" \\
+    -resume
 """
     pipeline_dir = demultiplexed_run_dir / "pipeline" / ("prj-" + project_name)
     pipeline_dir.mkdir(parents=True, exist_ok=True)
