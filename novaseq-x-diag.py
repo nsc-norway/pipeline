@@ -4,6 +4,7 @@ import sys
 import re
 import asyncio
 import time
+import requests
 from collections import defaultdict
 from pathlib import Path
 from genologics.lims import *
@@ -106,7 +107,10 @@ def qc_pass_and_complete_seq_step(lane_artifact_ids):
         step.actions.put()
         attempt = 0
         while attempt < 10 and step.current_state.upper() != "COMPLETED":
-            step.advance()
+            try:
+                step.advance()
+            except requests.exceptions.HTTPError:
+                pass # Can get API error if a script (LIMS EPP) is running
             time.sleep(10)
             step.get(force=True)
             attempt += 1
