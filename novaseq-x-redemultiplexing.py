@@ -430,7 +430,7 @@ def exchange_output_artifact_info(lims, bcl_convert_process, demultiplexed_lane_
     update_artifacts = set()
     # Lookup data for each output artifact
     for iparam, oparam in bcl_convert_process.input_output_maps:
-        if oparam['output-generation-type'] != "PerReagentLabel": continue
+        if oparam  == None or  oparam['output-generation-type'] != "PerReagentLabel": continue
         o = oparam['uri']
         i = iparam['uri']
         sample_id = o.udf.get("SampleSheet Sample_ID")
