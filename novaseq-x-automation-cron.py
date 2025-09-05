@@ -196,6 +196,7 @@ def start_nsc_nextflow(project_name, run_id, suffix, delivery_method, demultiple
     --analysisid "Analysis{suffix}" \\
     --project "{project_name}" \\
     --enableFastQC {not is_onboard} \\
+    --enableSuprdupr True \\
     --deliverymethod {delivery_method} \\
     --bcl_convert_version "{bcl_convert_version}" \\
     -resume
