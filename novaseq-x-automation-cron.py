@@ -80,6 +80,10 @@ def main():
         analysis_path = lims_file_path.parents[0]
         run_id = lims_file_path.parents[2].name
 
+        # Skip run if raw data is not ready
+        if not (lims_file_path.parents[2] / "CopyComplete.txt").exists():
+            continue
+
         automation_log_path = analysis_path / "automation_log_nsc.txt"
         if not automation_log_path.is_file():
             # Run automation for this path
