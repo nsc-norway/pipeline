@@ -523,7 +523,7 @@ def main(task):
             delivery_diag_move(task, project, task.bc_dir, project_path)
             diag_delete_work_dir_after = not not task.process
         elif project_type == "Immunology":
-            delivery_external_user(task, lims_project, project_path, project.name, "/data/runScratch.boston/imm_data")
+            delivery_external_user(task, lims_project, project_path, project.name, "/data/runScratch.boston/OUS-filsluse/UL-AMG-MiSeq/IMM/Til_Sentrallagring")
         elif project_type == "Microbiology":
             delivery_external_user(task, lims_project, project_path, project.name, "/data/runScratch.boston/mik_data")
         elif project_type == "FHI-Covid19": # Implicitly requires LIMS mode (or we wouldn't have project_type)
