@@ -525,7 +525,7 @@ def main(task):
         elif project_type == "Immunology":
             delivery_external_user(task, lims_project, project_path, project.name, "/data/runScratch.boston/OUS-filsluse/UL-AMG-MiSeq/IMM/Til_Sentrallagring")
         elif project_type == "Microbiology":
-            delivery_external_user(task, lims_project, project_path, project.name, "/data/runScratch.boston/mik_data")
+            delivery_external_user(task, lims_project, project_path, project.name, "/data/runScratch.boston/OUS-filsluse/UL-AMG-MiSeq/MIK/Til_Sentrallagring")
         elif project_type == "FHI-Covid19": # Implicitly requires LIMS mode (or we wouldn't have project_type)
             lims_samples = [s for s in l_samples if s.project == lims_project]
             fhi_mik_seq_delivery(task, project_type, project, lims_project, task.process, lims_samples, project_path, "/data/runScratch.boston/analysis/covid")
