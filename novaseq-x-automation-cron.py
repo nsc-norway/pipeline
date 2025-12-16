@@ -15,10 +15,13 @@ if TEST_MODE:
     NSC_DEMULTIPLEXED_RUNS_PATH.mkdir(exist_ok=True, parents=True)
     MIK_PATH = Path("test/mik")
     MIK_PATH.mkdir(exist_ok=True, parents=True)
+    MIK_FINAL_DESTINATION_PATH = Path("test/mik_final")
+    MIK_FINAL_DESTINATION_PATH.mkdir(exist_ok=True, parents=True)
     INPUT_RUN_PATH = Path(".")
 else:
     NSC_DEMULTIPLEXED_RUNS_PATH = Path("/data/runScratch.boston/demultiplexed")
     MIK_PATH = Path("/data/runScratch.boston/mik_data")
+    MIK_FINAL_DESTINATION_PATH = Path("/data/runScratch.boston/OUS-filsluse/UL-AMG-NovaSeqX/MIK/Til_Sentrallagring")
     INPUT_RUN_PATH = Path("/data/runScratch.boston/NovaSeqX")
 
 
@@ -234,16 +237,26 @@ def dir_name(project_name, run_id):
 def start_human_removal(run_id, project_name, project_samples):
     project_dir = MIK_PATH / dir_name(project_name, run_id)
     script_path = "/data/runScratch.boston/mik_data/human_cleanup_analysis/mik_cleanup_script.sh"
+    job_ids = []
     for sample in project_samples:
         # Start one human removal job per sample
         mik_sample_id = f"{sample['sample_name']}_S{sample['samplesheet_position']}_L{str(sample['lane']).zfill(3)}"
-        subprocess.run(
-            ["sbatch", str(script_path), mik_sample_id],
+        job_ids.append(subprocess.run(
+            ["sbatch", "--parsable", str(script_path), mik_sample_id],
             cwd=project_dir,
-            check=True
-        )
+            check=True,
+            stdout=subprocess.PIPE).stdout.decode().strip())
+
         # The command will fail if job submission fails, but pipeline failures are not fatal here,
         # will be logged in the script logs.
+    
+    # Submit a dependent job to move the project dir into the final destination
+    dependency_list = "afterany:" + ",".join(job_ids)
+    move_script_path = "/data/runScratch.boston/mik_data/human_cleanup_analysis/mv.sh"
+    subprocess.run(
+        ["sbatch", "--dependency=" + dependency_list, str(move_script_path), str(project_dir), str(MIK_FINAL_DESTINATION_PATH)],
+        cwd=project_dir,
+        check=True)
 
 if __name__ == "__main__":
     main()

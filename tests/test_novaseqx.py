@@ -271,21 +271,68 @@ class AutomationCronTest(unittest.TestCase):
         self.run_dir, self.analysis_dir = create_example_run(self.tmpdir, EXAMPLE_YAML_EXTRA_TYPES)
         calls = []
         human_calls = []
+        sbatch_calls = []
         def fake_run(logger, args, **kw):
             calls.append(args)
             return None
         def fake_human(*a, **kw):
             human_calls.append(a)
+        def fake_sbatch(args, **kw):
+            sbatch_calls.append(args)
+            return subprocess.CompletedProcess(args, 0, stdout=b"12345")
         with patch.object(self.ac_mod, "run_subprocess_with_logging", side_effect=fake_run), \
              patch.object(self.ac_mod, "start_nsc_nextflow", return_value="1") as nextflow, \
-             patch.object(self.ac_mod, "start_human_removal", side_effect=fake_human), \
-             patch.object(self.ac_mod.subprocess, "run") as sprun:
-            sprun.return_value = subprocess.CompletedProcess(["sbatch"], 0, stdout=b"1")
+             patch.object(self.ac_mod, "start_human_removal") as human_removal, \
+             patch.object(self.ac_mod.subprocess, "run", side_effect=fake_sbatch) as sprun:
             self.ac_mod.main()
         self.assertTrue(any("novaseq-x-file-mover.py" in c[1] for c in calls))
-        self.assertEqual(len(human_calls), 1)
+        self.assertEqual(human_removal.call_count, 1)
         # Only NSC projects should trigger nextflow
         self.assertEqual(nextflow.call_count, 2)
+        # Verify start_human_removal was called with correct arguments
+        call_args = human_removal.call_args[0]
+        self.assertEqual(call_args[0], "20250502_LH00534_0135_B22LCYYLT4")  # run_id
+        self.assertEqual(call_args[1], "Microbio-2025-04-10")  # project_name
+        self.assertEqual(len(call_args[2]), 1)  # project_samples - one MIK sample
+
+    def test_start_human_removal_captures_job_ids(self):
+        """Test that start_human_removal captures job IDs and submits move job with dependencies"""
+        shutil.rmtree(self.run_dir)
+        self.run_dir, self.analysis_dir = create_example_run(self.tmpdir, EXAMPLE_YAML_EXTRA_TYPES)
+        
+        lims_info = yaml.safe_load(EXAMPLE_YAML_EXTRA_TYPES)
+        mik_samples = [s for s in lims_info['samples'] if s['project_type'] == 'Microbiology']
+        
+        sbatch_calls = []
+        job_counter = [1000]  # Use list to allow modification in nested function
+        
+        def fake_sbatch(args, **kw):
+            sbatch_calls.append((args, kw))
+            job_id = str(job_counter[0])
+            job_counter[0] += 1
+            return subprocess.CompletedProcess(args, 0, stdout=job_id.encode())
+        
+        with patch.object(self.ac_mod.subprocess, "run", side_effect=fake_sbatch):
+            self.ac_mod.start_human_removal(
+                "20250502_LH00534_0135_B22LCYYLT4",
+                "Microbio-2025-04-10",
+                mik_samples
+            )
+        
+        # Should have 1 human removal job + 1 move job
+        self.assertEqual(len(sbatch_calls), 2)
+        
+        # Check first call is human removal with correct sample ID
+        human_removal_call = sbatch_calls[0]
+        self.assertIn("mik_cleanup_script.sh", human_removal_call[0][2])
+        self.assertEqual(human_removal_call[0][3], "MIK-S1_S150_L001")
+        
+        # Check second call is move job with dependency
+        move_call = sbatch_calls[1]
+        self.assertIn("mv.sh", move_call[0][2])
+        self.assertIn("--dependency=afterany:1000", move_call[0])
+        # Verify source and destination paths are included
+        self.assertEqual(len(move_call[0]), 5)  # sbatch, --dependency, mv.sh, src, dest
 
 if __name__ == "__main__":
     unittest.main()
