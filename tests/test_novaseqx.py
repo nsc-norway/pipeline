@@ -190,6 +190,7 @@ def create_example_run(tmpdir: Path, yaml_text: str):
     (interop / "dummy.bin").write_text("bin")
     (run_dir / "RunInfo.xml").write_text("<RunInfo/>")
     (run_dir / "RunParameters.xml").write_text("<RunParameters/>")
+    (run_dir / "CopyComplete.txt").write_text("done")
 
     (analysis_dir / "ClarityLIMSImport_NSC.yaml").write_text(yaml_text)
     return run_dir, analysis_dir
