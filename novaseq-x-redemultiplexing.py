@@ -221,7 +221,7 @@ def run_demultiplexing_dragen(job_name, run_folder_path, samplesheet_path, outpu
 #SBATCH --time=24:00:00
 
 
-/opt/edico/bin/dragen \\
+/opt/dragen/4.4.4/bin/dragen \\
         --bcl-input-directory {run_folder_path} \\
         --ora-reference /staging/projects/p22/reference/hg19/oradata_homo_sapiens \\
         --output-directory {output_folder} \\
