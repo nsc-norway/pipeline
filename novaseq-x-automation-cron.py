@@ -21,7 +21,7 @@ if TEST_MODE:
 else:
     NSC_DEMULTIPLEXED_RUNS_PATH = Path("/data/runScratch.boston/demultiplexed")
     MIK_PATH = Path("/data/runScratch.boston/mik_data")
-    MIK_FINAL_DESTINATION_PATH = Path("/data/runScratch.boston/OUS-filsluse/UL-AMG-NovaSeqX/MIK/Til_Sentrallagring")
+    MIK_FINAL_DESTINATION_PATH = Path("/data/runScratch.boston/OUS-filsluse/UL-AMG-NovaSeqX/MIK/Til_Sentrallagring/prod")
     INPUT_RUN_PATH = Path("/data/runScratch.boston/NovaSeqX")
 
 
